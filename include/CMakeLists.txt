@@ -3,8 +3,8 @@
 # 
 
 SET(${PROJECT_NAME}_HEADERS
-sot-pattern-generator.hh
-sot-pattern-generator-api.hh
+next-step.h
+exception-pg.h
 )
 
 # Recreate correct path for the headers

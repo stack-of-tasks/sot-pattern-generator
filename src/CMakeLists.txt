@@ -2,7 +2,6 @@
 #  Copyright 
 # 
 
-SET(LIBRARY_NAME ${PROJECT_NAME})
 
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include)
 
@@ -23,26 +22,9 @@ LINK_DIRECTORIES(${HRP2DYNAMICS_LIBRARY_DIRS})
 # provide path to library libsot-core.so
 LINK_DIRECTORIES(${SOT_CORE_LIBRARY_DIRS})
 
-ADD_LIBRARY(${LIBRARY_NAME} 
-  SHARED
-  sot-pattern-generator.cc)
-
-SET_TARGET_PROPERTIES(${LIBRARY_NAME} 
-  PROPERTIES 
-  SOVERSION ${PROJECT_VERSION}
-  INSTALL_RPATH lib)
-
-SET_TARGET_PROPERTIES(${PROJECT_NAME_LIB}
-  PROPERTIES
-  COMPILE_FLAGS ${${PROJECT_NAME}_src_CXXFLAGS}
-  LINK_FLAGS ${${PROJECT_NAME}_src_LDFLAGS}
-)
-
 # Add walkGenJrl compilation flags and link to library libwalkGenJrl.so
 ADD_DEFINITIONS(${WALKGENJRL_CFLAGS})
-IF(UNIX)
-TARGET_LINK_LIBRARIES(${LIBRARY_NAME} ${WALKGENJRL_LIBRARIES})
-ENDIF(UNIX)
+
 
 IF(WIN32)
 foreach(dlink ${WALKGENJRL_LDFLAGS})
@@ -52,9 +34,7 @@ ENDIF(WIN32)
 
 # Add dynamicsJRLJapan compilation flags and link to library libdynamicsJRLJapan.so
 ADD_DEFINITIONS(${DYNAMICSJRLJAPAN_CFLAGS})
-IF(UNIX)
-TARGET_LINK_LIBRARIES(${LIBRARY_NAME} ${DYNAMICSJRLJAPAN_LIBRARIES})
-ENDIF(UNIX)
+
 
 IF(WIN32)
 foreach(dlink ${DYNAMICSJRLJAPAN_LDFLAGS})
@@ -64,9 +44,7 @@ ENDIF(WIN32)
 
 # Add hrp2Dynamics compilation flags and link to library libhrp2Dynamics.so
 ADD_DEFINITIONS(${HRP2DYNAMICS_CFLAGS})
-IF(UNIX)
-TARGET_LINK_LIBRARIES(${LIBRARY_NAME} ${HRP2DYNAMICS_LIBRARIES})
-ENDIF(UNIX)
+
 
 IF(WIN32)
 foreach(dlink ${HRP2DYNAMICS_LDFLAGS})
@@ -76,9 +54,7 @@ ENDIF(WIN32)
 
 # Add sot-core compilation flags and link to library libsot-core.so
 ADD_DEFINITIONS(${SOT_CORE_CFLAGS})
-IF(UNIX)
-TARGET_LINK_LIBRARIES(${LIBRARY_NAME} ${SOT_CORE_LIBRARIES})
-ENDIF(UNIX)
+
 
 IF(WIN32)
 foreach(dlink ${SOT_CORE_LDFLAGS})
@@ -86,10 +62,65 @@ foreach(dlink ${SOT_CORE_LDFLAGS})
 endforeach(dlink)
 ENDIF(WIN32)
 
-SET_TARGET_PROPERTIES(${LIBRARY_NAME}
-  PROPERTIES
-  LINK_FLAGS "${${PROJECT_NAME}_src_LDFLAGS}"
+
+
+SET(LIBRARY_NAME ${PROJECT_NAME})
+
+
+# dependent on nothing
+SET(plugins_0
+	sotWhichFootUpper
+    sotSelector
+    sotNextStep
+    sotStepChecker
+	sotStepQueue
+	sotStepComputerPos
+	sotStepComputerForce
+	sotStepComputerJoystick
+	sotStepObserver
+# dependent on walkgenjrl
+	sotNextStepPgSot
+	sotPGManager
+	sotStepTimeLine
+# all dependencies
+	sotPatternGenerator
 )
 
-INSTALL(TARGETS ${LIBRARY_NAME}
-  DESTINATION lib)
+SET(plugins
+	next-step)
+	
+SET(plugins_common_deps
+	exception-pg.cpp)
+
+FOREACH(LIBRARY_NAME ${plugins})
+	ADD_LIBRARY(${LIBRARY_NAME} 
+	  SHARED
+	  ${LIBRARY_NAME}.cpp
+	  ${plugins_common_deps})
+	
+	SET_TARGET_PROPERTIES(${LIBRARY_NAME} 
+	  PROPERTIES 
+	  SOVERSION ${PROJECT_VERSION}
+	  INSTALL_RPATH lib)
+	
+	SET_TARGET_PROPERTIES(${LIBRARY_NAME}
+	  PROPERTIES
+	  COMPILE_FLAGS "${${PROJECT_NAME}_src_CXXFLAGS}"
+	  LINK_FLAGS "${${PROJECT_NAME}_src_LDFLAGS}"
+	)
+	
+	IF(UNIX)
+		TARGET_LINK_LIBRARIES(${LIBRARY_NAME} ${WALKGENJRL_LIBRARIES})
+		TARGET_LINK_LIBRARIES(${LIBRARY_NAME} ${DYNAMICSJRLJAPAN_LIBRARIES})
+		TARGET_LINK_LIBRARIES(${LIBRARY_NAME} ${HRP2DYNAMICS_LIBRARIES})
+		TARGET_LINK_LIBRARIES(${LIBRARY_NAME} ${SOT_CORE_LIBRARIES})
+	ENDIF(UNIX)
+	
+	SET_TARGET_PROPERTIES(${LIBRARY_NAME}
+	  PROPERTIES
+	  LINK_FLAGS "${${PROJECT_NAME}_src_LDFLAGS}"
+	)
+	
+	INSTALL(TARGETS ${LIBRARY_NAME}
+	  DESTINATION lib)  
+ENDFOREACH(LIBRARY_NAME)

@@ -1,0 +1,109 @@
+/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ * Copyright Projet JRL-Japan, 2007
+ *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ *
+ * File:      NextStep.h
+ * Project:   SOT
+ * Author:    Nicolas Mansard
+ *
+ * Version control
+ * ===============
+ *
+ *  $Id$
+ *
+ * Description
+ * ============
+ *
+ *
+ * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+
+
+
+#ifndef __SOT_NextStep_OHRP_H__
+#define __SOT_NextStep_OHRP_H__
+
+/* --------------------------------------------------------------------- */
+/* --- INCLUDE --------------------------------------------------------- */
+/* --------------------------------------------------------------------- */
+
+/* Matrix */
+#include <MatrixAbstractLayer/boost.h>
+namespace ml = maal::boost;
+
+/* SOT */
+#include <sot/NextStep.h>
+#include <sot/sotPatternGenerator.h>
+
+/* STD */
+#include <string>
+#include <deque>
+
+/* --------------------------------------------------------------------- */
+/* --- API ------------------------------------------------------------- */
+/* --------------------------------------------------------------------- */
+
+#if defined (WIN32) 
+#  if defined (NextStepPgSot_EXPORTS) 
+#    define NextStepPGSOT_EXPORT __declspec(dllexport)
+#  else  
+#    define NextStepPGSOT_EXPORT __declspec(dllimport)
+#  endif 
+#else
+#  define NextStepPGSOT_EXPORT
+#endif
+
+/* --------------------------------------------------------------------- */
+/* --- CLASS ----------------------------------------------------------- */
+/* --------------------------------------------------------------------- */
+
+
+class NextStepPGSOT_EXPORT NextStepPgSot
+:public NextStep
+{
+ public:
+  static const std::string CLASS_NAME;
+  static const unsigned int ADDING_STEP=0;
+  static const unsigned int CHANGING_STEP=1;
+
+  virtual const std::string& getClassName( void ) const { return CLASS_NAME; }
+
+ protected:
+
+  typedef std::pair<unsigned int, PatternGeneratorJRL::FootAbsolutePosition> FootPrint_t;
+  std::vector<FootPrint_t> stepbuf;
+
+  dg::Entity * pgdg::Entity;
+  unsigned int m_StepModificationMode;
+  double m_NextStepTime;
+  unsigned int m_NbOfFirstSteps;
+
+  /*! \brief Pointer towards the interface of the pattern generator. */
+  pg::PatternGeneratorInterface * m_PGI;
+
+  /*! \brief Pointer towards the entity which handle the pattern generator. */
+  sotPatternGenerator * m_sPG;
+
+ public: /* --- CONSTRUCTION --- */
+  NextStepPgSot( const std::string& name );
+  virtual ~NextStepPgSot( void ) {} 
+
+
+ public: /* --- FUNCTIONS --- */
+
+  virtual void starter( const int & timeCurr );
+  virtual void stoper( const int & timeCurr );
+  virtual void introductionCallBack( const int & timeCurr );
+
+ public: /* --- ENTITY INHERITANCE --- */
+  virtual void commandLine( const std::string& cmdLine,
+			    std::istringstream& cmdArgs,
+			    std::ostream& os );
+
+};
+
+
+
+
+
+#endif // #ifndef __SOT_NextStep_OHRP_H__
+

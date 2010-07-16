@@ -1,0 +1,508 @@
+/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ * Copyright Projet JRL-Japan, 2008
+ *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ *
+ * File:      sotDynamic.h
+ * Project:   SOT
+ * Author:    Olivier Stasse
+ *
+ * Version control
+ * ===============
+ *
+ *  $Id$
+ *
+ * Description
+ * ============
+ *
+ *
+ * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+
+
+
+#ifndef __SOT_PATTERN_GENERATOR_H__
+#define __SOT_PATTERN_GENERATOR_H__
+
+/* --------------------------------------------------------------------- */
+/* --- INCLUDE --------------------------------------------------------- */
+/* --------------------------------------------------------------------- */
+
+/* STD */
+#include <string>
+
+/* SOT */
+
+#include <sot/sotFlags.h>
+#include <dynamic-graph/entity.h>
+#include <sot/sotPool.h>
+#include <dynamic-graph/signal-ptr.h>
+#include <dynamic-graph/signal-time-dependent.h>
+#include <sot/sotExceptionPatternGenerator.h>
+#include <sot-core/matrix-homogeneous.h>
+
+/* Pattern Generator */
+#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+#include <walkGenJrl/PatternGeneratorInterface.h>
+namespace pg=PatternGeneratorJRL;
+
+/* --------------------------------------------------------------------- */
+/* --- API ------------------------------------------------------------- */
+/* --------------------------------------------------------------------- */
+
+#if defined (WIN32) 
+#  if defined (sotPatternGenerator_EXPORTS) 
+#    define SOTPATTERNGENERATOR_EXPORT __declspec(dllexport)
+#  else  
+#    define SOTPATTERNGENERATOR_EXPORT __declspec(dllimport)
+#  endif 
+#else
+#  define SOTPATTERNGENERATOR_EXPORT
+#endif
+
+/* --------------------------------------------------------------------- */
+/* --- CLASS ----------------------------------------------------------- */
+/* --------------------------------------------------------------------- */
+
+/*! @ingroup tasks
+
+\brief This class provides dynamically stable CoM, ZMP, feet trajectories.
+It wraps up the algorithms implemented by the walkGenJRL library.
+
+
+
+ */
+class SOTPATTERNGENERATOR_EXPORT sotPatternGenerator
+:public dg::Entity
+{
+ public:
+
+  /*! \name Some constant to define the type
+    of frame reference. 
+    @{
+  */
+  /*! \brief Specify that the frame is expressed  in
+    the world reference frame. */
+  static const int WORLD_FRAME=0;
+
+  /*! \brief Specify that the frame is expressed in
+   the robot ego centered frame. */
+  static const int EGOCENTERED_FRAME = 1;
+
+  /*! \brief Specify that the frame is expressed in
+   the left foot centered frame. */
+  static const int LEFT_FOOT_CENTERED_FRAME = 2;
+
+  /*! \brief Specify that the frame is expressed in
+   the waist centered frame. */
+  static const int WAIST_CENTERED_FRAME = 3;
+
+
+  /*! @} */
+  
+  /*! Class name */
+ protected:
+  /*! \brief The class name */
+  static const std::string CLASS_NAME;
+
+ public:
+  virtual const std::string & getClassName(void) const { return CLASS_NAME; }
+
+ protected:
+  
+  /*! \brief Pointer towards the interface of the pattern generator. */
+  pg::PatternGeneratorInterface * m_PGI;
+
+  /*! \name Fields to store name and positions of data files 
+    @{
+   */
+  /*! \brief Some information related to the preview control. */
+  std::string m_PreviewControlParametersFile;
+
+  /*! \brief Directory where the VRML file of the robot's model is located. */
+  std::string m_vrmlDirectory;
+
+  /*! \brief Name of the VRML file which containes the robot's model. */
+  std::string m_vrmlMainFile;
+
+  /*! \brief Name of the XML file which contains humanoid specific informations. */
+  std::string m_xmlSpecificitiesFile;
+
+  /*! \brief Name of the XML file which specificies the rank of the Joints in the state vector. */
+  std::string m_xmlRankFile;
+  /*! @} */
+
+  /*! \brief Boolean variable to initialize the object by loading an object. */
+  bool m_init;
+
+  /*! \brief Boolean variable to initialize the position:
+    first through the real state of the robot, then through the motor command. */
+  bool m_InitPositionByRealState;
+
+  /*! \brief Integer for the support foot. */
+  int m_SupportFoot;
+  
+  /*! \brief Keep the frame reference */
+  int m_ReferenceFrame;
+
+  /*! \brief Distance between ankle and soil */
+  double m_AnkleSoilDistance;
+
+  /*! \brief Time step */
+  double m_TimeStep;
+
+  /*! \brief Double support phase detected. */
+  bool m_DoubleSupportPhaseState;
+  int m_DSStartingTime;
+
+  /*! \brief iteration time. */
+  unsigned int m_LocalTime;
+
+ public: /* --- CONSTRUCTION --- */
+  
+  /*! \brief Default constructor. */
+  sotPatternGenerator( const std::string& name = "PatternGenerator" );
+  /*! \brief Default destructor. */
+  virtual ~sotPatternGenerator( void );
+
+ public: /* --- MODEL CREATION --- */
+ 
+  /*! \name Methods related to the data files. 
+    @{
+   */
+  
+  /*! \brief Build the pattern generator interface. */
+  bool buildModel( void );
+
+  /*! \brief Initialize the state of the robot. */
+  bool InitState( void );
+
+  /*! \brief Set the directory which contains the parameters for the preview control. */
+  void setPreviewControlParametersFile( const std::string& filename );
+
+  /*! \brief Set the directory which contains the VRML files robot's model. */
+  void setVrmlDirectory( const std::string& filename );
+
+  /*! \brief Set the name of the VRML file. */
+  void setVrmlMainFile( const std::string& filename );
+
+  /*! \brief Set the name of the file specifying a semantic to the joints.
+   More precisely this file describes which joints are the hands, feet.
+  For more information please see the documentation of walkGenJRL. */
+  void setXmlSpecificitiesFile( const std::string& filename );
+
+  /*! \brief Set the name of the file specifying the rank of the joints in the state vector. */
+  void setXmlRankFile( const std::string& filename );
+
+  /*! \brief Set the name of the file specifying the control parameters
+    of the preview control. */
+  void setParamPreviewFile(const std::string &filename);
+
+  /*! \brief Give access directly to the pattern generator... 
+   You really have to know what your are doing. */
+  pg::PatternGeneratorInterface * GetPatternGeneratorInterface()
+    { return m_PGI;};
+
+  /*! @} */
+
+ public: /* --- SIGNALS --- */
+
+  typedef int Dummy;
+
+  /*! \name Internal signals. 
+    @{
+   */
+
+  /*! \brief Internal signal for initialization and one shot signals. */
+  dg::SignalTimeDependent<Dummy,int> firstSINTERN;
+
+  /*! \brief Internal signal to trigger one step of the algorithm. */
+  dg::SignalTimeDependent<Dummy,int> OneStepOfControlS;
+
+  /*! @} */
+  
+ protected:
+
+  /*! \name Internal methods to access reference trajectories. 
+    @{
+   */
+  /*! \brief Internal method to get the reference ZMP at a given time. */
+  ml::Vector & getZMPRef(ml::Vector & res, int time);
+
+  /*! \brief Internal method to get the reference CoM at a given time.*/
+  ml::Vector & getCoMRef(ml::Vector & res, int time);
+
+  /*! \brief Internal method to get the reference dCoM at a given time.*/
+  ml::Vector & getdCoMRef(ml::Vector & res, int time);
+
+  /*! \brief Internal method to get the position of the left foot. */
+  MatrixHomogeneous & getLeftFootRef(MatrixHomogeneous &res, int time);
+
+  /*! \brief Internal method to get the position of the right foot. */
+  MatrixHomogeneous & getRightFootRef(MatrixHomogeneous &res, int time);
+
+  /*! \brief Internal method to get the derivative of the left foot. */
+  MatrixHomogeneous & getdotLeftFootRef(MatrixHomogeneous &res, int time);
+
+  /*! \brief Internal method to get the derivative of the right foot. */
+  MatrixHomogeneous & getdotRightFootRef(MatrixHomogeneous &res, int time);
+
+  /*! \brief Internal method to get the position of the flying foot. */
+  MatrixHomogeneous & getFlyingFootRef(MatrixHomogeneous &res, int time);
+
+  /*! \brief Internal method to get the joint position for walking. */
+  ml::Vector & getjointWalkingErrorPosition(ml::Vector &res, int time);
+
+  /*! \brief Internal method to get the attitude of the waist. */
+  VectorRollPitchYaw & getWaistAttitude(VectorRollPitchYaw &res, int time);
+
+  /*! \brief Internal method to get the absolute attitude of the waist. */
+  VectorRollPitchYaw & getWaistAttitudeAbsolute(VectorRollPitchYaw &res, int time);
+
+  /*! \brief Internal method to get the dataInPorcess flag */
+  unsigned & getDataInProcess(unsigned &res, int time);
+
+  /*! \brief Internal method to get the position of the waist. */
+  ml::Vector & getWaistPosition(ml::Vector &res, int time);
+
+  /*! \brief Internal method to get the absolute position of the waist. */
+  ml::Vector & getWaistPositionAbsolute(ml::Vector &res, int time);
+
+  /*! @} */
+
+  /*! \brief Getting the current support foot: 1 Left -1 Right. */
+  unsigned int & getSupportFoot(unsigned int &res, int time);
+  
+  /*! \brief Trigger the initialization of the algorithm */
+  int & InitOneStepOfControl(int &dummy, int time);
+  /*! \brief Trigger one step of the algorithm. */
+  int & OneStepOfControl(int &dummy, int time);
+
+  /*! \name Keep information computed once for each time. 
+    @{
+   */
+
+  /*! \brief Rigit motion between two waist positions 
+    at the  beginning of the walking and at the end of the walking. */
+  MatrixHomogeneous m_k_Waist_kp1;
+
+  /*! \brief Absolute Position for the left and right feet. */
+  MatrixHomogeneous m_LeftFootPosition,m_RightFootPosition;
+
+  /*! \brief Absolute Derivate for the left and right feet. */
+  MatrixHomogeneous m_dotLeftFootPosition,m_dotRightFootPosition;
+
+  /*! \brief Initial Absolute Starting Position for the left and right feet. */
+  MatrixHomogeneous m_InitLeftFootPosition,m_InitRightFootPosition;
+
+  /*! \brief Keep track of the motion between sequence of motions. */
+  MatrixHomogeneous m_MotionSinceInstanciationToThisSequence;
+
+  /*! \brief Relative Position of the flying foot. */
+  MatrixHomogeneous m_FlyingFootPosition;
+
+  /*! \brief Absolute position of the reference ZMP. */
+  ml::Vector m_ZMPRefPos;
+
+  /*! \brief Absolute position of the reference CoM. */
+  ml::Vector m_COMRefPos;
+
+  /*! \brief Absolute position of the reference dCoM. */
+  ml::Vector m_dCOMRefPos;
+
+  /*! \brief Initial Absolute position of the reference ZMP. */
+  ml::Vector m_InitZMPRefPos;
+
+  /*! \brief Initial Absolute position and attitude of the reference Waist. */
+  ml::Vector m_InitWaistRefPos, m_InitWaistRefAtt;
+
+  /*! \brief Initial Absolute position of the reference CoM. */
+  ml::Vector m_InitCOMRefPos;
+
+  /*! \brief Waist position */
+  ml::Vector m_WaistPosition;
+
+  /*! \brief Waist position Absolute */
+  ml::Vector m_WaistPositionAbsolute;
+
+  /*! \brief Waist Attitude */
+  ml::Vector m_WaistAttitude;
+
+  /*! \brief Waist Attitude Absolute */
+  ml::Vector m_WaistAttitudeAbsolute;
+
+  /*! \brief Joint values for walking. */
+  ml::Vector m_JointErrorValuesForWalking;
+
+  /*! \brief Velocity reference for Herdt's PG */
+  ml::Vector m_VelocityReference;
+  /*! \brief true iff the pattern if dealing with data, false if pg is not 
+   * working anymore/yet. */
+  unsigned int m_dataInProcess;
+
+  /*! @} */
+
+  /*! Parsing a file of command by the walking pattern generator interface.
+    \par[in] The command line (optional option)
+    \par[in] 
+    
+   */
+  void ParseCmdFile(std::istringstream &cmdArg,
+		    std::ostream &os);
+
+  /*! \brief Transfert from a current absolute foot position
+    to a dot homogeneous matrix. */
+  void FromAbsoluteFootPosToDotHomogeneous(pg::FootAbsolutePosition aFootPosition,
+					   MatrixHomogeneous &aFootMH,
+					   MatrixHomogeneous &adotFootMH);
+
+
+  /*! \brief Transfert from a current absolute foot position
+    to a homogeneous matrix. */
+  void FromAbsoluteFootPosToHomogeneous(pg::FootAbsolutePosition aFootPosition,
+					MatrixHomogeneous &aFootMH);
+
+
+  /*! \brief Provide an homogeneous matrix from the current waist position
+   and attitude*/
+  void getAbsoluteWaistPosAttHomogeneousMatrix(MatrixHomogeneous &aWaistMH);
+
+
+  /*! \brief Internal method to get the initial reference ZMP at a given time. */
+  ml::Vector & getInitZMPRef(ml::Vector & res, int time);
+
+  /*! \brief Internal method to get the initial reference CoM at a given time.*/
+  ml::Vector & getInitCoMRef(ml::Vector & res, int time);
+
+  /*! \brief Internal method to get the initial reference CoM at a given time.*/
+  ml::Vector & getInitWaistPosRef(ml::Vector & res, int time);
+
+  /*! \brief Internal method to get the initial reference CoM at a given time.*/
+  VectorRollPitchYaw & getInitWaistAttRef(VectorRollPitchYaw & res, int time);
+
+  /*! \brief Internal method to get the position of the left foot. */
+  MatrixHomogeneous & getInitLeftFootRef(MatrixHomogeneous &res, int time);
+
+  /*! \brief Internal method to get the position of the right foot. */
+  MatrixHomogeneous & getInitRightFootRef(MatrixHomogeneous &res, int time);
+  
+  
+ public:
+
+  /*! \name External signals 
+    @{
+   */
+  /*! \brief Real state position values. */
+  dg::SignalPtr<ml::Vector,int> jointPositionSIN;
+
+  /*! \brief Motor control joint position values. */
+  dg::SignalPtr<ml::Vector,int> motorControlJointPositionSIN;
+
+  /*! \brief Previous ZMP value (ZMP send by the preceding controller). */
+  dg::SignalPtr<ml::Vector,int> ZMPPreviousControllerSIN;
+
+  /*! \brief Externalize the ZMP reference . */
+  dg::SignalTimeDependent<ml::Vector,int> ZMPRefSOUT;
+
+  /*! \brief Externalize the CoM reference. */
+  dg::SignalTimeDependent<ml::Vector,int> CoMRefSOUT;
+
+  /*! \brief Externalize the CoM reference. */
+  dg::SignalTimeDependent<ml::Vector,int> dCoMRefSOUT;
+
+  /*! \brief Take the current CoM. */
+  dg::SignalPtr<ml::Vector,int> comSIN;
+
+  /*! \brief Take the current desired velocity. */
+  dg::SignalPtr<ml::Vector,int> velocitydesSIN;
+  
+  /*! \brief Take the current left foot homogeneous position. */
+  dg::SignalPtr<MatrixHomogeneous,int> LeftFootCurrentPosSIN;
+
+  /*! \brief Take the current right foot homogeneous position. */
+  dg::SignalPtr<MatrixHomogeneous,int> RightFootCurrentPosSIN;
+
+  /*! \brief Externalize the left foot position reference. */
+  dg::SignalTimeDependent<MatrixHomogeneous,int> LeftFootRefSOUT;
+  
+  /*! \brief Externalize the right foot position reference. */
+  dg::SignalTimeDependent<MatrixHomogeneous,int> RightFootRefSOUT;
+
+  /*! \brief Externalize the left foot position reference. */
+  dg::SignalTimeDependent<MatrixHomogeneous,int> dotLeftFootRefSOUT;
+  
+  /*! \brief Externalize the right foot position reference. */
+  dg::SignalTimeDependent<MatrixHomogeneous,int> dotRightFootRefSOUT;
+
+  /*! \brief Externalize the foot which is not considered as support foot,
+    the information are given in a relative referentiel. */
+  dg::SignalTimeDependent<MatrixHomogeneous,int> FlyingFootRefSOUT;
+
+  /*! \brief Externalize the support foot. */
+  dg::SignalTimeDependent<unsigned int,int> SupportFootSOUT;
+
+  /*! \brief Externalize the joint values for walking. */
+  dg::SignalTimeDependent<ml::Vector,int> jointWalkingErrorPositionSOUT;
+
+  /*! \brief Externalize the waist attitude. */
+  dg::SignalTimeDependent<VectorRollPitchYaw,int> waistattitudeSOUT;
+
+/*! \brief Externalize the absolute waist attitude. */
+  dg::SignalTimeDependent<VectorRollPitchYaw,int> waistattitudeabsoluteSOUT;
+
+  /*! \brief Externalize the waist position. */
+  dg::SignalTimeDependent<ml::Vector,int> waistpositionSOUT;
+  
+  /*! \brief Externalize the absolute waist position. */
+  dg::SignalTimeDependent<ml::Vector,int> waistpositionabsoluteSOUT;
+
+  /*! \brief true iff PG is processing. Use it for synchronize. */
+  dg::SignalTimeDependent<unsigned int,int> dataInProcessSOUT;
+
+  /*! \brief Externalize the initial ZMP reference . */
+  dg::SignalTimeDependent<ml::Vector,int> InitZMPRefSOUT;
+
+  /*! \brief Externalize the initial CoM reference. */
+  dg::SignalTimeDependent<ml::Vector,int> InitCoMRefSOUT;
+
+  /*! \brief Externalize the initial Waist reference. */
+  dg::SignalTimeDependent<ml::Vector,int> InitWaistPosRefSOUT;
+
+  /*! \brief Externalize the initial Waist reference. */
+  dg::SignalTimeDependent<VectorRollPitchYaw,int> InitWaistAttRefSOUT;
+
+  /*! \brief Externalize the left foot position reference. */
+  dg::SignalTimeDependent<MatrixHomogeneous,int> InitLeftFootRefSOUT;
+  
+  /*! \brief Externalize the right foot position reference. */
+  dg::SignalTimeDependent<MatrixHomogeneous,int> InitRightFootRefSOUT;
+
+  /*! @} */
+
+  /*! \name Reimplement the interface of the plugin. 
+    @{
+   */
+  
+  
+  
+  /*! @} */
+ protected:
+
+
+  /*! Storing the previous ZMP value. */
+  MAL_VECTOR(,double) m_ZMPPrevious;
+
+ public: /* --- PARAMS --- */
+  /*! \brief This method pass on to the Pattern Generator Interface to interpret the commands.
+   */
+  virtual void commandLine( const std::string& cmdLine,
+			    std::istringstream& cmdArgs,
+			    std::ostream& os );
+    
+
+};
+
+
+
+
+
+#endif // #ifndef __SOT_PATTERN_GENERATOR_H__
+

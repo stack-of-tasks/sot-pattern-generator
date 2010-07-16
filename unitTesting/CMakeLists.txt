@@ -19,14 +19,13 @@ LINK_DIRECTORIES(${HRP2DYNAMICS_LIBRARY_DIRS})
 LINK_DIRECTORIES(${SOT_CORE_LIBRARY_DIRS})
 
 ADD_EXECUTABLE(${EXECUTABLE_NAME}
-  main.cc
-  sot-pattern-generator-test.cc)
+  main.cc)
 
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include)
 
 LINK_DIRECTORIES(${${PROJECT_NAME}_BINARY_DIR}/src)
 TARGET_LINK_LIBRARIES(${EXECUTABLE_NAME}
-  sot-pattern-generator)
+  next-step)
 
 # Add walkGenJrl compilation flags and link to library libwalkGenJrl.so
 ADD_DEFINITIONS(${WALKGENJRL_CFLAGS})

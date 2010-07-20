@@ -31,13 +31,15 @@
 
 /* SOT */
 
-#include <sot/sotFlags.h>
+#include <sot-core/flags.h>
 #include <dynamic-graph/entity.h>
-#include <sot/sotPool.h>
+#include <dynamic-graph/pool.h>
 #include <dynamic-graph/signal-ptr.h>
 #include <dynamic-graph/signal-time-dependent.h>
-#include <sot/sotExceptionPatternGenerator.h>
+#include <sot-pattern-generator/exception-pg.h>
 #include <sot-core/matrix-homogeneous.h>
+#include <sot-core/vector-roll-pitch-yaw.h>
+#include <sot-core/matrix-rotation.h>
 
 /* Pattern Generator */
 #include <MatrixAbstractLayer/MatrixAbstractLayer.h>
@@ -49,7 +51,7 @@ namespace pg=PatternGeneratorJRL;
 /* --------------------------------------------------------------------- */
 
 #if defined (WIN32) 
-#  if defined (sotPatternGenerator_EXPORTS) 
+#  if defined (sot_pg_EXPORTS)
 #    define SOTPATTERNGENERATOR_EXPORT __declspec(dllexport)
 #  else  
 #    define SOTPATTERNGENERATOR_EXPORT __declspec(dllimport)
@@ -57,6 +59,9 @@ namespace pg=PatternGeneratorJRL;
 #else
 #  define SOTPATTERNGENERATOR_EXPORT
 #endif
+
+namespace sot {
+namespace dg = dynamicgraph;
 
 /* --------------------------------------------------------------------- */
 /* --- CLASS ----------------------------------------------------------- */
@@ -502,6 +507,9 @@ class SOTPATTERNGENERATOR_EXPORT sotPatternGenerator
 
 
 
+
+
+} // namespace sot
 
 
 #endif // #ifndef __SOT_PATTERN_GENERATOR_H__

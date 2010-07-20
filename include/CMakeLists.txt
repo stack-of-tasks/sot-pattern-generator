@@ -5,6 +5,8 @@
 SET(${PROJECT_NAME}_HEADERS
 next-step.h
 exception-pg.h
+next-step-pg-sot.h
+pg.h
 )
 
 # Recreate correct path for the headers

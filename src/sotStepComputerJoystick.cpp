@@ -29,15 +29,15 @@
 #endif /*WIN32*/
 
 #include <sot/sotStepComputerJoystick.h>
-#include <sot/sotDebug.h>
+#include <sot-core/debug.h>
 #include <sot/sotMacrosSignal.h>
-#include <sot/sotExceptionPatternGenerator.h>
+#include <sot-pattern-generator/exception-pg.h>
 #include <sot/sotStepQueue.h>
 #include <sot/sotStepChecker.h>
-#include <sot/sotFactory.h>
+#include <dynamic-graph/factory.h>
 
 
-SOT_FACTORY_ENTITY_PLUGIN(sotStepComputerJoystick,"StepComputerJoystick");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(sotStepComputerJoystick,"StepComputerJoystick");
 
 
 sotStepComputerJoystick::sotStepComputerJoystick( const std::string & name )

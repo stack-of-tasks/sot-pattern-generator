@@ -31,8 +31,8 @@
 namespace ml = maal::boost;
 
 /* SOT */
-#include <sot/NextStep.h>
-#include <sot/sotPatternGenerator.h>
+#include <sot-pattern-generator/next-step.h>
+#include <sot-pattern-generator/pg.h>
 
 /* STD */
 #include <string>
@@ -56,6 +56,8 @@ namespace ml = maal::boost;
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
+namespace sot {
+namespace dg = dynamicgraph;
 
 class NextStepPGSOT_EXPORT NextStepPgSot
 :public NextStep
@@ -72,7 +74,7 @@ class NextStepPGSOT_EXPORT NextStepPgSot
   typedef std::pair<unsigned int, PatternGeneratorJRL::FootAbsolutePosition> FootPrint_t;
   std::vector<FootPrint_t> stepbuf;
 
-  dg::Entity * pgdg::Entity;
+  dg::Entity * pgEntity;
   unsigned int m_StepModificationMode;
   double m_NextStepTime;
   unsigned int m_NbOfFirstSteps;
@@ -102,7 +104,7 @@ class NextStepPGSOT_EXPORT NextStepPgSot
 };
 
 
-
+} // namespace sot
 
 
 #endif // #ifndef __SOT_NextStep_OHRP_H__

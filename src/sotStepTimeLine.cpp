@@ -22,12 +22,12 @@
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 #include <sot/sotStepTimeLine.h>
-#include <sot/sotDebug.h>
-#include <sot/sotFactory.h>
-#include <sot/sotPool.h>
+#include <sot-core/debug.h>
+#include <dynamic-graph/factory.h>
+#include <dynamic-graph/pool.h>
 
 
-SOT_FACTORY_ENTITY_PLUGIN(sotStepTimeLine,"TimeLine");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(sotStepTimeLine,"TimeLine");
 
 
 const unsigned int sotStepTimeLine::PERIOD_DEFAULT = 160; // 160iter=800ms
@@ -135,7 +135,7 @@ void sotStepTimeLine::commandLine( const std::string& cmdLine,
     std::string name = "stepcomp";
     cmdArgs >> std::ws;
     if( cmdArgs.good()){ cmdArgs >> name; }
-    Entity* entity = &sotPool.getEntity( name );
+    Entity* entity = &g_pool.getEntity( name );
     stepComputer = dynamic_cast<sotStepComputer*>(entity);
   }
   else if( cmdLine == "setQueue" )
@@ -143,7 +143,7 @@ void sotStepTimeLine::commandLine( const std::string& cmdLine,
     std::string name = "stepqueue";
     cmdArgs >> std::ws;
     if( cmdArgs.good()){ cmdArgs >> name; }
-    Entity* entity = &sotPool.getEntity( name );
+    Entity* entity = &g_pool.getEntity( name );
     stepQueue = dynamic_cast<sotStepQueue*>(entity);
   }
   else if( cmdLine == "setPGManager" )
@@ -151,7 +151,7 @@ void sotStepTimeLine::commandLine( const std::string& cmdLine,
     std::string name = "steppg";
     cmdArgs >> std::ws;
     if( cmdArgs.good()){ cmdArgs >> name; }
-    Entity* entity = &sotPool.getEntity( name );
+    Entity* entity = &g_pool.getEntity( name );
     pgManager = dynamic_cast<sotPGManager*>(entity);
   }
   else if( cmdLine == "state" ) 

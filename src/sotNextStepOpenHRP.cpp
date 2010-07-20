@@ -20,13 +20,13 @@
 #include "NextStepOpenHRP.h"
 #include "StackOfTasks.h"
 
-#include <sot/sotDebug.h>
-#include <sot/sotFactory.h>
+#include <sot-core/debug.h>
+#include <dynamic-graph/factory.h>
 #include <sot/sotMacrosSignal.h>
-#include <sot/sotExceptionPatternGenerator.h>
-#include <sot/sotPool.h>
+#include <sot-pattern-generator/exception-pg.h>
+#include <dynamic-graph/pool.h>
 
-SOT_FACTORY_ENTITY_PLUGIN(NextStepOpenHRP,"NextStepOpenHRP");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(NextStepOpenHRP,"NextStepOpenHRP");
  
 
 /* --- CONSTRUCT ------------------------------------------------------------- */
@@ -39,7 +39,7 @@ NextStepOpenHRP( const std::string & name )
 {
   sotDEBUGIN(5);
 
-  Entity & ohrp = sotPool.getEntity( "OpenHRP" );
+  Entity & ohrp = g_pool.getEntity( "OpenHRP" );
   sot_ptr = dynamic_cast< StackOfTasks* > (&ohrp);
   if(! sot_ptr ) { sotERROR << "SOT plugin not found." << std::endl; }
 

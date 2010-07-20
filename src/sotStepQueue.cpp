@@ -20,11 +20,11 @@
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 #include <sot/sotStepQueue.h>
-#include <sot/sotDebug.h>
-#include <sot/sotFactory.h>
+#include <sot-core/debug.h>
+#include <dynamic-graph/factory.h>
 
 
-SOT_FACTORY_ENTITY_PLUGIN(sotStepQueue,"StepQueue");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(sotStepQueue,"StepQueue");
 
 
 sotFootPrint::sotFootPrint()

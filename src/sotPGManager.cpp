@@ -19,12 +19,12 @@
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 #include <sot/sotPGManager.h>
-#include <sot/sotDebug.h>
+#include <sot-core/debug.h>
 #include <sot/sotPatternGenerator.h>
-#include <sot/sotFactory.h>
+#include <dynamic-graph/factory.h>
 
 
-SOT_FACTORY_ENTITY_PLUGIN(sotPGManager,"PGManager");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(sotPGManager,"PGManager");
 
 
 sotPGManager::sotPGManager( const std::string& name )
@@ -131,7 +131,7 @@ void sotPGManager::commandLine( const std::string& cmdLine,
     std::string name = "pg";
     cmdArgs >> std::ws;
     if( cmdArgs.good()){ cmdArgs >> name; }
-    pgEntity = &sotPool.getEntity( name );
+    pgEntity = &g_pool.getEntity( name );
     sotPatternGenerator* spg = dynamic_cast<sotPatternGenerator*>(pgEntity);
     if (spg){ pgi = spg->GetPatternGeneratorInterface(); }
   }

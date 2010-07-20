@@ -29,17 +29,17 @@
 #endif /*WIN32*/
 
 #include <sot/sotStepComputerForce.h>
-#include <sot/sotDebug.h>
+#include <sot-core/debug.h>
 #include <sot/sotMacrosSignal.h>
-#include <sot/sotExceptionPatternGenerator.h>
+#include <sot-pattern-generator/exception-pg.h>
 #include <sot/sotStepQueue.h>
 #include <sot/sotStepChecker.h>
-#include <sot/sotFactory.h>
-#include <sot/sotPool.h>
+#include <dynamic-graph/factory.h>
+#include <dynamic-graph/pool.h>
 #include <sot/sotMatrixTwist.h>
 
 
-SOT_FACTORY_ENTITY_PLUGIN(sotStepComputerForce,"StepComputerForce");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(sotStepComputerForce,"StepComputerForce");
 
 
 sotStepComputerForce:: sotStepComputerForce( const std::string & name )
@@ -114,17 +114,17 @@ ml::Vector& sotStepComputerForce::computeDisplacement( ml::Vector& res,int timeC
   // extract the translation part and express it in the waist frame.
 
   ml::Vector t_ref0(3); ref0Mref.extract(t_ref0);
-  sotMatrixRotation waRref0; waMref0.extract(waRref0);
+  MatrixRotation waRref0; waMref0.extract(waRref0);
   ml::Vector t_wa = waRref0.multiply(t_ref0);
 
   // compute the rotation that transforms ref0 into ref,
   // express it in the waist frame. Then get the associated
   // yaw (rot around z).
 
-  sotMatrixRotation ref0Rwa; waRref0.transpose(ref0Rwa);
-  sotMatrixRotation ref0Rref; ref0Mref.extract(ref0Rref);
-  sotMatrixRotation tmp; ref0Rref.multiply(ref0Rwa, tmp);
-  sotMatrixRotation Rref; waRref0.multiply(tmp, Rref);
+  MatrixRotation ref0Rwa; waRref0.transpose(ref0Rwa);
+  MatrixRotation ref0Rref; ref0Mref.extract(ref0Rref);
+  MatrixRotation tmp; ref0Rref.multiply(ref0Rwa, tmp);
+  MatrixRotation Rref; waRref0.multiply(tmp, Rref);
   VectorRollPitchYaw rpy; rpy.fromMatrix(Rref);
 
   // store the result.
@@ -318,7 +318,7 @@ void sotStepComputerForce::commandLine( const std::string& cmdLine,
     std::string name = "stepobs";
     cmdArgs >> std::ws;
     if( cmdArgs.good()){ cmdArgs >> name; }
-    Entity* entity = &sotPool.getEntity( name );
+    Entity* entity = &g_pool.getEntity( name );
     twoHandObserver = dynamic_cast<sotStepObserver*>(entity);
   }
   else { Entity::commandLine( cmdLine,cmdArgs,os); }

@@ -29,15 +29,16 @@
 //#define VP_DEBUG
 //#define VP_DEBUG_MODE 10
 
-#include <sot/sotPatternGenerator.h>
-#include <sot/sotDebug.h>
-#include <sot/sotFactory.h>
+#include <sot-pattern-generator/pg.h>
+#include <sot-core/debug.h>
+#include <dynamic-graph/factory.h>
 #include <sot-core/matrix-homogeneous.h>
 
 using namespace std;
+using namespace sot;
+using namespace dynamicgraph;
 
-
-SOT_FACTORY_ENTITY_PLUGIN(sotPatternGenerator,"PatternGenerator");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(sotPatternGenerator,"PatternGenerator");
 
 sotPatternGenerator::
 sotPatternGenerator( const std::string & name ) 
@@ -199,7 +200,7 @@ sotPatternGenerator( const std::string & name )
   m_AnkleSoilDistance = 0.105; 
   sotDEBUGIN(5);
 
-  firstSINTERN.setDependancyType(sotTimeDependancy<int>::BOOL_DEPENDANT);
+  firstSINTERN.setDependencyType(dg::TimeDependency<int>::BOOL_DEPENDENT);
   // TODO: here, the 'setConstant' destroy the pointer toward
   // function initOneStepOfControl. By calling firstSINTERN(t), whatever t,
   // nothing will happen (well, it will just return 0).
@@ -208,7 +209,7 @@ sotPatternGenerator( const std::string & name )
   // TODO: Remove the next line: // firstSINTERN.setConstant(0);
   firstSINTERN.setReady(true);
 
-  //OneStepOfControlS.setDependancyType(sotTimeDependancy<int>::ALWAYS_READY);
+  //OneStepOfControlS.setDependencyType(dg::TimeDependency<int>::ALWAYS_READY);
   //  OneStepOfControlS.setConstant(0);
 
   signalRegistration( jointPositionSIN <<
@@ -397,7 +398,7 @@ bool sotPatternGenerator::InitState(void)
     }
   catch(...)
     {
-      SOT_THROW sotExceptionPatternGenerator( ExceptionPatternGenerator::PATTERN_GENERATOR_JRL,
+      SOT_THROW ExceptionPatternGenerator( ExceptionPatternGenerator::PATTERN_GENERATOR_JRL,
 					      "Error while setting the current joint values of the WPG.");      
       return false;
     }
@@ -430,7 +431,7 @@ bool sotPatternGenerator::buildModel( void )
 
   catch (...)
     {
-      SOT_THROW sotExceptionPatternGenerator( ExceptionPatternGenerator::PATTERN_GENERATOR_JRL,
+      SOT_THROW ExceptionPatternGenerator( ExceptionPatternGenerator::PATTERN_GENERATOR_JRL,
 					      "Error while allocating the Pattern Generator.",
 					      "(PG creation process for object %s).",
 					      getName().c_str());
@@ -711,7 +712,7 @@ void sotPatternGenerator::FromAbsoluteFootPosToDotHomogeneous(pg::FootAbsolutePo
 							      MatrixHomogeneous &aFootMH,
 							      MatrixHomogeneous &adotFootMH)
 {
-  sotMatrixRotation dRot,Twist,Rot;
+  MatrixRotation dRot,Twist,Rot;
   adotFootMH.setIdentity();
   FromAbsoluteFootPosToHomogeneous(aFootPosition,aFootMH);
 
@@ -1022,7 +1023,7 @@ OneStepOfControl(int &dummy, int time)
 	      MatrixHomogeneous lWaistPoseAbsoluste = WaistPoseAbsolute;
 	      WaistPoseAbsolute = iPoseOrigin * WaistPoseAbsolute;
 
-	      sotMatrixRotation newWaistRot;
+	      MatrixRotation newWaistRot;
 	      WaistPoseAbsolute.extract(newWaistRot);
 	      VectorRollPitchYaw newWaistRPY;
 	      newWaistRPY.fromMatrix(newWaistRot);

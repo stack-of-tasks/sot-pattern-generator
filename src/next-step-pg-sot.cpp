@@ -20,17 +20,21 @@
 #include <algorithm>
 
 #include <MatrixAbstractLayer/MatrixAbstractLayer.h>
-#include "NextStepPgSot.h"
+#include <sot-pattern-generator/next-step-pg-sot.h>
 
-#include <sot/sotDebug.h>
-#include <sot/sotFactory.h>
-#include <sot/sotMacrosSignal.h>
-#include <sot/sotExceptionPatternGenerator.h>
-#include <sot/sotPool.h>
+#include <sot-core/debug.h>
+#include <dynamic-graph/factory.h>
+#include <sot-core/macros-signal.h>
+#include <sot-pattern-generator/exception-pg.h>
+#include <dynamic-graph/pool.h>
 #include<cmath>
 #define PI 3.1416
 
-SOT_FACTORY_ENTITY_PLUGIN(NextStepPgSot,"NextStepPgSot");
+
+using namespace sot;
+using namespace dynamicgraph;
+
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(NextStepPgSot,"NextStepPgSot");
  
 
 /* --- CONSTRUCT ------------------------------------------------------------- */
@@ -314,7 +318,7 @@ commandLine( const std::string& cmdLine,
     {
       std::string name = "pg";
       cmdArgs >> std::ws; if( cmdArgs.good()) cmdArgs >> name;
-      pgEntity = &sotPool.getEntity( name );
+      pgEntity = &g_pool.getEntity( name );
       m_sPG = dynamic_cast<sotPatternGenerator *>(pgEntity);
       if (m_sPG!=0)
 	m_PGI = m_sPG->GetPatternGeneratorInterface();

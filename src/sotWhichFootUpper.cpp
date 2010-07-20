@@ -18,12 +18,12 @@
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 #include <sot/sotWhichFootUpper.h>
-#include <sot/sotDebug.h>
-#include <sot/sotFactory.h>
+#include <sot-core/debug.h>
+#include <dynamic-graph/factory.h>
 #include <sot/sotMacrosSignal.h>
-#include <sot/sotExceptionPatternGenerator.h>
+#include <sot-pattern-generator/exception-pg.h>
 
-SOT_FACTORY_ENTITY_PLUGIN(sotWhichFootUpper,"WhichFootUpper");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(sotWhichFootUpper,"WhichFootUpper");
 
 const unsigned int sotWhichFootUpper::
 INDEX_LEFT_FOOT_DEFAULT = 0;
@@ -34,7 +34,7 @@ const double sotWhichFootUpper::
 TRIGGER_THRESHOLD_DEFAULT = 5e-4;
 
 
-typedef sotMatrixRotation& (MatrixHomogeneous::*ExtractMemberType) (sotMatrixRotation&) const;
+typedef MatrixRotation& (MatrixHomogeneous::*ExtractMemberType) (MatrixRotation&) const;
 
 sotWhichFootUpper::
 sotWhichFootUpper( const std::string & name ) 
@@ -51,13 +51,13 @@ sotWhichFootUpper( const std::string & name )
   
   ,worldMlfootSOUT( SOT_INIT_SIGNAL_3( sotWhichFootUpper::computeFootPosition,
 				       waistMlfootSIN,MatrixHomogeneous,
-				       waistRsensorSIN,sotMatrixRotation,
-				       worldRsensorSIN,sotMatrixRotation),
+				       waistRsensorSIN,MatrixRotation,
+				       worldRsensorSIN,MatrixRotation),
 		    "WhichFootUpper("+name+")::output(MatrixHomogeneous)::worldMlfoot" )
   ,worldMrfootSOUT( SOT_INIT_SIGNAL_3( sotWhichFootUpper::computeFootPosition,
 				       waistMrfootSIN,MatrixHomogeneous,
-				       waistRsensorSIN,sotMatrixRotation,
-				       worldRsensorSIN,sotMatrixRotation),
+				       waistRsensorSIN,MatrixRotation,
+				       worldRsensorSIN,MatrixRotation),
 		    "WhichFootUpper("+name+")::output(MatrixHomogeneous)::worldMrfoot" )
    ,whichFootSOUT( SOT_MEMBER_SIGNAL_2( sotWhichFootUpper::whichFoot,
 					waistMlfootSIN,MatrixHomogeneous,
@@ -98,13 +98,13 @@ sotWhichFootUpper::
 
 MatrixHomogeneous & sotWhichFootUpper::
 computeFootPosition( const MatrixHomogeneous& waistMfoot,
-		     const sotMatrixRotation& waistRsensor,			 
-		     const sotMatrixRotation& worldRsensor,			 
+		     const MatrixRotation& waistRsensor,			 
+		     const MatrixRotation& worldRsensor,			 
 		     MatrixHomogeneous& worldMfoot )
 {
   sotDEBUGIN(15);
   
-  sotMatrixRotation worldRwaist;
+  MatrixRotation worldRwaist;
   worldRsensor.multiply( waistRsensor.transpose(),worldRwaist );
 
   ml::Vector trans(3); trans.fill(0);

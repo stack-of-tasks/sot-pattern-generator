@@ -83,8 +83,8 @@ class SOTWHICHFOOTUPPER_EXPORT sotWhichFootUpper
 
  public: /* --- SIGNAL --- */
 
-  dg::SignalPtr<sotMatrixRotation,int> waistRsensorSIN; 
-  dg::SignalPtr<sotMatrixRotation,int> worldRsensorSIN; 
+  dg::SignalPtr<MatrixRotation,int> waistRsensorSIN; 
+  dg::SignalPtr<MatrixRotation,int> worldRsensorSIN; 
   dg::SignalPtr<MatrixHomogeneous,int> waistMlfootSIN; 
   dg::SignalPtr<MatrixHomogeneous,int> waistMrfootSIN; 
   
@@ -93,14 +93,14 @@ class SOTWHICHFOOTUPPER_EXPORT sotWhichFootUpper
   dg::SignalTimeDependent<unsigned int,int> whichFootSOUT;
 
   dg::SignalPtr<MatrixHomogeneous,int> waistMsensorSIN; 
-  dg::SignalTimeDependent<sotMatrixRotation,int> waistRsensorSOUT; 
+  dg::SignalTimeDependent<MatrixRotation,int> waistRsensorSOUT; 
 
  public: /* --- FUNCTIONS --- */
 
   static MatrixHomogeneous &
     computeFootPosition( const MatrixHomogeneous& waistMfoot,
-			 const sotMatrixRotation& waistRsensor,			 
-			 const sotMatrixRotation& worldRsensor,			 
+			 const MatrixRotation& waistRsensor,			 
+			 const MatrixRotation& worldRsensor,			 
 			 MatrixHomogeneous& res );
 
   unsigned int & whichFoot( const MatrixHomogeneous& waistMlfoot,

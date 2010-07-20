@@ -29,16 +29,16 @@
 #endif /*WIN32*/
 
 #include <sot/sotStepComputerPos.h>
-#include <sot/sotDebug.h>
+#include <sot-core/debug.h>
 #include <sot/sotMacrosSignal.h>
-#include <sot/sotExceptionPatternGenerator.h>
+#include <sot-pattern-generator/exception-pg.h>
 #include <sot/sotStepQueue.h>
 #include <sot/sotStepChecker.h>
-#include <sot/sotFactory.h>
-#include <sot/sotPool.h>
+#include <dynamic-graph/factory.h>
+#include <dynamic-graph/pool.h>
 
 
-SOT_FACTORY_ENTITY_PLUGIN(sotStepComputerPos,"StepComputerPos");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(sotStepComputerPos,"StepComputerPos");
 
 
 sotStepComputerPos:: sotStepComputerPos( const std::string & name )
@@ -117,7 +117,7 @@ void sotStepComputerPos::changeFirstStep( sotStepQueue& queue, int timeCurr )
 
   MatrixHomogeneous sfMref0; sfMff.multiply(ffMref0, sfMref0);
   ml::Vector t_ref0(3); ref0Mref.extract(t_ref0);
-  sotMatrixRotation sfRref0; sfMref0.extract(sfRref0);
+  MatrixRotation sfRref0; sfMref0.extract(sfRref0);
   ml::Vector t_sf = sfRref0.multiply(t_ref0);
 
   // add it to the position of the fly foot in support foot to
@@ -130,16 +130,16 @@ void sotStepComputerPos::changeFirstStep( sotStepQueue& queue, int timeCurr )
   // express it in the support foot frame. Then get the
   // associated yaw (rot around z).
 
-  sotMatrixRotation ref0Rsf; sfRref0.transpose(ref0Rsf);
-  sotMatrixRotation ref0Rref; ref0Mref.extract(ref0Rref);
-  sotMatrixRotation tmp; ref0Rref.multiply(ref0Rsf, tmp);
-  sotMatrixRotation Rref; sfRref0.multiply(tmp, Rref);
+  MatrixRotation ref0Rsf; sfRref0.transpose(ref0Rsf);
+  MatrixRotation ref0Rref; ref0Mref.extract(ref0Rref);
+  MatrixRotation tmp; ref0Rref.multiply(ref0Rsf, tmp);
+  MatrixRotation Rref; sfRref0.multiply(tmp, Rref);
   VectorRollPitchYaw rpy; rpy.fromMatrix(Rref);
 
   // get the yaw of the current orientation of the ff wrt sf.
   // Add it to the previously computed rpy.
 
-  sotMatrixRotation sfRff; sfMff.extract(sfRff);
+  MatrixRotation sfRff; sfMff.extract(sfRff);
   VectorRollPitchYaw rpy_ff; rpy_ff.fromMatrix(sfRff);
   rpy += rpy_ff;
 
@@ -226,7 +226,7 @@ void sotStepComputerPos::commandLine( const std::string& cmdLine,
     std::string name = "stepobs";
     cmdArgs >> std::ws;
     if( cmdArgs.good()){ cmdArgs >> name; }
-    Entity* entity = &sotPool.getEntity( name );
+    Entity* entity = &g_pool.getEntity( name );
     twoHandObserver = dynamic_cast<sotStepObserver*>(entity);
   }
   else { Entity::commandLine( cmdLine,cmdArgs,os); }

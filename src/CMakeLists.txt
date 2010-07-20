@@ -87,7 +87,9 @@ SET(plugins_0
 )
 
 SET(plugins
-	next-step)
+	next-step
+	pg
+	next-step-pg-sot)
 	
 SET(plugins_common_deps
 	exception-pg.cpp)

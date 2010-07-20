@@ -3,9 +3,9 @@
 #include <sot/sotStepObserver.h>
 #include <sot-core/vector-roll-pitch-yaw.h>
 #include <sot-core/matrix-rotation.h>
-#include <sot/sotFactory.h>
+#include <dynamic-graph/factory.h>
 
-SOT_FACTORY_ENTITY_PLUGIN(sotStepObserver,"StepObserver");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(sotStepObserver,"StepObserver");
 
 sotStepObserver::sotStepObserver( const std::string & name )
   :Entity(name)
@@ -76,7 +76,7 @@ sotStepObserver::computeRefPos( MatrixHomogeneous& res,
   MatrixHomogeneous sfMlh; refMw.multiply(wMlh, sfMlh);
   MatrixHomogeneous sfMrh; refMw.multiply(wMrh, sfMrh);
 
-  sotMatrixRotation R;
+  MatrixRotation R;
   VectorRollPitchYaw rpy;
 
   ml::Vector prh(3); sfMrh.extract(prh);

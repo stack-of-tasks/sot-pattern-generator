@@ -18,11 +18,11 @@
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 #include <sot/sotSelector.h>
-#include <sot/sotDebug.h>
-#include <sot/sotFactory.h>
-#include <sot/sotExceptionPatternGenerator.h>
+#include <sot-core/debug.h>
+#include <dynamic-graph/factory.h>
+#include <sot-pattern-generator/exception-pg.h>
 
-SOT_FACTORY_ENTITY_PLUGIN(sotSelector,"Selector");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(sotSelector,"Selector");
 
 
 

@@ -80,7 +80,7 @@ SET(plugins_0
 	sotStepObserver
 # dependent on walkgenjrl
 	sotNextStepPgSot
-	sotPGManager
+	PGManager
 	sotStepTimeLine
 # all dependencies
 	PatternGenerator
@@ -103,8 +103,8 @@ SET (sotStepComputer_plugins_dependencies sotStepQueue sotStepChecker sotStepObs
 SET (sotStepComputerForce_plugins_dependencies sotStepQueue sotStepChecker sotStepObserver)
 SET (sotStepComputerPos_plugins_dependencies sotStepQueue sotStepChecker sotStepObserver)
 SET (sotStepComputerJoystick_plugins_dependencies  sotStepQueue sotStepChecker sotStepObserver)
-SET (sotPGManager_plugins_dependencies sotStepQueue sotPatternGenerator)
-SET (sotStepTimeLine_plugins_dependencies sotStepQueue sotPGManager)
+SET (PGManager_plugins_dependencies sotStepQueue sotPatternGenerator)
+SET (sotStepTimeLine_plugins_dependencies sotStepQueue PGManager)
 
 
 FOREACH(LIBRARY_NAME ${plugins})

@@ -152,7 +152,7 @@ void sotStepTimeLine::commandLine( const std::string& cmdLine,
     cmdArgs >> std::ws;
     if( cmdArgs.good()){ cmdArgs >> name; }
     Entity* entity = &g_pool.getEntity( name );
-    pgManager = dynamic_cast<sotPGManager*>(entity);
+    pgManager = dynamic_cast<PGManager*>(entity);
   }
   else if( cmdLine == "state" ) 
   {

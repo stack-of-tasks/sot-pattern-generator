@@ -35,7 +35,7 @@
 #include <dynamic-graph/signal-time-dependent.h>
 #include <sot/StepQueue.h>
 #include <sot/sotStepComputer.h>
-#include <sot/sotPGManager.h>
+#include <sot/PGManager.h>
 
 
 /* --------------------------------------------------------------------- */
@@ -129,7 +129,7 @@ private:
 
   StepQueue* stepQueue;
   sotStepComputer* stepComputer;
-  sotPGManager* pgManager;
+  PGManager* pgManager;
 
   sotSteppingState state;
   int timeLastIntroduction;

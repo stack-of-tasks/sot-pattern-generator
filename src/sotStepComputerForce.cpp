@@ -33,7 +33,7 @@
 #include <sot/sotMacrosSignal.h>
 #include <sot-pattern-generator/exception-pg.h>
 #include <sot/StepQueue.h>
-#include <sot/sotStepChecker.h>
+#include <sot-pattern-generator/step-checker.h>
 #include <dynamic-graph/factory.h>
 #include <dynamic-graph/pool.h>
 #include <sot/sotMatrixTwist.h>

@@ -2,7 +2,7 @@
  * Copyright Projet JRL-Japan, 2007
  *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  *
- * File:      sotSelector.h
+ * File:      Selector.h
  * Project:   SOT
  * Author:    Nicolas Mansard
  *
@@ -19,8 +19,8 @@
 
 
 
-#ifndef __SOT_SOTSELECTOR_H__
-#define __SOT_SOTSELECTOR_H__
+#ifndef __SOT_Selector_H__
+#define __SOT_Selector_H__
 
 /* --------------------------------------------------------------------- */
 /* --- INCLUDE --------------------------------------------------------- */
@@ -46,20 +46,23 @@ namespace ml = maal::boost;
 /* --------------------------------------------------------------------- */
 
 #if defined (WIN32) 
-#  if defined (sotSelector_EXPORTS) 
-#    define SOTSELECTOR_EXPORT __declspec(dllexport)
+#  if defined (selector_EXPORTS)
+#    define Selector_EXPORT __declspec(dllexport)
 #  else  
-#    define SOTSELECTOR_EXPORT __declspec(dllimport)
+#    define Selector_EXPORT __declspec(dllimport)
 #  endif 
 #else
-#  define SOTSELECTOR_EXPORT
+#  define Selector_EXPORT
 #endif
+
+namespace sot{
+namespace dg = dynamicgraph;
 
 /* --------------------------------------------------------------------- */
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-class SOTSELECTOR_EXPORT sotSelector
+class Selector_EXPORT Selector
 :public dg::Entity
 {
  public:
@@ -68,37 +71,37 @@ class SOTSELECTOR_EXPORT sotSelector
  protected:
   /** Number of signal type. For each signal type, you have
    * one output and <nbEntries> inputs. */
-  unsigned int nbdg::Signals; 
+  unsigned int nbSignals;
   /** Number of possible values for the selector. For each entry,
    * you have one signal of each type. */
   unsigned int nbEntries;
 
  public: /* --- CONSTRUCTION --- */
 
-  sotSelector( const std::string& name );
-  virtual ~sotSelector( void );
+  Selector( const std::string& name );
+  virtual ~Selector( void );
 
  public: /* --- SIGNAL --- */
 
   dg::SignalPtr<unsigned int,int> selectorSIN; 
 
-  std::vector< std::vector< sotdg::SignalAbstract<int>* > > inputsSIN;
-  std::vector< sotdg::SignalAbstract<int>* > outputsSOUT;
+  std::vector< std::vector<dg::SignalBase<int>* > > inputsSIN;
+  std::vector< dg::SignalBase<int>* > outputsSOUT;
 
 
  public: /* --- FUNCTIONS --- */
 
   template< class T >
     static T& computeSelection( const unsigned int & sigNum,
-				std::vector< sotdg::SignalAbstract<int>* >& entriesSIN,
+				std::vector< dg::SignalBase<int>* >& entriesSIN,
 				T& res,const int& time );
 
   template< class T >
-    unsigned int createdg::Signal( const std::string& shortname,
+    unsigned int createSignal( const std::string& shortname,
 			       const int & sigId=-1 );
   
 
-  void resetdg::Signals( const unsigned int & nbEntries,const unsigned int & nbdg::Signals );
+  void resetSignals( const unsigned int & nbEntries,const unsigned int & nbSignals );
 
  public: /* --- PARAMS --- */
   virtual void commandLine( const std::string& cmdLine,
@@ -109,8 +112,8 @@ class SOTSELECTOR_EXPORT sotSelector
 };
 
 
+} // namespace sot
 
 
-
-#endif // #ifndef __SOT_SOTSELECTOR_H__
+#endif // #ifndef __SOT_Selector_H__
 

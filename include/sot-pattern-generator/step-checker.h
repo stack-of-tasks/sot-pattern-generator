@@ -2,7 +2,7 @@
  * Copyright Projet JRL-Japan, 2007
  *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  *
- * File:      sotStepChecker.h
+ * File:      StepChecker.h
  * Project:   SOT
  * Author:    Nicolas Perrin, Paul Evrard, Nicolas Mansard
  *
@@ -28,18 +28,20 @@
 /* --------------------------------------------------------------------- */
 
 
+namespace sot {
+
 /* --------------------------------------------------------------------- */
 /* --- API ------------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
 #if defined (WIN32) 
-#  if defined (sotStepChecker_EXPORTS) 
-#    define SOTSTEPCHECKER_EXPORT __declspec(dllexport)
+#  if defined (step_checker_EXPORTS)
+#    define StepChecker_EXPORT __declspec(dllexport)
 #  else  
-#    define SOTSTEPCHECKER_EXPORT __declspec(dllimport)
+#    define StepChecker_EXPORT __declspec(dllimport)
 #  endif 
 #else
-#  define SOTSTEPCHECKER_EXPORT
+#  define StepChecker_EXPORT
 #endif
 
 
@@ -47,12 +49,13 @@
 /* --- FUNCTION -------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-class SOTSTEPCHECKER_EXPORT sotStepChecker
+class StepChecker_EXPORT StepChecker
 {
 public: // Methods
 
   void clipStep(double x, double y, double & x_result, double & y_result);
 };
 
+} //namespace sot
 
 #endif

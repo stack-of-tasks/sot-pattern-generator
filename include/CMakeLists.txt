@@ -9,6 +9,8 @@ next-step-pg-sot.h
 pg.h
 pg-manager.h
 step-queue.h
+selector.h
+step-checker.h
 )
 
 # Recreate correct path for the headers

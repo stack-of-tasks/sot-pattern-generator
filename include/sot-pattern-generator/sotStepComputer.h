@@ -37,7 +37,7 @@ namespace ml = maal::boost;
 #include <sot-core/vector-roll-pitch-yaw.h>
 #include <sot-core/matrix-rotation.h>
 #include <sot/sotStepObserver.h>
-#include <sot/sotStepChecker.h>
+#include <sot-pattern-generator/step-checker.h>
 
 /* STD */
 #include <string>

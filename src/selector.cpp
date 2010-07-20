@@ -2,7 +2,7 @@
  * Copyright Projet JRL-Japan, 2007
  *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  *
- * File:      sotSelector.h
+ * File:      Selector.h
  * Project:   SOT
  * Author:    Nicolas Mansard
  *
@@ -17,19 +17,22 @@
  *
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-#include <sot/sotSelector.h>
+#include <sot-pattern-generator/selector.h>
 #include <sot-core/debug.h>
 #include <dynamic-graph/factory.h>
 #include <sot-pattern-generator/exception-pg.h>
 
-DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(sotSelector,"Selector");
+
+using namespace sot;
+using namespace dynamicgraph;
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(Selector,"Selector");
 
 
 
-sotSelector::
-sotSelector( const std::string & name ) 
+Selector::
+Selector( const std::string & name ) 
   :Entity(name)
-  ,selectorSIN( NULL,"sotSelector("+name+")::input(uint)::selec" )
+  ,selectorSIN( NULL,"Selector("+name+")::input(uint)::selec" )
 {
   sotDEBUGIN(5);
   
@@ -39,8 +42,8 @@ sotSelector( const std::string & name )
 }
 
 
-sotSelector::
-~sotSelector( void )
+Selector::
+~Selector( void )
 {
   sotDEBUGIN(5);
 
@@ -58,7 +61,7 @@ sotSelector::
 	      &sotName,_2)
 
 template< class T >
-unsigned int sotSelector::
+unsigned int Selector::
 createSignal( const std::string& shortname,const int & sigId__)
 {
   sotDEBUGIN(15);
@@ -71,7 +74,7 @@ createSignal( const std::string& shortname,const int & sigId__)
   if ( (sigId<0)||(sigId>nbSignals) ) return -1;
   
   /* Set up the input signal vector. */
-  std::vector< sotSignalAbstract<int>* >& entriesSIN = inputsSIN[sigId];
+  std::vector< SignalBase<int>* >& entriesSIN = inputsSIN[sigId];
   for( unsigned int i=0;i<entriesSIN.size();++i )
     {
       if( NULL!=entriesSIN[i] ) 
@@ -90,7 +93,7 @@ createSignal( const std::string& shortname,const int & sigId__)
   for( unsigned int i=0;i<nbEntries;++i )
     {
       signame.str("");
-      signame << "sotSelector(" << Entity::getName() <<")::input("
+      signame << "Selector(" << Entity::getName() <<")::input("
 	      << typeid(T).name() << ")::" << shortname << i;
       SignalPtr<T,int> * sigIn = new SignalPtr<T,int>( NULL,signame.str() );
       inputsSIN[sigId][i] = sigIn; 
@@ -106,12 +109,12 @@ createSignal( const std::string& shortname,const int & sigId__)
       delete outputsSOUT[sigId]; 
     }
   signame.str("");
-  signame << "sotSelector(" << Entity::getName() <<")::output("
+  signame << "Selector(" << Entity::getName() <<")::output("
 	  << typeid(T).name() << ")::" << shortname;
   
   SignalTimeDependent<T,int> * sigOut 
     = new SignalTimeDependent<T,int>
-    ( boost::bind(&sotSelector::computeSelection<T>,
+    ( boost::bind(&Selector::computeSelection<T>,
 		  SOT_CALL_SIG(selectorSIN,unsigned int),
 		  boost::ref(entriesSIN),_1,_2), 
       sigDep<<selectorSIN,
@@ -125,9 +128,9 @@ createSignal( const std::string& shortname,const int & sigId__)
 }
 
 template< class T >
-T& sotSelector::
+T& Selector::
 computeSelection( const unsigned int & sigNum,
-		  std::vector< sotSignalAbstract<int>* >& entriesSIN,
+		  std::vector< SignalBase<int>* >& entriesSIN,
 		  T& res,const int& time )
 {
   sotDEBUGIN(15);
@@ -161,17 +164,17 @@ computeSelection( const unsigned int & sigNum,
   return res;
 }
 
-void sotSelector::
+void Selector::
 resetSignals( const unsigned int & nbEntries__,
 	      const unsigned int & nbSignals__ )
 {
-  for( std::vector< std::vector< sotSignalAbstract<int>* > >::iterator 
+  for( std::vector< std::vector< SignalBase<int>* > >::iterator
 	 iter=inputsSIN.begin();iter<inputsSIN.end();++iter )
     {
-      for( std::vector< sotSignalAbstract<int>* >::iterator 
+      for( std::vector< SignalBase<int>* >::iterator
 	     iterSig=iter->begin();iterSig<iter->end();++iterSig )
 	{
-	  sotSignalAbstract<int>* sigPtr = *iterSig;
+	  SignalBase<int>* sigPtr = *iterSig;
 	  if( NULL!=sigPtr ) delete sigPtr;
 	}
     }
@@ -179,10 +182,10 @@ resetSignals( const unsigned int & nbEntries__,
   nbSignals = nbSignals__;
   nbEntries = nbEntries__;
 
-  for( std::vector< sotSignalAbstract<int>* >::iterator 
+  for( std::vector< SignalBase<int>* >::iterator
 	 iterSig=outputsSOUT.begin();iterSig<outputsSOUT.end();++iterSig )
     {
-      sotSignalAbstract<int>* sigPtr = *iterSig;
+      SignalBase<int>* sigPtr = *iterSig;
       if( NULL!=sigPtr ) delete sigPtr;
     }
   outputsSOUT.resize( nbSignals );
@@ -199,7 +202,7 @@ resetSignals( const unsigned int & nbEntries__,
       else oss << "  - " << sotTypeName << std::endl;
 
 static void
-displayOrCreate( sotSelector& selec,
+displayOrCreate( Selector& selec,
 		 bool dORc,std::ostream& os,
 		 const std::string& name="",const std::string& type="",
 		 const int & sigId=-1 )
@@ -222,7 +225,7 @@ displayOrCreate( sotSelector& selec,
 
 
 
-void sotSelector::
+void Selector::
 commandLine( const std::string& cmdLine,
 	     std::istringstream& cmdArgs,
 	     std::ostream& os )

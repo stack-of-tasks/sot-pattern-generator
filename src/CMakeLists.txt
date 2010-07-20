@@ -83,7 +83,7 @@ SET(plugins_0
 	sotPGManager
 	sotStepTimeLine
 # all dependencies
-	sotPatternGenerator
+	PatternGenerator
 )
 
 SET(plugins

@@ -2,7 +2,7 @@
  * Copyright Projet JRL-Japan, 2008
  *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  *
- * File:      sotPatternGenerator.cpp
+ * File:      PatternGenerator.cpp
  * Project:   SOT
  * Author:    Olivier Stasse
  *
@@ -38,10 +38,10 @@ using namespace std;
 using namespace sot;
 using namespace dynamicgraph;
 
-DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(sotPatternGenerator,"PatternGenerator");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(PatternGenerator,"PatternGenerator");
 
-sotPatternGenerator::
-sotPatternGenerator( const std::string & name ) 
+PatternGenerator::
+PatternGenerator( const std::string & name ) 
   :Entity(name)
   //  ,m_PGI(NULL)
   ,m_PreviewControlParametersFile()
@@ -52,106 +52,106 @@ sotPatternGenerator( const std::string & name )
 
   ,m_init(false)
   ,m_InitPositionByRealState(true)
-  ,firstSINTERN( boost::bind(&sotPatternGenerator::InitOneStepOfControl,this,_1,_2),
-		 sotNOSIGNAL,"sotPatternGenerator("+name+")::intern(dummy)::init" ) 
+  ,firstSINTERN( boost::bind(&PatternGenerator::InitOneStepOfControl,this,_1,_2),
+		 sotNOSIGNAL,"PatternGenerator("+name+")::intern(dummy)::init" ) 
 
-  ,OneStepOfControlS( boost::bind(&sotPatternGenerator::OneStepOfControl,this,_1,_2),
-		      firstSINTERN << jointPositionSIN ,"sotPatternGenerator("+name+")::onestepofcontrol" ) 
+  ,OneStepOfControlS( boost::bind(&PatternGenerator::OneStepOfControl,this,_1,_2),
+		      firstSINTERN << jointPositionSIN ,"PatternGenerator("+name+")::onestepofcontrol" ) 
 
   ,m_dataInProcess(0)
-  ,jointPositionSIN(NULL,"sotPatternGenerator("+name+")::input(vector)::position")
+  ,jointPositionSIN(NULL,"PatternGenerator("+name+")::input(vector)::position")
 
-  ,motorControlJointPositionSIN(NULL,"sotPatternGenerator("+name+")::input(vector)::motorcontrol")
+  ,motorControlJointPositionSIN(NULL,"PatternGenerator("+name+")::input(vector)::motorcontrol")
 
-  ,ZMPPreviousControllerSIN(NULL,"sotPatternGenerator("+name+")::input(vector)::zmppreviouscontroller")
+  ,ZMPPreviousControllerSIN(NULL,"PatternGenerator("+name+")::input(vector)::zmppreviouscontroller")
 
-  ,ZMPRefSOUT( boost::bind(&sotPatternGenerator::getZMPRef,this,_1,_2),
+  ,ZMPRefSOUT( boost::bind(&PatternGenerator::getZMPRef,this,_1,_2),
 	       OneStepOfControlS,
-	       "sotPatternGenerator("+name+")::output(vector)::zmpref" ) 
+	       "PatternGenerator("+name+")::output(vector)::zmpref" ) 
 
-  ,CoMRefSOUT( boost::bind(&sotPatternGenerator::getCoMRef,this,_1,_2),
+  ,CoMRefSOUT( boost::bind(&PatternGenerator::getCoMRef,this,_1,_2),
 	       OneStepOfControlS,
-	       "sotPatternGenerator("+name+")::output(matrix)::comref" ) 
+	       "PatternGenerator("+name+")::output(matrix)::comref" ) 
 
-  ,dCoMRefSOUT( boost::bind(&sotPatternGenerator::getdCoMRef,this,_1,_2),
+  ,dCoMRefSOUT( boost::bind(&PatternGenerator::getdCoMRef,this,_1,_2),
 		OneStepOfControlS,
-		"sotPatternGenerator("+name+")::output(matrix)::dcomref" ) 
+		"PatternGenerator("+name+")::output(matrix)::dcomref" ) 
 
-  ,comSIN(NULL,"sotPatternGenerator("+name+")::input(vector)::com")
+  ,comSIN(NULL,"PatternGenerator("+name+")::input(vector)::com")
 
-   ,velocitydesSIN(NULL,"sotPatternGenerator("+name+")::input(vector)::velocitydes")
+   ,velocitydesSIN(NULL,"PatternGenerator("+name+")::input(vector)::velocitydes")
 
-  ,LeftFootCurrentPosSIN(NULL,"sotPatternGenerator("+name+")::input(homogeneousmatrix)::leftfootcurrentpos")
+  ,LeftFootCurrentPosSIN(NULL,"PatternGenerator("+name+")::input(homogeneousmatrix)::leftfootcurrentpos")
 
-  ,RightFootCurrentPosSIN(NULL,"sotPatternGenerator("+name+")::input(homogeneousmatrix)::rightfootcurrentpos")
+  ,RightFootCurrentPosSIN(NULL,"PatternGenerator("+name+")::input(homogeneousmatrix)::rightfootcurrentpos")
 
-  ,LeftFootRefSOUT( boost::bind(&sotPatternGenerator::getLeftFootRef,this,_1,_2),
+  ,LeftFootRefSOUT( boost::bind(&PatternGenerator::getLeftFootRef,this,_1,_2),
 		    OneStepOfControlS,
-		    "sotPatternGenerator("+name+")::output(homogeneousmatrix)::leftfootref" ) 
+		    "PatternGenerator("+name+")::output(homogeneousmatrix)::leftfootref" ) 
 
-  ,RightFootRefSOUT( boost::bind(&sotPatternGenerator::getRightFootRef,this,_1,_2),
+  ,RightFootRefSOUT( boost::bind(&PatternGenerator::getRightFootRef,this,_1,_2),
 		     OneStepOfControlS,
-		     "sotPatternGenerator("+name+")::output(homogeneousmatrix)::rightfootref" ) 
-  ,dotLeftFootRefSOUT( boost::bind(&sotPatternGenerator::getdotLeftFootRef,this,_1,_2),
+		     "PatternGenerator("+name+")::output(homogeneousmatrix)::rightfootref" ) 
+  ,dotLeftFootRefSOUT( boost::bind(&PatternGenerator::getdotLeftFootRef,this,_1,_2),
 		       OneStepOfControlS,
-		       "sotPatternGenerator("+name+")::output(homogeneousmatrix)::dotleftfootref" ) 
+		       "PatternGenerator("+name+")::output(homogeneousmatrix)::dotleftfootref" ) 
 
-  ,dotRightFootRefSOUT( boost::bind(&sotPatternGenerator::getdotRightFootRef,this,_1,_2),
+  ,dotRightFootRefSOUT( boost::bind(&PatternGenerator::getdotRightFootRef,this,_1,_2),
 			OneStepOfControlS,
-			"sotPatternGenerator("+name+")::output(homogeneousmatrix)::dotrightfootref" ) 
+			"PatternGenerator("+name+")::output(homogeneousmatrix)::dotrightfootref" ) 
 
-  ,FlyingFootRefSOUT( boost::bind(&sotPatternGenerator::getFlyingFootRef,this,_1,_2),
+  ,FlyingFootRefSOUT( boost::bind(&PatternGenerator::getFlyingFootRef,this,_1,_2),
 		      OneStepOfControlS,
-		      "sotPatternGenerator("+name+")::output(homogeneousmatrix)::flyingfootref" ) 
+		      "PatternGenerator("+name+")::output(homogeneousmatrix)::flyingfootref" ) 
 
 
-  ,SupportFootSOUT( boost::bind(&sotPatternGenerator::getSupportFoot,this,_1,_2),
+  ,SupportFootSOUT( boost::bind(&PatternGenerator::getSupportFoot,this,_1,_2),
 		    OneStepOfControlS,
-		    "sotPatternGenerator("+name+")::output(uint)::SupportFoot" )
-  ,jointWalkingErrorPositionSOUT(boost::bind(&sotPatternGenerator::getjointWalkingErrorPosition,this,_1,_2),
+		    "PatternGenerator("+name+")::output(uint)::SupportFoot" )
+  ,jointWalkingErrorPositionSOUT(boost::bind(&PatternGenerator::getjointWalkingErrorPosition,this,_1,_2),
 				 OneStepOfControlS,
-				 "sotPatternGenerator("+name+")::output(vector)::walkingerrorposition")
+				 "PatternGenerator("+name+")::output(vector)::walkingerrorposition")
   
-  ,waistattitudeSOUT(boost::bind(&sotPatternGenerator::getWaistAttitude,this,_1,_2),
+  ,waistattitudeSOUT(boost::bind(&PatternGenerator::getWaistAttitude,this,_1,_2),
 		     OneStepOfControlS,
-		     "sotPatternGenerator("+name+")::output(vectorRPY)::waistattitude")
-  ,waistattitudeabsoluteSOUT(boost::bind(&sotPatternGenerator::getWaistAttitudeAbsolute,this,_1,_2),
+		     "PatternGenerator("+name+")::output(vectorRPY)::waistattitude")
+  ,waistattitudeabsoluteSOUT(boost::bind(&PatternGenerator::getWaistAttitudeAbsolute,this,_1,_2),
 			     OneStepOfControlS,
-			     "sotPatternGenerator("+name+")::output(vectorRPY)::waistattitudeabsolute")
+			     "PatternGenerator("+name+")::output(vectorRPY)::waistattitudeabsolute")
    
-  ,waistpositionSOUT(boost::bind(&sotPatternGenerator::getWaistPosition,this,_1,_2),
+  ,waistpositionSOUT(boost::bind(&PatternGenerator::getWaistPosition,this,_1,_2),
 		     OneStepOfControlS,
-		     "sotPatternGenerator("+name+")::output(vector)::waistposition")
-  ,waistpositionabsoluteSOUT(boost::bind(&sotPatternGenerator::getWaistPositionAbsolute,this,_1,_2),
+		     "PatternGenerator("+name+")::output(vector)::waistposition")
+  ,waistpositionabsoluteSOUT(boost::bind(&PatternGenerator::getWaistPositionAbsolute,this,_1,_2),
 			     OneStepOfControlS,
-			     "sotPatternGenerator("+name+")::output(vector)::waistpositionabsolute")
+			     "PatternGenerator("+name+")::output(vector)::waistpositionabsolute")
   
-  ,dataInProcessSOUT(boost::bind(&sotPatternGenerator::getDataInProcess, this, _1, _2),
+  ,dataInProcessSOUT(boost::bind(&PatternGenerator::getDataInProcess, this, _1, _2),
 		     OneStepOfControlS,
-		     "sotPatternGenerator("+name+")::output(bool)::inprocess")
-  ,InitZMPRefSOUT( boost::bind(&sotPatternGenerator::getInitZMPRef,this,_1,_2),
+		     "PatternGenerator("+name+")::output(bool)::inprocess")
+  ,InitZMPRefSOUT( boost::bind(&PatternGenerator::getInitZMPRef,this,_1,_2),
 		   OneStepOfControlS,
-		   "sotPatternGenerator("+name+")::output(vector)::initzmpref" ) 
+		   "PatternGenerator("+name+")::output(vector)::initzmpref" ) 
   
-  ,InitCoMRefSOUT( boost::bind(&sotPatternGenerator::getInitCoMRef,this,_1,_2),
+  ,InitCoMRefSOUT( boost::bind(&PatternGenerator::getInitCoMRef,this,_1,_2),
 		   OneStepOfControlS,
-		   "sotPatternGenerator("+name+")::output(matrix)::initcomref" ) 
+		   "PatternGenerator("+name+")::output(matrix)::initcomref" ) 
   
-  ,InitWaistPosRefSOUT( boost::bind(&sotPatternGenerator::getInitWaistPosRef,this,_1,_2),
+  ,InitWaistPosRefSOUT( boost::bind(&PatternGenerator::getInitWaistPosRef,this,_1,_2),
 			OneStepOfControlS,
-			"sotPatternGenerator("+name+")::output(vector)::initwaistposref" ) 
+			"PatternGenerator("+name+")::output(vector)::initwaistposref" ) 
 
-  ,InitWaistAttRefSOUT( boost::bind(&sotPatternGenerator::getInitWaistAttRef,this,_1,_2),
+  ,InitWaistAttRefSOUT( boost::bind(&PatternGenerator::getInitWaistAttRef,this,_1,_2),
 			OneStepOfControlS,
-			"sotPatternGenerator("+name+")::output(vectorRPY)::initwaistattref" ) 
+			"PatternGenerator("+name+")::output(vectorRPY)::initwaistattref" ) 
 
-  ,InitLeftFootRefSOUT( boost::bind(&sotPatternGenerator::getInitLeftFootRef,this,_1,_2),
+  ,InitLeftFootRefSOUT( boost::bind(&PatternGenerator::getInitLeftFootRef,this,_1,_2),
 			OneStepOfControlS,
-			"sotPatternGenerator("+name+")::output(homogeneousmatrix)::initleftfootref" ) 
+			"PatternGenerator("+name+")::output(homogeneousmatrix)::initleftfootref" ) 
   
-  ,InitRightFootRefSOUT( boost::bind(&sotPatternGenerator::getInitRightFootRef,this,_1,_2),
+  ,InitRightFootRefSOUT( boost::bind(&PatternGenerator::getInitRightFootRef,this,_1,_2),
 			 OneStepOfControlS,
-			 "sotPatternGenerator("+name+")::output(homogeneousmatrix)::initrightfootref" ) 
+			 "PatternGenerator("+name+")::output(homogeneousmatrix)::initrightfootref" ) 
   
   
 {
@@ -249,7 +249,7 @@ sotPatternGenerator( const std::string & name )
   sotDEBUGOUT(5);
 }
 
-bool sotPatternGenerator::InitState(void)
+bool PatternGenerator::InitState(void)
 {
   sotDEBUGIN(5); 
   // TODO
@@ -407,7 +407,7 @@ bool sotPatternGenerator::InitState(void)
   sotDEBUGOUT(5);
   return true;
 }
-bool sotPatternGenerator::buildModel( void )
+bool PatternGenerator::buildModel( void )
 {
 
   // Creating the humanoid robot.
@@ -441,8 +441,8 @@ bool sotPatternGenerator::buildModel( void )
   return false;
 }
 
-sotPatternGenerator::
-~sotPatternGenerator( void )
+PatternGenerator::
+~PatternGenerator( void )
 {
   sotDEBUGIN(25);
   if( 0!=m_PGI )
@@ -461,28 +461,28 @@ sotPatternGenerator::
 /* --- CONFIG --------------------------------------------------------------- */
 /* --- CONFIG --------------------------------------------------------------- */
 /* --- CONFIG --------------------------------------------------------------- */
-void sotPatternGenerator::
+void PatternGenerator::
 setVrmlDirectory( const std::string& filename )
 {
   m_vrmlDirectory = filename;
 }
-void sotPatternGenerator::
+void PatternGenerator::
 setVrmlMainFile( const std::string& filename )
 {
   m_vrmlMainFile = filename;
 }
-void sotPatternGenerator::
+void PatternGenerator::
 setXmlSpecificitiesFile( const std::string& filename )
 {
   m_xmlSpecificitiesFile = filename;
 }
-void sotPatternGenerator::
+void PatternGenerator::
 setXmlRankFile( const std::string& filename )
 {
   m_xmlRankFile = filename;
 }
 
-void sotPatternGenerator::
+void PatternGenerator::
 setParamPreviewFile( const std::string& filename )
 {
   m_PreviewControlParametersFile = filename;
@@ -495,7 +495,7 @@ setParamPreviewFile( const std::string& filename )
 
 #include <MatrixAbstractLayer/boostspecific.h>
 
-ml::Vector & sotPatternGenerator::
+ml::Vector & PatternGenerator::
 getZMPRef(ml::Vector & ZMPRefval, int time)
 {
   sotDEBUGIN(5);
@@ -513,7 +513,7 @@ getZMPRef(ml::Vector & ZMPRefval, int time)
   return ZMPRefval;
 }
 
-ml::Vector & sotPatternGenerator::
+ml::Vector & PatternGenerator::
 getCoMRef(ml::Vector & CoMRefval, int time)
 {
   sotDEBUGIN(25);
@@ -525,7 +525,7 @@ getCoMRef(ml::Vector & CoMRefval, int time)
   return CoMRefval;
 }
 
-ml::Vector & sotPatternGenerator::
+ml::Vector & PatternGenerator::
 getdCoMRef(ml::Vector & CoMRefval, int time)
 {
   sotDEBUGIN(25);
@@ -537,7 +537,7 @@ getdCoMRef(ml::Vector & CoMRefval, int time)
   return CoMRefval;
 }
 
-ml::Vector & sotPatternGenerator::
+ml::Vector & PatternGenerator::
 getInitZMPRef(ml::Vector & InitZMPRefval, int time)
 {
   sotDEBUGIN(25);
@@ -553,7 +553,7 @@ getInitZMPRef(ml::Vector & InitZMPRefval, int time)
   return InitZMPRefval;
 }
 
-ml::Vector & sotPatternGenerator::
+ml::Vector & PatternGenerator::
 getInitCoMRef(ml::Vector & InitCoMRefval, int time)
 {
   sotDEBUGIN(25);
@@ -568,7 +568,7 @@ getInitCoMRef(ml::Vector & InitCoMRefval, int time)
   return InitCoMRefval;
 }
 
-ml::Vector & sotPatternGenerator::
+ml::Vector & PatternGenerator::
 getInitWaistPosRef(ml::Vector & InitWaistRefval, int time)
 {
   sotDEBUGIN(25);
@@ -578,7 +578,7 @@ getInitWaistPosRef(ml::Vector & InitWaistRefval, int time)
   sotDEBUGOUT(25);
   return InitWaistRefval;
 }
-VectorRollPitchYaw & sotPatternGenerator::
+VectorRollPitchYaw & PatternGenerator::
 getInitWaistAttRef(VectorRollPitchYaw & InitWaistRefval, int time)
 {
   sotDEBUGIN(25);
@@ -592,7 +592,7 @@ getInitWaistAttRef(VectorRollPitchYaw & InitWaistRefval, int time)
 
 
 
-MatrixHomogeneous & sotPatternGenerator::
+MatrixHomogeneous & PatternGenerator::
 getLeftFootRef(MatrixHomogeneous & LeftFootRefVal, int time)
 {
   sotDEBUGIN(25);
@@ -602,7 +602,7 @@ getLeftFootRef(MatrixHomogeneous & LeftFootRefVal, int time)
   sotDEBUGOUT(25) ;
   return LeftFootRefVal;
 }
-MatrixHomogeneous & sotPatternGenerator::
+MatrixHomogeneous & PatternGenerator::
 getRightFootRef(MatrixHomogeneous & RightFootRefval, int time)
 {
   sotDEBUGIN(25);
@@ -613,7 +613,7 @@ getRightFootRef(MatrixHomogeneous & RightFootRefval, int time)
   sotDEBUGOUT(25);
   return RightFootRefval;
 }
-MatrixHomogeneous & sotPatternGenerator::
+MatrixHomogeneous & PatternGenerator::
 getdotLeftFootRef(MatrixHomogeneous & LeftFootRefVal, int time)
 {
   sotDEBUGIN(25);
@@ -623,7 +623,7 @@ getdotLeftFootRef(MatrixHomogeneous & LeftFootRefVal, int time)
   sotDEBUGOUT(25) ;
   return LeftFootRefVal;
 }
-MatrixHomogeneous & sotPatternGenerator::
+MatrixHomogeneous & PatternGenerator::
 getdotRightFootRef(MatrixHomogeneous & RightFootRefval, int time)
 {
   sotDEBUGIN(25);
@@ -635,7 +635,7 @@ getdotRightFootRef(MatrixHomogeneous & RightFootRefval, int time)
   return RightFootRefval;
 }
 
-MatrixHomogeneous & sotPatternGenerator::
+MatrixHomogeneous & PatternGenerator::
 getInitLeftFootRef(MatrixHomogeneous & LeftFootRefVal, int time)
 {
   sotDEBUGIN(25);
@@ -644,7 +644,7 @@ getInitLeftFootRef(MatrixHomogeneous & LeftFootRefVal, int time)
   sotDEBUGOUT(25) ;
   return LeftFootRefVal;
 }
-MatrixHomogeneous & sotPatternGenerator::
+MatrixHomogeneous & PatternGenerator::
 getInitRightFootRef(MatrixHomogeneous & RightFootRefval, int time)
 {
   sotDEBUGIN(25);
@@ -654,7 +654,7 @@ getInitRightFootRef(MatrixHomogeneous & RightFootRefval, int time)
   return RightFootRefval;
 }
 
-MatrixHomogeneous & sotPatternGenerator::
+MatrixHomogeneous & PatternGenerator::
 getFlyingFootRef(MatrixHomogeneous & FlyingFootRefval, int time)
 {
   sotDEBUGIN(25);
@@ -664,7 +664,7 @@ getFlyingFootRef(MatrixHomogeneous & FlyingFootRefval, int time)
   return FlyingFootRefval;
 }
 
-int &sotPatternGenerator::
+int &PatternGenerator::
 InitOneStepOfControl(int &dummy, int time)
 {
   sotDEBUGIN(15);
@@ -677,7 +677,7 @@ InitOneStepOfControl(int &dummy, int time)
   return dummy;
 }
 
-void sotPatternGenerator::getAbsoluteWaistPosAttHomogeneousMatrix(MatrixHomogeneous &aWaistMH)
+void PatternGenerator::getAbsoluteWaistPosAttHomogeneousMatrix(MatrixHomogeneous &aWaistMH)
 {
   
   const double cr = cos(m_WaistAttitudeAbsolute(0)); // ROLL
@@ -708,7 +708,7 @@ void sotPatternGenerator::getAbsoluteWaistPosAttHomogeneousMatrix(MatrixHomogene
   
 }
 
-void sotPatternGenerator::FromAbsoluteFootPosToDotHomogeneous(pg::FootAbsolutePosition aFootPosition,
+void PatternGenerator::FromAbsoluteFootPosToDotHomogeneous(pg::FootAbsolutePosition aFootPosition,
 							      MatrixHomogeneous &aFootMH,
 							      MatrixHomogeneous &adotFootMH)
 {
@@ -736,7 +736,7 @@ void sotPatternGenerator::FromAbsoluteFootPosToDotHomogeneous(pg::FootAbsolutePo
   
 }
 
-void sotPatternGenerator::FromAbsoluteFootPosToHomogeneous(pg::FootAbsolutePosition aFootPosition,
+void PatternGenerator::FromAbsoluteFootPosToHomogeneous(pg::FootAbsolutePosition aFootPosition,
 							   MatrixHomogeneous &aFootMH)
 {
   double c,s,co,so;
@@ -757,7 +757,7 @@ void sotPatternGenerator::FromAbsoluteFootPosToHomogeneous(pg::FootAbsolutePosit
   aFootMH(3,3) = 1.0;
 }
 
-int &sotPatternGenerator::
+int &PatternGenerator::
 OneStepOfControl(int &dummy, int time)
 {
   m_LocalTime=time;
@@ -1091,7 +1091,7 @@ OneStepOfControl(int &dummy, int time)
 /* --- PARAMS --------------------------------------------------------------- */
 /* --- PARAMS --------------------------------------------------------------- */
 
-void sotPatternGenerator::
+void PatternGenerator::
 commandLine( const std::string& cmdLine,
 	     std::istringstream& cmdArgs,
 	     std::ostream& os )
@@ -1278,7 +1278,7 @@ commandLine( const std::string& cmdLine,
 
 }
 
-ml::Vector & sotPatternGenerator::getjointWalkingErrorPosition(ml::Vector &res,int time)
+ml::Vector & PatternGenerator::getjointWalkingErrorPosition(ml::Vector &res,int time)
 {
   sotDEBUGIN(5);
 
@@ -1291,14 +1291,14 @@ ml::Vector & sotPatternGenerator::getjointWalkingErrorPosition(ml::Vector &res,i
   return res;
 }
 
-unsigned int & sotPatternGenerator::
+unsigned int & PatternGenerator::
 getSupportFoot(unsigned int &res, int time)
 {
   res = m_SupportFoot;
   return res;
 }
 
-VectorRollPitchYaw & sotPatternGenerator::
+VectorRollPitchYaw & PatternGenerator::
 getWaistAttitude( VectorRollPitchYaw&res, int time)
 {
   sotDEBUGIN(5);
@@ -1309,7 +1309,7 @@ getWaistAttitude( VectorRollPitchYaw&res, int time)
   return res;
 }
 
-VectorRollPitchYaw & sotPatternGenerator::
+VectorRollPitchYaw & PatternGenerator::
 getWaistAttitudeAbsolute(VectorRollPitchYaw &res, int time)
 {
   sotDEBUGIN(5);
@@ -1321,7 +1321,7 @@ getWaistAttitudeAbsolute(VectorRollPitchYaw &res, int time)
   return res;
 }
 
-ml::Vector & sotPatternGenerator::
+ml::Vector & PatternGenerator::
 getWaistPosition(ml::Vector &res, int time)
 {
   sotDEBUGIN(5);
@@ -1331,7 +1331,7 @@ getWaistPosition(ml::Vector &res, int time)
   sotDEBUGOUT(5);
   return res;
 }
-ml::Vector & sotPatternGenerator::
+ml::Vector & PatternGenerator::
 getWaistPositionAbsolute(ml::Vector &res, int time)
 {
   sotDEBUGIN(5);
@@ -1343,7 +1343,7 @@ getWaistPositionAbsolute(ml::Vector &res, int time)
   return res;
 }
 
-unsigned & sotPatternGenerator::
+unsigned & PatternGenerator::
 getDataInProcess(unsigned &res, int time)
 {
   sotDEBUGIN(5);

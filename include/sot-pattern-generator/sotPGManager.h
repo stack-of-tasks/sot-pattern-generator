@@ -35,7 +35,7 @@ namespace ml = maal::boost;
 #include <dynamic-graph/signal-ptr.h>
 #include <dynamic-graph/signal-time-dependent.h>
 #include <sot/sotStepQueue.h>
-#include <sot/sotPatternGenerator.h>
+#include <sot/PatternGenerator.h>
 
 
 /* --------------------------------------------------------------------- */
@@ -58,7 +58,7 @@ namespace ml = maal::boost;
 /* --------------------------------------------------------------------- */
 
 class sotStepQueue;
-class sotPatternGenerator;
+class PatternGenerator;
 
 /// Finds the PG and sends steps to the PG.
 class SOTPGMANAGER_EXPORT sotPGManager

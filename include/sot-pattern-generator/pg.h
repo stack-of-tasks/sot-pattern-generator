@@ -52,12 +52,12 @@ namespace pg=PatternGeneratorJRL;
 
 #if defined (WIN32) 
 #  if defined (sot_pg_EXPORTS)
-#    define SOTPATTERNGENERATOR_EXPORT __declspec(dllexport)
+#    define PatternGenerator_EXPORT __declspec(dllexport)
 #  else  
-#    define SOTPATTERNGENERATOR_EXPORT __declspec(dllimport)
+#    define PatternGenerator_EXPORT __declspec(dllimport)
 #  endif 
 #else
-#  define SOTPATTERNGENERATOR_EXPORT
+#  define PatternGenerator_EXPORT
 #endif
 
 namespace sot {
@@ -75,7 +75,7 @@ It wraps up the algorithms implemented by the walkGenJRL library.
 
 
  */
-class SOTPATTERNGENERATOR_EXPORT sotPatternGenerator
+class PatternGenerator_EXPORT PatternGenerator
 :public dg::Entity
 {
  public:
@@ -164,9 +164,9 @@ class SOTPATTERNGENERATOR_EXPORT sotPatternGenerator
  public: /* --- CONSTRUCTION --- */
   
   /*! \brief Default constructor. */
-  sotPatternGenerator( const std::string& name = "PatternGenerator" );
+  PatternGenerator( const std::string& name = "PatternGenerator" );
   /*! \brief Default destructor. */
-  virtual ~sotPatternGenerator( void );
+  virtual ~PatternGenerator( void );
 
  public: /* --- MODEL CREATION --- */
  

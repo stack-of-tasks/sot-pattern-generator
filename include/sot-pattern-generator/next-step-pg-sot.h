@@ -83,7 +83,7 @@ class NextStepPGSOT_EXPORT NextStepPgSot
   pg::PatternGeneratorInterface * m_PGI;
 
   /*! \brief Pointer towards the entity which handle the pattern generator. */
-  sotPatternGenerator * m_sPG;
+  PatternGenerator * m_sPG;
 
  public: /* --- CONSTRUCTION --- */
   NextStepPgSot( const std::string& name );

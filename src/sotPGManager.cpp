@@ -20,7 +20,7 @@
 
 #include <sot/sotPGManager.h>
 #include <sot-core/debug.h>
-#include <sot/sotPatternGenerator.h>
+#include <sot/PatternGenerator.h>
 #include <dynamic-graph/factory.h>
 
 
@@ -132,7 +132,7 @@ void sotPGManager::commandLine( const std::string& cmdLine,
     cmdArgs >> std::ws;
     if( cmdArgs.good()){ cmdArgs >> name; }
     pgEntity = &g_pool.getEntity( name );
-    sotPatternGenerator* spg = dynamic_cast<sotPatternGenerator*>(pgEntity);
+    PatternGenerator* spg = dynamic_cast<PatternGenerator*>(pgEntity);
     if (spg){ pgi = spg->GetPatternGeneratorInterface(); }
   }
   else if( "savesteps" == cmdLine )

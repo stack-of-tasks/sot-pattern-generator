@@ -2,7 +2,7 @@
  * Copyright Projet JRL-Japan, 2007
  *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  *
- * File:      sotStepComputer.h
+ * File:      StepComputer.h
  * Project:   SOT
  * Author:    Olivier Stasse
  *
@@ -17,8 +17,8 @@
  *
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-#ifndef __SOT_SOTSTEPCOMPUTER_JOYSTICK_H__
-#define __SOT_SOTSTEPCOMPUTER_JOYSTICK_H__
+#ifndef __SOT_StepComputer_JOYSTICK_H__
+#define __SOT_StepComputer_JOYSTICK_H__
 
 
 /* --------------------------------------------------------------------- */
@@ -36,9 +36,9 @@ namespace ml = maal::boost;
 #include <sot-core/matrix-homogeneous.h>
 #include <sot-core/vector-roll-pitch-yaw.h>
 #include <sot-core/matrix-rotation.h>
-#include <sot/sotStepObserver.h>
+#include <sot-pattern-generator/step-observer.h>
 #include <sot-pattern-generator/step-checker.h>
-#include <sot/sotStepComputer.h>
+#include <sot-pattern-generator/step-computer.h>
 
 /* STD */
 #include <string>
@@ -51,13 +51,13 @@ namespace ml = maal::boost;
 /* --------------------------------------------------------------------- */
 
 #if defined (WIN32) 
-#  if defined (sotStepComputerJoystick_EXPORTS) 
-#    define SOTSTEPCOMPUTERJOYSTICK_EXPORT __declspec(dllexport)
+#  if defined (StepComputerJoystick_EXPORTS) 
+#    define StepComputerJOYSTICK_EXPORT __declspec(dllexport)
 #  else  
-#    define SOTSTEPCOMPUTERJOYSTICK_EXPORT __declspec(dllimport)
+#    define StepComputerJOYSTICK_EXPORT __declspec(dllimport)
 #  endif 
 #else
-#  define SOTSTEPCOMPUTERJOYSTICK_EXPORT
+#  define StepComputerJOYSTICK_EXPORT
 #endif
 
 
@@ -68,8 +68,8 @@ namespace ml = maal::boost;
 class StepQueue;
 
 /// Generates footsteps.
-class SOTSTEPCOMPUTERJOYSTICK_EXPORT sotStepComputerJoystick
-: public dg::Entity, public sotStepComputer
+class StepComputerJOYSTICK_EXPORT StepComputerJoystick
+: public dg::Entity, public StepComputer
 {
  public:
 
@@ -78,7 +78,7 @@ class SOTSTEPCOMPUTERJOYSTICK_EXPORT sotStepComputerJoystick
 
  public: // Construction
 
-  sotStepComputerJoystick( const std::string& name );
+  StepComputerJoystick( const std::string& name );
 
  public: // Methods
 

@@ -2,7 +2,7 @@
  * Copyright Projet JRL-Japan, 2007
  *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  *
- * File:      sotStepComputer.h
+ * File:      StepComputer.h
  * Project:   SOT
  * Author:    Paul Evrard, Nicolas Mansard
  *
@@ -37,16 +37,17 @@
 /* --------------------------------------------------------------------- */
 
 #if defined (WIN32) 
-#  if defined (sotStepObserver_EXPORTS) 
-#    define SOTSTEPOBSERVER_EXPORT __declspec(dllexport)
+#  if defined (step_observer_EXPORTS)
+#    define StepObserver_EXPORT __declspec(dllexport)
 #  else
-#    define SOTSTEPOBSERVER_EXPORT __declspec(dllimport)
+#    define StepObserver_EXPORT __declspec(dllimport)
 #  endif
 #else
-#  define SOTSTEPOBSERVER_EXPORT
+#  define StepObserver_EXPORT
 #endif
 
-
+namespace sot {
+namespace dg = dynamicgraph;
 /* --------------------------------------------------------------------- */
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
@@ -55,7 +56,7 @@
 /// hands and feet of the robot. The coordinates of the reference
 /// frames are computed both in the left and right foot frames,
 /// and in the waist frame.
-class SOTSTEPOBSERVER_EXPORT sotStepObserver
+class StepObserver_EXPORT StepObserver
   : public dg::Entity
 {
  public:
@@ -83,9 +84,9 @@ class SOTSTEPOBSERVER_EXPORT sotStepObserver
 
  public: // methods
 
-  sotStepObserver( const std::string & name );
+  StepObserver( const std::string & name );
 
-  dg::SignalArray<int> getdg::Signals( void );
+  dg::SignalArray<int> getSignals( void );
   operator dg::SignalArray<int> ();
 
  public: // signal callbacks
@@ -105,5 +106,8 @@ class SOTSTEPOBSERVER_EXPORT sotStepObserver
 
   MatrixHomogeneous& computeRefPos( MatrixHomogeneous& res,int timeCurr,const MatrixHomogeneous& wMref );
 };
+
+
+} // namespace sot
 
 #endif

@@ -1,31 +1,34 @@
 #include <cmath>
 
-#include <sot/sotStepObserver.h>
+#include <sot-pattern-generator/step-observer.h>
 #include <sot-core/vector-roll-pitch-yaw.h>
 #include <sot-core/matrix-rotation.h>
 #include <dynamic-graph/factory.h>
+#include <sot-core/debug.h>
 
-DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(sotStepObserver,"StepObserver");
+using namespace sot;
+using namespace dynamicgraph;
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(StepObserver,"StepObserver");
 
-sotStepObserver::sotStepObserver( const std::string & name )
+StepObserver::StepObserver( const std::string & name )
   :Entity(name)
 
-  ,leftHandPositionSIN( NULL,"sotStepObserver("+name+")::input(vector)::lefthand" )
-  ,rightHandPositionSIN( NULL,"sotStepObserver("+name+")::input(vector)::righthand" )
+  ,leftHandPositionSIN( NULL,"StepObserver("+name+")::input(vector)::lefthand" )
+  ,rightHandPositionSIN( NULL,"StepObserver("+name+")::input(vector)::righthand" )
 
-  ,leftFootPositionSIN( NULL,"sotStepObserver("+name+")::input(matrixhomo)::leftfoot" )
-  ,rightFootPositionSIN( NULL,"sotStepObserver("+name+")::input(matrixhomo)::rightfoot" )
-  ,waistPositionSIN( NULL,"sotStepObserver("+name+")::input(matrixhomo)::waist" )
+  ,leftFootPositionSIN( NULL,"StepObserver("+name+")::input(matrixhomo)::leftfoot" )
+  ,rightFootPositionSIN( NULL,"StepObserver("+name+")::input(matrixhomo)::rightfoot" )
+  ,waistPositionSIN( NULL,"StepObserver("+name+")::input(matrixhomo)::waist" )
 
-  ,referencePositionLeftSOUT( boost::bind(&sotStepObserver::computeReferencePositionLeft,this,_1,_2),
+  ,referencePositionLeftSOUT( boost::bind(&StepObserver::computeReferencePositionLeft,this,_1,_2),
 			      leftFootPositionSIN<<leftHandPositionSIN<<rightHandPositionSIN,
-			      "sotStepObserver("+name+")::output(vector)::position2handLeft" ) 
-  ,referencePositionRightSOUT( boost::bind(&sotStepObserver::computeReferencePositionRight,this,_1,_2),
+			      "StepObserver("+name+")::output(vector)::position2handLeft" ) 
+  ,referencePositionRightSOUT( boost::bind(&StepObserver::computeReferencePositionRight,this,_1,_2),
 			       rightFootPositionSIN<<rightHandPositionSIN<<leftHandPositionSIN,
-			       "sotStepObserver("+name+")::output(vector)::position2handRight" )
-  ,referencePositionWaistSOUT( boost::bind(&sotStepObserver::computeReferencePositionWaist,this,_1,_2),
+			       "StepObserver("+name+")::output(vector)::position2handRight" )
+  ,referencePositionWaistSOUT( boost::bind(&StepObserver::computeReferencePositionWaist,this,_1,_2),
 			       waistPositionSIN<<rightHandPositionSIN<<leftHandPositionSIN,
-			       "sotStepObserver("+name+")::output(vector)::position2handWaist" )
+			       "StepObserver("+name+")::output(vector)::position2handWaist" )
 {
   sotDEBUGIN(25);
 
@@ -35,7 +38,7 @@ sotStepObserver::sotStepObserver( const std::string & name )
 }
 
 
-SignalArray<int> sotStepObserver::getSignals( void )
+SignalArray<int> StepObserver::getSignals( void )
 {
   return (leftHandPositionSIN << leftFootPositionSIN << waistPositionSIN
 	  << rightHandPositionSIN << rightFootPositionSIN
@@ -44,14 +47,14 @@ SignalArray<int> sotStepObserver::getSignals( void )
 }
 
 
-sotStepObserver::operator SignalArray<int> ()
+StepObserver::operator SignalArray<int> ()
 {
   return getSignals();
 }
 
 
 MatrixHomogeneous&
-sotStepObserver::computeRefPos( MatrixHomogeneous& res,
+StepObserver::computeRefPos( MatrixHomogeneous& res,
 				int timeCurr,
 				const MatrixHomogeneous& wMref )
 {
@@ -102,7 +105,7 @@ sotStepObserver::computeRefPos( MatrixHomogeneous& res,
 
 
 MatrixHomogeneous&
-sotStepObserver::computeReferencePositionLeft( MatrixHomogeneous& res,
+StepObserver::computeReferencePositionLeft( MatrixHomogeneous& res,
 					       int timeCurr )
 {
   sotDEBUGIN(15);
@@ -115,7 +118,7 @@ sotStepObserver::computeReferencePositionLeft( MatrixHomogeneous& res,
 
 
 MatrixHomogeneous&
-sotStepObserver::computeReferencePositionRight( MatrixHomogeneous& res,
+StepObserver::computeReferencePositionRight( MatrixHomogeneous& res,
 						int timeCurr )
 {
   sotDEBUGIN(15);
@@ -128,7 +131,7 @@ sotStepObserver::computeReferencePositionRight( MatrixHomogeneous& res,
 
 
 MatrixHomogeneous&
-sotStepObserver::computeReferencePositionWaist( MatrixHomogeneous& res,
+StepObserver::computeReferencePositionWaist( MatrixHomogeneous& res,
 						int timeCurr )
 {
   sotDEBUGIN(15);
@@ -140,13 +143,13 @@ sotStepObserver::computeReferencePositionWaist( MatrixHomogeneous& res,
 }
 
 
-void sotStepObserver::display( std::ostream& os ) const
+void StepObserver::display( std::ostream& os ) const
 {
-  os << "sotStepObserver <" << getName() <<">:" << std::endl;
+  os << "StepObserver <" << getName() <<">:" << std::endl;
 }
 
 
-void sotStepObserver::commandLine( const std::string& cmdLine,
+void StepObserver::commandLine( const std::string& cmdLine,
 				   std::istringstream& cmdArgs,
 				   std::ostream& os )
 {

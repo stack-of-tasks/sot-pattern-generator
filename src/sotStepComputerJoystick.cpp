@@ -2,7 +2,7 @@
  * Copyright Projet JRL-Japan, 2009
  *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  *
- * File:      sotStepComputerJoystick.cpp
+ * File:      StepComputerJoystick.cpp
  * Project:   SOT
  * Author:    Olivier Stasse
  *
@@ -28,25 +28,25 @@
 # include <Winsock2.h>
 #endif /*WIN32*/
 
-#include <sot/sotStepComputerJoystick.h>
+#include <sot/StepComputerJoystick.h>
 #include <sot-core/debug.h>
 #include <sot/sotMacrosSignal.h>
 #include <sot-pattern-generator/exception-pg.h>
-#include <sot/StepQueue.h>
+#include <sot-pattern-generator/step-queue.h>
 #include <sot-pattern-generator/step-checker.h>
 #include <dynamic-graph/factory.h>
 
 
-DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(sotStepComputerJoystick,"StepComputerJoystick");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(StepComputerJoystick,"StepComputerJoystick");
 
 
-sotStepComputerJoystick::sotStepComputerJoystick( const std::string & name )
+StepComputerJoystick::StepComputerJoystick( const std::string & name )
   : Entity(name)
-  , joystickSIN( NULL,"sotStepComputerJoystick("+name+")::input(vector)::joystickin" )
-  , contactFootSIN( NULL,"sotStepComputerJoystick("+name+")::input(uint)::contactfoot" )
-  , laststepSOUT(boost::bind(&sotStepComputerJoystick::getlaststep,this,_1,_2),
+  , joystickSIN( NULL,"StepComputerJoystick("+name+")::input(vector)::joystickin" )
+  , contactFootSIN( NULL,"StepComputerJoystick("+name+")::input(uint)::contactfoot" )
+  , laststepSOUT(boost::bind(&StepComputerJoystick::getlaststep,this,_1,_2),
 		 joystickSIN,
-		 "sotStepComputerJoystick("+name+")::output(vector)::laststep")
+		 "StepComputerJoystick("+name+")::output(vector)::laststep")
   , checker()
   , logChanges("/tmp/stepcomp_changes.dat")
   , logPreview("/tmp/stepcomp_preview.dat")
@@ -59,7 +59,7 @@ sotStepComputerJoystick::sotStepComputerJoystick( const std::string & name )
   sotDEBUGOUT(5);
 }
 
-void sotStepComputerJoystick::nextStep( StepQueue& queue, int timeCurr )
+void StepComputerJoystick::nextStep( StepQueue& queue, int timeCurr )
 {
   // Introduce new step at the end of the preview window.
   if( queue.getLastStep().contact == CONTACT_LEFT_FOOT ) {
@@ -76,7 +76,7 @@ void sotStepComputerJoystick::nextStep( StepQueue& queue, int timeCurr )
   }
 }
 
-void sotStepComputerJoystick::changeFirstStep( StepQueue& queue, int timeCurr )
+void StepComputerJoystick::changeFirstStep( StepQueue& queue, int timeCurr )
 {
   logChanges << timeCurr << " changeFirstStep" <<std::endl;
 
@@ -133,13 +133,13 @@ void sotStepComputerJoystick::changeFirstStep( StepQueue& queue, int timeCurr )
   //  logChanges << x << " " << y << " " << theta << std::endl;
 }
 
-void sotStepComputerJoystick::display( std::ostream& os ) const
+void StepComputerJoystick::display( std::ostream& os ) const
 {
-  os << "sotStepComputer <" << getName() <<">:" << std::endl;
+  os << "StepComputer <" << getName() <<">:" << std::endl;
 }
 
 
-void sotStepComputerJoystick::commandLine( const std::string& cmdLine,
+void StepComputerJoystick::commandLine( const std::string& cmdLine,
 				   std::istringstream& cmdArgs,
 				   std::ostream& os )
 {
@@ -159,7 +159,7 @@ void sotStepComputerJoystick::commandLine( const std::string& cmdLine,
   else { Entity::commandLine( cmdLine,cmdArgs,os); }
 }
 
-ml::Vector & sotStepComputerJoystick::getlaststep(ml::Vector& res, int time)
+ml::Vector & StepComputerJoystick::getlaststep(ml::Vector& res, int time)
 {
   if (res.size()!=4)
     res.resize(4);

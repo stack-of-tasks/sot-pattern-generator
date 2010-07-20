@@ -2,7 +2,7 @@
  * Copyright Projet JRL-Japan, 2007
  *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  *
- * File:      sotStepComputer.h
+ * File:      StepComputer.h
  * Project:   SOT
  * Author:    Paul Evrard, Nicolas Mansard
  *
@@ -17,8 +17,8 @@
  *
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-#ifndef __SOT_SOTSTEPCOMPUTER_H__
-#define __SOT_SOTSTEPCOMPUTER_H__
+#ifndef __SOT_StepComputer_H__
+#define __SOT_StepComputer_H__
 
 
 /* --------------------------------------------------------------------- */
@@ -36,13 +36,15 @@ namespace ml = maal::boost;
 #include <sot-core/matrix-homogeneous.h>
 #include <sot-core/vector-roll-pitch-yaw.h>
 #include <sot-core/matrix-rotation.h>
-#include <sot/sotStepObserver.h>
+#include <sot-pattern-generator/step-observer.h>
 #include <sot-pattern-generator/step-checker.h>
 
 /* STD */
 #include <string>
 #include <deque>
 #include <fstream>
+
+namespace sot {
 
 /* --------------------------------------------------------------------- */
 /* --- CLASS ----------------------------------------------------------- */
@@ -51,14 +53,17 @@ namespace ml = maal::boost;
 class StepQueue;
 
 /// Generates footsteps.
-class sotStepComputer
+class StepComputer
 {
  public: // Methods
 
   virtual void changeFirstStep( StepQueue& queue, int timeCurr )=0;
   virtual void nextStep( StepQueue& queue, int timeCurr )=0 ;
-  virtual ~sotStepComputer(){};
+  virtual ~StepComputer(){};
 };
+
+
+} // namespace sot
 
 
 #endif // #ifndef __SOT_STEPCOMPUTER_H__

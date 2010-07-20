@@ -2,7 +2,7 @@
  * Copyright Projet JRL-Japan, 2007
  *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  *
- * File:      sotStepComputer.h
+ * File:      StepComputer.h
  * Project:   SOT
  * Author:    Paul Evrard, Nicolas Mansard
  *
@@ -17,8 +17,8 @@
  *
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-#ifndef __SOT_SOTSTEPCOMPUTER_FORCE_H__
-#define __SOT_SOTSTEPCOMPUTER_FORCE_H__
+#ifndef __SOT_StepComputer_FORCE_H__
+#define __SOT_StepComputer_FORCE_H__
 
 
 /* --------------------------------------------------------------------- */
@@ -36,9 +36,9 @@ namespace ml = maal::boost;
 #include <sot-core/matrix-homogeneous.h>
 #include <sot-core/vector-roll-pitch-yaw.h>
 #include <sot-core/matrix-rotation.h>
-#include <sot/sotStepObserver.h>
+#include <sot-pattern-generator/step-observer.h>
 #include <sot-pattern-generator/step-checker.h>
-#include <sot/sotStepComputer.h>
+#include <sot-pattern-generator/step-computer.h>
 /* STD */
 #include <string>
 #include <deque>
@@ -50,13 +50,13 @@ namespace ml = maal::boost;
 /* --------------------------------------------------------------------- */
 
 #if defined (WIN32) 
-#  if defined (sotStepComputerPos_EXPORTS) 
-#    define SOTSTEPCOMPUTERFORCE_EXPORT __declspec(dllexport)
+#  if defined (StepComputerPos_EXPORTS) 
+#    define StepComputerFORCE_EXPORT __declspec(dllexport)
 #  else  
-#    define SOTSTEPCOMPUTERFORCE_EXPORT __declspec(dllimport)
+#    define StepComputerFORCE_EXPORT __declspec(dllimport)
 #  endif 
 #else
-#  define SOTSTEPCOMPUTERFORCE_EXPORT
+#  define StepComputerFORCE_EXPORT
 #endif
 
 
@@ -67,8 +67,8 @@ namespace ml = maal::boost;
 class StepQueue;
 
 /// Generates footsteps.
-class SOTSTEPCOMPUTERFORCE_EXPORT sotStepComputerPos
-: public dg::Entity, public sotStepComputer
+class StepComputerFORCE_EXPORT StepComputerPos
+: public dg::Entity, public StepComputer
 {
  public:
 
@@ -77,7 +77,7 @@ class SOTSTEPCOMPUTERFORCE_EXPORT sotStepComputerPos
 
  public: // Construction
 
-  sotStepComputerPos( const std::string& name );
+  StepComputerPos( const std::string& name );
 
  public: // Methods
 
@@ -101,7 +101,7 @@ class SOTSTEPCOMPUTERFORCE_EXPORT sotStepComputerPos
 
   MatrixHomogeneous rfMref0;
   MatrixHomogeneous lfMref0;
-  sotStepObserver* twoHandObserver;
+  StepObserver* twoHandObserver;
   StepChecker checker;
 
   void thisIsZero();

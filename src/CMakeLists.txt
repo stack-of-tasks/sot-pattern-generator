@@ -74,14 +74,14 @@ SET(plugins_0
     sotNextStep
     StepChecker
 	StepQueue
-	sotStepComputerPos
-	sotStepComputerForce
-	sotStepComputerJoystick
-	sotStepObserver
+	StepComputerPos
+	StepComputerForce
+	StepComputerJoystick
+	StepObserver
 # dependent on walkgenjrl
 	sotNextStepPgSot
 	PGManager
-	sotStepTimeLine
+	StepTimeLine
 # all dependencies
 	PatternGenerator
 )
@@ -94,6 +94,8 @@ SET(plugins
 	step-queue
 	selector
 	step-checker
+	step-time-line
+	step-observer
 	)
 	
 SET(plugins_common_deps
@@ -102,12 +104,12 @@ SET(plugins_common_deps
 # Add specific plugins dependencies.
 #SET (sotNextStepOpenHRP_plugins_dependencies StackOfTasks sotNextStep)
 SET (sotNextStepPgSot_plugins_dependencies sotNextStep sotPatternGenerator)
-SET (sotStepComputer_plugins_dependencies sotStepQueue StepChecker sotStepObserver)
-SET (sotStepComputerForce_plugins_dependencies sotStepQueue StepChecker sotStepObserver)
-SET (sotStepComputerPos_plugins_dependencies sotStepQueue StepChecker sotStepObserver)
-SET (sotStepComputerJoystick_plugins_dependencies  sotStepQueue StepChecker sotStepObserver)
+SET (StepComputer_plugins_dependencies sotStepQueue StepChecker StepObserver)
+SET (StepComputerForce_plugins_dependencies sotStepQueue StepChecker StepObserver)
+SET (StepComputerPos_plugins_dependencies sotStepQueue StepChecker StepObserver)
+SET (StepComputerJoystick_plugins_dependencies  sotStepQueue StepChecker StepObserver)
 SET (PGManager_plugins_dependencies sotStepQueue sotPatternGenerator)
-SET (sotStepTimeLine_plugins_dependencies sotStepQueue PGManager)
+SET (StepTimeLine_plugins_dependencies sotStepQueue PGManager)
 
 
 FOREACH(LIBRARY_NAME ${plugins})

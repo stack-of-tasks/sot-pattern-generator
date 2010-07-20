@@ -2,7 +2,7 @@
  * Copyright Projet JRL-Japan, 2007
  *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  *
- * File:      sotStepTimeLine.cpp
+ * File:      StepTimeLine.cpp
  * Project:   SOT
  * Author:    Nicolas Mansard, Olivier Stasse, Paul Evrard
  *
@@ -21,20 +21,21 @@
  *
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-#include <sot/sotStepTimeLine.h>
+#include <sot-pattern-generator/step-time-line.h>
 #include <sot-core/debug.h>
 #include <dynamic-graph/factory.h>
 #include <dynamic-graph/pool.h>
 
-
-DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(sotStepTimeLine,"TimeLine");
-
-
-const unsigned int sotStepTimeLine::PERIOD_DEFAULT = 160; // 160iter=800ms
-const unsigned int sotStepTimeLine::FIRST_STEP_TO_MODIFY = 3;
+using namespace sot;
+using namespace dynamicgraph;
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(StepTimeLine,"TimeLine");
 
 
-sotStepTimeLine::sotStepTimeLine( const std::string& name )
+const unsigned int StepTimeLine::PERIOD_DEFAULT = 160; // 160iter=800ms
+const unsigned int StepTimeLine::FIRST_STEP_TO_MODIFY = 3;
+
+
+StepTimeLine::StepTimeLine( const std::string& name )
   : Entity(name)
   , triggerSOUT( "NextStep("+name+")::input(dummy)::trigger" )
 
@@ -49,14 +50,14 @@ sotStepTimeLine::sotStepTimeLine( const std::string& name )
 {
   sotDEBUGIN(5);
 
-  triggerSOUT.setFunction( boost::bind(&sotStepTimeLine::triggerCall,this,_1,_2) );
+  triggerSOUT.setFunction( boost::bind(&StepTimeLine::triggerCall,this,_1,_2) );
   signalRegistration( triggerSOUT );
 
   sotDEBUGOUT(5);
 }
 
 
-int& sotStepTimeLine::triggerCall ( int& dummy, int timeCurrent )
+int& StepTimeLine::triggerCall ( int& dummy, int timeCurrent )
 {
   sotDEBUGIN ( 45 );
 
@@ -105,9 +106,9 @@ int& sotStepTimeLine::triggerCall ( int& dummy, int timeCurrent )
 }
 
 
-void sotStepTimeLine::display( std::ostream& os ) const
+void StepTimeLine::display( std::ostream& os ) const
 {
-  os << "sotStepTimeLine <" << getName() << ">:" << std::endl;
+  os << "StepTimeLine <" << getName() << ">:" << std::endl;
   os << " - timeLastIntroduction: " << timeLastIntroduction << std::endl;
   os << " - period: " << period << std::endl;
 
@@ -121,7 +122,7 @@ void sotStepTimeLine::display( std::ostream& os ) const
 }
 
 
-void sotStepTimeLine::commandLine( const std::string& cmdLine,
+void StepTimeLine::commandLine( const std::string& cmdLine,
                                    std::istringstream& cmdArgs,
                                    std::ostream& os )
 {
@@ -136,7 +137,7 @@ void sotStepTimeLine::commandLine( const std::string& cmdLine,
     cmdArgs >> std::ws;
     if( cmdArgs.good()){ cmdArgs >> name; }
     Entity* entity = &g_pool.getEntity( name );
-    stepComputer = dynamic_cast<sotStepComputer*>(entity);
+    stepComputer = dynamic_cast<StepComputer*>(entity);
   }
   else if( cmdLine == "setQueue" )
   {

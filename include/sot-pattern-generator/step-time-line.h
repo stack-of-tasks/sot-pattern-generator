@@ -2,7 +2,7 @@
  * Copyright Projet JRL-Japan, 2007
  *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  *
- * File:      sotStepTimeLine.h
+ * File:      StepTimeLine.h
  * Project:   SOT
  * Author:    Nicolas Mansard, Olivier Stasse, Paul Evrard
  *
@@ -33,9 +33,9 @@
 #include <dynamic-graph/entity.h>
 #include <dynamic-graph/signal-ptr.h>
 #include <dynamic-graph/signal-time-dependent.h>
-#include <sot/StepQueue.h>
-#include <sot/sotStepComputer.h>
-#include <sot/PGManager.h>
+#include <sot-pattern-generator/step-queue.h>
+#include <sot-pattern-generator/step-computer.h>
+#include <sot-pattern-generator/pg-manager.h>
 
 
 /* --------------------------------------------------------------------- */
@@ -43,15 +43,17 @@
 /* --------------------------------------------------------------------- */
 
 #if defined (WIN32) 
-#  if defined (sotStepTimeLine_EXPORTS) 
-#    define SOTSTEPTIMELINE_EXPORT __declspec(dllexport)
+#  if defined (step_time_line_EXPORTS)
+#    define StepTimeLine_EXPORT __declspec(dllexport)
 #  else  
-#    define SOTSTEPTIMELINE_EXPORT __declspec(dllimport)
+#    define StepTimeLine_EXPORT __declspec(dllimport)
 #  endif 
 #else
-#  define SOTSTEPTIMELINE_EXPORT
+#  define StepTimeLine_EXPORT
 #endif
 
+namespace sot {
+namespace dg = dynamicgraph;
 
 /* --------------------------------------------------------------------- */
 /* --- CLASS ----------------------------------------------------------- */
@@ -77,7 +79,7 @@
 ///
 /// \note{This entity class can not be instantiated in a shell since it does not
 /// register any factory. This behavior is intended.}
-class SOTSTEPTIMELINE_EXPORT sotStepTimeLine
+class StepTimeLine_EXPORT StepTimeLine
   : public dg::Entity
 {
 public: // dg::Entity name
@@ -95,7 +97,7 @@ private:
 
 public: // Construction
 
-  sotStepTimeLine( const std::string& name );
+  StepTimeLine( const std::string& name );
 
 public: // Trigger
 
@@ -110,7 +112,7 @@ public: // Trigger
 
 private: // State
 
-  enum sotSteppingState
+  enum SteppingState
   {
     STATE_STARTING,   ///< Introducing 4 steps then switches to STATE_STARTED.
     STATE_STOPPING,   ///< Running but stop requested: introduce a last step and stop.
@@ -128,14 +130,23 @@ public: // dg::Entity
 private:
 
   StepQueue* stepQueue;
-  sotStepComputer* stepComputer;
+  StepComputer* stepComputer;
   PGManager* pgManager;
 
-  sotSteppingState state;
+  SteppingState state;
   int timeLastIntroduction;
   int period;
   unsigned int nStartingSteps;
 };
+
+
+
+
+
+} // namespace sot
+
+
+
 
 #endif
 

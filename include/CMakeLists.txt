@@ -11,6 +11,9 @@ pg-manager.h
 step-queue.h
 selector.h
 step-checker.h
+step-time-line.h
+step-observer.h
+step-computer.h
 )
 
 # Recreate correct path for the headers

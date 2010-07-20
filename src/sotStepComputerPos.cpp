@@ -2,7 +2,7 @@
  * Copyright Projet JRL-Japan, 2007
  *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  *
- * File:      sotStepComputer.cpp
+ * File:      StepComputer.cpp
  * Project:   SOT
  * Author:    Paul Evrard, Nicolas Mansard
  *
@@ -28,24 +28,24 @@
 # include <Winsock2.h>
 #endif /*WIN32*/
 
-#include <sot/sotStepComputerPos.h>
+#include <sot/StepComputerPos.h>
 #include <sot-core/debug.h>
 #include <sot/sotMacrosSignal.h>
 #include <sot-pattern-generator/exception-pg.h>
-#include <sot/StepQueue.h>
+#include <sot-pattern-generator/step-queue.h>
 #include <sot-pattern-generator/step-checker.h>
 #include <dynamic-graph/factory.h>
 #include <dynamic-graph/pool.h>
 
 
-DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(sotStepComputerPos,"StepComputerPos");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(StepComputerPos,"StepComputerPos");
 
 
-sotStepComputerPos:: sotStepComputerPos( const std::string & name )
+StepComputerPos:: StepComputerPos( const std::string & name )
   : Entity(name)
-  , referencePositionLeftSIN( NULL,"sotStepComputerPos("+name+")::input(vector)::posrefleft" )
-  , referencePositionRightSIN( NULL,"sotStepComputerPos("+name+")::input(vector)::posrefright" )
-  , contactFootSIN( NULL,"sotStepComputerPos("+name+")::input(uint)::contactfoot" )
+  , referencePositionLeftSIN( NULL,"StepComputerPos("+name+")::input(vector)::posrefleft" )
+  , referencePositionRightSIN( NULL,"StepComputerPos("+name+")::input(vector)::posrefright" )
+  , contactFootSIN( NULL,"StepComputerPos("+name+")::input(uint)::contactfoot" )
   , rfMref0()
   , lfMref0()
   , twoHandObserver( 0x0 )
@@ -60,7 +60,7 @@ sotStepComputerPos:: sotStepComputerPos( const std::string & name )
   sotDEBUGOUT(5);
 }
 
-void sotStepComputerPos::nextStep( StepQueue& queue, int timeCurr )
+void StepComputerPos::nextStep( StepQueue& queue, int timeCurr )
 {
   // Introduce new step at the end of the preview window.
   if( queue.getLastStep().contact == CONTACT_LEFT_FOOT ) {
@@ -77,7 +77,7 @@ void sotStepComputerPos::nextStep( StepQueue& queue, int timeCurr )
   }
 }
 
-void sotStepComputerPos::changeFirstStep( StepQueue& queue, int timeCurr )
+void StepComputerPos::changeFirstStep( StepQueue& queue, int timeCurr )
 {
   if(!twoHandObserver) {
     std::cerr << "Observer not set" << std::endl;
@@ -186,7 +186,7 @@ void sotStepComputerPos::changeFirstStep( StepQueue& queue, int timeCurr )
 }
 
 
-void sotStepComputerPos::thisIsZero()
+void StepComputerPos::thisIsZero()
 {
   sotDEBUGIN(15);
 
@@ -197,13 +197,13 @@ void sotStepComputerPos::thisIsZero()
 }
 
 
-void sotStepComputerPos::display( std::ostream& os ) const
+void StepComputerPos::display( std::ostream& os ) const
 {
-  os << "sotStepComputerPos <" << getName() <<">:" << std::endl;
+  os << "StepComputerPos <" << getName() <<">:" << std::endl;
 }
 
 
-void sotStepComputerPos::commandLine( const std::string& cmdLine,
+void StepComputerPos::commandLine( const std::string& cmdLine,
 				   std::istringstream& cmdArgs,
 				   std::ostream& os )
 {
@@ -227,7 +227,7 @@ void sotStepComputerPos::commandLine( const std::string& cmdLine,
     cmdArgs >> std::ws;
     if( cmdArgs.good()){ cmdArgs >> name; }
     Entity* entity = &g_pool.getEntity( name );
-    twoHandObserver = dynamic_cast<sotStepObserver*>(entity);
+    twoHandObserver = dynamic_cast<StepObserver*>(entity);
   }
   else { Entity::commandLine( cmdLine,cmdArgs,os); }
 }

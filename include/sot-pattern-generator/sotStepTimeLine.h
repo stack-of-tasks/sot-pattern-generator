@@ -33,7 +33,7 @@
 #include <dynamic-graph/entity.h>
 #include <dynamic-graph/signal-ptr.h>
 #include <dynamic-graph/signal-time-dependent.h>
-#include <sot/sotStepQueue.h>
+#include <sot/StepQueue.h>
 #include <sot/sotStepComputer.h>
 #include <sot/sotPGManager.h>
 
@@ -127,7 +127,7 @@ public: // dg::Entity
 
 private:
 
-  sotStepQueue* stepQueue;
+  StepQueue* stepQueue;
   sotStepComputer* stepComputer;
   sotPGManager* pgManager;
 

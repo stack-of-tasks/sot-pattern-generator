@@ -61,7 +61,7 @@ starter( const int & timeCurr )
     {
       std::ostringstream cmdstd;
       cmdstd << ":StartOnLineStepSequencing ";
-      for( std::deque< sotFootPrint >::const_iterator iter = footPrintList.begin();
+      for( std::deque< FootPrint >::const_iterator iter = footPrintList.begin();
 	   iter!=footPrintList.end();++iter )
 	{
 	  cmdstd <<  iter->x << " " << iter->y << " " << iter->theta << " ";
@@ -104,7 +104,7 @@ introductionCallBack( const int & timeCurr )
   if( state==STATE_STARTED ) 
     {
       
-      sotFootPrint & lastStep =  footPrintList.back();
+      FootPrint & lastStep =  footPrintList.back();
       if( (NULL!=sot_ptr)&&(NULL!=sot_ptr->walkGenpluginPTR) )
 	{
 	  switch( lastStep.contact )

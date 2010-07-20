@@ -65,7 +65,7 @@ namespace ml = maal::boost;
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-class sotStepQueue;
+class StepQueue;
 
 /// Generates footsteps.
 class SOTSTEPCOMPUTERJOYSTICK_EXPORT sotStepComputerJoystick
@@ -82,8 +82,8 @@ class SOTSTEPCOMPUTERJOYSTICK_EXPORT sotStepComputerJoystick
 
  public: // Methods
 
-  void changeFirstStep( sotStepQueue& queue, int timeCurr );
-  void nextStep( sotStepQueue& queue, int timeCurr );
+  void changeFirstStep( StepQueue& queue, int timeCurr );
+  void nextStep( StepQueue& queue, int timeCurr );
 
  public: // dg::Signals
   

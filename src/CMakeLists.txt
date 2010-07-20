@@ -73,7 +73,7 @@ SET(plugins_0
     sotSelector
     sotNextStep
     sotStepChecker
-	sotStepQueue
+	StepQueue
 	sotStepComputerPos
 	sotStepComputerForce
 	sotStepComputerJoystick
@@ -89,10 +89,23 @@ SET(plugins_0
 SET(plugins
 	next-step
 	pg
-	next-step-pg-sot)
+	next-step-pg-sot
+	pg-manager
+	step-queue)
 	
 SET(plugins_common_deps
 	exception-pg.cpp)
+	
+# Add specific plugins dependencies.
+#SET (sotNextStepOpenHRP_plugins_dependencies StackOfTasks sotNextStep)
+SET (sotNextStepPgSot_plugins_dependencies sotNextStep sotPatternGenerator)
+SET (sotStepComputer_plugins_dependencies sotStepQueue sotStepChecker sotStepObserver)
+SET (sotStepComputerForce_plugins_dependencies sotStepQueue sotStepChecker sotStepObserver)
+SET (sotStepComputerPos_plugins_dependencies sotStepQueue sotStepChecker sotStepObserver)
+SET (sotStepComputerJoystick_plugins_dependencies  sotStepQueue sotStepChecker sotStepObserver)
+SET (sotPGManager_plugins_dependencies sotStepQueue sotPatternGenerator)
+SET (sotStepTimeLine_plugins_dependencies sotStepQueue sotPGManager)
+
 
 FOREACH(LIBRARY_NAME ${plugins})
 	ADD_LIBRARY(${LIBRARY_NAME} 

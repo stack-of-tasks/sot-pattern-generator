@@ -32,7 +32,7 @@
 #include <sot-core/debug.h>
 #include <sot/sotMacrosSignal.h>
 #include <sot-pattern-generator/exception-pg.h>
-#include <sot/sotStepQueue.h>
+#include <sot/StepQueue.h>
 #include <sot/sotStepChecker.h>
 #include <dynamic-graph/factory.h>
 #include <dynamic-graph/pool.h>
@@ -60,7 +60,7 @@ sotStepComputerPos:: sotStepComputerPos( const std::string & name )
   sotDEBUGOUT(5);
 }
 
-void sotStepComputerPos::nextStep( sotStepQueue& queue, int timeCurr )
+void sotStepComputerPos::nextStep( StepQueue& queue, int timeCurr )
 {
   // Introduce new step at the end of the preview window.
   if( queue.getLastStep().contact == CONTACT_LEFT_FOOT ) {
@@ -77,7 +77,7 @@ void sotStepComputerPos::nextStep( sotStepQueue& queue, int timeCurr )
   }
 }
 
-void sotStepComputerPos::changeFirstStep( sotStepQueue& queue, int timeCurr )
+void sotStepComputerPos::changeFirstStep( StepQueue& queue, int timeCurr )
 {
   if(!twoHandObserver) {
     std::cerr << "Observer not set" << std::endl;

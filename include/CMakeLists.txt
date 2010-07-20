@@ -7,6 +7,8 @@ next-step.h
 exception-pg.h
 next-step-pg-sot.h
 pg.h
+pg-manager.h
+step-queue.h
 )
 
 # Recreate correct path for the headers

@@ -208,7 +208,7 @@ nextStep( const int & timeCurr )
     ns_theta = 0.;
   }
 
-  sotFootPrint newStep;
+  FootPrint newStep;
 
   if(sfoot != 1){ newStep.contact = CONTACT_LEFT_FOOT; }
   else{ newStep.contact = CONTACT_RIGHT_FOOT; }
@@ -243,7 +243,7 @@ starter( const int & timeCurr )
   sotDEBUGIN(15); 
 
   footPrintList.clear();
-  sotFootPrint initSteps[4];
+  FootPrint initSteps[4];
 
   initSteps[0].contact = CONTACT_RIGHT_FOOT;
   initSteps[0].x = 0;
@@ -315,7 +315,7 @@ triggerCall( int& dummy,int timeCurrent )
 	    nextStep( timeCurrent );
 	    if( NULL!=verbose )
 	      {
-		sotFootPrint & lastStep =  footPrintList.back();
+		FootPrint & lastStep =  footPrintList.back();
 		(*verbose) << "<T=" << timeCurrent << "> Introduced a new step: "; 
 		switch( lastStep.contact )
 		  {
@@ -356,7 +356,7 @@ void NextStep::
 display( std::ostream& os ) const
 {
   os << "NextStep <" << getName() <<">:" << std::endl;
-  for( std::deque< sotFootPrint >::const_iterator iter = footPrintList.begin();
+  for( std::deque< FootPrint >::const_iterator iter = footPrintList.begin();
        iter!=footPrintList.end();++iter )
     {
       os << "<time=" << iter->introductionTime << "> " ;

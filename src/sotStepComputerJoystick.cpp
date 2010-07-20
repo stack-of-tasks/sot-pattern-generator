@@ -32,7 +32,7 @@
 #include <sot-core/debug.h>
 #include <sot/sotMacrosSignal.h>
 #include <sot-pattern-generator/exception-pg.h>
-#include <sot/sotStepQueue.h>
+#include <sot/StepQueue.h>
 #include <sot/sotStepChecker.h>
 #include <dynamic-graph/factory.h>
 
@@ -59,7 +59,7 @@ sotStepComputerJoystick::sotStepComputerJoystick( const std::string & name )
   sotDEBUGOUT(5);
 }
 
-void sotStepComputerJoystick::nextStep( sotStepQueue& queue, int timeCurr )
+void sotStepComputerJoystick::nextStep( StepQueue& queue, int timeCurr )
 {
   // Introduce new step at the end of the preview window.
   if( queue.getLastStep().contact == CONTACT_LEFT_FOOT ) {
@@ -76,11 +76,11 @@ void sotStepComputerJoystick::nextStep( sotStepQueue& queue, int timeCurr )
   }
 }
 
-void sotStepComputerJoystick::changeFirstStep( sotStepQueue& queue, int timeCurr )
+void sotStepComputerJoystick::changeFirstStep( StepQueue& queue, int timeCurr )
 {
   logChanges << timeCurr << " changeFirstStep" <<std::endl;
 
-  const sotFootPrint& step = queue.getFirstStep();
+  const FootPrint& step = queue.getFirstStep();
   
   ml::Vector joyin;
   joyin.resize(3);

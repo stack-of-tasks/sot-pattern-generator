@@ -48,15 +48,15 @@ namespace ml = maal::boost;
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-class sotStepQueue;
+class StepQueue;
 
 /// Generates footsteps.
 class sotStepComputer
 {
  public: // Methods
 
-  virtual void changeFirstStep( sotStepQueue& queue, int timeCurr )=0;
-  virtual void nextStep( sotStepQueue& queue, int timeCurr )=0 ;
+  virtual void changeFirstStep( StepQueue& queue, int timeCurr )=0;
+  virtual void nextStep( StepQueue& queue, int timeCurr )=0 ;
   virtual ~sotStepComputer(){};
 };
 

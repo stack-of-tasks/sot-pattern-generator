@@ -133,14 +133,14 @@ class SOTNEXTSTEP_EXPORT NextStep
     CONTACT_LEFT_FOOT
     ,CONTACT_RIGHT_FOOT
   };
-  class sotFootPrint
+  class FootPrint
   {
   public:
     double x,y,theta;
     ContactName contact;
     int introductionTime;
   };
-  std::deque< sotFootPrint > footPrintList;
+  std::deque< FootPrint > footPrintList;
 
  protected: /* --- INTRODUCTION PERIOD --- */
 

@@ -32,7 +32,7 @@
 #include <sot-core/debug.h>
 #include <sot/sotMacrosSignal.h>
 #include <sot-pattern-generator/exception-pg.h>
-#include <sot/sotStepQueue.h>
+#include <sot/StepQueue.h>
 #include <sot/sotStepChecker.h>
 #include <dynamic-graph/factory.h>
 #include <dynamic-graph/pool.h>
@@ -79,7 +79,7 @@ sotStepComputerForce:: sotStepComputerForce( const std::string & name )
   sotDEBUGOUT(5);
 }
 
-void sotStepComputerForce::nextStep( sotStepQueue& queue, int timeCurr )
+void sotStepComputerForce::nextStep( StepQueue& queue, int timeCurr )
 {
   // Introduce new step at the end of the preview window.
   if( queue.getLastStep().contact == CONTACT_LEFT_FOOT ) {
@@ -218,7 +218,7 @@ ml::Vector& sotStepComputerForce::computeForceR( ml::Vector& res,int timeCurr )
   return computeHandForce( res,waMrh,waMref,F );
 }
 
-void sotStepComputerForce::changeFirstStep( sotStepQueue& queue, int timeCurr )
+void sotStepComputerForce::changeFirstStep( StepQueue& queue, int timeCurr )
 {
   const ml::Vector& v = velocitySIN.access( timeCurr );
   unsigned sfoot = contactFootSIN.access( timeCurr );

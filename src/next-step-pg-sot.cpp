@@ -128,7 +128,7 @@ starter( const int & timeCurr )
   if(pgEntity) {
     std::ostringstream cmdstd; std::ostringstream os;
     cmdstd << ":StartOnLineStepSequencing ";
-    for( std::deque< sotFootPrint >::const_iterator iter = footPrintList.begin();
+    for( std::deque< FootPrint >::const_iterator iter = footPrintList.begin();
 	   iter!=footPrintList.end();++iter )
     {
       cmdstd <<  iter->x << " " << iter->y << " " << iter->theta << " ";
@@ -173,7 +173,7 @@ introductionCallBack( const int & timeCurr )
   if( state==STATE_STARTED ) 
     {
       
-      sotFootPrint & lastStep =  footPrintList.back();
+      FootPrint & lastStep =  footPrintList.back();
       if( pgEntity ) 
 	{
 	  if (m_StepModificationMode == NextStepPgSot::ADDING_STEP)

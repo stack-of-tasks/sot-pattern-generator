@@ -28,17 +28,18 @@
 # include <Winsock2.h>
 #endif /*WIN32*/
 
-#include <sot/StepComputerForce.h>
+#include <sot-pattern-generator/step-computer-force.h>
 #include <sot-core/debug.h>
-#include <sot/sotMacrosSignal.h>
+#include <sot-core/macros-signal.h>
 #include <sot-pattern-generator/exception-pg.h>
 #include <sot-pattern-generator/step-queue.h>
 #include <sot-pattern-generator/step-checker.h>
 #include <dynamic-graph/factory.h>
 #include <dynamic-graph/pool.h>
-#include <sot/sotMatrixTwist.h>
+#include <sot-core/matrix-twist.h>
 
-
+using namespace sot;
+using namespace dynamicgraph;
 DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(StepComputerForce,"StepComputerForce");
 
 
@@ -194,7 +195,7 @@ StepComputerForce::computeHandForce( ml::Vector& res,
 
   MatrixHomogeneous H; waMh.inverse(H);
   for(int i = 0; i < 3; ++i){ H(i,3) = 0; }
-  sotMatrixTwist V; V.buildFrom(H);
+  MatrixTwist V; V.buildFrom(H);
   V.multiply(tmp, res);
 
   return res;

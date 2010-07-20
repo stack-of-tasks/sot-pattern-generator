@@ -28,15 +28,17 @@
 # include <Winsock2.h>
 #endif /*WIN32*/
 
-#include <sot/StepComputerJoystick.h>
+#include <sot-pattern-generator/step-computer-joystick.h>
 #include <sot-core/debug.h>
-#include <sot/sotMacrosSignal.h>
+#include <sot-core/macros-signal.h>
 #include <sot-pattern-generator/exception-pg.h>
 #include <sot-pattern-generator/step-queue.h>
 #include <sot-pattern-generator/step-checker.h>
 #include <dynamic-graph/factory.h>
 
 
+using namespace sot;
+using namespace dynamicgraph;
 DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(StepComputerJoystick,"StepComputerJoystick");
 
 

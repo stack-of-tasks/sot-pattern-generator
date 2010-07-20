@@ -50,7 +50,7 @@ namespace ml = maal::boost;
 /* --------------------------------------------------------------------- */
 
 #if defined (WIN32) 
-#  if defined (StepComputerPos_EXPORTS) 
+#  if defined (step_computer_force_EXPORTS)
 #    define StepComputerFORCE_EXPORT __declspec(dllexport)
 #  else  
 #    define StepComputerFORCE_EXPORT __declspec(dllimport)
@@ -59,6 +59,8 @@ namespace ml = maal::boost;
 #  define StepComputerFORCE_EXPORT
 #endif
 
+namespace sot {
+namespace dg = dynamicgraph;
 
 /* --------------------------------------------------------------------- */
 /* --- CLASS ----------------------------------------------------------- */
@@ -67,8 +69,8 @@ namespace ml = maal::boost;
 class StepQueue;
 
 /// Generates footsteps.
-class StepComputerFORCE_EXPORT StepComputerPos
-: public dg::Entity, public StepComputer
+class StepComputerFORCE_EXPORT StepComputerForce
+  : public dg::Entity, public StepComputer
 {
  public:
 
@@ -77,7 +79,7 @@ class StepComputerFORCE_EXPORT StepComputerPos
 
  public: // Construction
 
-  StepComputerPos( const std::string& name );
+  StepComputerForce( const std::string& name );
 
  public: // Methods
 
@@ -86,9 +88,26 @@ class StepComputerFORCE_EXPORT StepComputerPos
 
  public: // dg::Signals
 
-  dg::SignalPtr< MatrixHomogeneous,int > referencePositionLeftSIN; 
-  dg::SignalPtr< MatrixHomogeneous,int > referencePositionRightSIN; 
+  dg::SignalPtr< MatrixHomogeneous,int > waistMlhandSIN;
+  dg::SignalPtr< MatrixHomogeneous,int > waistMrhandSIN;
+  dg::SignalPtr< MatrixHomogeneous,int > referencePositionWaistSIN;
+  dg::SignalPtr< ml::Vector,int > stiffnessSIN;
+  dg::SignalPtr< ml::Vector,int > velocitySIN;
   dg::SignalPtr< unsigned,int > contactFootSIN;
+
+  dg::SignalTimeDependent< ml::Vector,int > displacementSOUT;
+  dg::SignalTimeDependent< ml::Vector,int > forceSOUT;
+  dg::SignalTimeDependent< ml::Vector,int > forceLhandSOUT;
+  dg::SignalTimeDependent< ml::Vector,int > forceRhandSOUT;
+
+  ml::Vector& computeDisplacement( ml::Vector& res,int timeCurr );
+  ml::Vector& computeForce( ml::Vector& res,int timeCurr );
+  ml::Vector& computeForceL( ml::Vector& res,int timeCurr );
+  ml::Vector& computeForceR( ml::Vector& res,int timeCurr );
+  ml::Vector& computeHandForce( ml::Vector& res,
+				const MatrixHomogeneous& waMh,
+				const MatrixHomogeneous& waMref,
+				const ml::Vector& F );
 
  public: // dg::Entity
 
@@ -99,8 +118,7 @@ class StepComputerFORCE_EXPORT StepComputerPos
 
  private: // Reference frame
 
-  MatrixHomogeneous rfMref0;
-  MatrixHomogeneous lfMref0;
+  MatrixHomogeneous waMref0;
   StepObserver* twoHandObserver;
   StepChecker checker;
 
@@ -112,6 +130,8 @@ class StepComputerFORCE_EXPORT StepComputerPos
   std::ofstream logPreview;
 };
 
+
+} // namespace sot
 
 #endif // #ifndef __SOT_STEPCOMPUTER_H__
 

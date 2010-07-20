@@ -4,7 +4,7 @@
  *
  * File:      StepComputer.h
  * Project:   SOT
- * Author:    Paul Evrard, Nicolas Mansard
+ * Author:    Olivier Stasse
  *
  * Version control
  * ===============
@@ -17,8 +17,8 @@
  *
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-#ifndef __SOT_StepComputer_FORCE_H__
-#define __SOT_StepComputer_FORCE_H__
+#ifndef __SOT_StepComputer_JOYSTICK_H__
+#define __SOT_StepComputer_JOYSTICK_H__
 
 
 /* --------------------------------------------------------------------- */
@@ -39,6 +39,7 @@ namespace ml = maal::boost;
 #include <sot-pattern-generator/step-observer.h>
 #include <sot-pattern-generator/step-checker.h>
 #include <sot-pattern-generator/step-computer.h>
+
 /* STD */
 #include <string>
 #include <deque>
@@ -50,15 +51,19 @@ namespace ml = maal::boost;
 /* --------------------------------------------------------------------- */
 
 #if defined (WIN32) 
-#  if defined (StepComputerForce_EXPORTS) 
-#    define StepComputerFORCE_EXPORT __declspec(dllexport)
+#  if defined (step_computer_joystick_EXPORTS)
+#    define StepComputerJOYSTICK_EXPORT __declspec(dllexport)
 #  else  
-#    define StepComputerFORCE_EXPORT __declspec(dllimport)
+#    define StepComputerJOYSTICK_EXPORT __declspec(dllimport)
 #  endif 
 #else
-#  define StepComputerFORCE_EXPORT
+#  define StepComputerJOYSTICK_EXPORT
 #endif
 
+
+
+namespace sot {
+namespace dg = dynamicgraph;
 
 /* --------------------------------------------------------------------- */
 /* --- CLASS ----------------------------------------------------------- */
@@ -67,8 +72,8 @@ namespace ml = maal::boost;
 class StepQueue;
 
 /// Generates footsteps.
-class StepComputerFORCE_EXPORT StepComputerForce
-  : public dg::Entity, public StepComputer
+class StepComputerJOYSTICK_EXPORT StepComputerJoystick
+: public dg::Entity, public StepComputer
 {
  public:
 
@@ -77,7 +82,7 @@ class StepComputerFORCE_EXPORT StepComputerForce
 
  public: // Construction
 
-  StepComputerForce( const std::string& name );
+  StepComputerJoystick( const std::string& name );
 
  public: // Methods
 
@@ -85,30 +90,19 @@ class StepComputerFORCE_EXPORT StepComputerForce
   void nextStep( StepQueue& queue, int timeCurr );
 
  public: // dg::Signals
-
-  dg::SignalPtr< MatrixHomogeneous,int > waistMlhandSIN;
-  dg::SignalPtr< MatrixHomogeneous,int > waistMrhandSIN;
-  dg::SignalPtr< MatrixHomogeneous,int > referencePositionWaistSIN;
-  dg::SignalPtr< ml::Vector,int > stiffnessSIN;
-  dg::SignalPtr< ml::Vector,int > velocitySIN;
+  
+  /*! \brief Entry of the joystick (x,y,theta)*/ 
+  dg::SignalPtr< ml::Vector,int > joystickSIN;
+  /*! \brief Getting the support foot */
   dg::SignalPtr< unsigned,int > contactFootSIN;
+  /*! \brief Externalize the last step . */
+  dg::SignalTimeDependent<ml::Vector,int> laststepSOUT;
 
-  dg::SignalTimeDependent< ml::Vector,int > displacementSOUT;
-  dg::SignalTimeDependent< ml::Vector,int > forceSOUT;
-  dg::SignalTimeDependent< ml::Vector,int > forceLhandSOUT;
-  dg::SignalTimeDependent< ml::Vector,int > forceRhandSOUT;
-
-  ml::Vector& computeDisplacement( ml::Vector& res,int timeCurr );
-  ml::Vector& computeForce( ml::Vector& res,int timeCurr );
-  ml::Vector& computeForceL( ml::Vector& res,int timeCurr );
-  ml::Vector& computeForceR( ml::Vector& res,int timeCurr );
-  ml::Vector& computeHandForce( ml::Vector& res,
-				const MatrixHomogeneous& waMh,
-				const MatrixHomogeneous& waMref,
-				const ml::Vector& F );
+ protected:
+  ml::Vector& getlaststep(ml::Vector &res, int time);
 
  public: // dg::Entity
-
+  
   virtual void display( std::ostream& os ) const; 
   virtual void commandLine( const std::string& cmdLine,
 			    std::istringstream& cmdArgs,
@@ -116,18 +110,20 @@ class StepComputerFORCE_EXPORT StepComputerForce
 
  private: // Reference frame
 
-  MatrixHomogeneous waMref0;
-  StepObserver* twoHandObserver;
   StepChecker checker;
 
   void thisIsZero();
-
+  
  private: // Debug
 
   std::ofstream logChanges;
   std::ofstream logPreview;
+
+  double m_laststep[3];
 };
 
+
+} // namespace sot
 
 #endif // #ifndef __SOT_STEPCOMPUTER_H__
 

@@ -88,35 +88,40 @@ SET(plugins_0
 
 SET(plugins
 	next-step
-	pg
-	next-step-pg-sot
-	pg-manager
+	step-observer
+	step-computer-force
+	step-computer-joystick
+	step-computer-pos
+	which-foot-upper
 	step-queue
 	selector
 	step-checker
+	# dependent on walkgenjrl
+	next-step-pg-sot
+	pg-manager
 	step-time-line
-	step-observer
+	# depends on everything
+	pg
 	)
 	
 SET(plugins_common_deps
 	exception-pg.cpp)
 	
 # Add specific plugins dependencies.
-#SET (sotNextStepOpenHRP_plugins_dependencies StackOfTasks sotNextStep)
-SET (sotNextStepPgSot_plugins_dependencies sotNextStep sotPatternGenerator)
-SET (StepComputer_plugins_dependencies sotStepQueue StepChecker StepObserver)
-SET (StepComputerForce_plugins_dependencies sotStepQueue StepChecker StepObserver)
-SET (StepComputerPos_plugins_dependencies sotStepQueue StepChecker StepObserver)
-SET (StepComputerJoystick_plugins_dependencies  sotStepQueue StepChecker StepObserver)
-SET (PGManager_plugins_dependencies sotStepQueue sotPatternGenerator)
-SET (StepTimeLine_plugins_dependencies sotStepQueue PGManager)
-
+SET (next-step-pg-sot_plugins_dependencies next-step pg)
+SET (step-computer_plugins_dependencies step-queue step-checker step-observer)
+SET (step-computer-force_plugins_dependencies ${step-computer_plugins_dependencies})
+SET (step-computer-pos_plugins_dependencies ${step-computer_plugins_dependencies})
+SET (step-computer-joystick_plugins_dependencies ${step-computer_plugins_dependencies})
+SET (pg-manager_plugins_dependencies step-queue pg)
+SET (step-time-line_plugins_dependencies step-queue pg-manager)
 
 FOREACH(LIBRARY_NAME ${plugins})
 	ADD_LIBRARY(${LIBRARY_NAME} 
 	  SHARED
 	  ${LIBRARY_NAME}.cpp
 	  ${plugins_common_deps})
+	  
 	
 	SET_TARGET_PROPERTIES(${LIBRARY_NAME} 
 	  PROPERTIES 
@@ -135,6 +140,8 @@ FOREACH(LIBRARY_NAME ${plugins})
 		TARGET_LINK_LIBRARIES(${LIBRARY_NAME} ${HRP2DYNAMICS_LIBRARIES})
 		TARGET_LINK_LIBRARIES(${LIBRARY_NAME} ${SOT_CORE_LIBRARIES})
 	ENDIF(UNIX)
+	
+	TARGET_LINK_LIBRARIES(${LIBRARY_NAME} ${${LIBRARY_NAME}_plugins_dependencies})
 	
 	SET_TARGET_PROPERTIES(${LIBRARY_NAME}
 	  PROPERTIES

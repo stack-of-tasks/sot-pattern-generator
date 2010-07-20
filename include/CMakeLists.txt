@@ -14,6 +14,10 @@ step-checker.h
 step-time-line.h
 step-observer.h
 step-computer.h
+step-computer-force.h
+step-computer-joystick.h
+step-computer-pos.h
+which-foot-upper.h
 )
 
 # Recreate correct path for the headers

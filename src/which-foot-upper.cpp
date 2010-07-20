@@ -17,12 +17,14 @@
  *
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-#include <sot/sotWhichFootUpper.h>
+#include <sot-pattern-generator/which-foot-upper.h>
 #include <sot-core/debug.h>
 #include <dynamic-graph/factory.h>
-#include <sot/sotMacrosSignal.h>
+#include <sot-core/macros-signal.h>
 #include <sot-pattern-generator/exception-pg.h>
 
+using namespace sot;
+using namespace dynamicgraph;
 DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(sotWhichFootUpper,"WhichFootUpper");
 
 const unsigned int sotWhichFootUpper::

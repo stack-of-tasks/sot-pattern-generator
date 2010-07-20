@@ -46,7 +46,7 @@ namespace ml = maal::boost;
 /* --------------------------------------------------------------------- */
 
 #if defined (WIN32) 
-#  if defined (sotWhichFootUpper_EXPORTS) 
+#  if defined (which_foot_upper_EXPORTS)
 #    define SOTWHICHFOOTUPPER_EXPORT __declspec(dllexport)
 #  else  
 #    define SOTWHICHFOOTUPPER_EXPORT __declspec(dllimport)
@@ -54,6 +54,10 @@ namespace ml = maal::boost;
 #else
 #  define SOTWHICHFOOTUPPER_EXPORT
 #endif
+
+
+namespace sot {
+namespace dg = dynamicgraph;
 
 /* --------------------------------------------------------------------- */
 /* --- CLASS ----------------------------------------------------------- */
@@ -117,6 +121,8 @@ class SOTWHICHFOOTUPPER_EXPORT sotWhichFootUpper
 };
 
 
+
+} // namespace sot
 
 
 

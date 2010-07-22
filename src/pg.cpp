@@ -399,7 +399,7 @@ bool PatternGenerator::InitState(void)
   catch(...)
     {
       SOT_THROW ExceptionPatternGenerator( ExceptionPatternGenerator::PATTERN_GENERATOR_JRL,
-					      "Error while setting the current joint values of the WPG.");      
+					      "Error while setting the current joint values of the WPG.");
       return false;
     }
 

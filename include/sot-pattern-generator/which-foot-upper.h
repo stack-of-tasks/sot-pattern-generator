@@ -2,7 +2,7 @@
  * Copyright Projet JRL-Japan, 2007
  *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  *
- * File:      sotWhichFootUpper.h
+ * File:      WhichFootUpper.h
  * Project:   SOT
  * Author:    Nicolas Mansard
  *
@@ -19,8 +19,8 @@
 
 
 
-#ifndef __SOT_SOTWHICHFOOTUPPER_H__
-#define __SOT_SOTWHICHFOOTUPPER_H__
+#ifndef __SOT_WhichFootUpper_H__
+#define __SOT_WhichFootUpper_H__
 
 /* --------------------------------------------------------------------- */
 /* --- INCLUDE --------------------------------------------------------- */
@@ -47,12 +47,12 @@ namespace ml = maal::boost;
 
 #if defined (WIN32) 
 #  if defined (which_foot_upper_EXPORTS)
-#    define SOTWHICHFOOTUPPER_EXPORT __declspec(dllexport)
+#    define WhichFootUpper_EXPORT __declspec(dllexport)
 #  else  
-#    define SOTWHICHFOOTUPPER_EXPORT __declspec(dllimport)
+#    define WhichFootUpper_EXPORT __declspec(dllimport)
 #  endif 
 #else
-#  define SOTWHICHFOOTUPPER_EXPORT
+#  define WhichFootUpper_EXPORT
 #endif
 
 
@@ -63,7 +63,7 @@ namespace dg = dynamicgraph;
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-class SOTWHICHFOOTUPPER_EXPORT sotWhichFootUpper
+class WhichFootUpper_EXPORT WhichFootUpper
 :public dg::Entity
 {
  public:
@@ -82,8 +82,8 @@ class SOTWHICHFOOTUPPER_EXPORT sotWhichFootUpper
   
  public: /* --- CONSTRUCTION --- */
 
-  sotWhichFootUpper( const std::string& name );
-  virtual ~sotWhichFootUpper( void );
+  WhichFootUpper( const std::string& name );
+  virtual ~WhichFootUpper( void );
 
  public: /* --- SIGNAL --- */
 
@@ -126,5 +126,5 @@ class SOTWHICHFOOTUPPER_EXPORT sotWhichFootUpper
 
 
 
-#endif // #ifndef __SOT_SOTWHICHFOOTUPPER_H__
+#endif // #ifndef __SOT_WhichFootUpper_H__
 

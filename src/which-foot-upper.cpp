@@ -2,7 +2,7 @@
  * Copyright Projet JRL-Japan, 2007
  *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  *
- * File:      sotWhichFootUpper.h
+ * File:      WhichFootUpper.h
  * Project:   SOT
  * Author:    Nicolas Mansard
  *
@@ -25,21 +25,21 @@
 
 using namespace sot;
 using namespace dynamicgraph;
-DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(sotWhichFootUpper,"WhichFootUpper");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(WhichFootUpper,"WhichFootUpper");
 
-const unsigned int sotWhichFootUpper::
+const unsigned int WhichFootUpper::
 INDEX_LEFT_FOOT_DEFAULT = 0;
-const unsigned int sotWhichFootUpper::
+const unsigned int WhichFootUpper::
 INDEX_RIGHT_FOOT_DEFAULT = 1;
 
-const double sotWhichFootUpper::
+const double WhichFootUpper::
 TRIGGER_THRESHOLD_DEFAULT = 5e-4;
 
 
 typedef MatrixRotation& (MatrixHomogeneous::*ExtractMemberType) (MatrixRotation&) const;
 
-sotWhichFootUpper::
-sotWhichFootUpper( const std::string & name ) 
+WhichFootUpper::
+WhichFootUpper( const std::string & name ) 
   :Entity(name)
    ,indexLeftFoot( INDEX_LEFT_FOOT_DEFAULT )
    ,indexRightFoot( INDEX_RIGHT_FOOT_DEFAULT )
@@ -51,17 +51,17 @@ sotWhichFootUpper( const std::string & name )
    ,waistMlfootSIN( NULL,"WhichFootUpper("+name+")::input(matrixhomogeneous)::waistMlfoot" ) 
    ,waistMrfootSIN( NULL,"WhichFootUpper("+name+")::input(matrixhomogeneous)::waistMrfoot" ) 
   
-  ,worldMlfootSOUT( SOT_INIT_SIGNAL_3( sotWhichFootUpper::computeFootPosition,
+  ,worldMlfootSOUT( SOT_INIT_SIGNAL_3( WhichFootUpper::computeFootPosition,
 				       waistMlfootSIN,MatrixHomogeneous,
 				       waistRsensorSIN,MatrixRotation,
 				       worldRsensorSIN,MatrixRotation),
 		    "WhichFootUpper("+name+")::output(MatrixHomogeneous)::worldMlfoot" )
-  ,worldMrfootSOUT( SOT_INIT_SIGNAL_3( sotWhichFootUpper::computeFootPosition,
+  ,worldMrfootSOUT( SOT_INIT_SIGNAL_3( WhichFootUpper::computeFootPosition,
 				       waistMrfootSIN,MatrixHomogeneous,
 				       waistRsensorSIN,MatrixRotation,
 				       worldRsensorSIN,MatrixRotation),
 		    "WhichFootUpper("+name+")::output(MatrixHomogeneous)::worldMrfoot" )
-   ,whichFootSOUT( SOT_MEMBER_SIGNAL_2( sotWhichFootUpper::whichFoot,
+   ,whichFootSOUT( SOT_MEMBER_SIGNAL_2( WhichFootUpper::whichFoot,
 					waistMlfootSIN,MatrixHomogeneous,
 					waistMrfootSIN,MatrixHomogeneous),
 		   "WhichFootUpper("+name+")::output(uint)::whichFoot" ) 
@@ -87,8 +87,8 @@ sotWhichFootUpper( const std::string & name )
 }
 
 
-sotWhichFootUpper::
-~sotWhichFootUpper( void )
+WhichFootUpper::
+~WhichFootUpper( void )
 {
   sotDEBUGINOUT(5);
   return;
@@ -98,7 +98,7 @@ sotWhichFootUpper::
 /* --- SIGNALS -------------------------------------------------------------- */
 /* --- SIGNALS -------------------------------------------------------------- */
 
-MatrixHomogeneous & sotWhichFootUpper::
+MatrixHomogeneous & WhichFootUpper::
 computeFootPosition( const MatrixHomogeneous& waistMfoot,
 		     const MatrixRotation& waistRsensor,			 
 		     const MatrixRotation& worldRsensor,			 
@@ -118,7 +118,7 @@ computeFootPosition( const MatrixHomogeneous& waistMfoot,
   return worldMfoot;
 }
 
-unsigned int & sotWhichFootUpper::
+unsigned int & WhichFootUpper::
 whichFoot( const MatrixHomogeneous& waistMlfoot,
 	   const MatrixHomogeneous& waistMrfoot,
 	   unsigned int& res )
@@ -147,7 +147,7 @@ whichFoot( const MatrixHomogeneous& waistMlfoot,
 /* --- PARAMS --------------------------------------------------------------- */
 /* --- PARAMS --------------------------------------------------------------- */
 
-void sotWhichFootUpper::
+void WhichFootUpper::
 commandLine( const std::string& cmdLine,
 	     std::istringstream& cmdArgs,
 	     std::ostream& os )

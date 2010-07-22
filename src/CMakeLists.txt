@@ -69,7 +69,7 @@ SET(LIBRARY_NAME ${PROJECT_NAME})
 
 # dependent on nothing
 SET(plugins_0
-	sotWhichFootUpper
+	WhichFootUpper
     Selector
     sotNextStep
     StepChecker

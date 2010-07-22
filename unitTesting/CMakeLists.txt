@@ -26,15 +26,15 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include)
 LINK_DIRECTORIES(${${PROJECT_NAME}_BINARY_DIR}/src)
 TARGET_LINK_LIBRARIES(${EXECUTABLE_NAME}
   next-step
-  #next-step-pg-sot
-  #step-checker
-  #step-computer-joystick
-  #step-observer
-  #step-queue
-  #step-time-line
+  next-step-pg-sot
+  step-checker
+  step-computer-joystick
+  step-observer
+  step-queue
+  step-time-line
   which-foot-upper
-  #pg
-  #pg-manager
+  pg
+  pg-manager
   )
   
 ADD_TEST(main_test ${EXECUTABLE_NAME})

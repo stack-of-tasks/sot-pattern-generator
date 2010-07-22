@@ -87,6 +87,7 @@ SET(plugins_0
 )
 
 SET(plugins
+	exception-pg
 	next-step
 	step-observer
 	step-computer-force
@@ -105,7 +106,7 @@ SET(plugins
 	)
 	
 SET(plugins_common_deps
-	exception-pg.cpp)
+	exception-pg)
 	
 # Add specific plugins dependencies.
 SET (next-step-pg-sot_plugins_dependencies next-step pg)
@@ -119,8 +120,7 @@ SET (step-time-line_plugins_dependencies step-queue pg-manager)
 FOREACH(LIBRARY_NAME ${plugins})
 	ADD_LIBRARY(${LIBRARY_NAME} 
 	  SHARED
-	  ${LIBRARY_NAME}.cpp
-	  ${plugins_common_deps})
+	  ${LIBRARY_NAME}.cpp)
 	  
 	
 	SET_TARGET_PROPERTIES(${LIBRARY_NAME} 
@@ -142,7 +142,7 @@ FOREACH(LIBRARY_NAME ${plugins})
 		TARGET_LINK_LIBRARIES(${LIBRARY_NAME} ${SOT_CORE_LIBRARIES})
 	ENDIF(UNIX)
 	
-	TARGET_LINK_LIBRARIES(${LIBRARY_NAME} ${${LIBRARY_NAME}_plugins_dependencies})
+	TARGET_LINK_LIBRARIES(${LIBRARY_NAME} ${${LIBRARY_NAME}_plugins_dependencies} ${plugins_common_deps})
 	
 	SET_TARGET_PROPERTIES(${LIBRARY_NAME}
 	  PROPERTIES

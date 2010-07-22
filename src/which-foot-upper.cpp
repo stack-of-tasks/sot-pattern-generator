@@ -21,7 +21,7 @@
 #include <sot-core/debug.h>
 #include <dynamic-graph/factory.h>
 #include <sot-core/macros-signal.h>
-#include <sot-pattern-generator/exception-pg.h>
+//#include <sot-pattern-generator/exception-pg.h>
 
 using namespace sot;
 using namespace dynamicgraph;

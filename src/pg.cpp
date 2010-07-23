@@ -108,6 +108,9 @@ PatternGenerator( const std::string & name )
   ,SupportFootSOUT( boost::bind(&PatternGenerator::getSupportFoot,this,_1,_2),
 		    OneStepOfControlS,
 		    "PatternGenerator("+name+")::output(uint)::SupportFoot" )
+	,comattitudeSOUT(boost::bind(&PatternGenerator::getComAttitude,this,_1,_2),
+		     OneStepOfControlS,
+		     "sotPatternGenerator("+name+")::output(vectorRPY)::comattitude")
   ,jointWalkingErrorPositionSOUT(boost::bind(&PatternGenerator::getjointWalkingErrorPosition,this,_1,_2),
 				 OneStepOfControlS,
 				 "PatternGenerator("+name+")::output(vector)::walkingerrorposition")
@@ -182,6 +185,8 @@ PatternGenerator( const std::string & name )
   m_VelocityReference.fill(0.0);
   m_WaistAttitude.resize(3);
   m_WaistAttitude.fill(0);
+  m_ComAttitude.resize(3);
+  m_ComAttitude.fill(0);
   m_WaistPosition.resize(3);
   m_WaistPosition.fill(0);
   m_WaistAttitudeAbsolute.resize(3);
@@ -231,6 +236,8 @@ PatternGenerator( const std::string & name )
 		      waistpositionSOUT <<
 		      waistattitudeabsoluteSOUT <<
 		      waistpositionabsoluteSOUT);
+
+  signalRegistration( comattitudeSOUT);
 
   signalRegistration( dotLeftFootRefSOUT <<
 		      dotRightFootRefSOUT);
@@ -864,6 +871,10 @@ OneStepOfControl(int &dummy, int time)
 	  m_dCOMRefPos(1) = lCOMRefPos.y[1];
 	  m_dCOMRefPos(2) = lCOMRefPos.z[1];
 
+	  m_ComAttitude(0) = lCOMRefPos.roll;
+	  m_ComAttitude(1) = lCOMRefPos.pitch;
+	  m_ComAttitude(2) = lCOMRefPos.yaw;
+
 	  sotDEBUG(2) << "dCOMRefPos returned by the PG: "<< m_dCOMRefPos <<endl;
 	  sotDEBUG(2) << "CurrentState.size()"<< CurrentState.size()<<endl;
 	  sotDEBUG(2) << "CurrentConfiguration.size()"<< CurrentConfiguration.size()<<endl;
@@ -1310,7 +1321,17 @@ getWaistAttitude( VectorRollPitchYaw&res, int time)
 }
 
 VectorRollPitchYaw & PatternGenerator::
-getWaistAttitudeAbsolute(VectorRollPitchYaw &res, int time)
+getComAttitude( VectorRollPitchYaw&res, int time)
+{
+  sotDEBUGIN(5);
+  OneStepOfControlS(time);
+  for( unsigned int i=0;i<3;++i ) { res(i) = m_ComAttitude(i); }
+  sotDEBUG(5) << "ComAttitude: " << m_ComAttitude << endl;
+  sotDEBUGOUT(5);
+  return res;
+}
+
+VectorRollPitchYaw & PatternGenerator::getWaistAttitudeAbsolute(VectorRollPitchYaw &res, int time)
 {
   sotDEBUGIN(5);
   OneStepOfControlS(time);

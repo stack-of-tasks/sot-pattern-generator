@@ -51,7 +51,7 @@ namespace pg=PatternGeneratorJRL;
 /* --------------------------------------------------------------------- */
 
 #if defined (WIN32) 
-#  if defined (sot_pg_EXPORTS)
+#  if defined (pg_EXPORTS)
 #    define PatternGenerator_EXPORT __declspec(dllexport)
 #  else  
 #    define PatternGenerator_EXPORT __declspec(dllimport)
@@ -256,6 +256,9 @@ class PatternGenerator_EXPORT PatternGenerator
   /*! \brief Internal method to get the joint position for walking. */
   ml::Vector & getjointWalkingErrorPosition(ml::Vector &res, int time);
 
+  /*! \brief Internal method to get the attitude of the com. */
+  VectorRollPitchYaw & getComAttitude(VectorRollPitchYaw &res, int time);
+
   /*! \brief Internal method to get the attitude of the waist. */
   VectorRollPitchYaw & getWaistAttitude(VectorRollPitchYaw &res, int time);
 
@@ -306,6 +309,10 @@ class PatternGenerator_EXPORT PatternGenerator
 
   /*! \brief Absolute position of the reference ZMP. */
   ml::Vector m_ZMPRefPos;
+
+  /*! \brief Com Attitude: does not really exist apart from when the robot
+    is seen as an inverted pendulum*/
+  ml::Vector m_ComAttitude;
 
   /*! \brief Absolute position of the reference CoM. */
   ml::Vector m_COMRefPos;
@@ -446,6 +453,9 @@ class PatternGenerator_EXPORT PatternGenerator
 
   /*! \brief Externalize the joint values for walking. */
   dg::SignalTimeDependent<ml::Vector,int> jointWalkingErrorPositionSOUT;
+
+  /*! \brief Externalize the com attitude. */
+  dg::SignalTimeDependent<VectorRollPitchYaw,int> comattitudeSOUT;
 
   /*! \brief Externalize the waist attitude. */
   dg::SignalTimeDependent<VectorRollPitchYaw,int> waistattitudeSOUT;

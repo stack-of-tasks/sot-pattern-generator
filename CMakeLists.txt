@@ -178,12 +178,36 @@ SET(install_pkg_libdir "\${libdir}")
 SET(install_pkg_datarootdir "\${datarootdir}")
 SET(install_pkg_include_dir "\${includedir}")
 
+# the shared libraries that will be listed in the .pc file
+SET(libs
+	exception-pg
+	next-step
+	step-observer
+	step-computer-force
+	step-computer-joystick
+	step-computer-pos
+	which-foot-upper
+	step-queue
+	selector
+	step-checker
+	# dependent on walkgenjrl
+	next-step-pg-sot
+	pg-manager
+	step-time-line
+	# depends on everything
+	pg
+	)
+	
+FOREACH(lib ${libs})
+	SET(pc-libs "${pc-libs} ${LIBINCL_KW}${lib}${CMAKE_IMPORT_LIBRARY_SUFFIX}")
+ENDFOREACH(lib)
+
 IF(UNIX)
-  SET (${PROJECT_NAME}_LDFLAGS "-Wl,-R${install_pkg_libdir} ${LIBINCL_KW}${PROJECT_NAME}${LIB_EXT} ${${PROJECT_NAME}_LDFLAGS}")
+  SET (${PROJECT_NAME}_LDFLAGS "-Wl,-R${install_pkg_libdir} ${pc-libs} ${${PROJECT_NAME}_LDFLAGS}")
 ENDIF(UNIX)
 
 IF(WIN32)
-  SET (${PROJECT_NAME}_LDFLAGS "${LIBINCL_KW}${PROJECT_NAME}${LIB_EXT} ${${PROJECT_NAME}_LDFLAGS}")
+  SET (${PROJECT_NAME}_LDFLAGS "${pc-libs}")
 ENDIF(WIN32)
 
 # Install the file in the appropriate place.

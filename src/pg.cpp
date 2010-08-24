@@ -111,6 +111,9 @@ PatternGenerator( const std::string & name )
 	,comattitudeSOUT(boost::bind(&PatternGenerator::getComAttitude,this,_1,_2),
 		     OneStepOfControlS,
 		     "sotPatternGenerator("+name+")::output(vectorRPY)::comattitude")
+	,dcomattitudeSOUT(boost::bind(&PatternGenerator::getdComAttitude,this,_1,_2),
+				 OneStepOfControlS,
+		     "sotPatternGenerator("+name+")::output(vectorRPY)::dcomattitude")
   ,jointWalkingErrorPositionSOUT(boost::bind(&PatternGenerator::getjointWalkingErrorPosition,this,_1,_2),
 				 OneStepOfControlS,
 				 "PatternGenerator("+name+")::output(vector)::walkingerrorposition")
@@ -181,6 +184,8 @@ PatternGenerator( const std::string & name )
   m_InitWaistRefPos.fill(0);
   m_InitWaistRefAtt.resize(3);
   m_InitWaistRefAtt.fill(0);
+  m_dComAttitude.resize(3);
+  m_dComAttitude.fill(0);
   m_VelocityReference.resize(3);
   m_VelocityReference.fill(0.0);
   m_WaistAttitude.resize(3);
@@ -237,7 +242,8 @@ PatternGenerator( const std::string & name )
 		      waistattitudeabsoluteSOUT <<
 		      waistpositionabsoluteSOUT);
 
-  signalRegistration( comattitudeSOUT);
+  signalRegistration( comattitudeSOUT <<
+  		      dcomattitudeSOUT );
 
   signalRegistration( dotLeftFootRefSOUT <<
 		      dotRightFootRefSOUT);
@@ -303,31 +309,31 @@ bool PatternGenerator::InitState(void)
 
       // Evaluate current position of the COM, ZMP and feet
       // according to the state of the robot.
-      PatternGeneratorJRL::COMPosition lStartingCOMPosition;
+      PatternGeneratorJRL::COMState lStartingCOMState;
       MAL_S3_VECTOR(,double) lStartingZMPPosition;
       MAL_VECTOR(,double) lWaistPosition;
       PatternGeneratorJRL::FootAbsolutePosition InitLeftFootAbsPos;
       PatternGeneratorJRL::FootAbsolutePosition InitRightFootAbsPos;
 
-      m_PGI->EvaluateStartingState(lStartingCOMPosition,
+      m_PGI->EvaluateStartingState(lStartingCOMState,
 				   lStartingZMPPosition,
 				   lWaistPosition,
 				   InitLeftFootAbsPos,
 				   InitRightFootAbsPos);
       
       // Put inside sotHomogeneous representation
-      m_InitCOMRefPos(0) = lStartingCOMPosition.x[0];
-      m_InitCOMRefPos(1) = lStartingCOMPosition.y[0];
-      m_InitCOMRefPos(2) = lStartingCOMPosition.z[0];
+      m_InitCOMRefPos(0) = lStartingCOMState.x[0];
+      m_InitCOMRefPos(1) = lStartingCOMState.y[0];
+      m_InitCOMRefPos(2) = lStartingCOMState.z[0];
       
-      m_InitZMPRefPos(0) = lStartingCOMPosition.x[0];
-      m_InitZMPRefPos(1) = lStartingCOMPosition.y[0];
+      m_InitZMPRefPos(0) = lStartingCOMState.x[0];
+      m_InitZMPRefPos(1) = lStartingCOMState.y[0];
       m_InitZMPRefPos(2) = 0;
 
       if (m_InitPositionByRealState)
 	{
-	  m_ZMPPrevious[0] = lStartingCOMPosition.x[0];
-	  m_ZMPPrevious[1] = lStartingCOMPosition.y[0];
+	  m_ZMPPrevious[0] = lStartingCOMState.x[0];
+	  m_ZMPPrevious[1] = lStartingCOMState.y[0];
 	  m_ZMPPrevious[2] = 0;
 	}
       sotDEBUG(5) << "InitZMPRefPos :" <<m_InitZMPRefPos<< endl;
@@ -815,7 +821,7 @@ OneStepOfControl(int &dummy, int time)
       lLeftFootPosition.x=0.0;lLeftFootPosition.y=0.0;lLeftFootPosition.z=0.0;
       lRightFootPosition.x=0.0;lRightFootPosition.y=0.0;lRightFootPosition.z=0.0;
       /*! \brief Absolute position of the reference CoM. */
-      pg::COMPosition lCOMRefPos;
+      pg::COMState lCOMRefState;
   
       sotDEBUG(45) << "mc = " << CurrentState << std::endl;
 
@@ -831,9 +837,9 @@ OneStepOfControl(int &dummy, int time)
 		   << ZMPTarget[1] << " " 
 		   << ZMPTarget[2] << endl;
       
-      sotDEBUG(25) << "Before One Step of control " << lCOMRefPos.x[0] << " " 
-		   << lCOMRefPos.y[0] << " " 
-		   << lCOMRefPos.z[0] << endl;
+      sotDEBUG(25) << "Before One Step of control " << lCOMRefState.x[0] << " "
+      		   << lCOMRefState.y[0] << " "
+      		   << lCOMRefState.z[0] << endl;
       sotDEBUG(4) << " VelocityReference " << m_VelocityReference << endl;
       
       m_PGI->setVelocityReference(m_VelocityReference(0),
@@ -845,7 +851,7 @@ OneStepOfControl(int &dummy, int time)
 					    CurrentVelocity,
 					    CurrentAcceleration,
 					    ZMPTarget,
-					    lCOMRefPos,
+					    lCOMRefState,
 					    lLeftFootPosition,
 					    lRightFootPosition))
 	{
@@ -863,17 +869,17 @@ OneStepOfControl(int &dummy, int time)
 	      m_WaistPositionAbsolute(i) = CurrentConfiguration(i);
 	      m_WaistAttitudeAbsolute(i) = CurrentConfiguration(i+3);
 	    }
-	  m_COMRefPos(0) = lCOMRefPos.x[0];
-	  m_COMRefPos(1) = lCOMRefPos.y[0];
-	  m_COMRefPos(2) = lCOMRefPos.z[0];
+	  m_COMRefPos(0) = lCOMRefState.x[0];
+	  m_COMRefPos(1) = lCOMRefState.y[0];
+	  m_COMRefPos(2) = lCOMRefState.z[0];
 	  sotDEBUG(2) << "COMRefPos returned by the PG: "<< m_COMRefPos <<endl;
-	  m_dCOMRefPos(0) = lCOMRefPos.x[1];
-	  m_dCOMRefPos(1) = lCOMRefPos.y[1];
-	  m_dCOMRefPos(2) = lCOMRefPos.z[1];
+	  m_dCOMRefPos(0) = lCOMRefState.x[1];
+	  m_dCOMRefPos(1) = lCOMRefState.y[1];
+	  m_dCOMRefPos(2) = lCOMRefState.z[1];
 
-	  m_ComAttitude(0) = lCOMRefPos.roll;
-	  m_ComAttitude(1) = lCOMRefPos.pitch;
-	  m_ComAttitude(2) = lCOMRefPos.yaw;
+	  m_ComAttitude(0) = lCOMRefState.roll[0];
+	  m_ComAttitude(1) = lCOMRefState.pitch[0];
+	  m_ComAttitude(2) = lCOMRefState.yaw[0];
 
 	  sotDEBUG(2) << "dCOMRefPos returned by the PG: "<< m_dCOMRefPos <<endl;
 	  sotDEBUG(2) << "CurrentState.size()"<< CurrentState.size()<<endl;
@@ -917,9 +923,9 @@ OneStepOfControl(int &dummy, int time)
 		      << lRightFootPosition.theta << endl;
 
 	  sotDEBUG(25) << "lCOMPosition : " 
-		       << lCOMRefPos.x[0] << " " 
-		       << lCOMRefPos.y[0] << " " 
-		       << lCOMRefPos.z[0] <<  endl;
+		       << lCOMRefState.x[0] << " "
+		       << lCOMRefState.y[0] << " "
+		       << lCOMRefState.z[0] <<  endl;
 
 	  /* Fill in the homogeneous matrix using the world reference frame*/
 	  FromAbsoluteFootPosToDotHomogeneous(lLeftFootPosition,
@@ -1319,6 +1325,18 @@ getWaistAttitude( VectorRollPitchYaw&res, int time)
   sotDEBUGOUT(5);
   return res;
 }
+
+VectorRollPitchYaw & PatternGenerator::
+getdComAttitude( VectorRollPitchYaw&res, int time)
+{
+  sotDEBUGIN(5);
+  OneStepOfControlS(time);
+  for( unsigned int i=0;i<3;++i ) { res(i) = m_dComAttitude(i); }
+  sotDEBUG(5) << "ComAttitude: " << m_dComAttitude << endl;
+  sotDEBUGOUT(5);
+  return res;
+}
+
 
 VectorRollPitchYaw & PatternGenerator::
 getComAttitude( VectorRollPitchYaw&res, int time)

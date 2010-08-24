@@ -256,6 +256,9 @@ class PatternGenerator_EXPORT PatternGenerator
   /*! \brief Internal method to get the joint position for walking. */
   ml::Vector & getjointWalkingErrorPosition(ml::Vector &res, int time);
 
+  /*! \brief Internal method to get the derivative of the com attitude. */
+  VectorRollPitchYaw & getdComAttitude(VectorRollPitchYaw &res, int time);
+
   /*! \brief Internal method to get the attitude of the com. */
   VectorRollPitchYaw & getComAttitude(VectorRollPitchYaw &res, int time);
 
@@ -313,6 +316,10 @@ class PatternGenerator_EXPORT PatternGenerator
   /*! \brief Com Attitude: does not really exist apart from when the robot
     is seen as an inverted pendulum*/
   ml::Vector m_ComAttitude;
+
+  /*! \brief Com Attitude: does not really exist apart when the robot
+     is seen as an inverted pendulum*/
+    ml::Vector m_dComAttitude;
 
   /*! \brief Absolute position of the reference CoM. */
   ml::Vector m_COMRefPos;
@@ -456,6 +463,9 @@ class PatternGenerator_EXPORT PatternGenerator
 
   /*! \brief Externalize the com attitude. */
   dg::SignalTimeDependent<VectorRollPitchYaw,int> comattitudeSOUT;
+
+  /*! \brief Externalize the dcom attitude. */
+  dg::SignalTimeDependent<VectorRollPitchYaw,int> dcomattitudeSOUT;
 
   /*! \brief Externalize the waist attitude. */
   dg::SignalTimeDependent<VectorRollPitchYaw,int> waistattitudeSOUT;

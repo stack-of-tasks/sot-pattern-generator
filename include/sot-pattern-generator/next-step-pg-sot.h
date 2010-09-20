@@ -43,7 +43,7 @@ namespace ml = maal::boost;
 /* --------------------------------------------------------------------- */
 
 #if defined (WIN32) 
-#  if defined (NextStepPgSot_EXPORTS) 
+#  if defined (next_step_pg_sot_EXPORTS) 
 #    define NextStepPGSOT_EXPORT __declspec(dllexport)
 #  else  
 #    define NextStepPGSOT_EXPORT __declspec(dllimport)

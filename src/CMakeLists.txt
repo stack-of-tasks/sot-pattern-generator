@@ -7,57 +7,25 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include)
 
 ADD_DEFINITIONS(-DDEBUG=2)
 
-# provide path to library libwalkGenJrl.so
-LINK_DIRECTORIES(${WALKGENJRL_LIBRARY_DIRS})
-
-
-# provide path to library libdynamicsJRLJapan.so
-LINK_DIRECTORIES(${DYNAMICSJRLJAPAN_LIBRARY_DIRS})
-
-
-# provide path to library libhrp2Dynamics.so
-LINK_DIRECTORIES(${HRP2DYNAMICS_LIBRARY_DIRS})
-
-
-# provide path to library libsot-core.so
-LINK_DIRECTORIES(${SOT_CORE_LIBRARY_DIRS})
+# provide path to library libwalkGenJrl.so,  libdynamicsJRLJapan.so,  libhrp2Dynamics.so, libsot-core.so
+LINK_DIRECTORIES(${WALKGENJRL_LIBRARY_DIRS} 
+				${DYNAMICSJRLJAPAN_LIBRARY_DIRS} 
+				${HRP2DYNAMICS_LIBRARY_DIRS} 
+				${SOT_CORE_LIBRARY_DIRS}
+				)
 
 # Add walkGenJrl compilation flags and link to library libwalkGenJrl.so
-ADD_DEFINITIONS(${WALKGENJRL_CFLAGS})
-
-
-IF(WIN32)
-foreach(dlink ${WALKGENJRL_LDFLAGS})
-	SET ( ${PROJECT_NAME}_src_LDFLAGS "${${PROJECT_NAME}_src_LDFLAGS}  ${dlink}")
-endforeach(dlink)
-ENDIF(WIN32)
-
 # Add dynamicsJRLJapan compilation flags and link to library libdynamicsJRLJapan.so
-ADD_DEFINITIONS(${DYNAMICSJRLJAPAN_CFLAGS})
-
-
-IF(WIN32)
-foreach(dlink ${DYNAMICSJRLJAPAN_LDFLAGS})
-	SET ( ${PROJECT_NAME}_src_LDFLAGS "${${PROJECT_NAME}_src_LDFLAGS}  ${dlink}")
-endforeach(dlink)
-ENDIF(WIN32)
-
 # Add hrp2Dynamics compilation flags and link to library libhrp2Dynamics.so
-ADD_DEFINITIONS(${HRP2DYNAMICS_CFLAGS})
-
-
-IF(WIN32)
-foreach(dlink ${HRP2DYNAMICS_LDFLAGS})
-	SET ( ${PROJECT_NAME}_src_LDFLAGS "${${PROJECT_NAME}_src_LDFLAGS}  ${dlink}")
-endforeach(dlink)
-ENDIF(WIN32)
-
 # Add sot-core compilation flags and link to library libsot-core.so
-ADD_DEFINITIONS(${SOT_CORE_CFLAGS})
-
+ADD_DEFINITIONS(${WALKGENJRL_CFLAGS}
+				${DYNAMICSJRLJAPAN_CFLAGS}
+				${HRP2DYNAMICS_CFLAGS}
+				${SOT_CORE_CFLAGS}
+				)
 
 IF(WIN32)
-foreach(dlink ${SOT_CORE_LDFLAGS})
+foreach(dlink ${WALKGENJRL_LDFLAGS} ${DYNAMICSJRLJAPAN_LDFLAGS} ${HRP2DYNAMICS_LDFLAGS} ${SOT_CORE_LDFLAGS})
 	SET ( ${PROJECT_NAME}_src_LDFLAGS "${${PROJECT_NAME}_src_LDFLAGS}  ${dlink}")
 endforeach(dlink)
 ENDIF(WIN32)

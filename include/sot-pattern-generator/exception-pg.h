@@ -61,7 +61,7 @@ public:
 		       const std::string & msg = "" );
   ExceptionPatternGenerator( const ExceptionPatternGenerator::ErrorCodeEnum& errcode,
 			const std::string & msg,const char* format, ... );
-  virtual ~ExceptionPatternGenerator( void ){}
+  virtual ~ExceptionPatternGenerator( void ) throw() {}
 
 
 };

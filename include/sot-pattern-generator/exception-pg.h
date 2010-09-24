@@ -29,6 +29,20 @@
 #include <sot-core/exception-abstract.h>
 
 /* --------------------------------------------------------------------- */
+/* --- API ------------------------------------------------------------- */
+/* --------------------------------------------------------------------- */
+
+#if defined (WIN32) 
+#  if defined (exception_pg_EXPORTS)
+#    define EXCEPTION_PG_EXPORT __declspec(dllexport)
+#  else  
+#    define EXCEPTION_PG_EXPORT __declspec(dllimport)
+#  endif 
+#else
+#  define EXCEPTION_PG_EXPORT
+#endif
+
+/* --------------------------------------------------------------------- */
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
@@ -36,7 +50,7 @@ namespace sot {
 
 /* \class ExceptionPatternGenerator
  */
-class ExceptionPatternGenerator
+class EXCEPTION_PG_EXPORT ExceptionPatternGenerator
 :public ExceptionAbstract
 
 {

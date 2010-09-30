@@ -1,28 +1,30 @@
-New in version 1.1 - 2010/09/30
-      Initialized git repository.
-      Converted plugin next-step
-      Converted sot::pg and sot::NextStepPgSot
-      Renamed pattern generator class
-      Added stepqueue and pgmanager classes.
-      Renamed pg class, added forgotten files.
-      Added Selector and StepChecker classes.
-      Added StepComputer, StepObserver and StepTimeLine classes.
-      Added the 4 remaining plugins + dependencies.
-      Corrected wrong library prefix and path.
-      Corrected target of plugins.
-      Activated unit tests, renamed a class.
-      Link test with all libraries.     Made exception-pg a library, which was causing a memory error (repeated free) when compiled separately with each library.
-      Corrected library versions.
-      Ported SOT commit d7f4b7e7244407b0
-      Changed the lib names listed in the .pc
-      Implemented commit 609c102da4ce1c from StackOfTasks.
-      Corrected throw specifier following changes in sot-core exceptions.
-      Merge branch 'master' of git+ssh://softs.laas.fr/git/jrl/sot/sot-pattern-generator
-      Correct the name of the pkg-config executable
-      Win32: Add compile flags to hide too verbose warnings
-      Add missing API for exception-pg.h
-      Correct the name of the macro used to define the API
-      Correct the src/CMakeLists.txt
-      Correct the Dependencies in unitTesting/CMakeLists.txt
-      Lighten the src/CMakeLists.txt
+                                                                -*- outline -*-
 
+New in version 1.1 - 2010/09/30
+ * Initialized git repository.
+ * Converted plugin next-step
+ * Converted sot::pg and sot::NextStepPgSot
+ * Renamed pattern generator class
+ * Added stepqueue and pgmanager classes.
+ * Renamed pg class, added forgotten files.
+ * Added Selector and StepChecker classes.
+ * Added StepComputer, StepObserver and StepTimeLine classes.
+ * Added the 4 remaining plugins + dependencies.
+ * Corrected wrong library prefix and path.
+ * Corrected target of plugins.
+ * Activated unit tests, renamed a class.
+ * Link test with all libraries.
+ * Made exception-pg a library, which was causing a memory error (repeated free)
+   when compiled separately with each library.
+ * Corrected library versions.
+ * Ported SOT commit d7f4b7e7244407b0
+ * Changed the lib names listed in the .pc
+ * Implemented commit 609c102da4ce1c from StackOfTasks.
+ * Corrected throw specifier following changes in sot-core exceptions.
+ * Correct the name of the pkg-config executable
+ * Win32: Add compile flags to hide too verbose warnings
+ * Add missing API for exception-pg.h
+ * Correct the name of the macro used to define the API
+ * Correct the src/CMakeLists.txt
+ * Correct the Dependencies in unitTesting/CMakeLists.txt
+ * Lighten the src/CMakeLists.txt

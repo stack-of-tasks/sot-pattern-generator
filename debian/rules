@@ -1,0 +1,21 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+# Sample debian/rules that uses debhelper.
+# This file was originally written by Joey Hess and Craig Small.
+# As a special exception, when this file is copied by dh-make into a
+# dh-make output file, you may use that output file without restriction.
+# This special exception was added by Craig Small in version 0.37 of dh-make.
+
+# Uncomment this to turn on verbose mode.
+export DH_VERBOSE=1
+
+# FIXME: this is only necessary because some binaries are linked against
+# plug-ins.
+# Teach dh_shlibdeps where the plug-in are located.
+override_dh_shlibdeps:
+	export LD_LIBRARY_PATH=\
+debian/libsot-pattern-generator1.0.0.99/usr/lib/plugin:$(LD_LIBRARY_PATH) \
+&& dh_shlibdeps --
+
+%:
+	dh  $@

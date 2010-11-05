@@ -42,7 +42,7 @@
 #include <sot-core/matrix-rotation.h>
 
 /* Pattern Generator */
-#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+#include <jrl/mal/matrixabstractlayer.hh>
 #include <walkGenJrl/PatternGeneratorInterface.h>
 namespace pg=PatternGeneratorJRL;
 

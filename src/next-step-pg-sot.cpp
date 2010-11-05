@@ -19,7 +19,7 @@
 
 #include <algorithm>
 
-#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+#include <jrl/mal/matrixabstractlayer.hh>
 #include <sot-pattern-generator/next-step-pg-sot.h>
 
 #include <sot-core/debug.h>

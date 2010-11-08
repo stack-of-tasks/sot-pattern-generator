@@ -18,12 +18,12 @@
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 #include <iostream>
 
-#include <MatrixAbstractLayer/MatrixAbstractLayer.h>
+#include <jrl/mal/matrixabstractlayer.hh>
 
-#include <dynamicsJRLJapan/dynamicsJRLJapanFactory.h>
+#include <jrl/dynamics/dynamicsfactory.hh>
 
 #ifdef WITH_HRP2DYNAMICS
-#include <hrp2Dynamics/hrp2OptHumanoidDynamicRobot.h>
+#include <hrp2Dynamics/hrp2Opthumanoid-dynamic-robot.hh>
 #endif
 
 //#define VP_DEBUG
@@ -506,7 +506,7 @@ setParamPreviewFile( const std::string& filename )
 /* --- COMPUTE -------------------------------------------------------------- */
 /* --- COMPUTE -------------------------------------------------------------- */
 
-#include <MatrixAbstractLayer/boostspecific.h>
+#include <jrl/mal/boostspecific.hh>
 
 ml::Vector & PatternGenerator::
 getZMPRef(ml::Vector & ZMPRefval, int time)

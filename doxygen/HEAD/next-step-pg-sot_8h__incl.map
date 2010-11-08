@@ -1,0 +1,12 @@
+<map id="G" name="G">
+<area shape="rect" href="$next-step_8h.html" title="sot&#45;pattern&#45;generator/next&#45;step.h" alt="" coords="363,83,571,112"/>
+<area shape="rect" href="$pg_8h.html" title="sot&#45;pattern&#45;generator/pg.h" alt="" coords="1143,83,1311,112"/>
+<area shape="rect" href="sot-core.doxytag$matrix-homogeneous_8h.html" title="sot&#45;core/matrix&#45;homogeneous.h" alt="" coords="296,160,499,189"/>
+<area shape="rect" href="sot-core.doxytag$vector-roll-pitch-yaw_8h.html" title="sot&#45;core/vector&#45;roll&#45;pitch&#45;yaw.h" alt="" coords="1264,160,1459,189"/>
+<area shape="rect" href="sot-core.doxytag$matrix-rotation_8h.html" title="sot&#45;core/matrix&#45;rotation.h" alt="" coords="1161,315,1327,344"/>
+<area shape="rect" href="sot-core.doxytag$sot-core-api_8h.html" title="sot&#45;core/sot&#45;core&#45;api.h" alt="" coords="1349,392,1499,421"/>
+<area shape="rect" href="sot-core.doxytag$vector-rotation_8h.html" title="sot&#45;core/vector&#45;rotation.h" alt="" coords="1264,237,1429,267"/>
+<area shape="rect" href="sot-core.doxytag$flags_8h.html" title="sot&#45;core/flags.h" alt="" coords="1945,315,2057,344"/>
+<area shape="rect" href="$exception-pg_8h.html" title="sot&#45;pattern&#45;generator/exception&#45;pg.h" alt="" coords="1968,160,2195,189"/>
+<area shape="rect" href="sot-core.doxytag$exception-abstract_8h.html" title="sot&#45;core/exception&#45;abstract.h" alt="" coords="1745,237,1935,267"/>
+</map>

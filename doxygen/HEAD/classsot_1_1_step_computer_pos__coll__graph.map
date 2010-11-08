@@ -1,0 +1,12 @@
+<map id="G" name="G">
+<area shape="rect" href="$classsot_1_1_step_computer.html" title="Generates footsteps." alt="" coords="5,341,136,371"/>
+<area shape="rect" href="$classsot_1_1_step_observer.html" title="Computes a reference frame from the position of both hands and feet of the robot." alt="" coords="296,341,424,371"/>
+<area shape="rect" title="STL class." alt="" coords="201,245,281,275"/>
+<area shape="rect" title="STL class." alt="" coords="159,165,324,195"/>
+<area shape="rect" title="STL class." alt="" coords="448,341,547,371"/>
+<area shape="rect" title="STL class." alt="" coords="405,245,589,275"/>
+<area shape="rect" title="STL class." alt="" coords="405,165,589,195"/>
+<area shape="rect" title="STL class." alt="" coords="421,85,573,115"/>
+<area shape="rect" title="STL class." alt="" coords="448,5,547,35"/>
+<area shape="rect" href="$classsot_1_1_step_checker.html" title="sot::StepChecker" alt="" coords="571,341,693,371"/>
+</map>

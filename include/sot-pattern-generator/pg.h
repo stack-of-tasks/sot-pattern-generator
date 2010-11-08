@@ -43,7 +43,7 @@
 
 /* Pattern Generator */
 #include <jrl/mal/matrixabstractlayer.hh>
-#include <walkGenJrl/PatternGeneratorInterface.h>
+#include <jrl/walkgen/patterngeneratorinterface.hh>
 namespace pg=PatternGeneratorJRL;
 
 /* --------------------------------------------------------------------- */

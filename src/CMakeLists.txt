@@ -17,33 +17,6 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include)
 
 ADD_DEFINITIONS(-DDEBUG=2)
 
-# provide path to library libwalkGenJrl.so, libdynamicsJRLJapan.so,
-# libhrp2Dynamics.so, libsot-core.so
-LINK_DIRECTORIES(${WALKGENJRL_LIBRARY_DIRS}
-  ${DYNAMICSJRLJAPAN_LIBRARY_DIRS}
-  ${HRP2_DYNAMICS_LIBRARY_DIRS}
-  ${SOT_CORE_LIBRARY_DIRS}
-  )
-
-# Add walkGenJrl compilation flags and link to library libwalkGenJrl.so
-# Add dynamicsJRLJapan compilation flags and link to library
-# libdynamicsJRLJapan.so
-# Add hrp2Dynamics compilation flags and link to library libhrp2Dynamics.so
-# Add sot-core compilation flags and link to library libsot-core.so
-ADD_DEFINITIONS(${WALKGENJRL_CFLAGS}
-  ${DYNAMICSJRLJAPAN_CFLAGS}
-  ${HRP2_DYNAMICS_CFLAGS}
-  ${SOT_CORE_CFLAGS}
-  )
-
-IF(WIN32)
-  foreach(dlink ${WALKGENJRL_LDFLAGS} ${DYNAMICSJRLJAPAN_LDFLAGS} ${HRP2_DYNAMICS_LDFLAGS} ${SOT_CORE_LDFLAGS})
-    SET ( ${PROJECT_NAME}_src_LDFLAGS "${${PROJECT_NAME}_src_LDFLAGS}  ${dlink}")
-  endforeach(dlink)
-ENDIF(WIN32)
-
-
-
 SET(LIBRARY_NAME ${PROJECT_NAME})
 
 
@@ -109,13 +82,6 @@ FOREACH(LIBRARY_NAME ${plugins})
     INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib/plugin
     PREFIX "")
 
-  IF(UNIX)
-    TARGET_LINK_LIBRARIES(${LIBRARY_NAME} ${WALKGENJRL_LIBRARIES})
-    TARGET_LINK_LIBRARIES(${LIBRARY_NAME} ${DYNAMICSJRLJAPAN_LIBRARIES})
-    TARGET_LINK_LIBRARIES(${LIBRARY_NAME} ${HRP2_DYNAMICS_LIBRARIES})
-    TARGET_LINK_LIBRARIES(${LIBRARY_NAME} ${SOT_CORE_LIBRARIES})
-  ENDIF(UNIX)
-
   # inter-plugins dependendies
   IF(NOT ${LIBRARY_NAME} STREQUAL ${plugins_common_deps})
     TARGET_LINK_LIBRARIES(${LIBRARY_NAME} ${plugins_common_deps})
@@ -131,6 +97,11 @@ FOREACH(LIBRARY_NAME ${plugins})
     PROPERTIES
     LINK_FLAGS "${${PROJECT_NAME}_src_LDFLAGS}"
     )
+
+  PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} jrl-dynamics)
+  PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} jrl-walkgen)
+  PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} hrp2-dynamics)
+  PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} sot-core) 
 
   INSTALL(TARGETS ${LIBRARY_NAME}
     DESTINATION lib/plugin)

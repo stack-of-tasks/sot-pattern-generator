@@ -20,7 +20,6 @@ INCLUDE(cmake/boost.cmake)
 INCLUDE(cmake/lapack.cmake)
 
 SET(PROJECT_NAME sot-pattern-generator)
-SET(PROJECT_VERSION 1.0.0.99)
 SET(PROJECT_DESCRIPTION "jrl-walkgen bindings for dynamic-graph.")
 SET(PROJECT_URL "https://github.com/jrl-umi3218/sot-pattern-generator")
 

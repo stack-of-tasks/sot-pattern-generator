@@ -1,16 +1,16 @@
 <map id="G" name="G">
-<area shape="rect" href="$step-queue_8h.html" title="sot&#45;pattern&#45;generator/step&#45;queue.h" alt="" coords="39,160,257,189"/>
-<area shape="rect" href="$step-computer_8h.html" title="sot&#45;pattern&#45;generator/step&#45;computer.h" alt="" coords="619,83,856,112"/>
-<area shape="rect" href="$pg-manager_8h.html" title="sot&#45;pattern&#45;generator/pg&#45;manager.h" alt="" coords="1269,83,1491,112"/>
-<area shape="rect" href="sot-core.doxytag$matrix-homogeneous_8h.html" title="sot&#45;core/matrix&#45;homogeneous.h" alt="" coords="828,237,1031,267"/>
-<area shape="rect" href="sot-core.doxytag$vector-roll-pitch-yaw_8h.html" title="sot&#45;core/vector&#45;roll&#45;pitch&#45;yaw.h" alt="" coords="1324,237,1519,267"/>
-<area shape="rect" href="sot-core.doxytag$matrix-rotation_8h.html" title="sot&#45;core/matrix&#45;rotation.h" alt="" coords="1473,392,1639,421"/>
-<area shape="rect" href="$step-observer_8h.html" title="sot&#45;pattern&#45;generator/step&#45;observer.h" alt="" coords="825,160,1057,189"/>
-<area shape="rect" href="$step-checker_8h.html" title="sot&#45;pattern&#45;generator/step&#45;checker.h" alt="" coords="383,160,612,189"/>
-<area shape="rect" href="sot-core.doxytag$sot-core-api_8h.html" title="sot&#45;core/sot&#45;core&#45;api.h" alt="" coords="1541,469,1691,499"/>
-<area shape="rect" href="sot-core.doxytag$vector-rotation_8h.html" title="sot&#45;core/vector&#45;rotation.h" alt="" coords="1593,315,1759,344"/>
-<area shape="rect" href="$pg_8h.html" title="sot&#45;pattern&#45;generator/pg.h" alt="" coords="1569,160,1737,189"/>
-<area shape="rect" href="sot-core.doxytag$flags_8h.html" title="sot&#45;core/flags.h" alt="" coords="2207,392,2319,421"/>
-<area shape="rect" href="$exception-pg_8h.html" title="sot&#45;pattern&#45;generator/exception&#45;pg.h" alt="" coords="2247,237,2473,267"/>
-<area shape="rect" href="sot-core.doxytag$exception-abstract_8h.html" title="sot&#45;core/exception&#45;abstract.h" alt="" coords="2024,315,2213,344"/>
+<area shape="rect" href="$step&#45;queue_8h.html" title="sot&#45;pattern&#45;generator/step&#45;queue.h" alt="" coords="41,161,292,188"/>
+<area shape="rect" href="$step&#45;computer_8h.html" title="sot&#45;pattern&#45;generator/step&#45;computer.h" alt="" coords="673,84,945,111"/>
+<area shape="rect" href="$pg&#45;manager_8h.html" title="sot&#45;pattern&#45;generator/pg&#45;manager.h" alt="" coords="1353,84,1609,111"/>
+<area shape="rect" href="sot&#45;core.doxytag$matrix&#45;homogeneous_8h.html" title="sot&#45;core/matrix&#45;homogeneous.h" alt="" coords="888,239,1115,265"/>
+<area shape="rect" href="sot&#45;core.doxytag$vector&#45;roll&#45;pitch&#45;yaw_8h.html" title="sot&#45;core/vector&#45;roll&#45;pitch&#45;yaw.h" alt="" coords="1440,239,1656,265"/>
+<area shape="rect" href="sot&#45;core.doxytag$matrix&#45;rotation_8h.html" title="sot&#45;core/matrix&#45;rotation.h" alt="" coords="1599,393,1785,420"/>
+<area shape="rect" href="$step&#45;observer_8h.html" title="sot&#45;pattern&#45;generator/step&#45;observer.h" alt="" coords="897,161,1161,188"/>
+<area shape="rect" href="$step&#45;checker_8h.html" title="sot&#45;pattern&#45;generator/step&#45;checker.h" alt="" coords="417,161,676,188"/>
+<area shape="rect" href="sot&#45;core.doxytag$sot&#45;core&#45;api_8h.html" title="sot&#45;core/sot&#45;core&#45;api.h" alt="" coords="1673,471,1841,497"/>
+<area shape="rect" href="sot&#45;core.doxytag$vector&#45;rotation_8h.html" title="sot&#45;core/vector&#45;rotation.h" alt="" coords="1731,316,1915,343"/>
+<area shape="rect" href="$pg_8h.html" title="sot&#45;pattern&#45;generator/pg.h" alt="" coords="1684,161,1876,188"/>
+<area shape="rect" href="sot&#45;core.doxytag$flags_8h.html" title="sot&#45;core/flags.h" alt="" coords="2407,393,2527,420"/>
+<area shape="rect" href="$exception&#45;pg_8h.html" title="sot&#45;pattern&#45;generator/exception&#45;pg.h" alt="" coords="2448,239,2707,265"/>
+<area shape="rect" href="sot&#45;core.doxytag$exception&#45;abstract_8h.html" title="sot&#45;core/exception&#45;abstract.h" alt="" coords="2205,316,2416,343"/>
 </map>

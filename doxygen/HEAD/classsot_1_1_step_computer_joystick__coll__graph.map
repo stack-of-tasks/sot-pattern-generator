@@ -1,11 +1,11 @@
 <map id="G" name="G">
-<area shape="rect" href="$classsot_1_1_step_computer.html" title="Generates footsteps." alt="" coords="5,325,136,355"/>
-<area shape="rect" title="STL class." alt="" coords="160,325,240,355"/>
-<area shape="rect" title="STL class." alt="" coords="77,245,243,275"/>
-<area shape="rect" title="STL class." alt="" coords="269,325,368,355"/>
-<area shape="rect" title="STL class." alt="" coords="267,245,451,275"/>
-<area shape="rect" title="STL class." alt="" coords="267,165,451,195"/>
-<area shape="rect" title="STL class." alt="" coords="283,85,435,115"/>
-<area shape="rect" title="STL class." alt="" coords="309,5,408,35"/>
-<area shape="rect" href="$classsot_1_1_step_checker.html" title="sot::StepChecker" alt="" coords="392,325,515,355"/>
+<area shape="rect" href="$classsot_1_1_step_computer.html" title="Generates footsteps." alt="" coords="5,327,149,353"/>
+<area shape="rect" title="STL class." alt="" coords="173,327,259,353"/>
+<area shape="rect" title="STL class." alt="" coords="75,247,259,273"/>
+<area shape="rect" title="STL class." alt="" coords="283,327,389,353"/>
+<area shape="rect" title="STL class." alt="" coords="283,247,488,273"/>
+<area shape="rect" title="STL class." alt="" coords="284,167,487,193"/>
+<area shape="rect" title="STL class." alt="" coords="301,87,469,113"/>
+<area shape="rect" title="STL class." alt="" coords="333,7,437,33"/>
+<area shape="rect" href="$classsot_1_1_step_checker.html" title="sot::StepChecker" alt="" coords="413,327,544,353"/>
 </map>

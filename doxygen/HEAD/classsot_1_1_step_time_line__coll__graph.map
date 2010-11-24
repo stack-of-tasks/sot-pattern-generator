@@ -1,8 +1,8 @@
 <map id="G" name="G">
-<area shape="rect" href="$classsot_1_1_step_queue.html" title="A step queue in the preview window." alt="" coords="169,205,281,235"/>
-<area shape="rect" href="$classsot_1_1_foot_print.html" title="sot::FootPrint" alt="" coords="164,5,263,35"/>
-<area shape="rect" title="STL class." alt="" coords="551,105,631,135"/>
-<area shape="rect" href="$classsot_1_1_p_g_manager.html" title="Finds the PG and sends steps to the PG." alt="" coords="349,205,464,235"/>
-<area shape="rect" title="STL class." alt="" coords="508,5,673,35"/>
-<area shape="rect" href="$classsot_1_1_step_computer.html" title="Generates footsteps." alt="" coords="488,205,619,235"/>
+<area shape="rect" href="$classsot_1_1_step_queue.html" title="A step queue in the preview window." alt="" coords="181,198,301,225"/>
+<area shape="rect" href="$classsot_1_1_foot_print.html" title="sot::FootPrint" alt="" coords="176,6,283,33"/>
+<area shape="rect" title="STL class." alt="" coords="575,102,660,129"/>
+<area shape="rect" href="$classsot_1_1_p_g_manager.html" title="Finds the PG and sends steps to the PG." alt="" coords="361,198,484,225"/>
+<area shape="rect" title="STL class." alt="" coords="525,6,709,33"/>
+<area shape="rect" href="$classsot_1_1_step_computer.html" title="Generates footsteps." alt="" coords="508,198,652,225"/>
 </map>

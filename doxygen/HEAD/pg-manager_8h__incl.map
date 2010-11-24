@@ -1,12 +1,12 @@
 <map id="G" name="G">
-<area shape="rect" href="$step-queue_8h.html" title="sot&#45;pattern&#45;generator/step&#45;queue.h" alt="" coords="139,83,357,112"/>
-<area shape="rect" href="$pg_8h.html" title="sot&#45;pattern&#45;generator/pg.h" alt="" coords="1025,83,1193,112"/>
-<area shape="rect" href="sot-core.doxytag$flags_8h.html" title="sot&#45;core/flags.h" alt="" coords="1136,315,1248,344"/>
-<area shape="rect" href="$exception-pg_8h.html" title="sot&#45;pattern&#45;generator/exception&#45;pg.h" alt="" coords="1147,160,1373,189"/>
-<area shape="rect" href="sot-core.doxytag$matrix-homogeneous_8h.html" title="sot&#45;core/matrix&#45;homogeneous.h" alt="" coords="1347,237,1549,267"/>
-<area shape="rect" href="sot-core.doxytag$vector-roll-pitch-yaw_8h.html" title="sot&#45;core/vector&#45;roll&#45;pitch&#45;yaw.h" alt="" coords="1489,160,1684,189"/>
-<area shape="rect" href="sot-core.doxytag$matrix-rotation_8h.html" title="sot&#45;core/matrix&#45;rotation.h" alt="" coords="1675,315,1840,344"/>
-<area shape="rect" href="sot-core.doxytag$sot-core-api_8h.html" title="sot&#45;core/sot&#45;core&#45;api.h" alt="" coords="1464,392,1613,421"/>
-<area shape="rect" href="sot-core.doxytag$exception-abstract_8h.html" title="sot&#45;core/exception&#45;abstract.h" alt="" coords="1133,237,1323,267"/>
-<area shape="rect" href="sot-core.doxytag$vector-rotation_8h.html" title="sot&#45;core/vector&#45;rotation.h" alt="" coords="1624,237,1789,267"/>
+<area shape="rect" href="$step&#45;queue_8h.html" title="sot&#45;pattern&#45;generator/step&#45;queue.h" alt="" coords="149,84,400,111"/>
+<area shape="rect" href="$pg_8h.html" title="sot&#45;pattern&#45;generator/pg.h" alt="" coords="1128,84,1320,111"/>
+<area shape="rect" href="sot&#45;core.doxytag$flags_8h.html" title="sot&#45;core/flags.h" alt="" coords="1260,316,1380,343"/>
+<area shape="rect" href="$exception&#45;pg_8h.html" title="sot&#45;pattern&#45;generator/exception&#45;pg.h" alt="" coords="1261,162,1520,188"/>
+<area shape="rect" href="sot&#45;core.doxytag$matrix&#45;homogeneous_8h.html" title="sot&#45;core/matrix&#45;homogeneous.h" alt="" coords="1483,239,1709,266"/>
+<area shape="rect" href="sot&#45;core.doxytag$vector&#45;roll&#45;pitch&#45;yaw_8h.html" title="sot&#45;core/vector&#45;roll&#45;pitch&#45;yaw.h" alt="" coords="1639,162,1855,188"/>
+<area shape="rect" href="sot&#45;core.doxytag$matrix&#45;rotation_8h.html" title="sot&#45;core/matrix&#45;rotation.h" alt="" coords="1835,316,2021,343"/>
+<area shape="rect" href="sot&#45;core.doxytag$sot&#45;core&#45;api_8h.html" title="sot&#45;core/sot&#45;core&#45;api.h" alt="" coords="1612,394,1780,420"/>
+<area shape="rect" href="sot&#45;core.doxytag$exception&#45;abstract_8h.html" title="sot&#45;core/exception&#45;abstract.h" alt="" coords="1248,239,1459,266"/>
+<area shape="rect" href="sot&#45;core.doxytag$vector&#45;rotation_8h.html" title="sot&#45;core/vector&#45;rotation.h" alt="" coords="1784,239,1968,266"/>
 </map>

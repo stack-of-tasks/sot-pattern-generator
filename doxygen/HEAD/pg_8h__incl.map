@@ -1,10 +1,10 @@
 <map id="G" name="G">
-<area shape="rect" href="sot-core.doxytag$flags_8h.html" title="sot&#45;core/flags.h" alt="" coords="428,237,540,267"/>
-<area shape="rect" href="$exception-pg_8h.html" title="sot&#45;pattern&#45;generator/exception&#45;pg.h" alt="" coords="941,83,1168,112"/>
-<area shape="rect" href="sot-core.doxytag$matrix-homogeneous_8h.html" title="sot&#45;core/matrix&#45;homogeneous.h" alt="" coords="995,160,1197,189"/>
-<area shape="rect" href="sot-core.doxytag$vector-roll-pitch-yaw_8h.html" title="sot&#45;core/vector&#45;roll&#45;pitch&#45;yaw.h" alt="" coords="1243,83,1437,112"/>
-<area shape="rect" href="sot-core.doxytag$matrix-rotation_8h.html" title="sot&#45;core/matrix&#45;rotation.h" alt="" coords="1323,237,1488,267"/>
-<area shape="rect" href="sot-core.doxytag$sot-core-api_8h.html" title="sot&#45;core/sot&#45;core&#45;api.h" alt="" coords="1112,315,1261,344"/>
-<area shape="rect" href="sot-core.doxytag$exception-abstract_8h.html" title="sot&#45;core/exception&#45;abstract.h" alt="" coords="781,160,971,189"/>
-<area shape="rect" href="sot-core.doxytag$vector-rotation_8h.html" title="sot&#45;core/vector&#45;rotation.h" alt="" coords="1272,160,1437,189"/>
+<area shape="rect" href="sot&#45;core.doxytag$flags_8h.html" title="sot&#45;core/flags.h" alt="" coords="472,238,592,265"/>
+<area shape="rect" href="$exception&#45;pg_8h.html" title="sot&#45;pattern&#45;generator/exception&#45;pg.h" alt="" coords="1029,84,1288,110"/>
+<area shape="rect" href="sot&#45;core.doxytag$matrix&#45;homogeneous_8h.html" title="sot&#45;core/matrix&#45;homogeneous.h" alt="" coords="1093,161,1320,188"/>
+<area shape="rect" href="sot&#45;core.doxytag$vector&#45;roll&#45;pitch&#45;yaw_8h.html" title="sot&#45;core/vector&#45;roll&#45;pitch&#45;yaw.h" alt="" coords="1363,84,1579,110"/>
+<area shape="rect" href="sot&#45;core.doxytag$matrix&#45;rotation_8h.html" title="sot&#45;core/matrix&#45;rotation.h" alt="" coords="1445,238,1632,265"/>
+<area shape="rect" href="sot&#45;core.doxytag$sot&#45;core&#45;api_8h.html" title="sot&#45;core/sot&#45;core&#45;api.h" alt="" coords="1223,316,1391,342"/>
+<area shape="rect" href="sot&#45;core.doxytag$exception&#45;abstract_8h.html" title="sot&#45;core/exception&#45;abstract.h" alt="" coords="859,161,1069,188"/>
+<area shape="rect" href="sot&#45;core.doxytag$vector&#45;rotation_8h.html" title="sot&#45;core/vector&#45;rotation.h" alt="" coords="1395,161,1579,188"/>
 </map>

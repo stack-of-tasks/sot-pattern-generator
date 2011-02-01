@@ -1,7 +1,4 @@
 <map id="G" name="G">
-<area shape="rect" href="$a00028.html" title="step&#45;computer&#45;force.h" alt="" coords="5,162,168,188"/>
-<area shape="rect" href="$a00031.html" title="step&#45;computer.h" alt="" coords="319,84,447,111"/>
-<area shape="rect" href="$a00029.html" title="step&#45;computer&#45;joystick.h" alt="" coords="192,162,371,188"/>
-<area shape="rect" href="$a00030.html" title="step&#45;computer&#45;pos.h" alt="" coords="541,162,696,188"/>
-<area shape="rect" href="$a00034.html" title="step&#45;time&#45;line.h" alt="" coords="395,162,517,188"/>
+<area shape="rect" href="sot-core.doxytag$a00145.html" title="sot&#45;core/matrix&#45;homogeneous.h" alt="" coords="715,84,941,111"/>
+<area shape="rect" href="sot-core.doxytag$a00163.html" title="sot&#45;core/sot&#45;core&#45;api.h" alt="" coords="744,161,912,188"/>
 </map>

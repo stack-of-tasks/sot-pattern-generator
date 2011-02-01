@@ -1,10 +1,9 @@
 <map id="G" name="G">
-<area shape="rect" href="sot&#45;core.doxytag$a00145.html" title="sot&#45;core/matrix&#45;homogeneous.h" alt="" coords="715,239,941,266"/>
-<area shape="rect" href="sot&#45;core.doxytag$a00178.html" title="sot&#45;core/vector&#45;roll&#45;pitch&#45;yaw.h" alt="" coords="913,162,1129,188"/>
-<area shape="rect" href="sot&#45;core.doxytag$a00146.html" title="sot&#45;core/matrix&#45;rotation.h" alt="" coords="1124,316,1311,343"/>
-<area shape="rect" href="$a00032.html" title="sot&#45;pattern&#45;generator/step&#45;observer.h" alt="" coords="423,162,687,188"/>
-<area shape="rect" href="$a00027.html" title="sot&#45;pattern&#45;generator/step&#45;checker.h" alt="" coords="1204,162,1463,188"/>
-<area shape="rect" href="$a00031.html" title="sot&#45;pattern&#45;generator/step&#45;computer.h" alt="" coords="761,84,1033,111"/>
-<area shape="rect" href="sot&#45;core.doxytag$a00163.html" title="sot&#45;core/sot&#45;core&#45;api.h" alt="" coords="939,394,1107,420"/>
-<area shape="rect" href="sot&#45;core.doxytag$a00179.html" title="sot&#45;core/vector&#45;rotation.h" alt="" coords="1016,239,1200,266"/>
+<area shape="rect" href="sot-core.doxytag$a00145.html" title="sot&#45;core/matrix&#45;homogeneous.h" alt="" coords="715,161,941,188"/>
+<area shape="rect" href="sot-core.doxytag$a00178.html" title="sot&#45;core/vector&#45;roll&#45;pitch&#45;yaw.h" alt="" coords="869,84,1085,111"/>
+<area shape="rect" href="sot-core.doxytag$a00146.html" title="sot&#45;core/matrix&#45;rotation.h" alt="" coords="1067,239,1253,265"/>
+<area shape="rect" href="$a00032.html" title="sot&#45;pattern&#45;generator/step&#45;observer.h" alt="" coords="435,84,699,111"/>
+<area shape="rect" href="$a00027.html" title="sot&#45;pattern&#45;generator/step&#45;checker.h" alt="" coords="1160,84,1419,111"/>
+<area shape="rect" href="sot-core.doxytag$a00163.html" title="sot&#45;core/sot&#45;core&#45;api.h" alt="" coords="920,316,1088,343"/>
+<area shape="rect" href="sot-core.doxytag$a00179.html" title="sot&#45;core/vector&#45;rotation.h" alt="" coords="1016,161,1200,188"/>
 </map>

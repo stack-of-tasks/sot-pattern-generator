@@ -1,4 +1,4 @@
 <map id="G" name="G">
-<area shape="rect" href="$a00005.html" title="sot::NextStep" alt="" coords="5,5,115,32"/>
-<area shape="rect" href="$a00006.html" title="sot::NextStepPgSot" alt="" coords="164,5,311,32"/>
+<area shape="rect" href="sot-core.doxytag$a00026.html" title="sot::ExceptionAbstract" alt="" coords="5,5,171,32"/>
+<area shape="rect" href="$a00002.html" title="sot::ExceptionPatternGenerator" alt="" coords="220,5,441,32"/>
 </map>

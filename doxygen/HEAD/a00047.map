@@ -1,7 +1,7 @@
 <map id="G" name="G">
-<area shape="rect" href="$a00028.html" title="step&#45;computer&#45;force.h" alt="" coords="5,162,168,188"/>
-<area shape="rect" href="$a00031.html" title="step&#45;computer.h" alt="" coords="319,84,447,111"/>
-<area shape="rect" href="$a00029.html" title="step&#45;computer&#45;joystick.h" alt="" coords="192,162,371,188"/>
-<area shape="rect" href="$a00030.html" title="step&#45;computer&#45;pos.h" alt="" coords="541,162,696,188"/>
-<area shape="rect" href="$a00034.html" title="step&#45;time&#45;line.h" alt="" coords="395,162,517,188"/>
+<area shape="rect" href="$a00028.html" title="step&#45;computer&#45;force.h" alt="" coords="5,84,168,111"/>
+<area shape="rect" href="$a00029.html" title="step&#45;computer&#45;joystick.h" alt="" coords="67,161,245,188"/>
+<area shape="rect" href="$a00030.html" title="step&#45;computer&#45;pos.h" alt="" coords="440,161,595,188"/>
+<area shape="rect" href="$a00031.html" title="step&#45;computer.h" alt="" coords="267,84,395,111"/>
+<area shape="rect" href="$a00034.html" title="step&#45;time&#45;line.h" alt="" coords="269,161,392,188"/>
 </map>

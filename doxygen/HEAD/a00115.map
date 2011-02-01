@@ -1,8 +1,5 @@
 <map id="G" name="G">
-<area shape="rect" href="$a00017.html" title="A step queue in the preview window." alt="" coords="181,198,301,225"/>
-<area shape="rect" href="$a00004.html" title="sot::FootPrint" alt="" coords="176,6,283,33"/>
-<area shape="rect" title="STL class." alt="" coords="575,102,660,129"/>
-<area shape="rect" href="$a00009.html" title="Finds the PG and sends steps to the PG." alt="" coords="361,198,484,225"/>
-<area shape="rect" title="STL class." alt="" coords="525,6,709,33"/>
-<area shape="rect" href="$a00012.html" title="Generates footsteps." alt="" coords="508,198,652,225"/>
+<area shape="rect" href="$a00004.html" title="sot::FootPrint" alt="" coords="69,7,176,33"/>
+<area shape="rect" title="STL class." alt="" coords="340,105,425,132"/>
+<area shape="rect" title="STL class." alt="" coords="291,7,475,33"/>
 </map>

@@ -881,6 +881,11 @@ OneStepOfControl(int &dummy, int time)
 	  m_ComAttitude(1) = lCOMRefState.pitch[0];
 	  m_ComAttitude(2) = lCOMRefState.yaw[0];
 
+	  m_dComAttitude(0) = lCOMRefState.roll[1];
+	  m_dComAttitude(1) = lCOMRefState.pitch[1];
+	  m_dComAttitude(2) = lCOMRefState.yaw[1];
+
+	  
 	  sotDEBUG(2) << "dCOMRefPos returned by the PG: "<< m_dCOMRefPos <<endl;
 	  sotDEBUG(2) << "CurrentState.size()"<< CurrentState.size()<<endl;
 	  sotDEBUG(2) << "CurrentConfiguration.size()"<< CurrentConfiguration.size()<<endl;

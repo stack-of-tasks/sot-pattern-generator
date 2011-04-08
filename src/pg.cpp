@@ -671,8 +671,279 @@ namespace dynamicgraph {
       return InitCoMRefval;
     }
 
+
     ml::Vector & PatternGenerator::
     getInitWaistPosRef(ml::Vector & InitWaistRefval, int /*time*/)
+{
+  sotDEBUGIN(5);
+ 
+  OneStepOfControlS(time);
+
+  ZMPRefval.resize(3);
+  ZMPRefval(0) = m_ZMPRefPos(0);
+  ZMPRefval(1) = m_ZMPRefPos(1);
+  ZMPRefval(2) = m_ZMPRefPos(2);
+  sotDEBUG(5) << "ZMPRefPos transmitted" << m_ZMPRefPos 
+	      << " " << ZMPRefval << endl;
+
+  sotDEBUGOUT(5);
+  return ZMPRefval;
+}
+
+ml::Vector & PatternGenerator::
+getCoMRef(ml::Vector & CoMRefval, int time)
+{
+  sotDEBUGIN(25);
+  
+  OneStepOfControlS(time);
+  CoMRefval = m_COMRefPos;
+
+  sotDEBUGOUT(25);
+  return CoMRefval;
+}
+
+ml::Vector & PatternGenerator::
+getdCoMRef(ml::Vector & CoMRefval, int time)
+{
+  sotDEBUGIN(25);
+  
+  OneStepOfControlS(time);
+  CoMRefval = m_dCOMRefPos;
+
+  sotDEBUGOUT(25);
+  return CoMRefval;
+}
+
+ml::Vector & PatternGenerator::
+getInitZMPRef(ml::Vector & InitZMPRefval, int time)
+{
+  sotDEBUGIN(25);
+ 
+  sotDEBUG(25) << "InitZMPRefPos transmitted" << m_InitZMPRefPos 
+	       << " " << InitZMPRefval << std::endl;
+  InitZMPRefval.resize(3);
+  InitZMPRefval(0) = m_InitZMPRefPos(0);
+  InitZMPRefval(1) = m_InitZMPRefPos(1);
+  InitZMPRefval(2) = m_InitZMPRefPos(2);
+
+  sotDEBUGOUT(25);
+  return InitZMPRefval;
+}
+
+ml::Vector & PatternGenerator::
+getInitCoMRef(ml::Vector & InitCoMRefval, int time)
+{
+  sotDEBUGIN(25);
+  
+  InitCoMRefval.resize(3);
+  InitCoMRefval(0) = m_InitCOMRefPos(0);
+  InitCoMRefval(1) = m_InitCOMRefPos(1);
+  InitCoMRefval(2) = m_InitCOMRefPos(2);
+  
+
+  sotDEBUGOUT(25);
+  return InitCoMRefval;
+}
+
+ml::Vector & PatternGenerator::
+getInitWaistPosRef(ml::Vector & InitWaistRefval, int time)
+{
+  sotDEBUGIN(25);
+  
+  InitWaistRefval = m_InitWaistRefPos;
+
+  sotDEBUGOUT(25);
+  return InitWaistRefval;
+}
+VectorRollPitchYaw & PatternGenerator::
+getInitWaistAttRef(VectorRollPitchYaw & InitWaistRefval, int time)
+{
+  sotDEBUGIN(25);
+  
+  for(unsigned int i=0;i<3;++i)
+    InitWaistRefval(i) = m_InitWaistRefAtt(i);
+
+  sotDEBUGOUT(25);
+  return InitWaistRefval;
+}
+
+
+
+MatrixHomogeneous & PatternGenerator::
+getLeftFootRef(MatrixHomogeneous & LeftFootRefVal, int time)
+{
+  sotDEBUGIN(25);
+
+  OneStepOfControlS(time);
+  LeftFootRefVal = m_LeftFootPosition;
+  sotDEBUGOUT(25) ;
+  return LeftFootRefVal;
+}
+MatrixHomogeneous & PatternGenerator::
+getRightFootRef(MatrixHomogeneous & RightFootRefval, int time)
+{
+  sotDEBUGIN(25);
+
+  OneStepOfControlS(time);
+
+  RightFootRefval = m_RightFootPosition;
+  sotDEBUGOUT(25);
+  return RightFootRefval;
+}
+MatrixHomogeneous & PatternGenerator::
+getdotLeftFootRef(MatrixHomogeneous & LeftFootRefVal, int time)
+{
+  sotDEBUGIN(25);
+
+  OneStepOfControlS(time);
+  LeftFootRefVal = m_dotLeftFootPosition;
+  sotDEBUGOUT(25) ;
+  return LeftFootRefVal;
+}
+MatrixHomogeneous & PatternGenerator::
+getdotRightFootRef(MatrixHomogeneous & RightFootRefval, int time)
+{
+  sotDEBUGIN(25);
+
+  OneStepOfControlS(time);
+
+  RightFootRefval = m_dotRightFootPosition;
+  sotDEBUGOUT(25);
+  return RightFootRefval;
+}
+
+MatrixHomogeneous & PatternGenerator::
+getInitLeftFootRef(MatrixHomogeneous & LeftFootRefVal, int time)
+{
+  sotDEBUGIN(25);
+
+  LeftFootRefVal = m_InitLeftFootPosition;
+  sotDEBUGOUT(25) ;
+  return LeftFootRefVal;
+}
+MatrixHomogeneous & PatternGenerator::
+getInitRightFootRef(MatrixHomogeneous & RightFootRefval, int time)
+{
+  sotDEBUGIN(25);
+
+  RightFootRefval = m_InitRightFootPosition;
+  sotDEBUGOUT(25);
+  return RightFootRefval;
+}
+
+MatrixHomogeneous & PatternGenerator::
+getFlyingFootRef(MatrixHomogeneous & FlyingFootRefval, int time)
+{
+  sotDEBUGIN(25);
+  OneStepOfControlS(time);
+  FlyingFootRefval = m_FlyingFootPosition;
+  sotDEBUGOUT(25);
+  return FlyingFootRefval;
+}
+
+int &PatternGenerator::
+InitOneStepOfControl(int &dummy, int time)
+{
+  sotDEBUGIN(15);
+  // TODO: modified first to avoid the loop.
+  firstSINTERN.setReady(false);
+  //  buildModel();
+  // Todo: modified the order of the calls
+  //OneStepOfControlS(time);
+  sotDEBUGIN(15);
+  return dummy;
+}
+
+void PatternGenerator::getAbsoluteWaistPosAttHomogeneousMatrix(MatrixHomogeneous &aWaistMH)
+{
+  
+  const double cr = cos(m_WaistAttitudeAbsolute(0)); // ROLL
+  const double sr = sin(m_WaistAttitudeAbsolute(0));
+  const double cp = cos(m_WaistAttitudeAbsolute(1)); // PITCH
+  const double sp = sin(m_WaistAttitudeAbsolute(1));
+  const double cy = cos(m_WaistAttitudeAbsolute(2)); // YAW
+  const double sy = sin(m_WaistAttitudeAbsolute(2));
+  
+  aWaistMH.fill(0.0);
+
+  aWaistMH(0,0) = cy*cp;
+  aWaistMH(0,1) = cy*sp*sr-sy*cr;
+  aWaistMH(0,2) = cy*sp*cr+sy*sr;
+  aWaistMH(0,3) = m_WaistPositionAbsolute(0);
+
+  aWaistMH(1,0) = sy*cp;
+  aWaistMH(1,1) = sy*sp*sr+cy*cr;
+  aWaistMH(1,2) = sy*sp*cr-cy*sr;
+  aWaistMH(1,3) = m_WaistPositionAbsolute(1);
+
+  aWaistMH(2,0) = -sp;
+  aWaistMH(2,1) = cp*sr;
+  aWaistMH(2,2) = cp*cr;
+  aWaistMH(2,3) = m_WaistPositionAbsolute(2);
+
+  aWaistMH(3,3) = 1.0;
+  
+}
+
+void PatternGenerator::FromAbsoluteFootPosToDotHomogeneous(pg::FootAbsolutePosition aFootPosition,
+							      MatrixHomogeneous &aFootMH,
+							      MatrixHomogeneous &adotFootMH)
+{
+  MatrixRotation dRot,Twist,Rot;
+  adotFootMH.setIdentity();
+  FromAbsoluteFootPosToHomogeneous(aFootPosition,aFootMH);
+
+  for(unsigned int i=0;i<3;i++)
+    for(unsigned int j=0;j<3;j++)
+      Rot(i,j) = aFootMH(i,j);
+  
+  Twist(0,0)=0.0; Twist(0,1)= -aFootPosition.dtheta; Twist(0,2) = aFootPosition.domega;
+  Twist(1,0)= aFootPosition.dtheta; Twist(1,1)= 0.0; Twist(1,2) = aFootPosition.domega2;
+  Twist(2,0)= -aFootPosition.domega; Twist(2,1)= -aFootPosition.domega2; Twist(2,2) = 0.0;
+
+  Twist.multiply(Rot,dRot);
+  
+  for(unsigned int i=0;i<3;i++)
+    for(unsigned int j=0;j<3;j++)
+      adotFootMH(i,j) = dRot(i,j);
+
+  adotFootMH(0,3) = aFootPosition.dx;
+  adotFootMH(1,3) = aFootPosition.dy;
+  adotFootMH(2,3) = aFootPosition.dz;
+  
+}
+
+void PatternGenerator::FromAbsoluteFootPosToHomogeneous(pg::FootAbsolutePosition aFootPosition,
+							   MatrixHomogeneous &aFootMH)
+{
+  double c,s,co,so;
+  c = cos(aFootPosition.theta*M_PI/180.0);
+  s = sin(aFootPosition.theta*M_PI/180.0);
+
+  co = cos(aFootPosition.omega*M_PI/180.0);
+  so = sin(aFootPosition.omega*M_PI/180.0);
+  
+  aFootMH(0,0) = c*co;        aFootMH(0,1) = -s;       aFootMH(0,2) = c*so; 
+  aFootMH(1,0) = s*co;        aFootMH(1,1) =  c;       aFootMH(1,2) = s*so; 
+  aFootMH(2,0) = -so ;        aFootMH(2,1) =  0;       aFootMH(2,2) =   co; 
+  aFootMH(3,0) = 0 ;          aFootMH(3,1) =  0;       aFootMH(3,2) =   0; 
+
+  aFootMH(0,3) = aFootPosition.x + m_AnkleSoilDistance*so;
+  aFootMH(1,3) = aFootPosition.y;
+  aFootMH(2,3) = aFootPosition.z + m_AnkleSoilDistance*co;
+  aFootMH(3,3) = 1.0;
+}
+
+int &PatternGenerator::
+OneStepOfControl(int &dummy, int time)
+{
+  m_LocalTime=time;
+  int lSupportFoot; // Local support foot.
+  // Default value
+  m_JointErrorValuesForWalking.fill(0.0);
+  const int robotSize = m_JointErrorValuesForWalking.size()+6;
+
+  try
     {
       sotDEBUGIN(25);
 
@@ -743,6 +1014,7 @@ namespace dynamicgraph {
     MatrixHomogeneous & PatternGenerator::
     getInitLeftFootRef(MatrixHomogeneous & LeftFootRefVal, int /*time*/)
     {
+
       sotDEBUGIN(25);
 
       LeftFootRefVal = m_InitLeftFootPosition;
@@ -905,20 +1177,82 @@ namespace dynamicgraph {
       //  m_WaistAttitudeAbsolute.fill(0);
       //  m_WaistPositionAbsolute.fill(0);
 
-      try
-	{
-	  m_LeftFootPosition = LeftFootCurrentPosSIN(time);
-	  m_RightFootPosition = RightFootCurrentPosSIN(time);
-	}
-      catch (...)
-	{ };
 
-      try
-	{
-	  m_VelocityReference = velocitydesSIN(time);
-	}
-      catch(...)
-	{ };
+	  m_ZMPRefPos(0) = ZMPTarget[0];
+	  m_ZMPRefPos(1) = ZMPTarget[1];
+	  m_ZMPRefPos(2) = ZMPTarget[2];
+	  m_ZMPRefPos(3) = 1.0;
+	  sotDEBUG(2) << "ZMPTarget returned by the PG: "<< m_ZMPRefPos <<endl;
+	  for(int i=0;i<3;i++)
+	    {
+	      m_WaistPositionAbsolute(i) = CurrentConfiguration(i);
+	      m_WaistAttitudeAbsolute(i) = CurrentConfiguration(i+3);
+	    }
+	  m_COMRefPos(0) = lCOMRefState.x[0];
+	  m_COMRefPos(1) = lCOMRefState.y[0];
+	  m_COMRefPos(2) = lCOMRefState.z[0];
+	  sotDEBUG(2) << "COMRefPos returned by the PG: "<< m_COMRefPos <<endl;
+	  m_dCOMRefPos(0) = lCOMRefState.x[1];
+	  m_dCOMRefPos(1) = lCOMRefState.y[1];
+	  m_dCOMRefPos(2) = lCOMRefState.z[1];
+
+	  m_ComAttitude(0) = lCOMRefState.roll[0];
+	  m_ComAttitude(1) = lCOMRefState.pitch[0];
+	  m_ComAttitude(2) = lCOMRefState.yaw[0];
+
+	  m_dComAttitude(0) = lCOMRefState.roll[1];
+	  m_dComAttitude(1) = lCOMRefState.pitch[1];
+	  m_dComAttitude(2) = lCOMRefState.yaw[1];
+
+	  sotDEBUG(2) << "dCOMRefPos returned by the PG: "<< m_dCOMRefPos <<endl;
+	  sotDEBUG(2) << "CurrentState.size()"<< CurrentState.size()<<endl;
+	  sotDEBUG(2) << "CurrentConfiguration.size()"<< CurrentConfiguration.size()<<endl;
+	  sotDEBUG(2) << "m_JointErrorValuesForWalking.size(): "<< m_JointErrorValuesForWalking.size() <<endl;
+
+	  // In this setting we assume that there is a proper mapping between
+	  // CurrentState and CurrentConfiguration.
+	  unsigned int SizeCurrentState = CurrentState.size();
+	  unsigned int SizeCurrentConfiguration = CurrentConfiguration.size()-6;
+	  unsigned int MinSize = std::min(SizeCurrentState,SizeCurrentConfiguration);
+
+	  if (m_JointErrorValuesForWalking.size()>=MinSize)
+	    {
+	      for(unsigned int li=0;li<MinSize;li++)
+		m_JointErrorValuesForWalking(li)= (CurrentConfiguration(li+6)- CurrentState(li) )/m_TimeStep;
+	    }
+	  else
+	    {
+	      std::cout <<"The state of the robot and the one return by the WPG are different" << std::endl;
+	      sotDEBUG(25) << "Size not coherent between CurrentState and m_JointErrorValuesForWalking: "
+			   << CurrentState.size()<< " "
+			   << m_JointErrorValuesForWalking.size()<< " "
+			   << endl;
+	    }
+	  sotDEBUG(2) << "Juste after updating m_JointErrorValuesForWalking" << endl;
+
+	  sotDEBUG(1) << "lLeftFootPosition : "
+		      << lLeftFootPosition.x << " "
+		      << lLeftFootPosition.y << " "
+		      << lLeftFootPosition.z << " "
+		      << lLeftFootPosition.theta << endl;
+	  sotDEBUG(1) << "lRightFootPosition : "
+		      << lRightFootPosition.x << " "
+		      << lRightFootPosition.y << " "
+		      << lRightFootPosition.z << " "
+		      << lRightFootPosition.theta << endl;
+
+	  sotDEBUG(25) << "lCOMPosition : "
+		       << lCOMRefState.x[0] << " "
+		       << lCOMRefState.y[0] << " "
+		       << lCOMRefState.z[0] <<  endl;
+
+	  /* Fill in the homogeneous matrix using the world reference frame*/
+	  FromAbsoluteFootPosToDotHomogeneous(lLeftFootPosition,
+					      m_LeftFootPosition,
+					      m_dotLeftFootPosition);
+	  FromAbsoluteFootPosToDotHomogeneous(lRightFootPosition,
+					      m_RightFootPosition,
+					      m_dotRightFootPosition);
 
       sotDEBUG(25) << "LeftFootCurrentPos:  " << m_LeftFootPosition << endl;
       sotDEBUG(25) << "RightFootCurrentPos:  " << m_RightFootPosition << endl;

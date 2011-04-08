@@ -785,23 +785,23 @@ OneStepOfControl(int &dummy, int time)
       for(unsigned int i=0;i<3;i++)
 	m_ZMPRefPos(i) = m_ZMPPrevious[i];
     }
-  catch(...) 
+  catch(...)
     { m_ZMPRefPos(0) = m_ZMPRefPos(1) = m_ZMPRefPos(2) = 0.0;
     m_ZMPRefPos(3) = 1.0;};
   //  m_WaistAttitudeAbsolute.fill(0);
   //  m_WaistPositionAbsolute.fill(0);
 
-  try 
+  try
     {
       m_LeftFootPosition = LeftFootCurrentPosSIN(time);
       m_RightFootPosition = RightFootCurrentPosSIN(time);
     }
-  catch (...) 
+  catch (...)
     { };
 
   try
     {
-      m_VelocityReference = velocitydesSIN(time); 
+      m_VelocityReference = velocitydesSIN(time);
     }
   catch(...)
     { };
@@ -816,7 +816,7 @@ OneStepOfControl(int &dummy, int time)
       // since the function initonestepofcontrol calls without
       // control this actual function. 'Hopefully', the function
       // pointer of firstSINTERN has been earlier destroyed
-      // by setconstant(0). 
+      // by setconstant(0).
       firstSINTERN(time);
       ml::Vector CurrentState = motorControlJointPositionSIN(time);
       /*! \brief Absolute Position for the left and right feet. */
@@ -825,7 +825,7 @@ OneStepOfControl(int &dummy, int time)
       lRightFootPosition.x=0.0;lRightFootPosition.y=0.0;lRightFootPosition.z=0.0;
       /*! \brief Absolute position of the reference CoM. */
       pg::COMState lCOMRefState;
-  
+
       sotDEBUG(45) << "mc = " << CurrentState << std::endl;
       
       MAL_VECTOR_DIM(CurrentConfiguration,double,robotSize);
@@ -835,15 +835,15 @@ OneStepOfControl(int &dummy, int time)
       MAL_VECTOR_DIM(ZMPTarget,double,3);
       MAL_VECTOR_FILL(ZMPTarget,0);
 
-      sotDEBUG(25) << "Before One Step of control " << ZMPTarget[0] << " " 
-		   << ZMPTarget[1] << " " 
+      sotDEBUG(25) << "Before One Step of control " << ZMPTarget[0] << " "
+		   << ZMPTarget[1] << " "
 		   << ZMPTarget[2] << endl;
-      
+
       sotDEBUG(25) << "Before One Step of control " << lCOMRefState.x[0] << " "
       		   << lCOMRefState.y[0] << " "
       		   << lCOMRefState.z[0] << endl;
       sotDEBUG(4) << " VelocityReference " << m_VelocityReference << endl;
-      
+
       m_PGI->setVelocityReference(m_VelocityReference(0),
 				  m_VelocityReference(1),
 				  m_VelocityReference(2));
@@ -857,7 +857,7 @@ OneStepOfControl(int &dummy, int time)
 					    lLeftFootPosition,
 					    lRightFootPosition))
 	{
-	  sotDEBUG(25) << "After One Step of control " << endl 
+	  sotDEBUG(25) << "After One Step of control " << endl
 		       << "CurrentState:" << CurrentState << endl
 		       << "CurrentConfiguration:" << CurrentConfiguration << endl;
 
@@ -887,13 +887,12 @@ OneStepOfControl(int &dummy, int time)
 	  m_dComAttitude(1) = lCOMRefState.pitch[1];
 	  m_dComAttitude(2) = lCOMRefState.yaw[1];
 
-	  
 	  sotDEBUG(2) << "dCOMRefPos returned by the PG: "<< m_dCOMRefPos <<endl;
 	  sotDEBUG(2) << "CurrentState.size()"<< CurrentState.size()<<endl;
 	  sotDEBUG(2) << "CurrentConfiguration.size()"<< CurrentConfiguration.size()<<endl;
 	  sotDEBUG(2) << "m_JointErrorValuesForWalking.size(): "<< m_JointErrorValuesForWalking.size() <<endl;
 
-	  // In this setting we assume that there is a proper mapping between 
+	  // In this setting we assume that there is a proper mapping between
 	  // CurrentState and CurrentConfiguration.
 	  unsigned int SizeCurrentState = CurrentState.size();
 	  unsigned int SizeCurrentConfiguration = CurrentConfiguration.size()-6;
@@ -906,30 +905,30 @@ OneStepOfControl(int &dummy, int time)
 	    {
 	      for(unsigned int li=0;li<MinSize;li++)
 		m_JointErrorValuesForWalking(li)= (CurrentConfiguration(li+6)- CurrentState(li) )/m_TimeStep;
-	      
+
 	    }
 	  else
 	    {
-	      std::cout <<"The state of the robot and the one returned by the WPG are different" << std::endl;
-	      sotDEBUG(25) << "Size not coherent between CurrentState and m_JointErrorValuesForWalking: " 
-			   << CurrentState.size()<< " " 
-			   << m_JointErrorValuesForWalking.size()<< " " 
+	      std::cout <<"The state of the robot and the one return by the WPG are different" << std::endl;
+	      sotDEBUG(25) << "Size not coherent between CurrentState and m_JointErrorValuesForWalking: "
+			   << CurrentState.size()<< " "
+			   << m_JointErrorValuesForWalking.size()<< " "
 			   << endl;
 	    }
 	  sotDEBUG(2) << "Juste after updating m_JointErrorValuesForWalking" << endl;
 
-	  sotDEBUG(1) << "lLeftFootPosition : " 
-		      << lLeftFootPosition.x << " " 
-		      << lLeftFootPosition.y << " " 
-		      << lLeftFootPosition.z << " " 
+	  sotDEBUG(1) << "lLeftFootPosition : "
+		      << lLeftFootPosition.x << " "
+		      << lLeftFootPosition.y << " "
+		      << lLeftFootPosition.z << " "
 		      << lLeftFootPosition.theta << endl;
-	  sotDEBUG(1) << "lRightFootPosition : " 
-		      << lRightFootPosition.x << " " 
-		      << lRightFootPosition.y << " " 
-		      << lRightFootPosition.z << " " 
+	  sotDEBUG(1) << "lRightFootPosition : "
+		      << lRightFootPosition.x << " "
+		      << lRightFootPosition.y << " "
+		      << lRightFootPosition.z << " "
 		      << lRightFootPosition.theta << endl;
 
-	  sotDEBUG(25) << "lCOMPosition : " 
+	  sotDEBUG(25) << "lCOMPosition : "
 		       << lCOMRefState.x[0] << " "
 		       << lCOMRefState.y[0] << " "
 		       << lCOMRefState.z[0] <<  endl;
@@ -941,7 +940,7 @@ OneStepOfControl(int &dummy, int time)
 	  FromAbsoluteFootPosToDotHomogeneous(lRightFootPosition,
 					      m_RightFootPosition,
 					      m_dotRightFootPosition);
-	
+
 	  /* We assume that the left foot is always the origin of the new frame. */
 	  m_LeftFootPosition = m_MotionSinceInstanciationToThisSequence * m_LeftFootPosition;
 	  m_RightFootPosition = m_MotionSinceInstanciationToThisSequence * m_RightFootPosition;
@@ -963,7 +962,7 @@ OneStepOfControl(int &dummy, int time)
 
 	  sotDEBUG(25) << "lLeftFootPosition.stepType: " << lLeftFootPosition.stepType
 		       << " lRightFootPosition.stepType: " << lRightFootPosition.stepType <<endl;
-	  // Find the support foot feet. 
+	  // Find the support foot feet.
 	  if (lLeftFootPosition.stepType==-1)
 	    {
 	      lSupportFoot=1;
@@ -974,18 +973,18 @@ OneStepOfControl(int &dummy, int time)
 	      lSupportFoot=0;
 	      m_DoubleSupportPhaseState = 0;
 	    }
-	  else /* m_LeftFootPosition.z ==m_RightFootPosition.z 
+	  else /* m_LeftFootPosition.z ==m_RightFootPosition.z
 		  We keep the previous support foot half the time of the double phase..
 	       */
 	    {
 	      lSupportFoot=m_SupportFoot;
 	    }
-	  
+
 	  /* Update the class related member. */
 	  m_SupportFoot = lSupportFoot;
 
 	  if ((m_ReferenceFrame==EGOCENTERED_FRAME) ||
-	      (m_ReferenceFrame==LEFT_FOOT_CENTERED_FRAME) || 
+	      (m_ReferenceFrame==LEFT_FOOT_CENTERED_FRAME) ||
 	      (m_ReferenceFrame==WAIST_CENTERED_FRAME))
 	    {
 	      sotDEBUG(25) << "Inside egocentered frame " <<endl;
@@ -997,10 +996,10 @@ OneStepOfControl(int &dummy, int time)
 		{
 		  if (m_SupportFoot==1)
 		    PoseOrigin = m_LeftFootPosition;
-		  else 
-		    PoseOrigin = m_RightFootPosition;	    
+		  else
+		    PoseOrigin = m_RightFootPosition;
 		}
-	      else if (m_ReferenceFrame==LEFT_FOOT_CENTERED_FRAME) 
+	      else if (m_ReferenceFrame==LEFT_FOOT_CENTERED_FRAME)
 		{
 		  PoseOrigin = m_LeftFootPosition;
 		}
@@ -1009,7 +1008,7 @@ OneStepOfControl(int &dummy, int time)
 		  PoseOrigin = WaistPoseAbsolute;
 		}
 	      PoseOrigin.inverse(iPoseOrigin);
-	      
+
 	      sotDEBUG(25) << "Old ComRef:  " << m_COMRefPos << endl;
 	      sotDEBUG(25) << "Old LeftFootRef:  " << m_LeftFootPosition << endl;
 	      sotDEBUG(25) << "Old RightFootRef:  " << m_RightFootPosition << endl;
@@ -1018,7 +1017,7 @@ OneStepOfControl(int &dummy, int time)
 
 	      ml::Vector lVZMPRefPos(4), lV2ZMPRefPos(4);
 	      ml::Vector lVCOMRefPos(4), lV2COMRefPos(4);
-	      
+
 	      for(unsigned int li=0;li<3;li++)
 		{
 		  lVZMPRefPos(li) = m_ZMPRefPos(li);
@@ -1026,12 +1025,12 @@ OneStepOfControl(int &dummy, int time)
 		}
 	      lVZMPRefPos(3) = lVCOMRefPos(3) = 1.0;
 
-	      // We do not touch to ZMP. 
+	      // We do not touch to ZMP.
 	      lV2ZMPRefPos = iPoseOrigin * (WaistPoseAbsolute * lVZMPRefPos);
-	      
+
 	      // Put the CoM reference pos in the Pos Origin reference frame.
 	      lV2COMRefPos = iPoseOrigin * lVCOMRefPos;
-	  
+
 	      MatrixHomogeneous lMLeftFootPosition = m_LeftFootPosition;
 	      MatrixHomogeneous lMRightFootPosition = m_RightFootPosition;
 
@@ -1043,7 +1042,7 @@ OneStepOfControl(int &dummy, int time)
 		  m_ZMPRefPos(i) = lV2ZMPRefPos(i);
 		  m_COMRefPos(i) = lV2COMRefPos(i);
 		}
-	      
+
 	      MatrixHomogeneous lWaistPoseAbsoluste = WaistPoseAbsolute;
 	      WaistPoseAbsolute = iPoseOrigin * WaistPoseAbsolute;
 
@@ -1060,25 +1059,23 @@ OneStepOfControl(int &dummy, int time)
 	    }
 	  sotDEBUG(25) << "After egocentered frame " << endl;
 
-	      
 	  sotDEBUG(25) << "ComRef:  " << m_COMRefPos << endl;
 	  sotDEBUG(25) << "LeftFootRef:  " << m_LeftFootPosition << endl;
 	  sotDEBUG(25) << "RightFootRef:  " << m_RightFootPosition << endl;
 	  sotDEBUG(25) << "ZMPRefPos:  " << m_ZMPRefPos << endl;
 	  sotDEBUG(25) << "m_MotionSinceInstanciationToThisSequence" <<
 	    m_MotionSinceInstanciationToThisSequence<< std::endl;
-	  
-	  
+
 	  for(unsigned int i=0;i<3;i++)
 	    m_ZMPPrevious[i] = m_ZMPRefPos(i);
 
 	  m_dataInProcess = 1;
 	}
-      else 
+      else
 	{
-	  sotDEBUG(1) << "Error while compute one step of PG." 
+	  sotDEBUG(1) << "Error while compute one step of PG."
 		      << m_dataInProcess << std::endl;
-	  // TODO: SOT_THROW 
+	  // TODO: SOT_THROW
 	  if (m_dataInProcess==1)
 	    {
 	      MatrixHomogeneous invInitLeftFootRef,Diff;
@@ -1089,9 +1086,6 @@ OneStepOfControl(int &dummy, int time)
 
 	    }
 	  m_dataInProcess = 0;
-
-	
-    
 	}
       sotDEBUG(25) << "After computing error " << m_JointErrorValuesForWalking << endl;
     }

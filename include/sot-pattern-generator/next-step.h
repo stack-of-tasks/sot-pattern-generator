@@ -107,8 +107,31 @@ namespace dynamicgraph {
       MatrixHomogeneous& computeRefPos( MatrixHomogeneous& res,int timeCurr,const MatrixHomogeneous& wMsf );
     };
 
+      SignalTimeDependent< MatrixHomogeneous,int > referencePositionLeftSOUT;
+      SignalTimeDependent< MatrixHomogeneous,int > referencePositionRightSOUT;
+      SignalTimeDependent< ml::Vector,int > referenceVelocitySOUT;
+      SignalTimeDependent< ml::Vector,int > referenceAccelerationSOUT;
+
+    public:
+
+      NextStepTwoHandObserver( const std::string & name );
+
+      MatrixHomogeneous& computeReferencePositionLeft( MatrixHomogeneous& res,int timeCurr );
+      MatrixHomogeneous& computeReferencePositionRight( MatrixHomogeneous& res,int timeCurr );
+      ml::Vector& computeReferenceVelocity( const ml::Vector& right,const ml::Vector& left,ml::Vector& res );
+      ml::Vector& computeReferenceAcceleration( const ml::Vector& right,const ml::Vector& left,ml::Vector& res );
+
+      SignalArray<int> getSignals( void );
+      operator SignalArray<int> ();
+
+    private:
+
+      MatrixHomogeneous& computeRefPos( MatrixHomogeneous& res,int timeCurr,const MatrixHomogeneous& wMsf );
+    };
+
 
     /* --- Next Step (stepper) --------------------------------------------- */
+
 
     /*!
      * Generates footsteps depending on the frame computed by the
@@ -122,7 +145,9 @@ namespace dynamicgraph {
       : public Entity
     {
     public:
-      DYNAMIC_GRAPH_ENTITY_DECL();
+
+      static const std::string CLASS_NAME;
+      virtual const std::string& getClassName( void ) const { return CLASS_NAME; }
 
     protected: /* --- FOOT PRINT LIST --- */
 

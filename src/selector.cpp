@@ -30,6 +30,7 @@ selector__INIT selector_initiator;
 
 
 #include <sot-pattern-generator/selector.h>
+#include <sot/core/debug.hh>
 #include <dynamic-graph/factory.h>
 #include <dynamic-graph/all-commands.h>
 #include <sot-pattern-generator/exception-pg.h>
@@ -99,6 +100,7 @@ namespace dynamicgraph {
       /* sigDep contains the list of the input signal. sigOut depends of these. */
       SignalArray<int> sigDep;
       std::ostringstream signame;
+
 
       /* Set the entries. */
       for( unsigned int i=0;i<nbEntries;++i )
@@ -174,7 +176,6 @@ namespace dynamicgraph {
       sotDEBUGOUT(15);
       return res;
     }
-
     void Selector::
     resetSignals( const unsigned int & nbEntries__,
 		  const unsigned int & nbSignals__ )
@@ -201,7 +202,6 @@ namespace dynamicgraph {
 	}
       outputsSOUT.resize( nbSignals );
     }
-
 
     /* --- PARAMS --------------------------------------------------------------- */
     /* --- PARAMS --------------------------------------------------------------- */

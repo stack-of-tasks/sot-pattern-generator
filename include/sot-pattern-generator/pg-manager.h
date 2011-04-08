@@ -70,6 +70,9 @@ namespace dynamicgraph {
     public: // Entity name
       DYNAMIC_GRAPH_ENTITY_DECL();
 
+      static const std::string CLASS_NAME;
+      virtual const std::string& getClassName( void ) const { return CLASS_NAME; }
+
     public: // Construction
 
       PGManager( const std::string& name );

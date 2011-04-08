@@ -67,6 +67,7 @@ namespace dynamicgraph {
     {
     public:
       DYNAMIC_GRAPH_ENTITY_DECL();
+      static const std::string CLASS_NAME;
 
     protected:
       /** Number of signal type. For each signal type, you have
@@ -111,6 +112,9 @@ namespace dynamicgraph {
       void create( const std::string& name,const std::string& type,const int & sigId );
       std::string getTypeList( void );
       void getTypeList( std::ostream& os );
+      virtual void commandLine( const std::string& cmdLine,
+				std::istringstream& cmdArgs,
+				std::ostream& os );
 
 
     };

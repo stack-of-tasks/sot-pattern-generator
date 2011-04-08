@@ -68,6 +68,7 @@ namespace dynamicgraph {
     {
     public:
       DYNAMIC_GRAPH_ENTITY_DECL();
+      static const std::string CLASS_NAME;
 
     protected:
 

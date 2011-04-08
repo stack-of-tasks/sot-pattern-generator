@@ -105,9 +105,11 @@ namespace dynamicgraph {
 
       /*! Class name */
     protected:
+      /*! \brief The class name */
+      static const std::string CLASS_NAME;
 
     public:
-      DYNAMIC_GRAPH_ENTITY_DECL();
+      virtual const std::string & getClassName(void) const { return CLASS_NAME; }
 
     protected:
 
@@ -355,9 +357,6 @@ namespace dynamicgraph {
        * working anymore/yet. */
       unsigned int m_dataInProcess;
 
-      /*! \brief Booleans used to indicate feet contacts */
-      bool m_rightFootContact, m_leftFootContact;
-
       /*! @} */
 
       /*! Parsing a file of command by the walking pattern generator interface.
@@ -404,11 +403,7 @@ namespace dynamicgraph {
       /*! \brief Internal method to get the position of the right foot. */
       MatrixHomogeneous & getInitRightFootRef(MatrixHomogeneous &res, int time);
 
-      /*! \brief Internal method to get the information of contact or not on
-	the feet. */
-      bool & getLeftFootContact(bool & res,int time);
-      bool & getRightFootContact(bool & res,int time);
-      
+
     public:
 
       /*! \name External signals
@@ -505,9 +500,6 @@ namespace dynamicgraph {
       /*! \brief Externalize the right foot position reference. */
       SignalTimeDependent<MatrixHomogeneous,int> InitRightFootRefSOUT;
 
-      /*! \brief Booleans for contact of the feet */
-      SignalTimeDependent<bool,int> leftFootContactSOUT;
-      SignalTimeDependent<bool,int> rightFootContactSOUT;
       /*! @} */
 
       /*! \name Reimplement the interface of the plugin.
@@ -519,6 +511,14 @@ namespace dynamicgraph {
 
       /*! Storing the previous ZMP value. */
       MAL_VECTOR(m_ZMPPrevious,double);
+
+    public: /* --- PARAMS --- */
+      /*! \brief This method pass on to the Pattern Generator Interface to interpret the commands.
+       */
+      virtual void commandLine( const std::string& cmdLine,
+				std::istringstream& cmdArgs,
+				std::ostream& os );
+    };
 
     public: /* --- PARAMS --- */
       void initCommands( void );

@@ -29,14 +29,14 @@
 #include <dynamic-graph/entity.h>
 #include <dynamic-graph/signal-ptr.h>
 #include <dynamic-graph/signal-time-dependent.h>
-#include <sot-core/matrix-homogeneous.h>
+#include <sot/core/matrix-homogeneous.hh>
 
 
 /* --------------------------------------------------------------------- */
 /* --- API ------------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-#if defined (WIN32) 
+#if defined (WIN32)
 #  if defined (step_observer_EXPORTS)
 #    define StepObserver_EXPORT __declspec(dllexport)
 #  else
@@ -46,68 +46,70 @@
 #  define StepObserver_EXPORT
 #endif
 
-namespace sot {
-namespace dg = dynamicgraph;
-/* --------------------------------------------------------------------- */
-/* --- CLASS ----------------------------------------------------------- */
-/* --------------------------------------------------------------------- */
+namespace dynamicgraph {
+  namespace sot {
 
-/// Computes a reference frame from the position of both
-/// hands and feet of the robot. The coordinates of the reference
-/// frames are computed both in the left and right foot frames,
-/// and in the waist frame.
-class StepObserver_EXPORT StepObserver
-  : public dg::Entity
-{
- public:
+    /* --------------------------------------------------------------------- */
+    /* --- CLASS ----------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
 
-  static const std::string CLASS_NAME;
-  virtual const std::string& getClassName( void ) const { return CLASS_NAME; }
+    /// Computes a reference frame from the position of both
+    /// hands and feet of the robot. The coordinates of the reference
+    /// frames are computed both in the left and right foot frames,
+    /// and in the waist frame.
+    class StepObserver_EXPORT StepObserver
+      : public Entity
+    {
+    public:
 
- public:
+      static const std::string CLASS_NAME;
+      virtual const std::string& getClassName( void ) const { return CLASS_NAME; }
 
-  dg::SignalPtr< MatrixHomogeneous,int > leftHandPositionSIN;
-  dg::SignalPtr< MatrixHomogeneous,int > rightHandPositionSIN;
+    public:
 
-  dg::SignalPtr< MatrixHomogeneous,int > leftFootPositionSIN;
-  dg::SignalPtr< MatrixHomogeneous,int > rightFootPositionSIN;
-  dg::SignalPtr< MatrixHomogeneous,int > waistPositionSIN;
+      SignalPtr< MatrixHomogeneous,int > leftHandPositionSIN;
+      SignalPtr< MatrixHomogeneous,int > rightHandPositionSIN;
 
-  /// Reference frame in left foot coordinates.
-  dg::SignalTimeDependent< MatrixHomogeneous,int > referencePositionLeftSOUT;
+      SignalPtr< MatrixHomogeneous,int > leftFootPositionSIN;
+      SignalPtr< MatrixHomogeneous,int > rightFootPositionSIN;
+      SignalPtr< MatrixHomogeneous,int > waistPositionSIN;
 
-  /// Reference frame in right foot coordinates.
-  dg::SignalTimeDependent< MatrixHomogeneous,int > referencePositionRightSOUT;
+      /// Reference frame in left foot coordinates.
+      SignalTimeDependent< MatrixHomogeneous,int > referencePositionLeftSOUT;
 
-  /// Reference frame in the waist coordinates.
-  dg::SignalTimeDependent< MatrixHomogeneous,int > referencePositionWaistSOUT;
+      /// Reference frame in right foot coordinates.
+      SignalTimeDependent< MatrixHomogeneous,int > referencePositionRightSOUT;
 
- public: // methods
+      /// Reference frame in the waist coordinates.
+      SignalTimeDependent< MatrixHomogeneous,int > referencePositionWaistSOUT;
 
-  StepObserver( const std::string & name );
+    public: // methods
 
-  dg::SignalArray<int> getSignals( void );
-  operator dg::SignalArray<int> ();
+      StepObserver( const std::string & name );
 
- public: // signal callbacks
+      SignalArray<int> getSignals( void );
+      operator SignalArray<int> ();
 
-  MatrixHomogeneous& computeReferencePositionLeft( MatrixHomogeneous& res,int timeCurr );
-  MatrixHomogeneous& computeReferencePositionRight( MatrixHomogeneous& res,int timeCurr );
-  MatrixHomogeneous& computeReferencePositionWaist( MatrixHomogeneous& res,int timeCurr );
+    public: // signal callbacks
 
- public: // dg::Entity
+      MatrixHomogeneous& computeReferencePositionLeft( MatrixHomogeneous& res,int timeCurr );
+      MatrixHomogeneous& computeReferencePositionRight( MatrixHomogeneous& res,int timeCurr );
+      MatrixHomogeneous& computeReferencePositionWaist( MatrixHomogeneous& res,int timeCurr );
 
-  virtual void display( std::ostream& os ) const; 
-  virtual void commandLine( const std::string& cmdLine,
-			    std::istringstream& cmdArgs,
-			    std::ostream& os );
+    public: // Entity
 
- private: // helpers
+      virtual void display( std::ostream& os ) const;
+      virtual void commandLine( const std::string& cmdLine,
+				std::istringstream& cmdArgs,
+				std::ostream& os );
 
-  MatrixHomogeneous& computeRefPos( MatrixHomogeneous& res,int timeCurr,const MatrixHomogeneous& wMref );
-};
+    private: // helpers
+
+      MatrixHomogeneous& computeRefPos( MatrixHomogeneous& res,int timeCurr,const MatrixHomogeneous& wMref );
+    };
 
 
-} // namespace sot
+  } // namespace sot
+} // namespace dynamicgraph
 
 #endif

@@ -33,9 +33,9 @@ namespace ml = maal::boost;
 #include <dynamic-graph/entity.h>
 #include <dynamic-graph/signal-ptr.h>
 #include <dynamic-graph/signal-time-dependent.h>
-#include <sot-core/matrix-homogeneous.h>
-#include <sot-core/vector-roll-pitch-yaw.h>
-#include <sot-core/matrix-rotation.h>
+#include <sot/core/matrix-homogeneous.hh>
+#include <sot/core/vector-roll-pitch-yaw.hh>
+#include <sot/core/matrix-rotation.hh>
 #include <sot-pattern-generator/step-observer.h>
 #include <sot-pattern-generator/step-checker.h>
 
@@ -44,7 +44,8 @@ namespace ml = maal::boost;
 #include <deque>
 #include <fstream>
 
-namespace sot {
+namespace dynamicgraph {
+  namespace sot {
 
 /* --------------------------------------------------------------------- */
 /* --- CLASS ----------------------------------------------------------- */
@@ -63,7 +64,8 @@ class StepComputer
 };
 
 
-} // namespace sot
+  } // namespace sot
+} // namespace dynamicgraph
 
 
 #endif // #ifndef __SOT_STEPCOMPUTER_H__

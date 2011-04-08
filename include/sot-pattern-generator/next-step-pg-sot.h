@@ -42,12 +42,12 @@ namespace ml = maal::boost;
 /* --- API ------------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-#if defined (WIN32) 
-#  if defined (next_step_pg_sot_EXPORTS) 
+#if defined (WIN32)
+#  if defined (next_step_pg_sot_EXPORTS)
 #    define NextStepPGSOT_EXPORT __declspec(dllexport)
-#  else  
+#  else
 #    define NextStepPGSOT_EXPORT __declspec(dllimport)
-#  endif 
+#  endif
 #else
 #  define NextStepPGSOT_EXPORT
 #endif
@@ -56,55 +56,56 @@ namespace ml = maal::boost;
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-namespace sot {
-namespace dg = dynamicgraph;
+namespace dynamicgraph {
+  namespace sot {
 
-class NextStepPGSOT_EXPORT NextStepPgSot
-:public NextStep
-{
- public:
-  static const std::string CLASS_NAME;
-  static const unsigned int ADDING_STEP=0;
-  static const unsigned int CHANGING_STEP=1;
+    class NextStepPGSOT_EXPORT NextStepPgSot
+      :public NextStep
+    {
+    public:
+      static const std::string CLASS_NAME;
+      static const unsigned int ADDING_STEP=0;
+      static const unsigned int CHANGING_STEP=1;
 
-  virtual const std::string& getClassName( void ) const { return CLASS_NAME; }
+      virtual const std::string& getClassName( void ) const { return CLASS_NAME; }
 
- protected:
+    protected:
 
-  typedef std::pair<unsigned int, PatternGeneratorJRL::FootAbsolutePosition> FootPrint_t;
-  std::vector<FootPrint_t> stepbuf;
+      typedef std::pair<unsigned int, PatternGeneratorJRL::FootAbsolutePosition> FootPrint_t;
+      std::vector<FootPrint_t> stepbuf;
 
-  dg::Entity * pgEntity;
-  unsigned int m_StepModificationMode;
-  double m_NextStepTime;
-  unsigned int m_NbOfFirstSteps;
+      Entity * pgEntity;
+      unsigned int m_StepModificationMode;
+      double m_NextStepTime;
+      unsigned int m_NbOfFirstSteps;
 
-  /*! \brief Pointer towards the interface of the pattern generator. */
-  pg::PatternGeneratorInterface * m_PGI;
+      /*! \brief Pointer towards the interface of the pattern generator. */
+      pg::PatternGeneratorInterface * m_PGI;
 
-  /*! \brief Pointer towards the entity which handle the pattern generator. */
-  PatternGenerator * m_sPG;
+      /*! \brief Pointer towards the entity which handle the pattern generator. */
+      PatternGenerator * m_sPG;
 
- public: /* --- CONSTRUCTION --- */
-  NextStepPgSot( const std::string& name );
-  virtual ~NextStepPgSot( void ) {} 
-
-
- public: /* --- FUNCTIONS --- */
-
-  virtual void starter( const int & timeCurr );
-  virtual void stoper( const int & timeCurr );
-  virtual void introductionCallBack( const int & timeCurr );
-
- public: /* --- ENTITY INHERITANCE --- */
-  virtual void commandLine( const std::string& cmdLine,
-			    std::istringstream& cmdArgs,
-			    std::ostream& os );
-
-};
+    public: /* --- CONSTRUCTION --- */
+      NextStepPgSot( const std::string& name );
+      virtual ~NextStepPgSot( void ) {}
 
 
-} // namespace sot
+    public: /* --- FUNCTIONS --- */
+
+      virtual void starter( const int & timeCurr );
+      virtual void stoper( const int & timeCurr );
+      virtual void introductionCallBack( const int & timeCurr );
+
+    public: /* --- ENTITY INHERITANCE --- */
+      virtual void commandLine( const std::string& cmdLine,
+				std::istringstream& cmdArgs,
+				std::ostream& os );
+
+    };
+
+
+  } // namespace sot
+} // namespace dynamicgraph
 
 
 #endif // #ifndef __SOT_NextStep_OHRP_H__

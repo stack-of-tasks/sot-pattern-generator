@@ -26,18 +26,18 @@
 /* --------------------------------------------------------------------- */
 
 
-#include <sot-core/exception-abstract.h>
+#include <sot/core/exception-abstract.hh>
 
 /* --------------------------------------------------------------------- */
 /* --- API ------------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-#if defined (WIN32) 
+#if defined (WIN32)
 #  if defined (exception_pg_EXPORTS)
 #    define EXCEPTION_PG_EXPORT __declspec(dllexport)
-#  else  
+#  else
 #    define EXCEPTION_PG_EXPORT __declspec(dllimport)
-#  endif 
+#  endif
 #else
 #  define EXCEPTION_PG_EXPORT
 #endif
@@ -46,41 +46,40 @@
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-namespace sot {
+namespace dynamicgraph {
+  namespace sot {
 
-/* \class ExceptionPatternGenerator
- */
-class EXCEPTION_PG_EXPORT ExceptionPatternGenerator
-:public ExceptionAbstract
-
-{
- public:
-  enum ErrorCodeEnum
+    /* \class ExceptionPatternGenerator
+     */
+    class EXCEPTION_PG_EXPORT ExceptionPatternGenerator
+      :public ExceptionAbstract
     {
-      GENERIC = ExceptionAbstract::PATTERN_GENERATOR
-      ,READ_FILE
-      ,CANT_DESTROY_SIGNAL
-      ,JOINT_RANK
-      ,PATTERN_GENERATOR_JRL
-      ,SELECTOR_RANK
-      ,BAD_CAST
+    public:
+      enum ErrorCodeEnum
+      {
+	GENERIC = ExceptionAbstract::PATTERN_GENERATOR
+	,READ_FILE
+	,CANT_DESTROY_SIGNAL
+	,JOINT_RANK
+	,PATTERN_GENERATOR_JRL
+	,SELECTOR_RANK
+	,BAD_CAST
+      };
+
+      static const std::string EXCEPTION_NAME;
+      virtual const std::string& getExceptionName( void ) const { return EXCEPTION_NAME; }
+
+    public:
+
+      ExceptionPatternGenerator ( const ExceptionPatternGenerator::ErrorCodeEnum& errcode,
+				  const std::string & msg = "" );
+      ExceptionPatternGenerator( const ExceptionPatternGenerator::ErrorCodeEnum& errcode,
+				 const std::string & msg,const char* format, ... );
+      virtual ~ExceptionPatternGenerator( void ) throw() {}
+
     };
 
-  static const std::string EXCEPTION_NAME;
-  virtual const std::string& getExceptionName( void ) const { return EXCEPTION_NAME; }
-  
-public:
-
-  ExceptionPatternGenerator ( const ExceptionPatternGenerator::ErrorCodeEnum& errcode,
-		       const std::string & msg = "" );
-  ExceptionPatternGenerator( const ExceptionPatternGenerator::ErrorCodeEnum& errcode,
-			const std::string & msg,const char* format, ... );
-  virtual ~ExceptionPatternGenerator( void ) throw() {}
-
-
-};
-
-
+  } // namespace dg
 } // namespace sot
 
 

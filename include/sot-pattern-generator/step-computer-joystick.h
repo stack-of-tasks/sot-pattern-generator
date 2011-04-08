@@ -33,9 +33,9 @@ namespace ml = maal::boost;
 #include <dynamic-graph/entity.h>
 #include <dynamic-graph/signal-ptr.h>
 #include <dynamic-graph/signal-time-dependent.h>
-#include <sot-core/matrix-homogeneous.h>
-#include <sot-core/vector-roll-pitch-yaw.h>
-#include <sot-core/matrix-rotation.h>
+#include <sot/core/matrix-homogeneous.hh>
+#include <sot/core/vector-roll-pitch-yaw.hh>
+#include <sot/core/matrix-rotation.hh>
 #include <sot-pattern-generator/step-observer.h>
 #include <sot-pattern-generator/step-checker.h>
 #include <sot-pattern-generator/step-computer.h>
@@ -50,80 +50,81 @@ namespace ml = maal::boost;
 /* --- API ------------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-#if defined (WIN32) 
+#if defined (WIN32)
 #  if defined (step_computer_joystick_EXPORTS)
 #    define StepComputerJOYSTICK_EXPORT __declspec(dllexport)
-#  else  
+#  else
 #    define StepComputerJOYSTICK_EXPORT __declspec(dllimport)
-#  endif 
+#  endif
 #else
 #  define StepComputerJOYSTICK_EXPORT
 #endif
 
 
 
-namespace sot {
-namespace dg = dynamicgraph;
+namespace dynamicgraph {
+  namespace sot {
 
-/* --------------------------------------------------------------------- */
-/* --- CLASS ----------------------------------------------------------- */
-/* --------------------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
+    /* --- CLASS ----------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
 
-class StepQueue;
+    class StepQueue;
 
-/// Generates footsteps.
-class StepComputerJOYSTICK_EXPORT StepComputerJoystick
-: public dg::Entity, public StepComputer
-{
- public:
+    /// Generates footsteps.
+    class StepComputerJOYSTICK_EXPORT StepComputerJoystick
+      : public Entity, public StepComputer
+    {
+    public:
 
-  static const std::string CLASS_NAME;
-  virtual const std::string& getClassName( void ) const { return CLASS_NAME; }
+      static const std::string CLASS_NAME;
+      virtual const std::string& getClassName( void ) const { return CLASS_NAME; }
 
- public: // Construction
+    public: // Construction
 
-  StepComputerJoystick( const std::string& name );
+      StepComputerJoystick( const std::string& name );
 
- public: // Methods
+    public: // Methods
 
-  void changeFirstStep( StepQueue& queue, int timeCurr );
-  void nextStep( StepQueue& queue, int timeCurr );
+      void changeFirstStep( StepQueue& queue, int timeCurr );
+      void nextStep( StepQueue& queue, int timeCurr );
 
- public: // dg::Signals
-  
-  /*! \brief Entry of the joystick (x,y,theta)*/ 
-  dg::SignalPtr< ml::Vector,int > joystickSIN;
-  /*! \brief Getting the support foot */
-  dg::SignalPtr< unsigned,int > contactFootSIN;
-  /*! \brief Externalize the last step . */
-  dg::SignalTimeDependent<ml::Vector,int> laststepSOUT;
+    public: // Signals
 
- protected:
-  ml::Vector& getlaststep(ml::Vector &res, int time);
+      /*! \brief Entry of the joystick (x,y,theta)*/
+      SignalPtr< ml::Vector,int > joystickSIN;
+      /*! \brief Getting the support foot */
+      SignalPtr< unsigned,int > contactFootSIN;
+      /*! \brief Externalize the last step . */
+      SignalTimeDependent<ml::Vector,int> laststepSOUT;
 
- public: // dg::Entity
-  
-  virtual void display( std::ostream& os ) const; 
-  virtual void commandLine( const std::string& cmdLine,
-			    std::istringstream& cmdArgs,
-			    std::ostream& os );
+    protected:
+      ml::Vector& getlaststep(ml::Vector &res, int time);
 
- private: // Reference frame
+    public: // Entity
 
-  StepChecker checker;
+      virtual void display( std::ostream& os ) const;
+      virtual void commandLine( const std::string& cmdLine,
+				std::istringstream& cmdArgs,
+				std::ostream& os );
 
-  void thisIsZero();
-  
- private: // Debug
+    private: // Reference frame
 
-  std::ofstream logChanges;
-  std::ofstream logPreview;
+      StepChecker checker;
 
-  double m_laststep[3];
-};
+      void thisIsZero();
+
+    private: // Debug
+
+      std::ofstream logChanges;
+      std::ofstream logPreview;
+
+      double m_laststep[3];
+    };
 
 
-} // namespace sot
+  } // namespace sot
+} // namespace dynamicgraph
 
 #endif // #ifndef __SOT_STEPCOMPUTER_H__
 

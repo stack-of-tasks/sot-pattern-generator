@@ -34,9 +34,9 @@ namespace ml = maal::boost;
 #include <dynamic-graph/entity.h>
 #include <dynamic-graph/signal-ptr.h>
 #include <dynamic-graph/signal-time-dependent.h>
-#include <sot-core/matrix-homogeneous.h>
-#include <sot-core/vector-roll-pitch-yaw.h>
-#include <sot-core/matrix-rotation.h>
+#include <sot/core/matrix-homogeneous.hh>
+#include <sot/core/vector-roll-pitch-yaw.hh>
+#include <sot/core/matrix-rotation.hh>
 
 /* STD */
 #include <string>
@@ -45,86 +45,82 @@ namespace ml = maal::boost;
 /* --- API ------------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-#if defined (WIN32) 
+#if defined (WIN32)
 #  if defined (which_foot_upper_EXPORTS)
 #    define WhichFootUpper_EXPORT __declspec(dllexport)
-#  else  
+#  else
 #    define WhichFootUpper_EXPORT __declspec(dllimport)
-#  endif 
+#  endif
 #else
 #  define WhichFootUpper_EXPORT
 #endif
 
 
-namespace sot {
-namespace dg = dynamicgraph;
+namespace dynamicgraph {
+  namespace sot {
 
-/* --------------------------------------------------------------------- */
-/* --- CLASS ----------------------------------------------------------- */
-/* --------------------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
+    /* --- CLASS ----------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
 
-class WhichFootUpper_EXPORT WhichFootUpper
-:public dg::Entity
-{
- public:
-  static const std::string CLASS_NAME;
+    class WhichFootUpper_EXPORT WhichFootUpper
+      :public Entity
+    {
+    public:
+      static const std::string CLASS_NAME;
 
- protected:
+    protected:
 
-  static const unsigned int INDEX_LEFT_FOOT_DEFAULT;
-  static const unsigned int INDEX_RIGHT_FOOT_DEFAULT;
-  unsigned int indexLeftFoot, indexRightFoot;
+      static const unsigned int INDEX_LEFT_FOOT_DEFAULT;
+      static const unsigned int INDEX_RIGHT_FOOT_DEFAULT;
+      unsigned int indexLeftFoot, indexRightFoot;
 
-  static const double TRIGGER_THRESHOLD_DEFAULT;
-  double triggerThreshold;
+      static const double TRIGGER_THRESHOLD_DEFAULT;
+      double triggerThreshold;
 
-  unsigned int lastFoot;
-  
- public: /* --- CONSTRUCTION --- */
+      unsigned int lastFoot;
 
-  WhichFootUpper( const std::string& name );
-  virtual ~WhichFootUpper( void );
+    public: /* --- CONSTRUCTION --- */
 
- public: /* --- SIGNAL --- */
+      WhichFootUpper( const std::string& name );
+      virtual ~WhichFootUpper( void );
 
-  dg::SignalPtr<MatrixRotation,int> waistRsensorSIN; 
-  dg::SignalPtr<MatrixRotation,int> worldRsensorSIN; 
-  dg::SignalPtr<MatrixHomogeneous,int> waistMlfootSIN; 
-  dg::SignalPtr<MatrixHomogeneous,int> waistMrfootSIN; 
-  
-  dg::SignalTimeDependent<MatrixHomogeneous,int> worldMlfootSOUT;
-  dg::SignalTimeDependent<MatrixHomogeneous,int> worldMrfootSOUT;
-  dg::SignalTimeDependent<unsigned int,int> whichFootSOUT;
+    public: /* --- SIGNAL --- */
 
-  dg::SignalPtr<MatrixHomogeneous,int> waistMsensorSIN; 
-  dg::SignalTimeDependent<MatrixRotation,int> waistRsensorSOUT; 
+      SignalPtr<MatrixRotation,int> waistRsensorSIN;
+      SignalPtr<MatrixRotation,int> worldRsensorSIN;
+      SignalPtr<MatrixHomogeneous,int> waistMlfootSIN;
+      SignalPtr<MatrixHomogeneous,int> waistMrfootSIN;
 
- public: /* --- FUNCTIONS --- */
+      SignalTimeDependent<MatrixHomogeneous,int> worldMlfootSOUT;
+      SignalTimeDependent<MatrixHomogeneous,int> worldMrfootSOUT;
+      SignalTimeDependent<unsigned int,int> whichFootSOUT;
 
-  static MatrixHomogeneous &
-    computeFootPosition( const MatrixHomogeneous& waistMfoot,
-			 const MatrixRotation& waistRsensor,			 
-			 const MatrixRotation& worldRsensor,			 
-			 MatrixHomogeneous& res );
+      SignalPtr<MatrixHomogeneous,int> waistMsensorSIN;
+      SignalTimeDependent<MatrixRotation,int> waistRsensorSOUT;
 
-  unsigned int & whichFoot( const MatrixHomogeneous& waistMlfoot,
-			    const MatrixHomogeneous& waistMrfoot,
-			    unsigned int& res );
+    public: /* --- FUNCTIONS --- */
 
-  
- public: /* --- PARAMS --- */
-  virtual void commandLine( const std::string& cmdLine,
-			    std::istringstream& cmdArgs,
-			    std::ostream& os );
-    
+      static MatrixHomogeneous &
+	computeFootPosition( const MatrixHomogeneous& waistMfoot,
+			     const MatrixRotation& waistRsensor,
+			     const MatrixRotation& worldRsensor,
+			     MatrixHomogeneous& res );
 
-};
+      unsigned int & whichFoot( const MatrixHomogeneous& waistMlfoot,
+				const MatrixHomogeneous& waistMrfoot,
+				unsigned int& res );
 
 
+    public: /* --- PARAMS --- */
+      virtual void commandLine( const std::string& cmdLine,
+				std::istringstream& cmdArgs,
+				std::ostream& os );
 
-} // namespace sot
 
+    };
 
+  } // namespace sot
+} // namespace dynamicgraph
 
 #endif // #ifndef __SOT_WhichFootUpper_H__
-

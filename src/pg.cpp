@@ -777,6 +777,8 @@ OneStepOfControl(int &dummy, int time)
   int lSupportFoot; // Local support foot.
   // Default value
   m_JointErrorValuesForWalking.fill(0.0);
+  const int robotSize = m_JointErrorValuesForWalking.size()+6;
+
   try
     {
       for(unsigned int i=0;i<3;i++)
@@ -816,30 +818,24 @@ OneStepOfControl(int &dummy, int time)
       // by setconstant(0).
       firstSINTERN(time);
       ml::Vector CurrentState = motorControlJointPositionSIN(time);
+      assert( CurrentState.size() == robotSize );
+
       /*! \brief Absolute Position for the left and right feet. */
       pg::FootAbsolutePosition lLeftFootPosition,lRightFootPosition;
       lLeftFootPosition.x=0.0;lLeftFootPosition.y=0.0;lLeftFootPosition.z=0.0;
       lRightFootPosition.x=0.0;lRightFootPosition.y=0.0;lRightFootPosition.z=0.0;
       /*! \brief Absolute position of the reference CoM. */
       pg::COMState lCOMRefState;
-
       sotDEBUG(45) << "mc = " << CurrentState << std::endl;
 
-      // TODO: hummmm, nice hard-coding '46' ... :)
-      MAL_VECTOR_DIM(CurrentConfiguration,double,46);
-      MAL_VECTOR_DIM(CurrentVelocity,double,46);
-      MAL_VECTOR_DIM(CurrentAcceleration,double,46);
-      /*! \brief Position of the reference ZMP. */
+      MAL_VECTOR_DIM(CurrentConfiguration,double,robotSize);
+      MAL_VECTOR_DIM(CurrentVelocity,double,robotSize);
+      MAL_VECTOR_DIM(CurrentAcceleration,double,robotSize);
       MAL_VECTOR_DIM(ZMPTarget,double,3);
       MAL_VECTOR_FILL(ZMPTarget,0);
 
-      sotDEBUG(25) << "Before One Step of control " << ZMPTarget[0] << " "
-		   << ZMPTarget[1] << " "
-		   << ZMPTarget[2] << endl;
-
       sotDEBUG(25) << "Before One Step of control " << lCOMRefState.x[0] << " "
-      		   << lCOMRefState.y[0] << " "
-      		   << lCOMRefState.z[0] << endl;
+      		   << lCOMRefState.y[0] << " " << lCOMRefState.z[0] << endl;
       sotDEBUG(4) << " VelocityReference " << m_VelocityReference << endl;
 
       m_PGI->setVelocityReference(m_VelocityReference(0),
@@ -894,16 +890,12 @@ OneStepOfControl(int &dummy, int time)
 	  // CurrentState and CurrentConfiguration.
 	  unsigned int SizeCurrentState = CurrentState.size();
 	  unsigned int SizeCurrentConfiguration = CurrentConfiguration.size()-6;
-	  unsigned int MinSize = SizeCurrentState < SizeCurrentConfiguration ?
-	    SizeCurrentState : SizeCurrentConfiguration;
-
-	  m_JointErrorValuesForWalking.fill(0.0);
+	  unsigned int MinSize = std::min(SizeCurrentState,SizeCurrentConfiguration);
 
 	  if (m_JointErrorValuesForWalking.size()>=MinSize)
 	    {
 	      for(unsigned int li=0;li<MinSize;li++)
 		m_JointErrorValuesForWalking(li)= (CurrentConfiguration(li+6)- CurrentState(li) )/m_TimeStep;
-
 	    }
 	  else
 	    {

@@ -17,7 +17,7 @@
  * PGManager entity: configures the PG and sends steps.
  *
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
- 
+
 #ifndef __SOT_PG_MANAGER_H__
 #define __SOT_PG_MANAGER_H__
 
@@ -42,67 +42,61 @@ namespace ml = maal::boost;
 /* --- API ------------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-#if defined (WIN32) 
+#if defined (WIN32)
 #  if defined (pg_manager_EXPORTS)
 #    define PGManager_EXPORT __declspec(dllexport)
-#  else  
+#  else
 #    define PGManager_EXPORT __declspec(dllimport)
-#  endif 
+#  endif
 #else
 #  define PGManager_EXPORT
 #endif
 
 
-namespace sot {
-namespace dg = dynamicgraph;
+namespace dynamicgraph {
+  namespace sot {
 
-/* --------------------------------------------------------------------- */
-/* --- CLASS ----------------------------------------------------------- */
-/* --------------------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
+    /* --- CLASS ----------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
 
-class StepQueue;
-class PatternGenerator;
+    class StepQueue;
+    class PatternGenerator;
 
-/// Finds the PG and sends steps to the PG.
-class PGManager_EXPORT PGManager
-  : public dg::Entity
-{
-public: // dg::Entity name
+    /// Finds the PG and sends steps to the PG.
+    class PGManager_EXPORT PGManager
+      : public Entity
+    {
+    public: // Entity name
 
-  static const std::string CLASS_NAME;
-  virtual const std::string& getClassName( void ) const { return CLASS_NAME; }
+      static const std::string CLASS_NAME;
+      virtual const std::string& getClassName( void ) const { return CLASS_NAME; }
 
-public: // Construction
+    public: // Construction
 
-  PGManager( const std::string& name );
+      PGManager( const std::string& name );
 
-  void startSequence( const StepQueue& seq );
-  void stopSequence( const StepQueue& seq );
-  void introduceStep( StepQueue& queue );
-  double changeNextStep( StepQueue& queue );
+      void startSequence( const StepQueue& seq );
+      void stopSequence( const StepQueue& seq );
+      void introduceStep( StepQueue& queue );
+      double changeNextStep( StepQueue& queue );
 
-public: // dg::Entity
+    public: // Entity
 
-  virtual void display( std::ostream& os ) const; 
-  virtual void commandLine( const std::string& cmdLine,
-			    std::istringstream& cmdArgs,
-			    std::ostream& os );
+      virtual void display( std::ostream& os ) const;
+      virtual void commandLine( const std::string& cmdLine,
+				std::istringstream& cmdArgs,
+				std::ostream& os );
 
-private:
+    private:
 
-  std::vector<FootPrint> stepbuf;
-  dg::Entity* pgEntity;
-  pg::PatternGeneratorInterface* pgi;
-};
+      std::vector<FootPrint> stepbuf;
+      Entity* pgEntity;
+      pg::PatternGeneratorInterface* pgi;
+    };
 
-
-
-
+  } // namespace sot
+} // namespace dg
 
 #endif
-
-
-
-} // namespace sot
-
 

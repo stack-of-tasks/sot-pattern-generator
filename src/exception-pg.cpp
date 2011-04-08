@@ -21,39 +21,41 @@
 #include <stdarg.h>
 #include <cstdio>
 
+namespace dynamicgraph {
+  namespace sot {
 
-using namespace sot;
+    /* --------------------------------------------------------------------- */
+    /* --- CLASS ----------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
 
-/* --------------------------------------------------------------------- */
-/* --- CLASS ----------------------------------------------------------- */
-/* --------------------------------------------------------------------- */
+    const std::string ExceptionPatternGenerator::EXCEPTION_NAME = "PatternGenerator";
 
-const std::string ExceptionPatternGenerator::EXCEPTION_NAME = "PatternGenerator";
+    ExceptionPatternGenerator::
+    ExceptionPatternGenerator ( const ExceptionPatternGenerator::ErrorCodeEnum& errcode,
+				const std::string & msg )
+      :ExceptionAbstract(errcode,msg)
+    {
+    }
 
-ExceptionPatternGenerator::
-ExceptionPatternGenerator ( const ExceptionPatternGenerator::ErrorCodeEnum& errcode,
-		     const std::string & msg )
-  :ExceptionAbstract(errcode,msg)
-{
-}
+    ExceptionPatternGenerator::
+    ExceptionPatternGenerator ( const ExceptionPatternGenerator::ErrorCodeEnum& errcode,
+				const std::string & msg,const char* format, ... )
+      :ExceptionAbstract(errcode,msg)
+    {
+      va_list args;
+      va_start(args,format);
 
-ExceptionPatternGenerator::
-ExceptionPatternGenerator ( const ExceptionPatternGenerator::ErrorCodeEnum& errcode,
-			const std::string & msg,const char* format, ... )
-  :ExceptionAbstract(errcode,msg)
-{
-  va_list args;
-  va_start(args,format);
+      const unsigned int SIZE = 256;
+      char  buffer[SIZE];
+      vsnprintf(buffer,SIZE,format,args);
 
-  const unsigned int SIZE = 256;
-  char  buffer[SIZE];
-  vsnprintf(buffer,SIZE,format,args);
+      message += buffer;
 
-  message += buffer;
+      va_end(args);
+    }
 
-  va_end(args);
-}
-
+  } // namespace dg
+} // namespace sot
 
 
 /*

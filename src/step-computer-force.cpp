@@ -24,304 +24,306 @@
 # include <sys/time.h>
 #else
 # include <jrl/mal/boost.hh>
-# include <sot-core/utils-windows.h>
+# include <sot/core/utils-windows.hh>
 # include <Winsock2.h>
 #endif /*WIN32*/
 
 #include <sot-pattern-generator/step-computer-force.h>
-#include <sot-core/debug.h>
-#include <sot-core/macros-signal.h>
+#include <sot/core/debug.hh>
+#include <sot/core/macros-signal.hh>
 #include <sot-pattern-generator/exception-pg.h>
 #include <sot-pattern-generator/step-queue.h>
 #include <sot-pattern-generator/step-checker.h>
 #include <dynamic-graph/factory.h>
 #include <dynamic-graph/pool.h>
-#include <sot-core/matrix-twist.h>
+#include <sot/core/matrix-twist.hh>
 
-using namespace sot;
-using namespace dynamicgraph;
-DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(StepComputerForce,"StepComputerForce");
+namespace dynamicgraph {
+  namespace sot {
 
+    DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(StepComputerForce,"StepComputerForce");
 
-StepComputerForce:: StepComputerForce( const std::string & name )
-  : Entity(name)
-  , waistMlhandSIN( NULL,"StepComputerForce("+name+")::input(vector)::waistMlhand" )
-  , waistMrhandSIN( NULL,"StepComputerForce("+name+")::input(vector)::waistMrhand" )
-  , referencePositionWaistSIN( NULL,"StepComputerForce("+name+")::input(vector)::posrefwaist" )
-  , stiffnessSIN( NULL,"StepComputerForce("+name+")::input(vector)::stiffness" )
-  , velocitySIN( NULL,"StepComputerForce("+name+")::input(vector)::velocity" )
-  , contactFootSIN( NULL,"StepComputerForce("+name+")::input(uint)::contactfoot" )
-  , displacementSOUT( boost::bind(&StepComputerForce::computeDisplacement,this,_1,_2),
-		      referencePositionWaistSIN,
-		      "StepComputerForce("+name+")::output(vector)::displacement" )
-  , forceSOUT( boost::bind(&StepComputerForce::computeForce,this,_1,_2),
-	       displacementSOUT,
-	       "StepComputerForce("+name+")::output(vector)::force" )
-  , forceLhandSOUT( boost::bind(&StepComputerForce::computeForceL,this,_1,_2),
-		    waistMlhandSIN<<referencePositionWaistSIN<<forceSOUT,
-		    "StepComputerForce("+name+")::output(vector)::forceL" )
-  , forceRhandSOUT( boost::bind(&StepComputerForce::computeForceR,this,_1,_2),
-		    waistMrhandSIN<<referencePositionWaistSIN<<forceSOUT,
-		    "StepComputerForce("+name+")::output(vector)::forceR" )
-  , waMref0()
-  , twoHandObserver( 0x0 )
-  , checker()
-  , logChanges("/tmp/stepcomp_changes.dat")
-  , logPreview("/tmp/stepcomp_preview.dat")
-{
-  sotDEBUGIN(5);
+    StepComputerForce:: StepComputerForce( const std::string & name )
+      : Entity(name)
+      , waistMlhandSIN( NULL,"StepComputerForce("+name+")::input(vector)::waistMlhand" )
+      , waistMrhandSIN( NULL,"StepComputerForce("+name+")::input(vector)::waistMrhand" )
+      , referencePositionWaistSIN( NULL,"StepComputerForce("+name+")::input(vector)::posrefwaist" )
+      , stiffnessSIN( NULL,"StepComputerForce("+name+")::input(vector)::stiffness" )
+      , velocitySIN( NULL,"StepComputerForce("+name+")::input(vector)::velocity" )
+      , contactFootSIN( NULL,"StepComputerForce("+name+")::input(uint)::contactfoot" )
+      , displacementSOUT( boost::bind(&StepComputerForce::computeDisplacement,this,_1,_2),
+			  referencePositionWaistSIN,
+			  "StepComputerForce("+name+")::output(vector)::displacement" )
+      , forceSOUT( boost::bind(&StepComputerForce::computeForce,this,_1,_2),
+		   displacementSOUT,
+		   "StepComputerForce("+name+")::output(vector)::force" )
+      , forceLhandSOUT( boost::bind(&StepComputerForce::computeForceL,this,_1,_2),
+			waistMlhandSIN<<referencePositionWaistSIN<<forceSOUT,
+			"StepComputerForce("+name+")::output(vector)::forceL" )
+      , forceRhandSOUT( boost::bind(&StepComputerForce::computeForceR,this,_1,_2),
+			waistMrhandSIN<<referencePositionWaistSIN<<forceSOUT,
+			"StepComputerForce("+name+")::output(vector)::forceR" )
+      , waMref0()
+      , twoHandObserver( 0x0 )
+      , checker()
+      , logChanges("/tmp/stepcomp_changes.dat")
+      , logPreview("/tmp/stepcomp_preview.dat")
+    {
+      sotDEBUGIN(5);
 
-  signalRegistration( referencePositionWaistSIN<<contactFootSIN <<
-		      waistMlhandSIN << waistMrhandSIN <<
-		      stiffnessSIN << velocitySIN <<
-		      displacementSOUT << forceSOUT <<
-		      forceLhandSOUT << forceRhandSOUT );
+      signalRegistration( referencePositionWaistSIN<<contactFootSIN <<
+			  waistMlhandSIN << waistMrhandSIN <<
+			  stiffnessSIN << velocitySIN <<
+			  displacementSOUT << forceSOUT <<
+			  forceLhandSOUT << forceRhandSOUT );
 
-  sotDEBUGOUT(5);
-}
+      sotDEBUGOUT(5);
+    }
 
-void StepComputerForce::nextStep( StepQueue& queue, int timeCurr )
-{
-  // Introduce new step at the end of the preview window.
-  if( queue.getLastStep().contact == CONTACT_LEFT_FOOT ) {
-    queue.pushStep(0., -queue.getZeroStepPosition(), 0.);
-    logPreview << timeCurr << " " << 0 << " "
-	       << -queue.getZeroStepPosition() << " " << 0
-	       << std::endl;
-  }
-  else {
-    queue.pushStep(0., queue.getZeroStepPosition(), 0.);
-    logPreview << timeCurr << " " << 0 << " "
-	       << queue.getZeroStepPosition() << " " << 0
-	       << std::endl;
-  }
-}
+    void StepComputerForce::nextStep( StepQueue& queue, int timeCurr )
+    {
+      // Introduce new step at the end of the preview window.
+      if( queue.getLastStep().contact == CONTACT_LEFT_FOOT ) {
+	queue.pushStep(0., -queue.getZeroStepPosition(), 0.);
+	logPreview << timeCurr << " " << 0 << " "
+		   << -queue.getZeroStepPosition() << " " << 0
+		   << std::endl;
+      }
+      else {
+	queue.pushStep(0., queue.getZeroStepPosition(), 0.);
+	logPreview << timeCurr << " " << 0 << " "
+		   << queue.getZeroStepPosition() << " " << 0
+		   << std::endl;
+      }
+    }
 
-ml::Vector& StepComputerForce::computeDisplacement( ml::Vector& res,int timeCurr )
-{
-  if(!twoHandObserver) {
-    std::cerr << "Observer not set" << std::endl;
-    res.resize(3);
-    res.fill(0.);
-    return res;
-  }
+    ml::Vector& StepComputerForce::computeDisplacement( ml::Vector& res,int timeCurr )
+    {
+      if(!twoHandObserver) {
+	std::cerr << "Observer not set" << std::endl;
+	res.resize(3);
+	res.fill(0.);
+	return res;
+      }
 
-  // transformation from ref0 to ref.
+      // transformation from ref0 to ref.
 
-  const MatrixHomogeneous& waMref = referencePositionWaistSIN.access( timeCurr );
-  MatrixHomogeneous ref0Mwa; waMref0.inverse(ref0Mwa);
-  MatrixHomogeneous ref0Mref; ref0Mwa.multiply(waMref, ref0Mref);
+      const MatrixHomogeneous& waMref = referencePositionWaistSIN.access( timeCurr );
+      MatrixHomogeneous ref0Mwa; waMref0.inverse(ref0Mwa);
+      MatrixHomogeneous ref0Mref; ref0Mwa.multiply(waMref, ref0Mref);
 
-  // extract the translation part and express it in the waist frame.
+      // extract the translation part and express it in the waist frame.
 
-  ml::Vector t_ref0(3); ref0Mref.extract(t_ref0);
-  MatrixRotation waRref0; waMref0.extract(waRref0);
-  ml::Vector t_wa = waRref0.multiply(t_ref0);
+      ml::Vector t_ref0(3); ref0Mref.extract(t_ref0);
+      MatrixRotation waRref0; waMref0.extract(waRref0);
+      ml::Vector t_wa = waRref0.multiply(t_ref0);
 
-  // compute the rotation that transforms ref0 into ref,
-  // express it in the waist frame. Then get the associated
-  // yaw (rot around z).
+      // compute the rotation that transforms ref0 into ref,
+      // express it in the waist frame. Then get the associated
+      // yaw (rot around z).
 
-  MatrixRotation ref0Rwa; waRref0.transpose(ref0Rwa);
-  MatrixRotation ref0Rref; ref0Mref.extract(ref0Rref);
-  MatrixRotation tmp; ref0Rref.multiply(ref0Rwa, tmp);
-  MatrixRotation Rref; waRref0.multiply(tmp, Rref);
-  VectorRollPitchYaw rpy; rpy.fromMatrix(Rref);
+      MatrixRotation ref0Rwa; waRref0.transpose(ref0Rwa);
+      MatrixRotation ref0Rref; ref0Mref.extract(ref0Rref);
+      MatrixRotation tmp; ref0Rref.multiply(ref0Rwa, tmp);
+      MatrixRotation Rref; waRref0.multiply(tmp, Rref);
+      VectorRollPitchYaw rpy; rpy.fromMatrix(Rref);
 
-  // store the result.
+      // store the result.
 
-  res.resize(3);
-  res = t_wa;
-  res(2) = rpy(2);
+      res.resize(3);
+      res = t_wa;
+      res(2) = rpy(2);
 
-  return res;
-}
+      return res;
+    }
 
-ml::Vector& StepComputerForce::computeForce( ml::Vector& res,int timeCurr )
-{
-  const ml::Vector& dx = displacementSOUT.access( timeCurr );
-  const ml::Vector& K = stiffnessSIN.access( timeCurr );
+    ml::Vector& StepComputerForce::computeForce( ml::Vector& res,int timeCurr )
+    {
+      const ml::Vector& dx = displacementSOUT.access( timeCurr );
+      const ml::Vector& K = stiffnessSIN.access( timeCurr );
 
-  if((dx.size() != 3) || (K.size() != 3) || (dx.size() != K.size())) {
-    res.resize(3);
-    res.fill(0.);
-  }
-  else {
-    res = K.multiply(dx);
-  }
+      if((dx.size() != 3) || (K.size() != 3) || (dx.size() != K.size())) {
+	res.resize(3);
+	res.fill(0.);
+      }
+      else {
+	res = K.multiply(dx);
+      }
 
-  return res;
-}
+      return res;
+    }
 
-ml::Vector&
-StepComputerForce::computeHandForce( ml::Vector& res,
-					const MatrixHomogeneous& waMh,
-					const MatrixHomogeneous& waMref,
-					const ml::Vector& F )
-{
-  if(F.size() != 3) {
-    res.resize(6);
-    res.fill(0.);
-    return res;
-  }
+    ml::Vector&
+    StepComputerForce::computeHandForce( ml::Vector& res,
+					 const MatrixHomogeneous& waMh,
+					 const MatrixHomogeneous& waMref,
+					 const ml::Vector& F )
+    {
+      if(F.size() != 3) {
+	res.resize(6);
+	res.fill(0.);
+	return res;
+      }
 
-  ml::Vector pref(3); waMref.extract(pref);
-  ml::Vector ph(3); waMh.extract(ph);
+      ml::Vector pref(3); waMref.extract(pref);
+      ml::Vector ph(3); waMh.extract(ph);
 
-  ml::Vector OA(3);
-  OA(0) = ph(0) - pref(0);
-  OA(1) = ph(1) - pref(1);
-  OA(2) = 0;
+      ml::Vector OA(3);
+      OA(0) = ph(0) - pref(0);
+      OA(1) = ph(1) - pref(1);
+      OA(2) = 0;
 
-  ml::Vector tau(3); tau.fill(0.);
-  tau(2) = -F(2);
+      ml::Vector tau(3); tau.fill(0.);
+      tau(2) = -F(2);
 
-  ml::Vector tauOA = tau.crossProduct(OA);
-  double ntauOA = tauOA.norm();
-  double nOA = OA.norm();
-  double L = 2 * ntauOA * nOA;
+      ml::Vector tauOA = tau.crossProduct(OA);
+      double ntauOA = tauOA.norm();
+      double nOA = OA.norm();
+      double L = 2 * ntauOA * nOA;
 
-  if(L < 1e-12) {
-    tauOA.fill(0);
-  }
-  else {
-    tauOA = tauOA.multiply(1./L);
-  }
+      if(L < 1e-12) {
+	tauOA.fill(0);
+      }
+      else {
+	tauOA = tauOA.multiply(1./L);
+      }
 
-  ml::Vector tmp(6); tmp.fill(0.);
-  tmp.resize(6); tmp.fill(0.);
-  tmp(0) = tauOA(0) - F(0);
-  tmp(1) = tauOA(1) - F(1);
+      ml::Vector tmp(6); tmp.fill(0.);
+      tmp.resize(6); tmp.fill(0.);
+      tmp(0) = tauOA(0) - F(0);
+      tmp(1) = tauOA(1) - F(1);
 
-  MatrixHomogeneous H; waMh.inverse(H);
-  for(int i = 0; i < 3; ++i){ H(i,3) = 0; }
-  MatrixTwist V; V.buildFrom(H);
-  V.multiply(tmp, res);
+      MatrixHomogeneous H; waMh.inverse(H);
+      for(int i = 0; i < 3; ++i){ H(i,3) = 0; }
+      MatrixTwist V; V.buildFrom(H);
+      V.multiply(tmp, res);
 
-  return res;
-}
-						    
-ml::Vector& StepComputerForce::computeForceL( ml::Vector& res,int timeCurr )
-{
-  const MatrixHomogeneous& waMlh = waistMlhandSIN.access( timeCurr );
-  const MatrixHomogeneous& waMref = referencePositionWaistSIN.access( timeCurr );
-  const ml::Vector& F = forceSOUT.access( timeCurr );
+      return res;
+    }
 
-  return computeHandForce( res,waMlh,waMref,F );
-}
+    ml::Vector& StepComputerForce::computeForceL( ml::Vector& res,int timeCurr )
+    {
+      const MatrixHomogeneous& waMlh = waistMlhandSIN.access( timeCurr );
+      const MatrixHomogeneous& waMref = referencePositionWaistSIN.access( timeCurr );
+      const ml::Vector& F = forceSOUT.access( timeCurr );
 
-ml::Vector& StepComputerForce::computeForceR( ml::Vector& res,int timeCurr )
-{
-  const MatrixHomogeneous& waMrh = waistMrhandSIN.access( timeCurr );
-  const MatrixHomogeneous& waMref = referencePositionWaistSIN.access( timeCurr );
-  const ml::Vector& F = forceSOUT.access( timeCurr );
+      return computeHandForce( res,waMlh,waMref,F );
+    }
 
-  return computeHandForce( res,waMrh,waMref,F );
-}
+    ml::Vector& StepComputerForce::computeForceR( ml::Vector& res,int timeCurr )
+    {
+      const MatrixHomogeneous& waMrh = waistMrhandSIN.access( timeCurr );
+      const MatrixHomogeneous& waMref = referencePositionWaistSIN.access( timeCurr );
+      const ml::Vector& F = forceSOUT.access( timeCurr );
 
-void StepComputerForce::changeFirstStep( StepQueue& queue, int timeCurr )
-{
-  const ml::Vector& v = velocitySIN.access( timeCurr );
-  unsigned sfoot = contactFootSIN.access( timeCurr );
+      return computeHandForce( res,waMrh,waMref,F );
+    }
 
-  double y_default = 0;
-  if( sfoot != 1 ) { // --- left foot support ---
-    y_default = -0.19;
-  }
-  else { // -- right foot support ---
-    y_default = 0.19;
-  }
+    void StepComputerForce::changeFirstStep( StepQueue& queue, int timeCurr )
+    {
+      const ml::Vector& v = velocitySIN.access( timeCurr );
+      unsigned sfoot = contactFootSIN.access( timeCurr );
 
-  // The clipping function expects the x-y coordinates of the
-  // destination fly foot in the support foot frame.
+      double y_default = 0;
+      if( sfoot != 1 ) { // --- left foot support ---
+	y_default = -0.19;
+      }
+      else { // -- right foot support ---
+	y_default = 0.19;
+      }
 
-  double x = v(0), y = v(1);
-  double theta = v(2) * 180 / 3.14159265;
+      // The clipping function expects the x-y coordinates of the
+      // destination fly foot in the support foot frame.
 
-  if(std::abs(x) < 0.03){ x = 0; }
-  if(std::abs(y) < 0.03){ y = 0; }
-  if(std::abs(theta) < 2){ theta = 0; }
+      double x = v(0), y = v(1);
+      double theta = v(2) * 180 / 3.14159265;
 
-  y += y_default;
+      if(std::abs(x) < 0.03){ x = 0; }
+      if(std::abs(y) < 0.03){ y = 0; }
+      if(std::abs(theta) < 2){ theta = 0; }
 
-  const double THETA_MAX = 9.;
-  if(theta < -THETA_MAX){ theta = -THETA_MAX; }
-  if(theta > THETA_MAX){ theta = THETA_MAX; }
+      y += y_default;
 
-  double nx = 0, ny = 0;
-  if(sfoot != 1) { // left foot support phase
-    if(y > 0){ y = -0.001; }
-  }
-  else {
-    if(y < 0){ y = 0.001; }
-  }
+      const double THETA_MAX = 9.;
+      if(theta < -THETA_MAX){ theta = -THETA_MAX; }
+      if(theta > THETA_MAX){ theta = THETA_MAX; }
 
-  checker.clipStep(x, y, nx, ny);
+      double nx = 0, ny = 0;
+      if(sfoot != 1) { // left foot support phase
+	if(y > 0){ y = -0.001; }
+      }
+      else {
+	if(y < 0){ y = 0.001; }
+      }
 
-  // Log x-y values before and after clipping
+      checker.clipStep(x, y, nx, ny);
 
-  logChanges << timeCurr << " " << x << " " << y << " " << nx << " " << ny << " ";
+      // Log x-y values before and after clipping
 
-  // The coordinates must be expressed in the destination foot frame.
-  // See the technical report of Olivier Stasse for more details,
-  // on top of page 79.
+      logChanges << timeCurr << " " << x << " " << y << " " << nx << " " << ny << " ";
 
-  double theta_rad = 3.14159265 * theta / 180.;
-  double ctheta = cos(theta_rad);
-  double stheta = sin(theta_rad);
+      // The coordinates must be expressed in the destination foot frame.
+      // See the technical report of Olivier Stasse for more details,
+      // on top of page 79.
 
-  x = nx * ctheta + ny * stheta;
-  y = -nx * stheta + ny * ctheta;
+      double theta_rad = 3.14159265 * theta / 180.;
+      double ctheta = cos(theta_rad);
+      double stheta = sin(theta_rad);
 
-  queue.changeFirstStep(x, y, theta);
+      x = nx * ctheta + ny * stheta;
+      y = -nx * stheta + ny * ctheta;
 
-  // Log the step
+      queue.changeFirstStep(x, y, theta);
 
-  logChanges << x << " " << y << " " << theta << std::endl;
-}
+      // Log the step
 
-
-void StepComputerForce::thisIsZero()
-{
-  sotDEBUGIN(15);
-
-  waMref0 = referencePositionWaistSIN.accessCopy();
-
-  sotDEBUGOUT(15);
-}
+      logChanges << x << " " << y << " " << theta << std::endl;
+    }
 
 
-void StepComputerForce::display( std::ostream& os ) const
-{
-  os << "StepComputerForce <" << getName() <<">:" << std::endl;
-}
+    void StepComputerForce::thisIsZero()
+    {
+      sotDEBUGIN(15);
+
+      waMref0 = referencePositionWaistSIN.accessCopy();
+
+      sotDEBUGOUT(15);
+    }
 
 
-void StepComputerForce::commandLine( const std::string& cmdLine,
-				   std::istringstream& cmdArgs,
-				   std::ostream& os )
-{
-  if( cmdLine == "help" )
-  {
-    os << "NextStep: " << std::endl
-       << " - setObserver" << std::endl
-       << " - thisIsZero {record|disp}" << std::endl
-       << std::endl;
-  }
-  else if( cmdLine == "thisIsZero" )
-  {
-    std::string arg; cmdArgs >> arg; 
-    if( arg == "disp" ) { os << "zero = " << waMref0; }
-    else if( arg == "record" ) { thisIsZero(); }
-  }
-  else if( cmdLine == "setObserver" )
-  {
-    std::string name = "stepobs";
-    cmdArgs >> std::ws;
-    if( cmdArgs.good()){ cmdArgs >> name; }
-    Entity* entity = &g_pool.getEntity( name );
-    twoHandObserver = dynamic_cast<StepObserver*>(entity);
-  }
-  else { Entity::commandLine( cmdLine,cmdArgs,os); }
-}
+    void StepComputerForce::display( std::ostream& os ) const
+    {
+      os << "StepComputerForce <" << getName() <<">:" << std::endl;
+    }
 
+
+    void StepComputerForce::commandLine( const std::string& cmdLine,
+					 std::istringstream& cmdArgs,
+					 std::ostream& os )
+    {
+      if( cmdLine == "help" )
+	{
+	  os << "NextStep: " << std::endl
+	     << " - setObserver" << std::endl
+	     << " - thisIsZero {record|disp}" << std::endl
+	     << std::endl;
+	}
+      else if( cmdLine == "thisIsZero" )
+	{
+	  std::string arg; cmdArgs >> arg;
+	  if( arg == "disp" ) { os << "zero = " << waMref0; }
+	  else if( arg == "record" ) { thisIsZero(); }
+	}
+      else if( cmdLine == "setObserver" )
+	{
+	  std::string name = "stepobs";
+	  cmdArgs >> std::ws;
+	  if( cmdArgs.good()){ cmdArgs >> name; }
+	  Entity* entity = &g_pool.getEntity( name );
+	  twoHandObserver = dynamic_cast<StepObserver*>(entity);
+	}
+      else { Entity::commandLine( cmdLine,cmdArgs,os); }
+    }
+
+  } // namespace dg
+} // namespace sot

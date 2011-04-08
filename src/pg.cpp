@@ -695,6 +695,7 @@ namespace dynamicgraph {
 
 
 
+
     MatrixHomogeneous & PatternGenerator::
     getLeftFootRef(MatrixHomogeneous & LeftFootRefVal, int time)
     {
@@ -705,6 +706,7 @@ namespace dynamicgraph {
       sotDEBUGOUT(25) ;
       return LeftFootRefVal;
     }
+
     MatrixHomogeneous & PatternGenerator::
     getRightFootRef(MatrixHomogeneous & RightFootRefval, int time)
     {
@@ -750,6 +752,7 @@ namespace dynamicgraph {
     MatrixHomogeneous & PatternGenerator::
     getInitRightFootRef(MatrixHomogeneous & RightFootRefval, int /*time*/)
     {
+
       sotDEBUGIN(25);
 
       RightFootRefval = m_InitRightFootPosition;
@@ -962,6 +965,7 @@ namespace dynamicgraph {
 						lCOMRefState,
 						lLeftFootPosition,
 						lRightFootPosition))
+
 	    {
 	      sotDEBUG(25) << "After One Step of control " << endl
 			   << "CurrentState:" << CurrentState << endl
@@ -1011,13 +1015,12 @@ namespace dynamicgraph {
 		    m_JointErrorValuesForWalking(li)= (CurrentConfiguration(li+6)- CurrentState(li) )/m_TimeStep;
 		}
 	      else
-		{
-		  std::cout <<"The state of the robot and the one return by the WPG are different" << std::endl;
-		  sotDEBUG(25) << "Size not coherent between CurrentState and m_JointErrorValuesForWalking: "
-			       << CurrentState.size()<< " "
-			       << m_JointErrorValuesForWalking.size()<< " "
-			       << endl;
+		  if (m_SupportFoot==1)
+		    PoseOrigin = m_LeftFootPosition;
+		  else
+		    PoseOrigin = m_RightFootPosition;
 		}
+	      
 	      sotDEBUG(2) << "Juste after updating m_JointErrorValuesForWalking" << endl;
 
 	      sotDEBUG(1) << "lLeftFootPosition : "
@@ -1075,19 +1078,48 @@ namespace dynamicgraph {
 		    m_rightFootContact = false;
 		  m_DoubleSupportPhaseState = 0;
 		}
-	      else if (lRightFootPosition.stepType==-1)
+
+	      PoseOrigin.inverse(iPoseOrigin);
+
+	      sotDEBUG(25) << "Old ComRef:  " << m_COMRefPos << endl;
+	      sotDEBUG(25) << "Old LeftFootRef:  " << m_LeftFootPosition << endl;
+	      sotDEBUG(25) << "Old RightFootRef:  " << m_RightFootPosition << endl;
+	      sotDEBUG(25) << "Old PoseOrigin:  " << PoseOrigin << endl;
+
+
+	      ml::Vector lVZMPRefPos(4), lV2ZMPRefPos(4);
+	      ml::Vector lVCOMRefPos(4), lV2COMRefPos(4);
+
+	      for(unsigned int li=0;li<3;li++)
 		{
 		  lSupportFoot=0; m_rightFootContact = true;
 		  if (lLeftFootPosition.stepType!=-1)
 		    m_leftFootContact = false;
 		  m_DoubleSupportPhaseState = 0;
 		}
-	      else /* m_LeftFootPosition.z ==m_RightFootPosition.z
-		      We keep the previous support foot half the time of the double support phase..
-		   */
+
+	      lVZMPRefPos(3) = lVCOMRefPos(3) = 1.0;
+
+	      // We do not touch to ZMP.
+	      lV2ZMPRefPos = iPoseOrigin * (WaistPoseAbsolute * lVZMPRefPos);
+
+	      // Put the CoM reference pos in the Pos Origin reference frame.
+	      lV2COMRefPos = iPoseOrigin * lVCOMRefPos;
+
+	      MatrixHomogeneous lMLeftFootPosition = m_LeftFootPosition;
+	      MatrixHomogeneous lMRightFootPosition = m_RightFootPosition;
+
+	      m_LeftFootPosition = iPoseOrigin * lMLeftFootPosition;
+	      m_RightFootPosition = iPoseOrigin * lMRightFootPosition;
+
+	      for(unsigned int i=0;i<3;i++)
+
 		{
 		  lSupportFoot=m_SupportFoot;
 		}
+
+	      MatrixHomogeneous lWaistPoseAbsoluste = WaistPoseAbsolute;
+	      WaistPoseAbsolute = iPoseOrigin * WaistPoseAbsolute;
 
 	      /* Update the class related member. */
 	      m_SupportFoot = lSupportFoot;
@@ -1192,6 +1224,17 @@ namespace dynamicgraph {
 		  Diff = invInitLeftFootRef * m_LeftFootPosition;
 
 		  m_k_Waist_kp1 = m_k_Waist_kp1 * Diff;
+	  sotDEBUG(25) << "After egocentered frame " << endl;
+
+	  sotDEBUG(25) << "ComRef:  " << m_COMRefPos << endl;
+	  sotDEBUG(25) << "LeftFootRef:  " << m_LeftFootPosition << endl;
+	  sotDEBUG(25) << "RightFootRef:  " << m_RightFootPosition << endl;
+	  sotDEBUG(25) << "ZMPRefPos:  " << m_ZMPRefPos << endl;
+	  sotDEBUG(25) << "m_MotionSinceInstanciationToThisSequence" <<
+	    m_MotionSinceInstanciationToThisSequence<< std::endl;
+
+	  for(unsigned int i=0;i<3;i++)
+	    m_ZMPPrevious[i] = m_ZMPRefPos(i);
 
 		}
 	      m_dataInProcess = 0;
@@ -1209,11 +1252,9 @@ namespace dynamicgraph {
       sotDEBUG(25) << "LeftFootRef:  " << m_LeftFootPosition << endl;
       sotDEBUG(25) << "RightFootRef:  " << m_RightFootPosition << endl;
       sotDEBUG(25) << "COMRef:  " << m_COMRefPos << endl;
-
       sotDEBUGOUT(15);
       return dummy;
     }
-
 
     /* --- PARAMS --------------------------------------------------------------- */
     /* --- PARAMS --------------------------------------------------------------- */
@@ -1290,6 +1331,10 @@ namespace dynamicgraph {
 				  (void (PatternGenerator::*) (void))&PatternGenerator::debug,
 				  docCommandVoid0("Launch a debug command.")));
 
+	    }
+	  m_dataInProcess = 0;
+	}
+      sotDEBUG(25) << "After computing error " << m_JointErrorValuesForWalking << endl;
     }
 
     void PatternGenerator::debug(void)

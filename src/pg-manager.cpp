@@ -4,7 +4,7 @@
  *
  * File:      PGManager.cpp
  * Project:   SOT
- * Author:    Nicolas Mansard, Olivier Stasse, Paul Evrard
+ * Author:    Olivier Stasse, Paul Evrard
  *
  * Version control
  * ===============

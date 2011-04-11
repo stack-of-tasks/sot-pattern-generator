@@ -47,21 +47,21 @@ namespace ml = maal::boost;
 namespace dynamicgraph {
   namespace sot {
 
-/* --------------------------------------------------------------------- */
-/* --- CLASS ----------------------------------------------------------- */
-/* --------------------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
+    /* --- CLASS ----------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
 
-class StepQueue;
+    class StepQueue;
 
-/// Generates footsteps.
-class StepComputer
-{
- public: // Methods
+    /// Generates footsteps.
+    class StepComputer
+    {
+    public: // Methods
 
-  virtual void changeFirstStep( StepQueue& queue, int timeCurr )=0;
-  virtual void nextStep( StepQueue& queue, int timeCurr )=0 ;
-  virtual ~StepComputer(){};
-};
+      virtual void changeFirstStep( StepQueue& queue, int timeCurr )=0;
+      virtual void nextStep( StepQueue& queue, int timeCurr )=0 ;
+      virtual ~StepComputer(){};
+    };
 
 
   } // namespace sot

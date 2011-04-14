@@ -17,11 +17,22 @@
  *
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-#include <sot-pattern-generator/selector.h>
+#define VP_DEBUG
+#define VP_DEBUG_MODE 50
 #include <sot/core/debug.hh>
-#include <dynamic-graph/factory.h>
-#include <sot-pattern-generator/exception-pg.h>
+#ifdef VP_DEBUG
+class selector__INIT
+{
+public:selector__INIT( void ) { dynamicgraph::sot::DebugTrace::openFile(); }
+};
+selector__INIT selector_initiator;
+#endif //#ifdef VP_DEBUG
 
+
+#include <sot-pattern-generator/selector.h>
+#include <dynamic-graph/factory.h>
+#include <dynamic-graph/all-commands.h>
+#include <sot-pattern-generator/exception-pg.h>
 
 namespace dynamicgraph {
   namespace sot {
@@ -36,6 +47,7 @@ namespace dynamicgraph {
       sotDEBUGIN(5);
 
       signalRegistration( selectorSIN );
+      initCommands();
 
       sotDEBUGOUT(5);
     }
@@ -206,6 +218,7 @@ namespace dynamicgraph {
 		     const std::string& name="",const std::string& type="",
 		     const int & sigId=-1 )
     {
+      sotDEBUGIN(15);
       std::ostringstream oss;
 
       /* ------------------------------------------------------------------------ */
@@ -220,9 +233,48 @@ namespace dynamicgraph {
       /* ------------------------------------------------------------------------ */
 
       if(! dORc ) os << "Types available:" << std::endl << oss.str();
+      sotDEBUGOUT(15);
     }
 
+    void Selector::
+    initCommands( void )
+    {
+     using namespace command;
+     addCommand("reset",
+		makeCommandVoid2(*this,&Selector::resetSignals,
+				 docCommandVoid2("Re-set the list MxN in and M out, for M outputs, "
+						 "and M possible inputs for each M.",
+						 "int (N=nb inputs foreach)","int (M=nb output)")));
+     addCommand("create",
+		makeCommandVoid3(*this,&Selector::create,
+				 docCommandVoid3("Create a new set of input and the corresponding output.",
+						 "string among authorized values (type)","str(name)",
+						 "int (sig id)")));
+     addCommand("getTypeList",
+		makeCommandVerbose(*this,&Selector::getTypeList,
+				   docCommandVerbose("Get the list of all possible types.")));
 
+
+    }
+
+    void Selector::
+    create( const std::string& type,const std::string& name,const int & sigId )
+    {
+      std::ostringstream dummy;
+      displayOrCreate( *this,true,dummy,name,type,sigId );
+    }
+    std::string Selector::
+    getTypeList( void )
+    {
+      std::ostringstream sout;
+      displayOrCreate( *this,false,sout );
+      return sout.str();
+    }
+    void Selector::
+    getTypeList( std::ostream& os )
+    {
+      os << getTypeList();
+    }
 
     void Selector::
     commandLine( const std::string& cmdLine,

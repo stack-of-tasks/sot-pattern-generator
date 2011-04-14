@@ -70,11 +70,15 @@ SET (step-computer-joystick_plugins_dependencies ${step-computer_plugins_depende
 SET (pg-manager_plugins_dependencies step-queue pg)
 SET (step-time-line_plugins_dependencies step-queue pg-manager)
 
+# --- PY ---
+INCLUDE(../cmake/python.cmake)
+SET(PYTHON_LOCAL_PATH sot/pattern_generator)
+
+# --- PLUGIN COMPILATION/INSTALLATION
 FOREACH(LIBRARY_NAME ${plugins})
   ADD_LIBRARY(${LIBRARY_NAME}
     SHARED
     ${LIBRARY_NAME}.cpp)
-
 
   SET_TARGET_PROPERTIES(${LIBRARY_NAME}
     PROPERTIES
@@ -95,14 +99,31 @@ FOREACH(LIBRARY_NAME ${plugins})
 
   SET_TARGET_PROPERTIES(${LIBRARY_NAME}
     PROPERTIES
-    LINK_FLAGS "${${PROJECT_NAME}_src_LDFLAGS}"
-    )
+    LINK_FLAGS "${${PROJECT_NAME}_src_LDFLAGS}")
 
   PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} jrl-dynamics)
   PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} jrl-walkgen)
   PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} hrp2-dynamics)
-  PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} sot-core) 
+  PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} sot-core)
 
-  INSTALL(TARGETS ${LIBRARY_NAME}
-    DESTINATION lib/plugin)
+  INSTALL(TARGETS ${LIBRARY_NAME} DESTINATION lib/plugin)
+
+  # --- PY ---
+  STRING(REPLACE - _ PYTHON_LIBRARY_NAME ${LIBRARY_NAME})
+  ADD_DEPENDENCIES(${LIBRARY_NAME} MKDIR_${PYTHON_LIBRARY_NAME})
+  ADD_CUSTOM_TARGET(MKDIR_${PYTHON_LIBRARY_NAME}
+    mkdir -p dynamic_graph/${PYTHON_LOCAL_PATH}/${PYTHON_LIBRARY_NAME})
+  DYNAMIC_GRAPH_PYTHON_MODULE("${PYTHON_LOCAL_PATH}/${PYTHON_LIBRARY_NAME}"
+    ${LIBRARY_NAME} ${PYTHON_LOCAL_PATH}/${PYTHON_LIBRARY_NAME}/wrap)
+
 ENDFOREACH(LIBRARY_NAME)
+
+
+# --- PY ---
+# Install empty __init__.py files in intermediate directories.
+EXEC_PROGRAM(${PYTHON_EXECUTABLE} ARGS
+  "-c \"from distutils import sysconfig; print sysconfig.get_python_lib(0,0,prefix='')\""
+  OUTPUT_VARIABLE PYTHON_SITELIB)
+INSTALL(FILES
+  ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_graph/${PYTHON_LOCAL_PATH}/__init__.py
+  DESTINATION ${PYTHON_SITELIB}/dynamic_graph/${PYTHON_LOCAL_PATH})

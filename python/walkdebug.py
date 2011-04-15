@@ -1,17 +1,14 @@
 import sys
 sys.path.append('../../sot-dyninv/python')
 
-
 from dynamic_graph import plug
 from dynamic_graph.sot.core import *
 from dynamic_graph.sot.core.math_small_entities import Derivator_of_Matrix
 from dynamic_graph.sot.dynamics import *
-from dynamic_graph.sot.dyninv import *
 import dynamic_graph.script_shortcuts
 from dynamic_graph.script_shortcuts import optionalparentheses
 from dynamic_graph.matlab import matlab
-from MetaTask6d import MetaTask6d,toFlags
-from attime import attime
+from dynamic_graph.sot.core.meta_task_6d import MetaTask6d,toFlags
 
 from robotSpecific import pkgDataRootDir,modelName,robotDimension,initialConfig,gearRatio,inertiaRotor
 robotName = 'hrp10small'
@@ -25,7 +22,6 @@ def totuple( a ):
     return tuple(res)
 
 initialConfig.clear()
-#initialConfig['hrp10small'] = (0, 0, 0, 0, 0, 0, 0, 0, -0.4538, 0.8727, -0.4189, 0, 0, 0, -0.4538, 0.8727, -0.4189, 0, 0, 0, 0, 0, 0.2618, -0.1745, 0, -0.5236, 0, 0, 0, 0, 0.2618, 0.1745, 0, -0.5236, 0, 0, 0, 0 )
 initialConfig['hrp10small'] = (0,0,0.648697398115,0,0,0)+(0, 0, -0.4538, 0.8727, -0.4189, 0, 0, 0, -0.4538, 0.8727, -0.4189, 0, 0, 0, 0, 0, 0.2618, -0.1745, 0, -0.5236, 0, 0, 0, 0, 0.2618, 0.1745, 0, -0.5236, 0, 0, 0, 0 )
 
 # --- ROBOT SIMU ---------------------------------------------------------------
@@ -79,7 +75,6 @@ except:
 
 qs=[]
 def inc():
-    attime.run(robot.control.time+1)
     robot.increment(dt)
     qs.append(robot.state.value)
 
@@ -143,29 +138,11 @@ dyn.ffacceleration.unplug()
 robot.control.unplug()
 
 # --- Task 6D ------------------------------------------
-class MetaTaskKine6d( MetaTask6d ):
-    def createTask(self):
-        self.task = Task('task'+self.name)
-
-    def createGain(self):
-        self.gain = GainAdaptive('gain'+self.name)
-        self.gain.set(0.1,0.1,125e3)
-    def plugEverything(self):
-        self.feature.sdes.value = self.featureDes.name
-        plug(self.dyn.signal(self.opPoint),self.feature.signal('position'))
-        plug(self.dyn.signal('J'+self.opPoint),self.feature.signal('Jq'))
-        self.task.add(self.feature.name)
-        plug(self.task.error,self.gain.error)
-        plug(self.gain.gain,self.task.controlGain)
-    def keep(self):
-        self.feature.position.recompute(self.dyn.position.time)
-        self.feature.keep()
-
 # Task right hand
-taskRH=MetaTaskKine6d('rh',dyn,'rh','right-wrist')
-taskLH=MetaTaskKine6d('lh',dyn,'lh','left-wrist')
-taskRF=MetaTaskKine6d('rf',dyn,'rf','right-ankle')
-taskLF=MetaTaskKine6d('lf',dyn,'lf','left-ankle')
+taskRH=MetaTask6d('rh',dyn,'rh','right-wrist')
+taskLH=MetaTask6d('lh',dyn,'lh','left-wrist')
+taskRF=MetaTask6d('rf',dyn,'rf','right-ankle')
+taskLF=MetaTask6d('lf',dyn,'lf','left-ankle')
 
 taskRH.ref = ((0,0,-1,0.22),(0,1,0,-0.37),(1,0,0,.74),(0,0,0,1))
 
@@ -239,27 +216,15 @@ geom.ffposition.value = 6*(0,)
 geom.velocity.value = robotDim*(0,)
 geom.acceleration.value = robotDim*(0,)
 
-class SelectorPy (Selector):
-    def __init__(self,name,*signalPlug):
-        Selector.__init__(self,name)
-        nbOut=len(signalPlug)
-        nbIn=len(signalPlug[0])-2
-        self.reset(nbIn,nbOut)
-        idxOut=0
-        for sigOut in signalPlug:
-            typeSig=sigOut[0]
-            nameSig=sigOut[1]
-            self.create(typeSig,nameSig,idxOut)
-            idxIn=0
-            for sigIn in sigOut[2:]:
-                plug( sigIn,self.signal(nameSig+str(idxIn)))
-                idxIn+=1
-            idxOut+=1
+#from dynamic_graph.sot.pattern_generator.meta_selector import SelectorPy
+#import dynamic_graph.sot.pattern_generator.meta_selector
+# --- Selector of the foot on the ground
+SelectorPy=Selector
+selecSupportFoot = Selector('selecSupportFoot'
+                            ,['matrixHomo','pg_H_sf',pg.rightfootref,pg.leftfootref]
+                            ,['matrixHomo','wa_H_sf',geom.rf,geom.lf]
+                            )
 
-selecSupportFoot = SelectorPy('selecSupportFoot'
-                              ,['matrixHomo','pg_H_sf',pg.rightfootref,pg.leftfootref]
-                              ,['matrixHomo','wa_H_sf',geom.rf,geom.lf]
-                              )
 plug(pg.SupportFoot,selecSupportFoot.selec)
 sf_H_wa = Inverse_of_matrixHomo('sf_H_wa')
 plug(selecSupportFoot.wa_H_sf,sf_H_wa.sin)
@@ -292,13 +257,12 @@ ffattitude_from_pg.selec(3,6)
 plug(ffattitude_from_pg.sout,robot.attitudeIN)
 
 # --- REFERENCES ---------------------------------------------------------------
-
 # --- Selector of Com Ref: when pg is stopped, pg.inprocess becomes 0
 pgSelec = SelectorPy('pgSelec'
                      ,['vector','scomref',dyn.com,pg.comref])
 plug(pg.inprocess,pgSelec.selec)
 
-# --- Selector of the foot on the ground
+
 footSelection = SelectorPy('refFootSelection'
                               ,[ 'matrixHomo','desFoot',pg.rightfootref,pg.leftfootref] # Ref of the flying foot
                               ,[ 'matrixHomo','desRefFoot',pg.leftfootref,pg.rightfootref] # Ref of the support foot
@@ -312,7 +276,7 @@ plug(pg.SupportFoot,footSelection.selec)
 # ---- TASKS -------------------------------------------------------------------
 
 # ---- WAIST TASK ---
-taskWaist=MetaTaskKine6d('waist',dyn,'waist','waist')
+taskWaist=MetaTask6d('waist',dyn,'waist','waist')
 
 # Build the reference waist pos homo-matrix from PG.
 waistReferenceVector = Stack_of_vector('waistReferenceVector')
@@ -361,9 +325,6 @@ taskComPD.controlGain.value = 40
 taskComPD.setBeta(-1)
 
 # --- CONSTRAINT SUPPORT FOOT
-#constraintSupport = Constraint('constraintSupport')
-#constraintSupport.addJacobian(footSelection.name+'.Jfoot')
-
 featureSupport = FeatureGeneric('featureSupport')
 featureSupport.errorIN.value = 6*(0,)
 plug(footSelection.Jfoot,featureSupport.jacobianIN)
@@ -372,6 +333,8 @@ constraintSupport.add(featureSupport.name)
 constraintSupport.task.value = 6*(0,)
 
 # ---- SOT ---------------------------------------------------------------------
+# The solver SOTH of dyninv is used, but normally, the SOT solver should be sufficient
+from dynamic_graph.sot.dyninv import SolverKine
 sot = SolverKine('sot')
 sot.setSize(robotDim)
 sot.push(constraintSupport.name)

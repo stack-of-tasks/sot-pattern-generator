@@ -5,12 +5,10 @@ from dynamic_graph import plug
 from dynamic_graph.sot.core import *
 from dynamic_graph.sot.core.math_small_entities import Derivator_of_Matrix
 from dynamic_graph.sot.dynamics import *
-from dynamic_graph.sot.dyninv import *
 import dynamic_graph.script_shortcuts
 from dynamic_graph.script_shortcuts import optionalparentheses
 from dynamic_graph.matlab import matlab
-from MetaTask6d import MetaTask6d,toFlags
-from attime import attime
+from dynamic_graph.sot.core.meta_task_6d import MetaTask6d,toFlags
 
 from robotSpecific import pkgDataRootDir,modelName,robotDimension,initialConfig,gearRatio,inertiaRotor
 robotName = 'hrp10small'
@@ -74,7 +72,6 @@ except:
 
 qs=[]
 def inc():
-    attime.run(robot.control.time+1)
     robot.increment(dt)
     qs.append(robot.state.value)
 
@@ -181,29 +178,12 @@ geom.ffposition.value = 6*(0,)
 geom.velocity.value = robotDim*(0,)
 geom.acceleration.value = robotDim*(0,)
 
-class SelectorPy (Selector):
-    def __init__(self,name,*signalPlug):
-        Selector.__init__(self,name)
-        nbOut=len(signalPlug)
-        nbIn=len(signalPlug[0])-2
-        self.reset(nbIn,nbOut)
-        idxOut=0
-        for sigOut in signalPlug:
-            typeSig=sigOut[0]
-            nameSig=sigOut[1]
-            self.create(typeSig,nameSig,idxOut)
-            idxIn=0
-            for sigIn in sigOut[2:]:
-                plug( sigIn,self.signal(nameSig+str(idxIn)))
-                idxIn+=1
-            idxOut+=1
-
 # --- Selector of Com Ref: when pg is stopped, pg.inprocess becomes 0
-comRef = SelectorPy('comRef'
+comRef = Selector('comRef'
                     ,['vector','ref',dyn.com,pg.comref])
 plug(pg.inprocess,comRef.selec)
 
-selecSupportFoot = SelectorPy('selecSupportFoot'
+selecSupportFoot = Selector('selecSupportFoot'
                               ,['matrixHomo','pg_H_sf',pg.rightfootref,pg.leftfootref]
                               ,['matrixHomo','wa_H_sf',geom.rf,geom.lf]
                               )
@@ -226,27 +206,8 @@ plug(wa_zmp.sout,robot.zmp)
 
 # ---- TASKS -------------------------------------------------------------------
 
-# --- Task 6D ------------------------------------------
-class MetaTaskKine6d( MetaTask6d ):
-    def createTask(self):
-        self.task = Task('task'+self.name)
-
-    def createGain(self):
-        self.gain = GainAdaptive('gain'+self.name)
-        self.gain.set(0.1,0.1,125e3)
-    def plugEverything(self):
-        self.feature.sdes.value = self.featureDes.name
-        plug(self.dyn.signal(self.opPoint),self.feature.signal('position'))
-        plug(self.dyn.signal('J'+self.opPoint),self.feature.signal('Jq'))
-        self.task.add(self.feature.name)
-        plug(self.task.error,self.gain.error)
-        plug(self.gain.gain,self.task.controlGain)
-    def keep(self):
-        self.feature.position.recompute(self.dyn.position.time)
-        self.feature.keep()
-
 # ---- WAIST TASK ---
-taskWaist=MetaTaskKine6d('waist',dyn,'waist','waist')
+taskWaist=MetaTask6d('waist',dyn,'waist','waist')
 
 # Build the reference waist pos homo-matrix from PG.
 waistReferenceVector = Stack_of_vector('waistReferenceVector')
@@ -279,8 +240,8 @@ taskComPD.setBeta(-1)
 
 # --- TASK RIGHT FOOT
 # Task right hand
-taskRF=MetaTaskKine6d('rf',dyn,'rf','right-ankle')
-taskLF=MetaTaskKine6d('lf',dyn,'lf','left-ankle')
+taskRF=MetaTask6d('rf',dyn,'rf','right-ankle')
+taskLF=MetaTask6d('lf',dyn,'lf','left-ankle')
 
 plug(pg.rightfootref,taskRF.featureDes.position)
 taskRF.task.controlGain.value = 5
@@ -288,16 +249,14 @@ plug(pg.leftfootref,taskLF.featureDes.position)
 taskLF.task.controlGain.value = 5
 
 # ---- SOT ---------------------------------------------------------------------
+# The solver SOTH of dyninv is used, but normally, the SOT solver should be sufficient
+from dynamic_graph.sot.dyninv import SolverKine
 sot = SolverKine('sot')
 sot.setSize(robotDim)
 sot.push(taskWaist.task.name)
 sot.push(taskRF.task.name)
 sot.push(taskLF.task.name)
 sot.push(taskComPD.name)
-
-taskRF.feature.position.recompute(0)
-taskLF.feature.position.recompute(0)
-#taskRF.feature.keep()
 
 plug(sot.control,robot.control)
 

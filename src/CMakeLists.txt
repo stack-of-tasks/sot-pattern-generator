@@ -120,11 +120,6 @@ ENDFOREACH(LIBRARY_NAME)
 
 
 # --- PY ---
-# Install empty __init__.py files in intermediate directories.
-EXEC_PROGRAM(${PYTHON_EXECUTABLE} ARGS
-  "-c \"from distutils import sysconfig; print sysconfig.get_python_lib(0,0,prefix='')\""
-  OUTPUT_VARIABLE PYTHON_SITELIB)
-
 # Install lonely files
 SET(PYTHON_MODULE dynamic_graph/sot/pattern_generator)
 SET(LOCAL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_graph/${PYTHON_LOCAL_PATH})
@@ -138,3 +133,7 @@ FOREACH(PYFILE ${PYFILES})
   PYTHON_INSTALL_ON_SITE("${PYTHON_MODULE}" "${PYFILE}" )
 ENDFOREACH()
 
+INSTALL(FILES
+  ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_graph/${PYTHON_LOCAL_PATH}/__init__.py
+  ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_graph/${PYTHON_LOCAL_PATH}/meta_selector.py
+  DESTINATION ${PYTHON_SITELIB}/dynamic_graph/${PYTHON_LOCAL_PATH})

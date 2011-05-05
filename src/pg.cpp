@@ -908,7 +908,7 @@ OneStepOfControl(int &dummy, int time)
 	    }
 	  else
 	    {
-	      std::cout <<"The state of the robot and the one return by the WPG are different" << std::endl;
+	      std::cout <<"The state of the robot and the one returned by the WPG are different" << std::endl;
 	      sotDEBUG(25) << "Size not coherent between CurrentState and m_JointErrorValuesForWalking: " 
 			   << CurrentState.size()<< " " 
 			   << m_JointErrorValuesForWalking.size()<< " " 

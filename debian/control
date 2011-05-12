@@ -4,15 +4,8 @@ Maintainer: Thomas Moulard <thomas.moulard@gmail.com>
 Build-Depends: debhelper (>= 7.0.50~), cmake (>= 2.6),
 	       doxygen (>= 1.6.3),
 	       pkg-config (>= 0.22),
-	       libjrl-mal-dev (>= 1.9.0.99),
-	       libdynamic-graph-dev (>= 1.0.0.99),
-	       libsot-core-dev (>= 1.0.0.99),
-	       libjrl-dynamics-dev (>= 1.19.1.99),
-	       libhrp2-dynamics-dev (>= 1.5.1.99),
-	       libhrp2-10-optimized-dev (>= 1.0.0.99),
-	       hrp2-10-data (>= 1.0.0.99),
-	       hrp2-14-data (>= 1.7.5),
-	       hrp2-14-small-data (>= 1.0.0.99)
+	       libsot-core-dev (>= 1.1.1),
+	       libsot-dynamics-dev (>= 1.1.1)
 Standards-Version: 3.8.4
 #Vcs-Git:
 #Vcs-browser:
@@ -22,7 +15,7 @@ Section: libs
 Package: libsot-pattern-generator-dev
 Section: libdevel
 Architecture: any
-Depends: libjrl-mal-dev (>= 1.9.0.99), libdynamic-graph-dev (>= 1.0.0.99), libsot-core-dev (>= 1.0.0.99), libjrl-dynamics-dev (>= 1.19.1.99), libhrp2-dynamics-dev (>= 1.5.1.99), libhrp2-10-optimized-dev (>= 1.0.0.99), hrp2-10-data (>= 1.0.0.99), hrp2-14-data (>= 1.7.5), hrp2-14-small-data (>= 1.0.0.99),libsot-pattern-generator1.0.0.99 (= ${binary:Version}), ${misc:Depends}
+Depends: libsot-core (>= 1.1.1), libsot-dynamic1.1.1 (= ${binary:Version}), libsot-pattern-generator1.1.1 (= ${binary:Version}), ${misc:Depends}
 Suggests: libsot-pattern-generator-doc
 Description: pattern generator plug-in for dynamic-graph development package
  This software provides jrl-walkgen bindings for the dynamic-graph
@@ -31,7 +24,7 @@ Description: pattern generator plug-in for dynamic-graph development package
  .
  This package contains development files (headers and pkg-config file).
 
-Package: libsot-pattern-generator1.0.0.99
+Package: libsot-pattern-generator1.1.1
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: pattern generator plug-in for dynamic-graph
@@ -54,3 +47,15 @@ Description: documentation for the pattern generator plug-in
  trajectories.
  .
  This package contains the Doxygen documentation.
+
+Package: libsot-pattern-generator-dbg
+Architecture: any
+Section: debug
+Priority: extra
+Depends:  libsot-dynamic (= 1.1.1)
+Description: debugging symbols for libsot-pattern-generator
+ This software provides jrl-walkgen bindings for the dynamic-graph
+ package. It allows the computation of whole-body biped walk
+ trajectories.
+ .
+ This package contains the debugging symbols for libsot-pattern-generator

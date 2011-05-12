@@ -7,7 +7,7 @@ Build-Depends: debhelper (>= 7.0.50~), cmake (>= 2.6),
 	       libhrp2-dynamics-dev (>= 1.5.2),
 	       libhrp2-10-optimized-dev (>= 1.0.1),
 	       hrp2-10-data (>= 1.0.1),
-	       libjrl-dynamics-dev (>=1.19.3),
+      	       libjrl-dynamics-dev (>=1.19.3),
 	       libjrl-walkgen-dev (>= 3.1.4),
 	       libsot-core-dev (>= 1.1.1),
 	       libsot-dynamic-dev (>= 1.1.1)
@@ -20,7 +20,7 @@ Section: libs
 Package: libsot-pattern-generator-dev
 Section: libdevel
 Architecture: any
-Depends: hrp2-dynamics (>= 1.5.2), hrp2-optimized (>= 1.0.1), hrp2-10-data (>= 1.0.1), libjrl-dynamics-dev (>=1.19.3), libjrl-walkgen-dev (>= 3.1.4), libsot-core-dev (>= 1.1.1), libsot-dynamic1.1.1 (= ${binary:Version}), libsot-pattern-generator1.1.1 (= ${binary:Version}), ${misc:Depends}
+Depends: libhrp2-dynamics-dev (>= 1.5.2), libhrp2-10-optimized-dev (>= 1.0.1), hrp2-10-data (>= 1.0.1), libjrl-dynamics-dev (>=1.19.3), libjrl-walkgen-dev (>= 3.1.4), libsot-core-dev (>= 1.1.1), libsot-dynamic-dev (= ${binary:Version}), libsot-pattern-generator1.1.1 (= ${binary:Version}), ${misc:Depends}
 Suggests: libsot-pattern-generator-doc
 Description: pattern generator plug-in for dynamic-graph development package
  This software provides jrl-walkgen bindings for the dynamic-graph

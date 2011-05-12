@@ -19,6 +19,12 @@ override_dh_strip:
 override_dh_auto_configure:
 	dh_auto_configure -- -DCMAKE_BUILD_TYPE=RELEASE -DGENERATE_DOC=ON -DCMAKE_INSTALL_PREFIX=/opt/openrobots
 
+override_dh_auto_test:
+	export LD_LIBRARY_PATH=\
+/opt/openrobots/lib/plugin:\
+/opt/openrobots/lib/:$(LD_LIBRARY_PATH) \
+&& dh_auto_test --
+
 # FIXME: this is only necessary because some binaries are linked against
 # plug-ins.
 # Teach dh_shlibdeps where the plug-in are located.

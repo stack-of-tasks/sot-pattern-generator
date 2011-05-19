@@ -4,18 +4,25 @@ from numpy import *
 from dynamic_graph import plug
 from dynamic_graph.sot.core import *
 from dynamic_graph.sot.core.math_small_entities import Derivator_of_Matrix
-from dynamic_graph.sot.dynamics import *
+from dynamic_graph.sot.dynamics import Dynamic
 import dynamic_graph.script_shortcuts
 from dynamic_graph.script_shortcuts import optionalparentheses
 from dynamic_graph.matlab import matlab
 from dynamic_graph.sot.core.meta_task_6d import MetaTask6d,toFlags
-from dynamic_graph.sot.dynamics.tools import *
+sys.path.append("/home/nddang/src/sotpy/sot-pattern-generator/python")
 from robotSpecific import pkgDataRootDir,modelName,robotDimension,initialConfig,gearRatio,inertiaRotor
+
+OPENHRP = True
+if "solver" not in globals().keys():
+    OPENHRP = False
+    from dynamic_graph.sot.dynamics.tools import solver, robot
+
+import time
+robotName = 'hrp14small'
 
 logger = logging.getLogger()
 logging.basicConfig()
 logger.setLevel(logging.DEBUG)
-robotName = 'hrp14small'
 dt = 0.005
 def totuple( a ):
     al=a.tolist()
@@ -27,12 +34,19 @@ def totuple( a ):
 # --- MAIN LOOP ------------------------------------------
 
 qs=[]
-clt = robotviewer.client()
+try:
+    import robotviewer
+    clt = robotviewer.client()
+    clt.Ping()
+except:
+    clt = None
+
 def inc():
     robot.device.increment(dt)
     state = robot.device.state.value
     qs.append(state)
-    clt.updateElementConfig('hrp', list(state) + 10*[0])
+    if clt:
+        clt.updateElementConfig('hrp', list(state) + 10*[0])
 
 from ThreadInterruptibleLoop import *
 @loopInThread
@@ -107,7 +121,7 @@ pg.motorcontrol.value = robotDim*(0,)
 pg.zmppreviouscontroller.value = (0,0,0)
 
 pg.initState()
-
+time.sleep(.5)
 # --- PG INIT FRAMES ---
 geom = Dynamic("geom")
 geom.setFiles(modelDir, modelName[robotName],specificitiesPath,jointRankPath)
@@ -141,9 +155,10 @@ plug(pg_H_wa.sout,wa_H_pg.sin)
 wa_zmp = Multiply_matrixHomo_vector('wa_zmp')
 plug(wa_H_pg.sout,wa_zmp.sin1)
 plug(pg.zmpref,wa_zmp.sin2)
-# Connect the ZMPref to OpenHRP in the waist reference frame.
+
+# Connect the ZMPref to OpenHRP in the world reference frame.
 pg.parseCmd(':SetZMPFrame world')
-plug(wa_zmp.sout,robot.device.zmp)
+plug(pg.zmpref, robot.device.zmp)
 
 # ---- TASKS -------------------------------------------------------------------
 
@@ -176,37 +191,36 @@ taskComPD = TaskPD('taskComPD')
 taskComPD.add('featureCom')
 plug(pg.dcomref,featureComDes.errordotIN)
 plug(featureCom.errordot,taskComPD.errorDot)
-taskComPD.controlGain.value = 180
+taskComPD.controlGain.value = 40
 taskComPD.setBeta(-1)
 
-# --- TASK RIGHT FOOT
-# Task right hand
-taskRF=MetaTask6d('rf',robot.dynamic,'rf','right-ankle')
-taskLF=MetaTask6d('lf',robot.dynamic,'lf','left-ankle')
 
-plug(pg.rightfootref,taskRF.featureDes.position)
-taskRF.task.controlGain.value = 30
-plug(pg.leftfootref,taskLF.featureDes.position)
-taskLF.task.controlGain.value = 30
+plug(pg.rightfootref,robot.features['right-ankle'].reference)
+plug(pg.leftfootref,robot.features['left-ankle'].reference)
+
 
 # ---- SOT ---------------------------------------------------------------------
+#sot.control.unplug()
+#sot = solver.sot
+#sot.setNumberDofs(robotDim)
+solver.sot.remove("robot_task_com")
+solver.sot.remove("robot_task_left-ankle")
+solver.sot.remove("robot_task_right-ankle")
+solver.sot.push(taskWaist.task.name)
+solver.sot.push("robot_task_left-ankle")
+solver.sot.push("robot_task_right-ankle")
+solver.sot.push(taskComPD.name)
 
-sot = solver.sot
-sot.clear()
-#sot.setSize(robotDim)
-sot.setNumberDofs(robotDim)
-sot.push(taskWaist.task.name)
-sot.push(taskRF.task.name)
-sot.push(taskLF.task.name)
-sot.push(taskComPD.name)
-
-plug(sot.control,robot.device.control)
+robot.tasks['right-ankle'].controlGain.value = 180
+robot.tasks['left-ankle'].controlGain.value = 180
+if not OPENHRP:
+    plug(solver.sot.control, robot.device.control)
 
 pg.parseCmd(':stepseq 0.0 -0.095 0.0 0.2 0.19 0.0 0.2 -0.19 0.0 0.2 0.19 0.0 0.2 -0.19 0.0 0.0 0.19 0.0')
 
 
 # You can now modifiy the speed of the robot using set pg.velocitydes [3]( x, y, yaw)
-pg.velocitydes.value =(0.1,0.0,0.0)
+#pg.velocitydes.value =(0.1,0.0,0.0)
 
 # --- TRACER -----------------------------------------------------------------
 from dynamic_graph.tracer import *
@@ -215,9 +229,6 @@ tr = Tracer('tr')
 tr.open('/tmp/','','.dat')
 tr.start()
 robot.device.after.addSignal('tr.triger')
+robot.device.before.addSignal(robot.device.name + ".zmp")
 
-#tr.add(robot.dynamic.name+'.ffposition','ff')
-tr.add(taskRF.featureDes.name+'.position','refr')
-tr.add(taskLF.featureDes.name+'.position','refl')
-tr.add(taskRF.feature.name+'.error','errrf')
-tr.add(taskLF.feature.name+'.error','errlf')
+tr.add(robot.device.name + ".zmp",'zmpref')

@@ -1,9 +1,6 @@
 import sys
 import logging
-logger = logging.getLogger()
-logging.basicConfig()
-logger.setLevel(logging.DEBUG)
-
+from numpy import *
 from dynamic_graph import plug
 from dynamic_graph.sot.core import *
 from dynamic_graph.sot.core.math_small_entities import Derivator_of_Matrix
@@ -12,11 +9,14 @@ import dynamic_graph.script_shortcuts
 from dynamic_graph.script_shortcuts import optionalparentheses
 from dynamic_graph.matlab import matlab
 from dynamic_graph.sot.core.meta_task_6d import MetaTask6d,toFlags
-
+from dynamic_graph.sot.dynamics.tools import *
 from robotSpecific import pkgDataRootDir,modelName,robotDimension,initialConfig,gearRatio,inertiaRotor
-robotName = 'hrp14small'
 
-from numpy import *
+logger = logging.getLogger()
+logging.basicConfig()
+logger.setLevel(logging.DEBUG)
+robotName = 'hrp14small'
+dt = 0.005
 def totuple( a ):
     al=a.tolist()
     res=[]
@@ -24,64 +24,15 @@ def totuple( a ):
         res.append( tuple(al[i]) )
     return tuple(res)
 
-initialConfig['hrp14small'] = (
-    0,0,0.6487,0,0,0,0.0,0.0,-0.453785605519,0.872664625997,-0.418879020479,0.0,0.0,0.0,-0.453785605519,0.872664625997,-0.418879020479,0.0,0.0,0.0,0.0,0.0,0.261799387799,-0.174532925199,0.0,-0.523598775598,0.0,0.0,0.174532925199,0.261799387799,0.174532925199,0.0,-0.523598775598,0.0,0.0,0.174532925199
-    )
-
-
-initialConfig['hrp10small'] = (0,0,0.648697398115,0,0,0)+(0, 0, -0.4538, 0.8727, -0.4189, 0, 0, 0, -0.4538, 0.8727, -0.4189, 0, 0, 0, 0, 0, 0.2618, -0.1745, 0, -0.5236, 0, 0, 0, 0, 0.2618, 0.1745, 0, -0.5236, 0, 0 )
-# --- ROBOT SIMU ---------------------------------------------------------------
-# --- ROBOT SIMU ---------------------------------------------------------------
-# --- ROBOT SIMU ---------------------------------------------------------------
-
-robotDim=robotDimension[robotName]
-robot = RobotSimu("robot")
-robot.resize(robotDim)
-robot.set( initialConfig[robotName] )
-dt=5e-3
-
-# --- VIEWER -------------------------------------------------------------------
-# --- VIEWER -------------------------------------------------------------------
-# --- VIEWER -------------------------------------------------------------------
-try:
-   import robotviewer
-
-   def stateFullSize(robot):
-       return [float(val) for val in robot.state.value]+10*[0.0]
-   RobotSimu.stateFullSize = stateFullSize
-   robot.viewer = robotviewer.client()
-   # Check the connection
-
-   robot.viewer.updateElementConfig('hrp',robot.stateFullSize()[:46])
-
-   def refreshView( robot ):
-       robot.viewer.updateElementConfig('hrp',robot.stateFullSize()[:46])
-   RobotSimu.refresh = refreshView
-   def incrementView( robot,dt ):
-       robot.incrementNoView(dt)
-       robot.refresh()
-   RobotSimu.incrementNoView = RobotSimu.increment
-   RobotSimu.increment = incrementView
-   def setView( robot,*args ):
-       robot.setNoView(*args)
-       robot.refresh()
-   RobotSimu.setNoView = RobotSimu.set
-   RobotSimu.set = setView
-
-   robot.refresh()
-except Exception, error:
-    logging.exception(error)
-
-    print "No robot viewer, sorry."
-    robot.viewer = None
-
-
 # --- MAIN LOOP ------------------------------------------
 
 qs=[]
+clt = robotviewer.client()
 def inc():
-    robot.increment(dt)
-    qs.append(robot.state.value)
+    robot.device.increment(dt)
+    state = robot.device.state.value
+    qs.append(state)
+    clt.updateElementConfig('hrp', list(state) + 10*[0])
 
 from ThreadInterruptibleLoop import *
 @loopInThread
@@ -109,44 +60,24 @@ def n10():
     for loopIdx in range(10): inc()
 @optionalparentheses
 def q():
-    if 'dyn' in globals(): print dyn.ffposition.__repr__()
-    print robot.state.__repr__()
+    if 'dyn' in globals(): print robot.dynamic.ffposition.__repr__()
+    print robot.device.state.__repr__()
 @optionalparentheses
-def qdot(): print robot.control.__repr__()
+def qdot(): print robot.device.control.__repr__()
 @optionalparentheses
-def t(): print robot.state.time-1
+def t(): print robot.device.state.time-1
 @optionalparentheses
-def iter():         print 'iter = ',robot.state.time
+def iter():         print 'iter = ',robot.device.state.time
 @optionalparentheses
 def status():       print runner.isPlay
 
-# --- DYN ----------------------------------------------------------------------
-if os.path.isfile(pkgDataRootDir[robotName]):
-    raise Exception("%s not found."%pkgDataRootDir[robotName])
+# --- PG ---------------------------------------------------------
+from dynamic_graph.sot.pattern_generator import PatternGenerator,Selector
 modelDir = pkgDataRootDir[robotName]
 xmlDir = pkgDataRootDir[robotName]
 specificitiesPath = xmlDir + '/HRP2SpecificitiesSmall.xml'
 jointRankPath = xmlDir + '/HRP2LinkJointRankSmall.xml'
-
-dyn = Dynamic("dyn")
-dyn.setFiles(modelDir, modelName[robotName],specificitiesPath,jointRankPath)
-dyn.parse()
-
-dyn.inertiaRotor.value = inertiaRotor[robotName]
-dyn.gearRatio.value = gearRatio[robotName]
-
-plug(robot.state,dyn.position)
-dyn.velocity.value = robotDim*(0.,)
-dyn.acceleration.value = robotDim*(0.,)
-
-dyn.ffposition.unplug()
-dyn.ffvelocity.unplug()
-dyn.ffacceleration.unplug()
-robot.control.unplug()
-
-# --- PG ---------------------------------------------------------
-from dynamic_graph.sot.pattern_generator import PatternGenerator,Selector
-
+robotDim = robotDimension[robotName]
 pg = PatternGenerator('pg')
 pg.setVrmlDir(modelDir+'/')
 pg.setVrml(modelName[robotName])
@@ -170,8 +101,8 @@ pg.parseCmd(":UpperBodyMotionParameters 0.0 -0.5 0.0")
 pg.parseCmd(":comheight 0.814")
 pg.parseCmd(":SetAlgoForZmpTrajectory Morisawa")
 
-plug(dyn.position,pg.position)
-plug(dyn.com,pg.com)
+plug(robot.dynamic.position,pg.position)
+plug(robot.dynamic.com,pg.com)
 pg.motorcontrol.value = robotDim*(0,)
 pg.zmppreviouscontroller.value = (0,0,0)
 
@@ -183,14 +114,14 @@ geom.setFiles(modelDir, modelName[robotName],specificitiesPath,jointRankPath)
 geom.parse()
 geom.createOpPoint('rf','right-ankle')
 geom.createOpPoint('lf','left-ankle')
-plug(dyn.position,geom.position)
+plug(robot.dynamic.position,geom.position)
 geom.ffposition.value = 6*(0,)
 geom.velocity.value = robotDim*(0,)
 geom.acceleration.value = robotDim*(0,)
 
 # --- Selector of Com Ref: when pg is stopped, pg.inprocess becomes 0
 comRef = Selector('comRef'
-                    ,['vector','ref',dyn.com,pg.comref])
+                    ,['vector','ref',robot.dynamic.com,pg.comref])
 plug(pg.inprocess,comRef.selec)
 
 selecSupportFoot = Selector('selecSupportFoot'
@@ -212,12 +143,12 @@ plug(wa_H_pg.sout,wa_zmp.sin1)
 plug(pg.zmpref,wa_zmp.sin2)
 # Connect the ZMPref to OpenHRP in the waist reference frame.
 pg.parseCmd(':SetZMPFrame world')
-plug(wa_zmp.sout,robot.zmp)
+plug(wa_zmp.sout,robot.device.zmp)
 
 # ---- TASKS -------------------------------------------------------------------
 
 # ---- WAIST TASK ---
-taskWaist=MetaTask6d('waist',dyn,'waist','waist')
+taskWaist=MetaTask6d('waist', robot.dynamic,'waist','waist')
 
 # Build the reference waist pos homo-matrix from PG.
 waistReferenceVector = Stack_of_vector('waistReferenceVector')
@@ -234,8 +165,8 @@ taskWaist.task.controlGain.value = 5
 
 # --- TASK COM ---
 featureCom = FeatureGeneric('featureCom')
-plug(dyn.com,featureCom.errorIN)
-plug(dyn.Jcom,featureCom.jacobianIN)
+plug(robot.dynamic.com,featureCom.errorIN)
+plug(robot.dynamic.Jcom,featureCom.jacobianIN)
 featureComDes = FeatureGeneric('featureComDes')
 featureCom.sdes.value = 'featureComDes'
 plug(comRef.ref,featureComDes.errorIN)
@@ -250,8 +181,8 @@ taskComPD.setBeta(-1)
 
 # --- TASK RIGHT FOOT
 # Task right hand
-taskRF=MetaTask6d('rf',dyn,'rf','right-ankle')
-taskLF=MetaTask6d('lf',dyn,'lf','left-ankle')
+taskRF=MetaTask6d('rf',robot.dynamic,'rf','right-ankle')
+taskLF=MetaTask6d('lf',robot.dynamic,'lf','left-ankle')
 
 plug(pg.rightfootref,taskRF.featureDes.position)
 taskRF.task.controlGain.value = 30
@@ -259,9 +190,9 @@ plug(pg.leftfootref,taskLF.featureDes.position)
 taskLF.task.controlGain.value = 30
 
 # ---- SOT ---------------------------------------------------------------------
-# The solver SOTH of dyninv is used, but normally, the SOT solver should be sufficient
-from dynamic_graph.sot.core import SOT
-sot = SOT('sot')
+
+sot = solver.sot
+sot.clear()
 #sot.setSize(robotDim)
 sot.setNumberDofs(robotDim)
 sot.push(taskWaist.task.name)
@@ -269,26 +200,8 @@ sot.push(taskRF.task.name)
 sot.push(taskLF.task.name)
 sot.push(taskComPD.name)
 
-plug(sot.control,robot.control)
+plug(sot.control,robot.device.control)
 
-# --- HERDT PG AND START -------------------------------------------------------
-# Set the algorithm generating the ZMP reference trajectory to Herdt's one.
-#pg.parseCmd(':SetAlgoForZmpTrajectory Herdt')
-#pg.parseCmd(':doublesupporttime 0.1')
-#pg.parseCmd(':singlesupporttime 0.7')
-# When velocity reference is at zero, the robot stops all motion after n steps
-
-
-#pg.parseCmd(':numberstepsbeforestop 4')
-# Set constraints on XY
-
-logger.debug("setting  feet constraints")
-pg.parseCmd(':setfeetconstraint XY 0.09 0.06')
-
-# The next command must be runned after a OpenHRP.inc ... ???
-# Start the robot with a speed of 0.1 m/0.8 s.
-#pg.parseCmd(':setting Herde Online 4')
-#pg.parseCmd(':HerdtOnline 0.1 0.0 0.0')
 pg.parseCmd(':stepseq 0.0 -0.095 0.0 0.2 0.19 0.0 0.2 -0.19 0.0 0.2 0.19 0.0 0.2 -0.19 0.0 0.0 0.19 0.0')
 
 
@@ -301,9 +214,9 @@ from dynamic_graph.tracer_real_time import *
 tr = Tracer('tr')
 tr.open('/tmp/','','.dat')
 tr.start()
-robot.after.addSignal('tr.triger')
+robot.device.after.addSignal('tr.triger')
 
-#tr.add(dyn.name+'.ffposition','ff')
+#tr.add(robot.dynamic.name+'.ffposition','ff')
 tr.add(taskRF.featureDes.name+'.position','refr')
 tr.add(taskLF.featureDes.name+'.position','refl')
 tr.add(taskRF.feature.name+'.error','errrf')

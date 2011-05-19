@@ -1,5 +1,8 @@
 import sys
-sys.path.append('../../sot-dyninv/python')
+import logging
+logger = logging.getLogger()
+logging.basicConfig()
+logger.setLevel(logging.DEBUG)
 
 from dynamic_graph import plug
 from dynamic_graph.sot.core import *
@@ -11,7 +14,7 @@ from dynamic_graph.matlab import matlab
 from dynamic_graph.sot.core.meta_task_6d import MetaTask6d,toFlags
 
 from robotSpecific import pkgDataRootDir,modelName,robotDimension,initialConfig,gearRatio,inertiaRotor
-robotName = 'hrp10small'
+robotName = 'hrp14small'
 
 from numpy import *
 def totuple( a ):
@@ -21,9 +24,12 @@ def totuple( a ):
         res.append( tuple(al[i]) )
     return tuple(res)
 
-initialConfig.clear()
-initialConfig['hrp10small'] = (0,0,0.648697398115,0,0,0)+(0, 0, -0.4538, 0.8727, -0.4189, 0, 0, 0, -0.4538, 0.8727, -0.4189, 0, 0, 0, 0, 0, 0.2618, -0.1745, 0, -0.5236, 0, 0, 0, 0, 0.2618, 0.1745, 0, -0.5236, 0, 0, 0, 0 )
+initialConfig['hrp14small'] = (
+    0,0,0.6487,0,0,0,0.0,0.0,-0.453785605519,0.872664625997,-0.418879020479,0.0,0.0,0.0,-0.453785605519,0.872664625997,-0.418879020479,0.0,0.0,0.0,0.0,0.0,0.261799387799,-0.174532925199,0.0,-0.523598775598,0.0,0.0,0.174532925199,0.261799387799,0.174532925199,0.0,-0.523598775598,0.0,0.0,0.174532925199
+    )
 
+
+initialConfig['hrp10small'] = (0,0,0.648697398115,0,0,0)+(0, 0, -0.4538, 0.8727, -0.4189, 0, 0, 0, -0.4538, 0.8727, -0.4189, 0, 0, 0, 0, 0, 0.2618, -0.1745, 0, -0.5236, 0, 0, 0, 0, 0.2618, 0.1745, 0, -0.5236, 0, 0 )
 # --- ROBOT SIMU ---------------------------------------------------------------
 # --- ROBOT SIMU ---------------------------------------------------------------
 # --- ROBOT SIMU ---------------------------------------------------------------
@@ -31,7 +37,6 @@ initialConfig['hrp10small'] = (0,0,0.648697398115,0,0,0)+(0, 0, -0.4538, 0.8727,
 robotDim=robotDimension[robotName]
 robot = RobotSimu("robot")
 robot.resize(robotDim)
-
 robot.set( initialConfig[robotName] )
 dt=5e-3
 
@@ -44,12 +49,13 @@ try:
    def stateFullSize(robot):
        return [float(val) for val in robot.state.value]+10*[0.0]
    RobotSimu.stateFullSize = stateFullSize
-   robot.viewer = robotviewer.client('XML-RPC')
+   robot.viewer = robotviewer.client()
    # Check the connection
-   robot.viewer.updateElementConfig('hrp',robot.stateFullSize())
+
+   robot.viewer.updateElementConfig('hrp',robot.stateFullSize()[:46])
 
    def refreshView( robot ):
-       robot.viewer.updateElementConfig('hrp',robot.stateFullSize())
+       robot.viewer.updateElementConfig('hrp',robot.stateFullSize()[:46])
    RobotSimu.refresh = refreshView
    def incrementView( robot,dt ):
        robot.incrementNoView(dt)
@@ -63,7 +69,9 @@ try:
    RobotSimu.set = setView
 
    robot.refresh()
-except:
+except Exception, error:
+    logging.exception(error)
+
     print "No robot viewer, sorry."
     robot.viewer = None
 
@@ -113,6 +121,8 @@ def iter():         print 'iter = ',robot.state.time
 def status():       print runner.isPlay
 
 # --- DYN ----------------------------------------------------------------------
+if os.path.isfile(pkgDataRootDir[robotName]):
+    raise Exception("%s not found."%pkgDataRootDir[robotName])
 modelDir = pkgDataRootDir[robotName]
 xmlDir = pkgDataRootDir[robotName]
 specificitiesPath = xmlDir + '/HRP2SpecificitiesSmall.xml'
@@ -235,7 +245,7 @@ taskComPD = TaskPD('taskComPD')
 taskComPD.add('featureCom')
 plug(pg.dcomref,featureComDes.errordotIN)
 plug(featureCom.errordot,taskComPD.errorDot)
-taskComPD.controlGain.value = 40
+taskComPD.controlGain.value = 180
 taskComPD.setBeta(-1)
 
 # --- TASK RIGHT FOOT
@@ -244,15 +254,16 @@ taskRF=MetaTask6d('rf',dyn,'rf','right-ankle')
 taskLF=MetaTask6d('lf',dyn,'lf','left-ankle')
 
 plug(pg.rightfootref,taskRF.featureDes.position)
-taskRF.task.controlGain.value = 5
+taskRF.task.controlGain.value = 30
 plug(pg.leftfootref,taskLF.featureDes.position)
-taskLF.task.controlGain.value = 5
+taskLF.task.controlGain.value = 30
 
 # ---- SOT ---------------------------------------------------------------------
 # The solver SOTH of dyninv is used, but normally, the SOT solver should be sufficient
-from dynamic_graph.sot.dyninv import SolverKine
-sot = SolverKine('sot')
-sot.setSize(robotDim)
+from dynamic_graph.sot.core import SOT
+sot = SOT('sot')
+#sot.setSize(robotDim)
+sot.setNumberDofs(robotDim)
 sot.push(taskWaist.task.name)
 sot.push(taskRF.task.name)
 sot.push(taskLF.task.name)
@@ -262,17 +273,24 @@ plug(sot.control,robot.control)
 
 # --- HERDT PG AND START -------------------------------------------------------
 # Set the algorithm generating the ZMP reference trajectory to Herdt's one.
-pg.parseCmd(':SetAlgoForZmpTrajectory Herdt')
-pg.parseCmd(':doublesupporttime 0.1')
-pg.parseCmd(':singlesupporttime 0.7')
+#pg.parseCmd(':SetAlgoForZmpTrajectory Herdt')
+#pg.parseCmd(':doublesupporttime 0.1')
+#pg.parseCmd(':singlesupporttime 0.7')
 # When velocity reference is at zero, the robot stops all motion after n steps
-pg.parseCmd(':numberstepsbeforestop 4')
+
+
+#pg.parseCmd(':numberstepsbeforestop 4')
 # Set constraints on XY
+
+logger.debug("setting  feet constraints")
 pg.parseCmd(':setfeetconstraint XY 0.09 0.06')
 
 # The next command must be runned after a OpenHRP.inc ... ???
 # Start the robot with a speed of 0.1 m/0.8 s.
-pg.parseCmd(':HerdtOnline 0.1 0.0 0.0')
+#pg.parseCmd(':setting Herde Online 4')
+#pg.parseCmd(':HerdtOnline 0.1 0.0 0.0')
+pg.parseCmd(':stepseq 0.0 -0.095 0.0 0.2 0.19 0.0 0.2 -0.19 0.0 0.2 0.19 0.0 0.2 -0.19 0.0 0.0 0.19 0.0')
+
 
 # You can now modifiy the speed of the robot using set pg.velocitydes [3]( x, y, yaw)
 pg.velocitydes.value =(0.1,0.0,0.0)
@@ -288,3 +306,5 @@ robot.after.addSignal('tr.triger')
 #tr.add(dyn.name+'.ffposition','ff')
 tr.add(taskRF.featureDes.name+'.position','refr')
 tr.add(taskLF.featureDes.name+'.position','refl')
+tr.add(taskRF.feature.name+'.error','errrf')
+tr.add(taskLF.feature.name+'.error','errlf')

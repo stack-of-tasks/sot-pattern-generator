@@ -8,9 +8,9 @@ robotDimension=dict()
 initialConfig=dict()
 gearRatio=dict()
 inertiaRotor=dict()
-
-pkgDataRootDir['hrp10small'] = "/local/nddang/profiles/sotpy/install/unstable/share/hrp2_10/"
-pkgDataRootDir['hrp14small'] = "/local/nddang/profiles/sotpy/install/unstable/share/hrp2_14/"
+prefix = "/home/nddang/releasehrp214"
+pkgDataRootDir['hrp10small'] = prefix + "/share/hrp2-10"
+pkgDataRootDir['hrp14small'] = prefix + "/share/hrp2-14"
 modelName['hrp10small'] = 'HRP2JRLmainsmall.wrl'
 modelName['hrp14small'] = 'HRP2JRLmainsmall.wrl'
 

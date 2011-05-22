@@ -22,7 +22,7 @@
 #include <sot/core/debug.hh>
 #include <sot-pattern-generator/pg.h>
 #include <dynamic-graph/factory.h>
-
+#include <dynamic-graph/all-commands.h>
 namespace dynamicgraph {
   namespace sot {
 
@@ -33,7 +33,18 @@ namespace dynamicgraph {
     {
       sotDEBUGIN(5);
 
+      using namespace command;
+      addCommand("initPg",
+		 makeCommandVoid1(*this,&PGManager::initPg,
+				  docCommandVoid1("Set the name of pg entinty "
+                                                  "to be used.",
+						  "string (pg entity name)")));
+      addCommand("saveSteps",
+		 makeCommandVoid0(*this,&PGManager::saveSteps,
+				  docCommandVoid0("Save steps to /tmp/step.dat"
+						  )));
       sotDEBUGOUT(5);
+
     }
 
 
@@ -132,13 +143,18 @@ namespace dynamicgraph {
 	  std::string name = "pg";
 	  cmdArgs >> std::ws;
 	  if( cmdArgs.good()){ cmdArgs >> name; }
-	  pgEntity = &g_pool.getEntity( name );
-	  PatternGenerator* spg = dynamic_cast<PatternGenerator*>(pgEntity);
-	  if (spg){ pgi = spg->GetPatternGeneratorInterface(); }
+          initPg(name);
 	}
       else if( "savesteps" == cmdLine )
 	{
-	  std::ofstream os("/tmp/steps.dat");
+          saveSteps();
+	}
+      else { Entity::commandLine( cmdLine,cmdArgs,os); }
+    }
+
+    void PGManager::saveSteps()
+    {
+    	  std::ofstream os("/tmp/steps.dat");
 	  for(size_t i = 0; i < stepbuf.size(); ++i)
 	    {
 	      os << stepbuf[i].contact << " "
@@ -148,8 +164,13 @@ namespace dynamicgraph {
 	    }
 	  os << std::endl;
 	  stepbuf.clear();
-	}
-      else { Entity::commandLine( cmdLine,cmdArgs,os); }
+    }
+
+    void PGManager::initPg( const std::string& name )
+    {
+      pgEntity = &g_pool.getEntity( name );
+      PatternGenerator* spg = dynamic_cast<PatternGenerator*>(pgEntity);
+      if (spg){ pgi = spg->GetPatternGeneratorInterface(); }
     }
 
   } // namespace dg

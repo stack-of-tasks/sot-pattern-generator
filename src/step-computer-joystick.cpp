@@ -103,8 +103,8 @@ namespace dynamicgraph {
       double x = step.x+joyin(0), y = step.y+joyin(1);
       double theta = step.theta+joyin(2);
 
-      std::cout << "stopStepComputedJoystick::changeFirstStep: " <<
-	x << " " << y << " " << theta << std::endl;
+      // std::cout << "stopStepComputedJoystick::changeFirstStep: " <<
+      //	x << " " << y << " " << theta << std::endl;
       const double THETA_MAX = 9.;
       if(theta < -THETA_MAX){ theta = -THETA_MAX; }
       if(theta > THETA_MAX){ theta = THETA_MAX; }

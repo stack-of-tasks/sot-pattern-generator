@@ -25,6 +25,7 @@
 #include <sot-pattern-generator/step-time-line.h>
 #include <dynamic-graph/factory.h>
 #include <dynamic-graph/pool.h>
+#include <dynamic-graph/all-commands.h>
 
 namespace dynamicgraph {
   namespace sot {
@@ -54,6 +55,28 @@ namespace dynamicgraph {
       signalRegistration( triggerSOUT );
 
       sotDEBUGOUT(5);
+
+      using namespace command;
+      addCommand("setComputer",
+		 makeCommandVoid1(*this,&StepTimeLine::setComputer,
+				  docCommandVoid1("Set stepComp entity "
+                                                  "to be used.",
+						  "string (stepComp entity name)")));
+      addCommand("setPGManager",
+		 makeCommandVoid1(*this,&StepTimeLine::setPGManager,
+				  docCommandVoid1("Set PGManager entity "
+                                                  "to be used.",
+						  "string (PGManager entity name)")));
+      addCommand("setQueue",
+		 makeCommandVoid1(*this,&StepTimeLine::setQueue,
+				  docCommandVoid1("Set stepQueue entity "
+                                                  "to be used.",
+						  "string (stepQueue entity name)")));
+      addCommand("setState",
+		 makeCommandVoid1(*this,&StepTimeLine::setState,
+				  docCommandVoid1("Set time line state (start|stop)",
+						  "string (start|stop)")));
+
     }
 
 
@@ -121,6 +144,28 @@ namespace dynamicgraph {
 	}
     }
 
+    void StepTimeLine::setComputer(const std::string& name)
+    {
+      Entity* entity = &g_pool.getEntity( name );
+      stepComputer = dynamic_cast<StepComputer*>(entity);
+    }
+    void StepTimeLine::setQueue(const std::string& name)
+    {
+      Entity* entity = &g_pool.getEntity( name );
+      stepQueue = dynamic_cast<StepQueue*>(entity);
+    }
+
+    void StepTimeLine::setPGManager(const std::string& name)
+    {
+      Entity* entity = &g_pool.getEntity( name );
+      pgManager = dynamic_cast<PGManager*>(entity);
+    }
+
+    void StepTimeLine::setState(const std::string& statearg)
+    {
+      if( statearg == "start" ){ state = STATE_STARTING; }
+      else if( statearg == "stop" ){ state = STATE_STOPPING; }
+    }
 
     void StepTimeLine::commandLine( const std::string& cmdLine,
 				    std::istringstream& cmdArgs,
@@ -136,32 +181,28 @@ namespace dynamicgraph {
 	  std::string name = "stepcomp";
 	  cmdArgs >> std::ws;
 	  if( cmdArgs.good()){ cmdArgs >> name; }
-	  Entity* entity = &g_pool.getEntity( name );
-	  stepComputer = dynamic_cast<StepComputer*>(entity);
+          setComputer(name);
 	}
       else if( cmdLine == "setQueue" )
 	{
 	  std::string name = "stepqueue";
 	  cmdArgs >> std::ws;
 	  if( cmdArgs.good()){ cmdArgs >> name; }
-	  Entity* entity = &g_pool.getEntity( name );
-	  stepQueue = dynamic_cast<StepQueue*>(entity);
+          setQueue(name);
 	}
       else if( cmdLine == "setPGManager" )
 	{
 	  std::string name = "steppg";
 	  cmdArgs >> std::ws;
 	  if( cmdArgs.good()){ cmdArgs >> name; }
-	  Entity* entity = &g_pool.getEntity( name );
-	  pgManager = dynamic_cast<PGManager*>(entity);
+          setPGManager(name);
 	}
       else if( cmdLine == "state" )
 	{
 	  cmdArgs >> std::ws;
 	  if( cmdArgs.good() ) {
 	    std::string statearg; cmdArgs >> statearg;
-	    if( statearg == "start" ){ state = STATE_STARTING; }
-	    else if( statearg == "stop" ){ state = STATE_STOPPING; }
+            setState(statearg);
 	  }
 	  else  {
 	    os << "state = ";

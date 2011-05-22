@@ -88,6 +88,8 @@ namespace dynamicgraph {
 				std::istringstream& cmdArgs,
 				std::ostream& os );
 
+      void initPg( const std::string& pg_name );
+      void saveSteps();
     private:
 
       std::vector<FootPrint> stepbuf;

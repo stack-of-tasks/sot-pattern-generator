@@ -121,7 +121,6 @@ pg.motorcontrol.value = robotDim*(0,)
 pg.zmppreviouscontroller.value = (0,0,0)
 
 pg.initState()
-time.sleep(.5)
 # --- PG INIT FRAMES ---
 geom = Dynamic("geom")
 geom.setFiles(modelDir, modelName[robotName],specificitiesPath,jointRankPath)
@@ -216,8 +215,10 @@ robot.tasks['left-ankle'].controlGain.value = 180
 if not OPENHRP:
     plug(solver.sot.control, robot.device.control)
 
-pg.parseCmd(':stepseq 0.0 -0.095 0.0 0.2 0.19 0.0 0.2 -0.19 0.0 0.2 0.19 0.0 0.2 -0.19 0.0 0.0 0.19 0.0')
 
+pg.parseCmd(':stepseq 0.0 -0.095 0.0 0.2 0.19 0.0 0.2 -0.19 0.0 0.2 0.19 0.0 0.2 -0.19 0.0 0.0 0.19 0.0')
+#pg.addStep(0,0.19,0)
+#pg.addStep(0,-0.19,0)
 
 # You can now modifiy the speed of the robot using set pg.velocitydes [3]( x, y, yaw)
 #pg.velocitydes.value =(0.1,0.0,0.0)
@@ -230,5 +231,8 @@ tr.open('/tmp/','','.dat')
 tr.start()
 robot.device.after.addSignal('tr.triger')
 robot.device.before.addSignal(robot.device.name + ".zmp")
-
 tr.add(robot.device.name + ".zmp",'zmpref')
+
+if __name__ == '__main__':
+    while True:
+        inc()

@@ -127,6 +127,11 @@ namespace dynamicgraph {
 				std::istringstream& cmdArgs,
 				std::ostream& os );
 
+      void setComputer( const std::string& name );
+      void setPGManager( const std::string& name );
+      void setQueue( const std::string& name );
+      void setState( const std::string& statearg );
+
     private:
 
       StepQueue* stepQueue;

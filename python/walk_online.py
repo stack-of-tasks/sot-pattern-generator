@@ -129,6 +129,9 @@ pg.parseCmd(":TimeDistributeParameters 2.0 3.5 1.0 3.0")
 pg.parseCmd(":UpperBodyMotionParameters 0.0 -0.5 0.0")
 pg.parseCmd(":comheight 0.814")
 pg.parseCmd(":SetAlgoForZmpTrajectory Morisawa")
+# ONLINEWALKING SPECIFIC SETUP
+pg.parseCmd(":onlinechangsstepframe relative")
+pg.parseCmd(":SetAutoFirstStep false")
 
 plug(robot.dynamic.position,pg.position)
 plug(robot.dynamic.com,pg.com)
@@ -136,7 +139,6 @@ plug(robot.dynamic.signal('left-ankle'), pg.leftfootcurrentpos)
 plug(robot.dynamic.signal('right-ankle'), pg.rightfootcurrentpos)
 pg.motorcontrol.value = robotDim*(0,)
 pg.zmppreviouscontroller.value = (0,0,0)
-
 pg.initState()
 
 # --- PG INIT FRAMES ---
@@ -177,8 +179,39 @@ plug(pg.zmpref,wa_zmp.sin2)
 pg.parseCmd(':SetZMPFrame world')
 plug(pg.zmpref, robot.device.zmp)
 
+############################################
+# JOYSTICK
+from dynamic_graph.sot.pattern_generator.pg_manager import PGManager, StepQueue
+from dynamic_graph.sot.pattern_generator.step_time_line import TimeLine
+from dynamic_graph.sot.pattern_generator.step_computer_joystick import StepComputerJoystick
 
 
+stepqueue = StepQueue('stepqueue')
+stepcomp = StepComputerJoystick('stepcomp')
+steppg =  PGManager('steppg')
+stepper = TimeLine('stepper')
+
+stepper.setComputer('stepcomp')
+stepper.setPGManager('steppg')
+stepper.setQueue('stepqueue')
+
+plug (pg.SupportFoot,stepcomp.contactfoot)
+steppg.initPg('pg')
+stepcomp.joystickin.value = (0,0,0)
+
+robot.device.before.addSignal('stepper.trigger')
+robot.device.before.addSignal('stepcomp.laststep')
+
+# #time.sleep(0.5)
+stepper.setState('start')
+# time.sleep(0.5)
+
+# pg.parseCmd(":StartOnLineStepSequencing 0.0 -0.095 0.0 0.0 0.19 0.0 0.0 -0.19 0.0 0.0 0.19 0.0")
+#pg.addStep(0,0.19,0)
+#pg.addStep(0,-0.19,0)
+
+# You can now modifiy the speed of the robot using set pg.velocitydes [3]( x, y, yaw)
+#pg.velocitydes.value =(0.1,0.0,0.0)
 
 # ---- TASKS -------------------------------------------------------------------
 
@@ -218,47 +251,6 @@ taskComPD.setBeta(-1)
 plug(pg.rightfootref,robot.features['right-ankle'].reference)
 plug(pg.leftfootref,robot.features['left-ankle'].reference)
 
-# ONLINEWALKING SPECIFIC SETUP
-
-pg.parseCmd(":onlinechangsstepframe relative")
-pg.parseCmd(":SetAutoFirstStep false")
-
-# JOYSTICK
-from dynamic_graph.sot.pattern_generator.pg_manager import PGManager, StepQueue
-from dynamic_graph.sot.pattern_generator.step_time_line import TimeLine
-from dynamic_graph.sot.pattern_generator.step_computer_joystick import StepComputerJoystick
-
-
-stepqueue = StepQueue('stepqueue')
-stepcomp = StepComputerJoystick('stepcomp')
-steppg =  PGManager('steppg')
-stepper = TimeLine('stepper')
-
-stepper.setComputer('stepcomp')
-stepper.setPGManager('steppg')
-stepper.setQueue('stepqueue')
-
-plug (pg.SupportFoot,stepcomp.contactfoot)
-steppg.initPg('pg')
-stepcomp.joystickin.value = (0,0,0)
-
-robot.device.before.addSignal('stepper.trigger')
-robot.device.before.addSignal('stepcomp.laststep')
-
-# #time.sleep(0.5)
-stepper.setState('start')
-# time.sleep(0.5)
-
-# pg.parseCmd(":StartOnLineStepSequencing 0.0 -0.095 0.0 0.0 0.19 0.0 0.0 -0.19 0.0 0.0 0.19 0.0")
-#pg.addStep(0,0.19,0)
-#pg.addStep(0,-0.19,0)
-
-# You can now modifiy the speed of the robot using set pg.velocitydes [3]( x, y, yaw)
-#pg.velocitydes.value =(0.1,0.0,0.0)
-
-
-
-
 # ---- SOT ---------------------------------------------------------------------
 #sot.control.unplug()
 #sot = solver.sot
@@ -289,3 +281,8 @@ tr.add("pg.zmpref",'pg.zmpref')
 tr.add("pg.leftfootref",'pg.leftfootref')
 tr.add("pg.rightfootref",'pg.rightfootref')
 tr.add("pg.comref",'pg.comref')
+
+
+if __name__ == '__main__':
+    while True:
+        inc()

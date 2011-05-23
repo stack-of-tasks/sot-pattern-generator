@@ -121,41 +121,14 @@ pg.motorcontrol.value = robotDim*(0,)
 pg.zmppreviouscontroller.value = (0,0,0)
 
 pg.initState()
-# --- PG INIT FRAMES ---
-geom = Dynamic("geom")
-geom.setFiles(modelDir, modelName[robotName],specificitiesPath,jointRankPath)
-geom.parse()
-geom.createOpPoint('rf','right-ankle')
-geom.createOpPoint('lf','left-ankle')
-plug(robot.dynamic.position,geom.position)
-geom.ffposition.value = 6*(0,)
-geom.velocity.value = robotDim*(0,)
-geom.acceleration.value = robotDim*(0,)
 
-# --- Selector of Com Ref: when pg is stopped, pg.inprocess becomes 0
+
 comRef = Selector('comRef'
-                    ,['vector','ref',robot.dynamic.com,pg.comref])
+                    ,['vector','ref', robot.dynamic.com, pg.comref])
+
 plug(pg.inprocess,comRef.selec)
 
-selecSupportFoot = Selector('selecSupportFoot'
-                              ,['matrixHomo','pg_H_sf',pg.rightfootref,pg.leftfootref]
-                              ,['matrixHomo','wa_H_sf',geom.rf,geom.lf]
-                              )
-plug(pg.SupportFoot,selecSupportFoot.selec)
-sf_H_wa = Inverse_of_matrixHomo('sf_H_wa')
-plug(selecSupportFoot.wa_H_sf,sf_H_wa.sin)
-pg_H_wa = Multiply_of_matrixHomo('pg_H_wa')
-plug(selecSupportFoot.pg_H_sf,pg_H_wa.sin1)
-plug(sf_H_wa.sout,pg_H_wa.sin2)
 
-# --- Compute the ZMP ref in the Waist reference frame.
-wa_H_pg = Inverse_of_matrixHomo('wa_H_pg')
-plug(pg_H_wa.sout,wa_H_pg.sin)
-wa_zmp = Multiply_matrixHomo_vector('wa_zmp')
-plug(wa_H_pg.sout,wa_zmp.sin1)
-plug(pg.zmpref,wa_zmp.sin2)
-
-# Connect the ZMPref to OpenHRP in the world reference frame.
 pg.parseCmd(':SetZMPFrame world')
 plug(pg.zmpref, robot.device.zmp)
 
@@ -233,6 +206,3 @@ robot.device.after.addSignal('tr.triger')
 robot.device.before.addSignal(robot.device.name + ".zmp")
 tr.add(robot.device.name + ".zmp",'zmpref')
 
-if __name__ == '__main__':
-    while True:
-        inc()

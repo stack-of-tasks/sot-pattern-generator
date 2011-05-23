@@ -203,11 +203,7 @@ PatternGenerator( const std::string & name )
 
   m_SupportFoot = 1; // Means that we do not know which support foot it is.
   m_ReferenceFrame = WORLD_FRAME;
-  
-  /* TODO: To be removed and extract from 
-     Humanoid specificities.
-  */
-  m_AnkleSoilDistance = 0.105; 
+  m_AnkleSoilDistance = 0.0; // This value is initialized later.
   sotDEBUGIN(5);
 
   firstSINTERN.setDependencyType(dg::TimeDependency<int>::BOOL_DEPENDENT);
@@ -436,6 +432,11 @@ bool PatternGenerator::buildModel( void )
   // Parsing the file.
   string RobotFileName = m_vrmlDirectory + m_vrmlMainFile;
   dynamicsJRLJapan::parseOpenHRPVRMLFile(*aHDR,RobotFileName,m_xmlRankFile,m_xmlSpecificitiesFile);
+
+  // Initialize m_AnkleSoilDistance
+  vector3d ankle;
+  aHDR->leftFoot()->getAnklePositionInLocalFrame(ankle);
+  m_AnkleSoilDistance = ankle[2];
 
   try
     {

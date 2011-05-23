@@ -777,6 +777,8 @@ OneStepOfControl(int &dummy, int time)
   int lSupportFoot; // Local support foot.
   // Default value
   m_JointErrorValuesForWalking.fill(0.0);
+ const int robotSize = m_JointErrorValuesForWalking.size()+6;
+
   try
     {
       for(unsigned int i=0;i<3;i++)
@@ -824,11 +826,10 @@ OneStepOfControl(int &dummy, int time)
       pg::COMState lCOMRefState;
   
       sotDEBUG(45) << "mc = " << CurrentState << std::endl;
-
-      // TODO: hummmm, nice hard-coding '46' ... :)
-      MAL_VECTOR_DIM(CurrentConfiguration,double,46);
-      MAL_VECTOR_DIM(CurrentVelocity,double,46);
-      MAL_VECTOR_DIM(CurrentAcceleration,double,46);
+      
+      MAL_VECTOR_DIM(CurrentConfiguration,double,robotSize);
+      MAL_VECTOR_DIM(CurrentVelocity,double,robotSize);
+      MAL_VECTOR_DIM(CurrentAcceleration,double,robotSize);
       /*! \brief Position of the reference ZMP. */
       MAL_VECTOR_DIM(ZMPTarget,double,3);
       MAL_VECTOR_FILL(ZMPTarget,0);

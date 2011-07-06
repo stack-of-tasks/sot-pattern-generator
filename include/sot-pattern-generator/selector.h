@@ -65,9 +65,7 @@ namespace dynamicgraph {
     class Selector_EXPORT Selector
       :public Entity
     {
-    public:
-      static const std::string CLASS_NAME;
-      virtual const std::string& getClassName( void ) const { return CLASS_NAME; }
+      DYNAMIC_GRAPH_ENTITY_DECL ();
 
     protected:
       /** Number of signal type. For each signal type, you have

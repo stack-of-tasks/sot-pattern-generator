@@ -165,7 +165,6 @@ PatternGenerator( const std::string & name )
 
   m_LocalTime = 0;
   m_TimeStep = 0.005;
-  m_DoubleSupportPhaseState = false;
 
   m_ZMPRefPos.resize(4);
   m_ZMPRefPos.fill(0.0);
@@ -967,12 +966,10 @@ OneStepOfControl(int &dummy, int time)
 	  if (lLeftFootPosition.stepType==-1)
 	    {
 	      lSupportFoot=1;
-	      m_DoubleSupportPhaseState = 0;
 	    }
 	  else if (lRightFootPosition.stepType==-1)
 	    {
 	      lSupportFoot=0;
-	      m_DoubleSupportPhaseState = 0;
 	    }
 	  else /* m_LeftFootPosition.z ==m_RightFootPosition.z 
 		  We keep the previous support foot half the time of the double phase..

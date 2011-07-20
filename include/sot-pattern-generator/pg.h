@@ -155,7 +155,6 @@ class PatternGenerator_EXPORT PatternGenerator
   double m_TimeStep;
 
   /*! \brief Double support phase detected. */
-  bool m_DoubleSupportPhaseState;
   int m_DSStartingTime;
 
   /*! \brief iteration time. */

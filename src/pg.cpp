@@ -175,26 +175,19 @@ PatternGenerator( const std::string & name )
   m_ZMPPrevious(3) = 1.0;
   m_dCOMRefPos.resize(3);
   m_dCOMRefPos.fill(0.0);
+  m_ddCOMRefPos.resize(3);
+  m_ddCOMRefPos.fill(0);
   m_InitZMPRefPos.resize(3);
   m_InitZMPRefPos.fill(0);
   m_InitCOMRefPos.resize(3);
   m_InitCOMRefPos.fill(0);
   m_InitWaistRefPos.resize(3);
   m_InitWaistRefPos.fill(0);
-  m_InitWaistRefAtt.resize(3);
-  m_InitWaistRefAtt.fill(0);
-  m_dComAttitude.resize(3);
-  m_dComAttitude.fill(0);
+
   m_VelocityReference.resize(3);
   m_VelocityReference.fill(0.0);
-  m_WaistAttitude.resize(3);
-  m_WaistAttitude.fill(0);
-  m_ComAttitude.resize(3);
-  m_ComAttitude.fill(0);
   m_WaistPosition.resize(3);
   m_WaistPosition.fill(0);
-  m_WaistAttitudeAbsolute.resize(3);
-  m_WaistAttitudeAbsolute.fill(0);
   m_WaistPositionAbsolute.resize(3);
   m_WaistPositionAbsolute.fill(0);
 

@@ -41,6 +41,26 @@ using namespace dynamicgraph;
 DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(PatternGenerator,"PatternGenerator");
 
 // some usefull macros
+#define ACCESSOR_BUILDER_WITH_ONESTEP_OF_CONTROL(functionName, typeName, attribute, debugLevel) 			\
+typeName & PatternGenerator::functionName(typeName & res, int time)		\
+{							\
+  sotDEBUGIN(debugLevel);	\
+  OneStepOfControlS(time);	\
+  res = attribute;			\
+  sotDEBUGOUT(debugLevel);	\
+  return res;				\
+}
+
+
+#define ACCESSOR_BUILDER_WITHOUT_ONESTEP_OF_CONTROL(functionName, typeName, attribute, debugLevel) 			\
+typeName & PatternGenerator::functionName(typeName & res, int /*time*/)		\
+{							\
+  sotDEBUGIN(debugLevel);	\
+  res = attribute;			\
+  sotDEBUGOUT(debugLevel);	\
+  return res;				\
+}
+
 #define PG_BIND(functionName, signalName) 					\
   boost::bind(&PatternGenerator::functionName,this,_1,_2),	\
 	OneStepOfControlS,										\
@@ -471,173 +491,22 @@ ml::Vector & PatternGenerator::
 getZMPRef(ml::Vector & ZMPRefval, int time)
 {
   sotDEBUGIN(5);
- 
+
   OneStepOfControlS(time);
 
   ZMPRefval.resize(3);
   ZMPRefval(0) = m_ZMPRefPos(0);
   ZMPRefval(1) = m_ZMPRefPos(1);
   ZMPRefval(2) = m_ZMPRefPos(2);
-  sotDEBUG(5) << "ZMPRefPos transmitted" << m_ZMPRefPos 
+  sotDEBUG(5) << "ZMPRefPos transmitted" << m_ZMPRefPos
 	      << " " << ZMPRefval << endl;
 
   sotDEBUGOUT(5);
   return ZMPRefval;
 }
 
-ml::Vector & PatternGenerator::
-getCoMRef(ml::Vector & CoMRefval, int time)
-{
-  sotDEBUGIN(25);
-  
-  OneStepOfControlS(time);
-  CoMRefval = m_COMRefPos;
-
-  sotDEBUGOUT(25);
-  return CoMRefval;
-}
-
-ml::Vector & PatternGenerator::
-getdCoMRef(ml::Vector & CoMRefval, int time)
-{
-  sotDEBUGIN(25);
-  
-  OneStepOfControlS(time);
-  CoMRefval = m_dCOMRefPos;
-
-  sotDEBUGOUT(25);
-  return CoMRefval;
-}
-
-ml::Vector & PatternGenerator::
-getInitZMPRef(ml::Vector & InitZMPRefval, int time)
-{
-  sotDEBUGIN(25);
- 
-  sotDEBUG(25) << "InitZMPRefPos transmitted" << m_InitZMPRefPos 
-	       << " " << InitZMPRefval << std::endl;
-  InitZMPRefval.resize(3);
-  InitZMPRefval(0) = m_InitZMPRefPos(0);
-  InitZMPRefval(1) = m_InitZMPRefPos(1);
-  InitZMPRefval(2) = m_InitZMPRefPos(2);
-
-  sotDEBUGOUT(25);
-  return InitZMPRefval;
-}
-
-ml::Vector & PatternGenerator::
-getInitCoMRef(ml::Vector & InitCoMRefval, int time)
-{
-  sotDEBUGIN(25);
-  
-  InitCoMRefval.resize(3);
-  InitCoMRefval(0) = m_InitCOMRefPos(0);
-  InitCoMRefval(1) = m_InitCOMRefPos(1);
-  InitCoMRefval(2) = m_InitCOMRefPos(2);
-  
-
-  sotDEBUGOUT(25);
-  return InitCoMRefval;
-}
-
-ml::Vector & PatternGenerator::
-getInitWaistPosRef(ml::Vector & InitWaistRefval, int time)
-{
-  sotDEBUGIN(25);
-  
-  InitWaistRefval = m_InitWaistRefPos;
-
-  sotDEBUGOUT(25);
-  return InitWaistRefval;
-}
-VectorRollPitchYaw & PatternGenerator::
-getInitWaistAttRef(VectorRollPitchYaw & InitWaistRefval, int time)
-{
-  sotDEBUGIN(25);
-  
-  for(unsigned int i=0;i<3;++i)
-    InitWaistRefval(i) = m_InitWaistRefAtt(i);
-
-  sotDEBUGOUT(25);
-  return InitWaistRefval;
-}
-
-
-
-MatrixHomogeneous & PatternGenerator::
-getLeftFootRef(MatrixHomogeneous & LeftFootRefVal, int time)
-{
-  sotDEBUGIN(25);
-
-  OneStepOfControlS(time);
-  LeftFootRefVal = m_LeftFootPosition;
-  sotDEBUGOUT(25) ;
-  return LeftFootRefVal;
-}
-MatrixHomogeneous & PatternGenerator::
-getRightFootRef(MatrixHomogeneous & RightFootRefval, int time)
-{
-  sotDEBUGIN(25);
-
-  OneStepOfControlS(time);
-
-  RightFootRefval = m_RightFootPosition;
-  sotDEBUGOUT(25);
-  return RightFootRefval;
-}
-MatrixHomogeneous & PatternGenerator::
-getdotLeftFootRef(MatrixHomogeneous & LeftFootRefVal, int time)
-{
-  sotDEBUGIN(25);
-
-  OneStepOfControlS(time);
-  LeftFootRefVal = m_dotLeftFootPosition;
-  sotDEBUGOUT(25) ;
-  return LeftFootRefVal;
-}
-MatrixHomogeneous & PatternGenerator::
-getdotRightFootRef(MatrixHomogeneous & RightFootRefval, int time)
-{
-  sotDEBUGIN(25);
-
-  OneStepOfControlS(time);
-
-  RightFootRefval = m_dotRightFootPosition;
-  sotDEBUGOUT(25);
-  return RightFootRefval;
-}
-
-MatrixHomogeneous & PatternGenerator::
-getInitLeftFootRef(MatrixHomogeneous & LeftFootRefVal, int time)
-{
-  sotDEBUGIN(25);
-
-  LeftFootRefVal = m_InitLeftFootPosition;
-  sotDEBUGOUT(25) ;
-  return LeftFootRefVal;
-}
-MatrixHomogeneous & PatternGenerator::
-getInitRightFootRef(MatrixHomogeneous & RightFootRefval, int time)
-{
-  sotDEBUGIN(25);
-
-  RightFootRefval = m_InitRightFootPosition;
-  sotDEBUGOUT(25);
-  return RightFootRefval;
-}
-
-MatrixHomogeneous & PatternGenerator::
-getFlyingFootRef(MatrixHomogeneous & FlyingFootRefval, int time)
-{
-  sotDEBUGIN(25);
-  OneStepOfControlS(time);
-  FlyingFootRefval = m_FlyingFootPosition;
-  sotDEBUGOUT(25);
-  return FlyingFootRefval;
-}
-
 int &PatternGenerator::
-InitOneStepOfControl(int &dummy, int time)
+InitOneStepOfControl(int &dummy, int /*time*/)
 {
   sotDEBUGIN(15);
   // TODO: modified first to avoid the loop.
@@ -1258,100 +1127,42 @@ commandLine( const std::string& cmdLine,
 
 }
 
-ml::Vector & PatternGenerator::getjointWalkingErrorPosition(ml::Vector &res,int time)
-{
-  sotDEBUGIN(5);
 
-  OneStepOfControlS(time);
+ACCESSOR_BUILDER_WITHOUT_ONESTEP_OF_CONTROL (getInitZMPRef,      ml::Vector, m_InitZMPRefPos, 25)
+ACCESSOR_BUILDER_WITHOUT_ONESTEP_OF_CONTROL (getInitCoMRef,      ml::Vector, m_InitCOMRefPos, 25)
+ACCESSOR_BUILDER_WITHOUT_ONESTEP_OF_CONTROL (getInitWaistPosRef, ml::Vector, m_InitWaistRefPos, 25)
+ACCESSOR_BUILDER_WITHOUT_ONESTEP_OF_CONTROL (getInitWaistAttRef, VectorRollPitchYaw, m_InitWaistRefAtt, 25)
+ACCESSOR_BUILDER_WITHOUT_ONESTEP_OF_CONTROL (getInitLeftFootRef,  MatrixHomogeneous, m_InitLeftFootPosition, 25)
+ACCESSOR_BUILDER_WITHOUT_ONESTEP_OF_CONTROL (getInitRightFootRef, MatrixHomogeneous, m_InitRightFootPosition, 25)
 
-  res=m_JointErrorValuesForWalking;
-
-  sotDEBUGOUT(5);
-  
-  return res;
-}
-
-unsigned int & PatternGenerator::
-getSupportFoot(unsigned int &res, int time)
-{
-  res = m_SupportFoot;
-  return res;
-}
-
-VectorRollPitchYaw & PatternGenerator::
-getWaistAttitude( VectorRollPitchYaw&res, int time)
-{
-  sotDEBUGIN(5);
-  OneStepOfControlS(time);
-  for( unsigned int i=0;i<3;++i ) { res(i) = m_WaistAttitude(i); }
-  sotDEBUG(5) << "WaistAttitude: " << m_WaistAttitude << endl;
-  sotDEBUGOUT(5);
-  return res;
-}
-
-VectorRollPitchYaw & PatternGenerator::
-getdComAttitude( VectorRollPitchYaw&res, int time)
-{
-  sotDEBUGIN(5);
-  OneStepOfControlS(time);
-  for( unsigned int i=0;i<3;++i ) { res(i) = m_dComAttitude(i); }
-  sotDEBUG(5) << "ComAttitude: " << m_dComAttitude << endl;
-  sotDEBUGOUT(5);
-  return res;
-}
+ACCESSOR_BUILDER_WITHOUT_ONESTEP_OF_CONTROL (getSupportFoot, unsigned int, m_SupportFoot, 100)
 
 
-VectorRollPitchYaw & PatternGenerator::
-getComAttitude( VectorRollPitchYaw&res, int time)
-{
-  sotDEBUGIN(5);
-  OneStepOfControlS(time);
-  for( unsigned int i=0;i<3;++i ) { res(i) = m_ComAttitude(i); }
-  sotDEBUG(5) << "ComAttitude: " << m_ComAttitude << endl;
-  sotDEBUGOUT(5);
-  return res;
-}
+ACCESSOR_BUILDER_WITH_ONESTEP_OF_CONTROL (getCoMRef,   ml::Vector, m_COMRefPos, 25)
+ACCESSOR_BUILDER_WITH_ONESTEP_OF_CONTROL (getdCoMRef,  ml::Vector, m_dCOMRefPos, 25)
+ACCESSOR_BUILDER_WITH_ONESTEP_OF_CONTROL (getddCoMRef, ml::Vector, m_ddCOMRefPos, 25)
 
-VectorRollPitchYaw & PatternGenerator::getWaistAttitudeAbsolute(VectorRollPitchYaw &res, int time)
-{
-  sotDEBUGIN(5);
-  OneStepOfControlS(time);
-  sotDEBUG(15) << "I survived one step of control" << std::endl;
-  for( unsigned int i=0;i<3;++i ) { res(i) = m_WaistAttitudeAbsolute(i); }
-  sotDEBUG(5) << "WaistAttitude: " << m_WaistAttitudeAbsolute << endl;
-  sotDEBUGOUT(5);
-  return res;
-}
+ACCESSOR_BUILDER_WITH_ONESTEP_OF_CONTROL (getLeftFootRef,     MatrixHomogeneous, m_LeftFootPosition, 25)
+ACCESSOR_BUILDER_WITH_ONESTEP_OF_CONTROL (getdotLeftFootRef,  MatrixHomogeneous, m_dotLeftFootPosition, 25)
+ACCESSOR_BUILDER_WITH_ONESTEP_OF_CONTROL (getddotLeftFootRef, MatrixHomogeneous, m_ddotLeftFootPosition, 25)
 
-ml::Vector & PatternGenerator::
-getWaistPosition(ml::Vector &res, int time)
-{
-  sotDEBUGIN(5);
-  OneStepOfControlS(time);
-  res = m_WaistPosition;
-  sotDEBUG(5) << "WaistPosition: " << m_WaistPosition << endl;
-  sotDEBUGOUT(5);
-  return res;
-}
-ml::Vector & PatternGenerator::
-getWaistPositionAbsolute(ml::Vector &res, int time)
-{
-  sotDEBUGIN(5);
-  OneStepOfControlS(time);
-  res = m_WaistPositionAbsolute; 
-  /* ARGH ! ->  res(2) =0*/ 
-  sotDEBUG(5) << "WaistPosition: " << m_WaistPositionAbsolute << endl;
-  sotDEBUGOUT(5);
-  return res;
-}
+ACCESSOR_BUILDER_WITH_ONESTEP_OF_CONTROL (getRightFootRef,     MatrixHomogeneous, m_RightFootPosition, 25)
+ACCESSOR_BUILDER_WITH_ONESTEP_OF_CONTROL (getdotRightFootRef,  MatrixHomogeneous, m_dotRightFootPosition, 25)
+ACCESSOR_BUILDER_WITH_ONESTEP_OF_CONTROL (getddotRightFootRef, MatrixHomogeneous, m_ddotRightFootPosition, 25)
 
-unsigned & PatternGenerator::
-getDataInProcess(unsigned &res, int time)
-{
-  sotDEBUGIN(5);
-  OneStepOfControlS(time);
-  res = m_dataInProcess;
-  sotDEBUG(5) << "DataInProcess: " << m_dataInProcess << endl;
-  sotDEBUGOUT(5);
-  return res;
-}
+ACCESSOR_BUILDER_WITH_ONESTEP_OF_CONTROL (getFlyingFootRef, MatrixHomogeneous, m_FlyingFootPosition, 25)
+
+ACCESSOR_BUILDER_WITH_ONESTEP_OF_CONTROL (getjointWalkingErrorPosition, ml::Vector, m_JointErrorValuesForWalking, 5)
+
+
+ACCESSOR_BUILDER_WITH_ONESTEP_OF_CONTROL (getComAttitude,   VectorRollPitchYaw, m_ComAttitude, 5)
+ACCESSOR_BUILDER_WITH_ONESTEP_OF_CONTROL (getdComAttitude,  VectorRollPitchYaw, m_dComAttitude, 5)
+ACCESSOR_BUILDER_WITH_ONESTEP_OF_CONTROL (getddComAttitude, VectorRollPitchYaw, m_ddComAttitude, 5)
+
+ACCESSOR_BUILDER_WITH_ONESTEP_OF_CONTROL (getWaistAttitude,         VectorRollPitchYaw, m_WaistAttitude, 5)
+ACCESSOR_BUILDER_WITH_ONESTEP_OF_CONTROL (getWaistAttitudeAbsolute, VectorRollPitchYaw, m_WaistAttitudeAbsolute, 5)
+
+ACCESSOR_BUILDER_WITH_ONESTEP_OF_CONTROL (getWaistPosition, ml::Vector, m_WaistPosition, 5)
+ACCESSOR_BUILDER_WITH_ONESTEP_OF_CONTROL (getWaistPositionAbsolute, ml::Vector, m_WaistPositionAbsolute, 5)
+ACCESSOR_BUILDER_WITH_ONESTEP_OF_CONTROL (getDataInProcess, unsigned, m_dataInProcess, 5)
+

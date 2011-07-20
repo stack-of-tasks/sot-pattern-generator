@@ -66,6 +66,13 @@ typeName & PatternGenerator::functionName(typeName & res, int /*time*/)		\
 	OneStepOfControlS,										\
 	"sotPatternGenerator("+name+")::" + signalName
 
+// some methods
+namespace detail
+{
+  MatrixRotation skewMatrix(double x, double y, double z);
+  MatrixRotation doubleSkewMatrix (double x, double y, double z);
+}
+
 // start the definition
 PatternGenerator::
 PatternGenerator( const std::string & name ) 
@@ -327,19 +334,25 @@ bool PatternGenerator::InitState(void)
 	m_WaistAttitudeAbsolute(2) = lWaistPosition(5);
       
       
-      FromAbsoluteFootPosToDotHomogeneous(InitRightFootAbsPos,
+      FromAbsoluteFootPosToDDotHomogeneous(InitRightFootAbsPos,
 					  m_InitRightFootPosition,
-					  m_dotRightFootPosition);
-      FromAbsoluteFootPosToDotHomogeneous(InitLeftFootAbsPos,
+					  m_dotRightFootPosition,
+					  m_ddotRightFootPosition
+					  );
+      FromAbsoluteFootPosToDDotHomogeneous(InitLeftFootAbsPos,
 					  m_InitLeftFootPosition,
-					  m_dotLeftFootPosition);
+					  m_dotLeftFootPosition,
+					  m_ddotLeftFootPosition
+					  );
       ml::Vector newtmp(4),oldtmp(4);
+      //InitCOMRefPos = MSI * InitCOMRefPos
       oldtmp(0) =  m_InitCOMRefPos(0); oldtmp(1) =  m_InitCOMRefPos(1);
       oldtmp(2) =  m_InitCOMRefPos(2); oldtmp(3)=1.0;
       newtmp = m_MotionSinceInstanciationToThisSequence* oldtmp;
       m_InitCOMRefPos(0) = newtmp(0);	m_InitCOMRefPos(1) = newtmp(1);
       m_InitCOMRefPos(2) = newtmp(2);
-      
+
+      //InitZMPRefPos = MSI * InitZMPRefPos
       oldtmp(0) =  m_InitZMPRefPos(0); oldtmp(1) =  m_InitZMPRefPos(1);
       oldtmp(2) =  m_InitZMPRefPos(2);
       newtmp = m_MotionSinceInstanciationToThisSequence* oldtmp;
@@ -549,7 +562,60 @@ void PatternGenerator::getAbsoluteWaistPosAttHomogeneousMatrix(MatrixHomogeneous
   
 }
 
-void PatternGenerator::FromAbsoluteFootPosToDotHomogeneous(pg::FootAbsolutePosition aFootPosition,
+void PatternGenerator::FromAbsoluteFootPosToDDotHomogeneous(
+							      const pg::FootAbsolutePosition & aFootPosition,
+							      MatrixHomogeneous &aFootMH,
+							      MatrixHomogeneous &adotFootMH,
+							      MatrixHomogeneous &addotFootMH
+							      )
+{
+  // the position.
+  FromAbsoluteFootPosToHomogeneous(aFootPosition,aFootMH);
+
+  MatrixRotation  Rot;
+  for(unsigned int i=0;i<3;i++)
+    for(unsigned int j=0;j<3;j++)
+      Rot(i,j) = aFootMH(i,j);
+
+  // the derivative.
+  // dR = wx * R
+  MatrixRotation velocityTwist = detail::skewMatrix( aFootPosition.domega2, aFootPosition.domega, aFootPosition.dtheta);
+  MatrixRotation  dRot;
+  velocityTwist.multiply(Rot,dRot);
+
+  for(unsigned int i=0;i<3;i++)
+    for(unsigned int j=0;j<3;j++)
+      adotFootMH(i,j) = dRot(i,j);
+
+  adotFootMH(0,3) = aFootPosition.dx;
+  adotFootMH(1,3) = aFootPosition.dy;
+  adotFootMH(2,3) = aFootPosition.dz;
+  adotFootMH(3,3) = 1.0;
+
+  // the second derivative.
+  // ddR1 = (dw)x * R
+  MatrixRotation  ddRot1;
+  MatrixRotation accTwist1 = detail::skewMatrix( aFootPosition.ddomega2, aFootPosition.ddomega, aFootPosition.ddtheta);
+  accTwist1.multiply(Rot,ddRot1);
+
+  // ddR2 = wx * wx * R
+  MatrixRotation  ddRot2;
+  MatrixRotation accTwist2 = detail::doubleSkewMatrix( aFootPosition.domega2, aFootPosition.domega, aFootPosition.dtheta);
+  accTwist2.multiply(Rot,ddRot2);
+
+  for(unsigned int i=0;i<3;i++)
+    for(unsigned int j=0;j<3;j++)
+      addotFootMH(i,j) = ddRot1(i,j) + ddRot2(i,j);
+
+  addotFootMH(0,3) = aFootPosition.ddx;
+  addotFootMH(1,3) = aFootPosition.ddy;
+  addotFootMH(2,3) = aFootPosition.ddz;
+  addotFootMH(3,3) = 1.0;
+
+}
+
+void PatternGenerator::FromAbsoluteFootPosToDotHomogeneous(
+							      const pg::FootAbsolutePosition & aFootPosition,
 							      MatrixHomogeneous &aFootMH,
 							      MatrixHomogeneous &adotFootMH)
 {
@@ -560,13 +626,10 @@ void PatternGenerator::FromAbsoluteFootPosToDotHomogeneous(pg::FootAbsolutePosit
   for(unsigned int i=0;i<3;i++)
     for(unsigned int j=0;j<3;j++)
       Rot(i,j) = aFootMH(i,j);
-  
-  Twist(0,0)=0.0; Twist(0,1)= -aFootPosition.dtheta; Twist(0,2) = aFootPosition.domega;
-  Twist(1,0)= aFootPosition.dtheta; Twist(1,1)= 0.0; Twist(1,2) = aFootPosition.domega2;
-  Twist(2,0)= -aFootPosition.domega; Twist(2,1)= -aFootPosition.domega2; Twist(2,2) = 0.0;
 
+  Twist = detail::skewMatrix( aFootPosition.domega2, aFootPosition.domega, aFootPosition.dtheta);
   Twist.multiply(Rot,dRot);
-  
+
   for(unsigned int i=0;i<3;i++)
     for(unsigned int j=0;j<3;j++)
       adotFootMH(i,j) = dRot(i,j);
@@ -574,10 +637,10 @@ void PatternGenerator::FromAbsoluteFootPosToDotHomogeneous(pg::FootAbsolutePosit
   adotFootMH(0,3) = aFootPosition.dx;
   adotFootMH(1,3) = aFootPosition.dy;
   adotFootMH(2,3) = aFootPosition.dz;
-  
 }
 
-void PatternGenerator::FromAbsoluteFootPosToHomogeneous(pg::FootAbsolutePosition aFootPosition,
+void PatternGenerator::FromAbsoluteFootPosToHomogeneous(
+							   const pg::FootAbsolutePosition & aFootPosition,
 							   MatrixHomogeneous &aFootMH)
 {
   double c,s,co,so;
@@ -769,17 +832,22 @@ OneStepOfControl(int &dummy, int time)
 		       << lCOMRefState.z[0] <<  endl;
 
 	  /* Fill in the homogeneous matrix using the world reference frame*/
-	  FromAbsoluteFootPosToDotHomogeneous(lLeftFootPosition,
+	  FromAbsoluteFootPosToDDotHomogeneous(lLeftFootPosition,
 					      m_LeftFootPosition,
-					      m_dotLeftFootPosition);
-	  FromAbsoluteFootPosToDotHomogeneous(lRightFootPosition,
+					      m_dotLeftFootPosition,
+					      m_ddotLeftFootPosition
+					      );
+	  FromAbsoluteFootPosToDDotHomogeneous(lRightFootPosition,
 					      m_RightFootPosition,
-					      m_dotRightFootPosition);
+					      m_dotRightFootPosition,
+					      m_ddotRightFootPosition
+					      );
 	
 	  /* We assume that the left foot is always the origin of the new frame. */
 	  m_LeftFootPosition = m_MotionSinceInstanciationToThisSequence * m_LeftFootPosition;
 	  m_RightFootPosition = m_MotionSinceInstanciationToThisSequence * m_RightFootPosition;
 
+	  // com = Motion * com
 	  ml::Vector newRefPos(4), oldRefPos(4);
 	  oldRefPos(0) = m_COMRefPos(0); oldRefPos(1) = m_COMRefPos(1);
 	  oldRefPos(2) = m_COMRefPos(2); oldRefPos(3) = 1.0;
@@ -788,6 +856,7 @@ OneStepOfControl(int &dummy, int time)
 	  m_COMRefPos(1) = newRefPos(1);
 	  m_COMRefPos(2) = newRefPos(2);
 
+	  // zmp = Motion * zmp
 	  oldRefPos(0) = m_ZMPRefPos(0); oldRefPos(1) = m_ZMPRefPos(1);
 	  oldRefPos(2) = m_ZMPRefPos(2); oldRefPos(3) = 1.0;
 	  newRefPos = m_MotionSinceInstanciationToThisSequence * oldRefPos;
@@ -1173,3 +1242,30 @@ ACCESSOR_BUILDER_WITH_ONESTEP_OF_CONTROL (getWaistPosition, ml::Vector, m_WaistP
 ACCESSOR_BUILDER_WITH_ONESTEP_OF_CONTROL (getWaistPositionAbsolute, ml::Vector, m_WaistPositionAbsolute, 5)
 ACCESSOR_BUILDER_WITH_ONESTEP_OF_CONTROL (getDataInProcess, unsigned, m_dataInProcess, 5)
 
+namespace detail
+{
+	MatrixRotation skewMatrix(double x, double y, double z)
+	{
+	  MatrixRotation Twist;
+	  Twist(0,0)= 0.; Twist(0,1)= -z; Twist(0,2) = y;
+	  Twist(1,0)=  z; Twist(1,1)= 0.; Twist(1,2) = x;
+	  Twist(2,0)= -y; Twist(2,1)= -x; Twist(2,2) = 0.;
+	  return Twist;
+	}
+
+	MatrixRotation doubleSkewMatrix (double x, double y, double z)
+	{
+	  double xx = x * x;
+	  double yy = y * y;
+	  double zz = z * z;
+	  double xy = - x * y;
+	  double xz = - x * z;
+	  double yz = - y * z;
+
+	  MatrixRotation Twist;
+	  Twist(0,0) = yy + zz;	Twist(0,1) = xy;	  Twist(0,2) = 	xz;
+	  Twist(1,0) = xy;	  	Twist(1,1) = xx + zz; Twist(1,2) = 	yz;
+	  Twist(2,0) = xz;		Twist(2,1) = yz;	  Twist(2,2) = 	xx + yy;
+	  return Twist;
+	}
+}

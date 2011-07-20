@@ -237,17 +237,29 @@ class PatternGenerator_EXPORT PatternGenerator
   /*! \brief Internal method to get the reference dCoM at a given time.*/
   ml::Vector & getdCoMRef(ml::Vector & res, int time);
 
+  /*! \brief Internal method to get the reference ddCoM at a given time.*/
+  ml::Vector & getddCoMRef(ml::Vector & res, int time);
+
+
   /*! \brief Internal method to get the position of the left foot. */
   MatrixHomogeneous & getLeftFootRef(MatrixHomogeneous &res, int time);
-
-  /*! \brief Internal method to get the position of the right foot. */
-  MatrixHomogeneous & getRightFootRef(MatrixHomogeneous &res, int time);
 
   /*! \brief Internal method to get the derivative of the left foot. */
   MatrixHomogeneous & getdotLeftFootRef(MatrixHomogeneous &res, int time);
 
+  /*! \brief Internal method to get the second derivative of the left foot. */
+  MatrixHomogeneous & getddotLeftFootRef(MatrixHomogeneous &res, int time);
+
+
+  /*! \brief Internal method to get the position of the right foot. */
+  MatrixHomogeneous & getRightFootRef(MatrixHomogeneous &res, int time);
+
   /*! \brief Internal method to get the derivative of the right foot. */
   MatrixHomogeneous & getdotRightFootRef(MatrixHomogeneous &res, int time);
+
+  /*! \brief Internal method to get the derivative of the right foot. */
+  MatrixHomogeneous & getddotRightFootRef(MatrixHomogeneous &res, int time);
+
 
   /*! \brief Internal method to get the position of the flying foot. */
   MatrixHomogeneous & getFlyingFootRef(MatrixHomogeneous &res, int time);
@@ -255,11 +267,14 @@ class PatternGenerator_EXPORT PatternGenerator
   /*! \brief Internal method to get the joint position for walking. */
   ml::Vector & getjointWalkingErrorPosition(ml::Vector &res, int time);
 
+  /*! \brief Internal method to get the attitude of the com. */
+  VectorRollPitchYaw & getComAttitude(VectorRollPitchYaw &res, int time);
+
   /*! \brief Internal method to get the derivative of the com attitude. */
   VectorRollPitchYaw & getdComAttitude(VectorRollPitchYaw &res, int time);
 
-  /*! \brief Internal method to get the attitude of the com. */
-  VectorRollPitchYaw & getComAttitude(VectorRollPitchYaw &res, int time);
+  /*! \brief Internal method to get the derivative of the com attitude. */
+  VectorRollPitchYaw & getddComAttitude(VectorRollPitchYaw &res, int time);
 
   /*! \brief Internal method to get the attitude of the waist. */
   VectorRollPitchYaw & getWaistAttitude(VectorRollPitchYaw &res, int time);
@@ -297,8 +312,11 @@ class PatternGenerator_EXPORT PatternGenerator
   /*! \brief Absolute Position for the left and right feet. */
   MatrixHomogeneous m_LeftFootPosition,m_RightFootPosition;
 
-  /*! \brief Absolute Derivate for the left and right feet. */
+  /*! \brief Absolute Derivative for the left and right feet. */
   MatrixHomogeneous m_dotLeftFootPosition,m_dotRightFootPosition;
+
+  /*! \brief Absolute second Derivative for the left and right feet. */
+  MatrixHomogeneous m_ddotLeftFootPosition,m_ddotRightFootPosition;
 
   /*! \brief Initial Absolute Starting Position for the left and right feet. */
   MatrixHomogeneous m_InitLeftFootPosition,m_InitRightFootPosition;
@@ -436,6 +454,9 @@ class PatternGenerator_EXPORT PatternGenerator
   /*! \brief Externalize the CoM reference. */
   dg::SignalTimeDependent<ml::Vector,int> dCoMRefSOUT;
 
+  /*! \brief Externalize the CoM reference. */
+  dg::SignalTimeDependent<ml::Vector,int> ddCoMRefSOUT;
+
   /*! \brief Take the current CoM. */
   dg::SignalPtr<ml::Vector,int> comSIN;
 
@@ -450,15 +471,22 @@ class PatternGenerator_EXPORT PatternGenerator
 
   /*! \brief Externalize the left foot position reference. */
   dg::SignalTimeDependent<MatrixHomogeneous,int> LeftFootRefSOUT;
-  
-  /*! \brief Externalize the right foot position reference. */
-  dg::SignalTimeDependent<MatrixHomogeneous,int> RightFootRefSOUT;
 
   /*! \brief Externalize the left foot position reference. */
   dg::SignalTimeDependent<MatrixHomogeneous,int> dotLeftFootRefSOUT;
+
+  /*! \brief Externalize the left foot position reference. */
+  dg::SignalTimeDependent<MatrixHomogeneous,int> ddotLeftFootRefSOUT;
+
+  /*! \brief Externalize the right foot position reference. */
+  dg::SignalTimeDependent<MatrixHomogeneous,int> RightFootRefSOUT;
   
   /*! \brief Externalize the right foot position reference. */
   dg::SignalTimeDependent<MatrixHomogeneous,int> dotRightFootRefSOUT;
+
+  /*! \brief Externalize the right foot position reference. */
+  dg::SignalTimeDependent<MatrixHomogeneous,int> ddotRightFootRefSOUT;
+
 
   /*! \brief Externalize the foot which is not considered as support foot,
     the information are given in a relative referentiel. */
@@ -475,6 +503,9 @@ class PatternGenerator_EXPORT PatternGenerator
 
   /*! \brief Externalize the dcom attitude. */
   dg::SignalTimeDependent<VectorRollPitchYaw,int> dcomattitudeSOUT;
+
+  /*! \brief Externalize the dcom attitude. */
+  dg::SignalTimeDependent<VectorRollPitchYaw,int> ddcomattitudeSOUT;
 
   /*! \brief Externalize the waist attitude. */
   dg::SignalTimeDependent<VectorRollPitchYaw,int> waistattitudeSOUT;

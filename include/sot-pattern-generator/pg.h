@@ -279,7 +279,7 @@ namespace dynamicgraph {
       /*! @} */
 
       /*! \brief Getting the current support foot: 1 Left -1 Right. */
-      unsigned int & getSupportFoot(unsigned int &res, int time);
+      unsigned int & getSupportFoot(unsigned int &res, int time) const;
 
       /*! \brief Trigger the initialization of the algorithm */
       int & InitOneStepOfControl(int &dummy, int time);
@@ -388,22 +388,22 @@ namespace dynamicgraph {
 
 
       /*! \brief Internal method to get the initial reference ZMP at a given time. */
-      ml::Vector & getInitZMPRef(ml::Vector & res, int time);
+      ml::Vector & getInitZMPRef(ml::Vector & res, int time) const;
 
       /*! \brief Internal method to get the initial reference CoM at a given time.*/
-      ml::Vector & getInitCoMRef(ml::Vector & res, int time);
+      ml::Vector & getInitCoMRef(ml::Vector & res, int time) const;
 
       /*! \brief Internal method to get the initial reference CoM at a given time.*/
-      ml::Vector & getInitWaistPosRef(ml::Vector & res, int time);
+      ml::Vector & getInitWaistPosRef(ml::Vector & res, int time) const;
 
       /*! \brief Internal method to get the initial reference CoM at a given time.*/
-      VectorRollPitchYaw & getInitWaistAttRef(VectorRollPitchYaw & res, int time);
+      VectorRollPitchYaw & getInitWaistAttRef(VectorRollPitchYaw & res, int time) const;
 
       /*! \brief Internal method to get the position of the left foot. */
-      MatrixHomogeneous & getInitLeftFootRef(MatrixHomogeneous &res, int time);
+      MatrixHomogeneous & getInitLeftFootRef(MatrixHomogeneous &res, int time) const;
 
       /*! \brief Internal method to get the position of the right foot. */
-      MatrixHomogeneous & getInitRightFootRef(MatrixHomogeneous &res, int time);
+      MatrixHomogeneous & getInitRightFootRef(MatrixHomogeneous &res, int time) const;
 
 
     public:

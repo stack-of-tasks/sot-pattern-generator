@@ -54,7 +54,7 @@ typeName & PatternGenerator::functionName(typeName & res, int time)		\
 
 
 #define ACCESSOR_BUILDER_WITHOUT_ONESTEP_OF_CONTROL(functionName, typeName, attribute, debugLevel) 			\
-typeName & PatternGenerator::functionName(typeName & res, int /*time*/)		\
+typeName & PatternGenerator::functionName(typeName & res, int /*time*/)	 const	\
 {							\
   sotDEBUGIN(debugLevel);	\
   res = attribute;			\
@@ -106,8 +106,8 @@ typeName & PatternGenerator::functionName(typeName & res, int /*time*/)		\
       ,RightFootCurrentPosSIN(NULL,"PatternGenerator("+name+")::input(homogeneousmatrix)::rightfootcurrentpos")
 
       ,LeftFootRefSOUT(    PG_BIND(getLeftFootRef,     "output(homogeneousmatrix)::leftfootref") )
-      ,dotLeftFootRefSOUT( PG_BIND(getdotLeftFootRef,  "output(homogeneousmatrix)::dotleftfootref") )
       ,RightFootRefSOUT(    PG_BIND(getRightFootRef,     "output(homogeneousmatrix)::rightfootref") )
+      ,dotLeftFootRefSOUT( PG_BIND(getdotLeftFootRef,  "output(homogeneousmatrix)::dotleftfootref") )
       ,dotRightFootRefSOUT( PG_BIND(getdotRightFootRef,  "output(homogeneousmatrix)::dotrightfootref") )
 
 

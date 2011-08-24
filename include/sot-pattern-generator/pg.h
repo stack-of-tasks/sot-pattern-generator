@@ -314,11 +314,11 @@ namespace dynamicgraph {
 
       /*! \brief Com Attitude: does not really exist apart from when the robot
 	is seen as an inverted pendulum*/
-      ml::Vector m_ComAttitude;
+      VectorRollPitchYaw m_ComAttitude;
 
       /*! \brief Com Attitude: does not really exist apart when the robot
 	is seen as an inverted pendulum*/
-      ml::Vector m_dComAttitude;
+      VectorRollPitchYaw m_dComAttitude;
 
       /*! \brief Absolute position of the reference CoM. */
       ml::Vector m_COMRefPos;
@@ -329,8 +329,11 @@ namespace dynamicgraph {
       /*! \brief Initial Absolute position of the reference ZMP. */
       ml::Vector m_InitZMPRefPos;
 
-      /*! \brief Initial Absolute position and attitude of the reference Waist. */
-      ml::Vector m_InitWaistRefPos, m_InitWaistRefAtt;
+      /*! \brief Initial Absolute position of the reference Waist. */
+      ml::Vector m_InitWaistRefPos;
+      
+      /*! \brief Initial Absolute attitude of the reference Waist. */
+      VectorRollPitchYaw m_InitWaistRefAtt;
 
       /*! \brief Initial Absolute position of the reference CoM. */
       ml::Vector m_InitCOMRefPos;
@@ -342,10 +345,10 @@ namespace dynamicgraph {
       ml::Vector m_WaistPositionAbsolute;
 
       /*! \brief Waist Attitude */
-      ml::Vector m_WaistAttitude;
+      VectorRollPitchYaw m_WaistAttitude;
 
       /*! \brief Waist Attitude Absolute */
-      ml::Vector m_WaistAttitudeAbsolute;
+      VectorRollPitchYaw m_WaistAttitudeAbsolute;
 
       /*! \brief Joint values for walking. */
       ml::Vector m_JointErrorValuesForWalking;

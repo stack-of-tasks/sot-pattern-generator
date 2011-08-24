@@ -41,6 +41,13 @@ namespace dynamicgraph {
 
     DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(PatternGenerator,"PatternGenerator");
 
+// some usefull macros
+#define PG_BIND(functionName, signalName) 					\
+	boost::bind(&PatternGenerator::functionName,this,_1,_2),	\
+	OneStepOfControlS,										\
+	"sotPatternGenerator("+name+")::" + signalName
+
+ 	// start the definition
     PatternGenerator::
     PatternGenerator( const std::string & name )
       :Entity(name)
@@ -66,17 +73,9 @@ namespace dynamicgraph {
 
       ,ZMPPreviousControllerSIN(NULL,"PatternGenerator("+name+")::input(vector)::zmppreviouscontroller")
 
-      ,ZMPRefSOUT( boost::bind(&PatternGenerator::getZMPRef,this,_1,_2),
-		   OneStepOfControlS,
-		   "PatternGenerator("+name+")::output(vector)::zmpref" )
-
-      ,CoMRefSOUT( boost::bind(&PatternGenerator::getCoMRef,this,_1,_2),
-		   OneStepOfControlS,
-		   "PatternGenerator("+name+")::output(matrix)::comref" )
-
-      ,dCoMRefSOUT( boost::bind(&PatternGenerator::getdCoMRef,this,_1,_2),
-		    OneStepOfControlS,
-		    "PatternGenerator("+name+")::output(matrix)::dcomref" )
+      ,ZMPRefSOUT(  PG_BIND(getZMPRef,  "output(vector)::zmpref") )
+      ,CoMRefSOUT(  PG_BIND(getCoMRef,  "output(vector)::comref") )
+      ,dCoMRefSOUT( PG_BIND(getdCoMRef, "output(vector)::dcomref") )
 
       ,comSIN(NULL,"PatternGenerator("+name+")::input(vector)::com")
 
@@ -86,80 +85,37 @@ namespace dynamicgraph {
 
       ,RightFootCurrentPosSIN(NULL,"PatternGenerator("+name+")::input(homogeneousmatrix)::rightfootcurrentpos")
 
-      ,LeftFootRefSOUT( boost::bind(&PatternGenerator::getLeftFootRef,this,_1,_2),
-			OneStepOfControlS,
-			"PatternGenerator("+name+")::output(homogeneousmatrix)::leftfootref" )
-
-      ,RightFootRefSOUT( boost::bind(&PatternGenerator::getRightFootRef,this,_1,_2),
-			 OneStepOfControlS,
-			 "PatternGenerator("+name+")::output(homogeneousmatrix)::rightfootref" )
-      ,dotLeftFootRefSOUT( boost::bind(&PatternGenerator::getdotLeftFootRef,this,_1,_2),
-			   OneStepOfControlS,
-			   "PatternGenerator("+name+")::output(homogeneousmatrix)::dotleftfootref" )
-
-      ,dotRightFootRefSOUT( boost::bind(&PatternGenerator::getdotRightFootRef,this,_1,_2),
-			    OneStepOfControlS,
-			    "PatternGenerator("+name+")::output(homogeneousmatrix)::dotrightfootref" )
-
-      ,FlyingFootRefSOUT( boost::bind(&PatternGenerator::getFlyingFootRef,this,_1,_2),
-			  OneStepOfControlS,
-			  "PatternGenerator("+name+")::output(homogeneousmatrix)::flyingfootref" )
+      ,LeftFootRefSOUT(    PG_BIND(getLeftFootRef,     "output(homogeneousmatrix)::leftfootref") )
+      ,dotLeftFootRefSOUT( PG_BIND(getdotLeftFootRef,  "output(homogeneousmatrix)::dotleftfootref") )
+      ,RightFootRefSOUT(    PG_BIND(getRightFootRef,     "output(homogeneousmatrix)::rightfootref") )
+      ,dotRightFootRefSOUT( PG_BIND(getdotRightFootRef,  "output(homogeneousmatrix)::dotrightfootref") )
 
 
-      ,SupportFootSOUT( boost::bind(&PatternGenerator::getSupportFoot,this,_1,_2),
-			OneStepOfControlS,
-			"PatternGenerator("+name+")::output(uint)::SupportFoot" )
-      ,jointWalkingErrorPositionSOUT(boost::bind(&PatternGenerator::getjointWalkingErrorPosition,this,_1,_2),
-				     OneStepOfControlS,
-				     "PatternGenerator("+name+")::output(vector)::walkingerrorposition")
+      ,FlyingFootRefSOUT( PG_BIND(getFlyingFootRef, "output(homogeneousmatrix)::flyingfootref") )
 
-      ,comattitudeSOUT(boost::bind(&PatternGenerator::getComAttitude,this,_1,_2),
-		       OneStepOfControlS,
-		       "sotPatternGenerator("+name+")::output(vectorRPY)::comattitude")
-      ,dcomattitudeSOUT(boost::bind(&PatternGenerator::getdComAttitude,this,_1,_2),
-			OneStepOfControlS,
-			"sotPatternGenerator("+name+")::output(vectorRPY)::dcomattitude")
 
-      ,waistattitudeSOUT(boost::bind(&PatternGenerator::getWaistAttitude,this,_1,_2),
-			 OneStepOfControlS,
-			 "PatternGenerator("+name+")::output(vectorRPY)::waistattitude")
-      ,waistattitudeabsoluteSOUT(boost::bind(&PatternGenerator::getWaistAttitudeAbsolute,this,_1,_2),
-				 OneStepOfControlS,
-				 "PatternGenerator("+name+")::output(vectorRPY)::waistattitudeabsolute")
+      ,SupportFootSOUT( PG_BIND(getSupportFoot, "output(uint)::SupportFoot" ) )
+      ,jointWalkingErrorPositionSOUT( PG_BIND(getjointWalkingErrorPosition, "output(vector)::walkingerrorposition") )
 
-      ,waistpositionSOUT(boost::bind(&PatternGenerator::getWaistPosition,this,_1,_2),
-			 OneStepOfControlS,
-			 "PatternGenerator("+name+")::output(vector)::waistposition")
-      ,waistpositionabsoluteSOUT(boost::bind(&PatternGenerator::getWaistPositionAbsolute,this,_1,_2),
-				 OneStepOfControlS,
-				 "PatternGenerator("+name+")::output(vector)::waistpositionabsolute")
+      ,comattitudeSOUT(   PG_BIND(getComAttitude, "output(vectorRPY)::comattitude") )
+      ,dcomattitudeSOUT(  PG_BIND(getdComAttitude, "output(vectorRPY)::dcomattitude") )
 
-      ,dataInProcessSOUT(boost::bind(&PatternGenerator::getDataInProcess, this, _1, _2),
-			 OneStepOfControlS,
-			 "PatternGenerator("+name+")::output(bool)::inprocess")
-      ,InitZMPRefSOUT( boost::bind(&PatternGenerator::getInitZMPRef,this,_1,_2),
-		       OneStepOfControlS,
-		       "PatternGenerator("+name+")::output(vector)::initzmpref" )
+      ,waistattitudeSOUT( PG_BIND(getWaistAttitude, "output(vectorRPY)::waistattitude") )
+      ,waistattitudeabsoluteSOUT( PG_BIND(getWaistAttitudeAbsolute,  "output(vectorRPY)::waistattitudeabsolute") )
 
-      ,InitCoMRefSOUT( boost::bind(&PatternGenerator::getInitCoMRef,this,_1,_2),
-		       OneStepOfControlS,
-		       "PatternGenerator("+name+")::output(matrix)::initcomref" )
+      ,waistpositionSOUT( PG_BIND(getWaistPosition,  "output(vector)::waistposition") )
+      ,waistpositionabsoluteSOUT( PG_BIND(getWaistPositionAbsolute,  "output(vector)::waistpositionabsolute") )
 
-      ,InitWaistPosRefSOUT( boost::bind(&PatternGenerator::getInitWaistPosRef,this,_1,_2),
-			    OneStepOfControlS,
-			    "PatternGenerator("+name+")::output(vector)::initwaistposref" )
 
-      ,InitWaistAttRefSOUT( boost::bind(&PatternGenerator::getInitWaistAttRef,this,_1,_2),
-			    OneStepOfControlS,
-			    "PatternGenerator("+name+")::output(vectorRPY)::initwaistattref" )
+      ,dataInProcessSOUT( PG_BIND(getDataInProcess,  "output(bool)::inprocess") )
+      ,InitZMPRefSOUT( PG_BIND(getInitZMPRef,  "output(vector)::initzmpref") )
+      ,InitCoMRefSOUT( PG_BIND(getInitCoMRef,  "output(matrix)::initcomref") )
 
-      ,InitLeftFootRefSOUT( boost::bind(&PatternGenerator::getInitLeftFootRef,this,_1,_2),
-			    OneStepOfControlS,
-			    "PatternGenerator("+name+")::output(homogeneousmatrix)::initleftfootref" )
+      ,InitWaistPosRefSOUT( PG_BIND(getInitWaistPosRef,  "output(vector)::initwaistposref") )
+      ,InitWaistAttRefSOUT( PG_BIND(getInitWaistAttRef,  "output(vectorRPY)::initwaistattref" )  )
 
-      ,InitRightFootRefSOUT( boost::bind(&PatternGenerator::getInitRightFootRef,this,_1,_2),
-			     OneStepOfControlS,
-			     "PatternGenerator("+name+")::output(homogeneousmatrix)::initrightfootref" )
+      ,InitLeftFootRefSOUT( PG_BIND(getInitLeftFootRef,  "output(homogeneousmatrix)::initleftfootref") )
+      ,InitRightFootRefSOUT(PG_BIND(getInitRightFootRef, "output(homogeneousmatrix)::initrightfootref") )
 
 
     {

@@ -81,6 +81,8 @@ PatternGenerator( const std::string & name )
 
    ,velocitydesSIN(NULL,"PatternGenerator("+name+")::input(vector)::velocitydes")
 
+   ,positiondesSIN(NULL,"PatternGenerator("+name+")::input(vector)::positiondes")
+
   ,LeftFootCurrentPosSIN(NULL,"PatternGenerator("+name+")::input(homogeneousmatrix)::leftfootcurrentpos")
 
   ,RightFootCurrentPosSIN(NULL,"PatternGenerator("+name+")::input(homogeneousmatrix)::rightfootcurrentpos")
@@ -188,6 +190,8 @@ PatternGenerator( const std::string & name )
   m_dComAttitude.fill(0);
   m_VelocityReference.resize(3);
   m_VelocityReference.fill(0.0);
+  m_PositionReference.resize(3);
+  m_PositionReference.fill(0.0);
   m_WaistAttitude.resize(3);
   m_WaistAttitude.fill(0);
   m_ComAttitude.resize(3);
@@ -251,7 +255,8 @@ PatternGenerator( const std::string & name )
 		      InitLeftFootRefSOUT <<
 		      InitRightFootRefSOUT <<		      
 		      comSIN <<
-		      velocitydesSIN);
+		      velocitydesSIN <<
+		      positiondesSIN);
 
   dataInProcessSOUT.setReference( &m_dataInProcess );
 
@@ -806,6 +811,13 @@ OneStepOfControl(int &dummy, int time)
   catch(...)
     { };
 
+  try
+    {
+      m_PositionReference = positiondesSIN(time); 
+    }
+  catch(...)
+    { };
+
   sotDEBUG(25) << "LeftFootCurrentPos:  " << m_LeftFootPosition << endl;
   sotDEBUG(25) << "RightFootCurrentPos:  " << m_RightFootPosition << endl;
 
@@ -834,7 +846,7 @@ OneStepOfControl(int &dummy, int time)
       /*! \brief Position of the reference ZMP. */
       MAL_VECTOR_DIM(ZMPTarget,double,3);
       MAL_VECTOR_FILL(ZMPTarget,0);
-
+  
       sotDEBUG(25) << "Before One Step of control " << ZMPTarget[0] << " " 
 		   << ZMPTarget[1] << " " 
 		   << ZMPTarget[2] << endl;
@@ -847,6 +859,10 @@ OneStepOfControl(int &dummy, int time)
       m_PGI->setVelocityReference(m_VelocityReference(0),
 				  m_VelocityReference(1),
 				  m_VelocityReference(2));
+				  
+      m_PGI->setPositionReference(m_PositionReference(0),
+				  m_PositionReference(1),
+				  m_PositionReference(2));
 
       // Test if the pattern value has some value to provide.
       if (m_PGI->RunOneStepOfTheControlLoop(CurrentConfiguration,
@@ -983,7 +999,7 @@ OneStepOfControl(int &dummy, int time)
 	  
 	  /* Update the class related member. */
 	  m_SupportFoot = lSupportFoot;
-
+  
 	  if ((m_ReferenceFrame==EGOCENTERED_FRAME) ||
 	      (m_ReferenceFrame==LEFT_FOOT_CENTERED_FRAME) || 
 	      (m_ReferenceFrame==WAIST_CENTERED_FRAME))
@@ -1009,7 +1025,7 @@ OneStepOfControl(int &dummy, int time)
 		  PoseOrigin = WaistPoseAbsolute;
 		}
 	      PoseOrigin.inverse(iPoseOrigin);
-	      
+	   
 	      sotDEBUG(25) << "Old ComRef:  " << m_COMRefPos << endl;
 	      sotDEBUG(25) << "Old LeftFootRef:  " << m_LeftFootPosition << endl;
 	      sotDEBUG(25) << "Old RightFootRef:  " << m_RightFootPosition << endl;

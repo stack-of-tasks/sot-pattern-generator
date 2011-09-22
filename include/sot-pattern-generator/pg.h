@@ -353,6 +353,10 @@ class PatternGenerator_EXPORT PatternGenerator
 
   /*! \brief Velocity reference for Herdt's PG */
   ml::Vector m_VelocityReference;
+
+  /*! \brief Position reference for Herdt's PG */
+  ml::Vector m_PositionReference;
+  
   /*! \brief true iff the pattern if dealing with data, false if pg is not 
    * working anymore/yet. */
   unsigned int m_dataInProcess;
@@ -432,6 +436,9 @@ class PatternGenerator_EXPORT PatternGenerator
 
   /*! \brief Take the current desired velocity. */
   dg::SignalPtr<ml::Vector,int> velocitydesSIN;
+
+  /*! \brief Take the current desired position. */
+  dg::SignalPtr<ml::Vector,int> positiondesSIN;
   
   /*! \brief Take the current left foot homogeneous position. */
   dg::SignalPtr<MatrixHomogeneous,int> LeftFootCurrentPosSIN;

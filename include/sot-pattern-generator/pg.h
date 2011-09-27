@@ -287,6 +287,13 @@ namespace dynamicgraph {
       /*! \brief Trigger one step of the algorithm. */
       int & OneStepOfControl(int &dummy, int time);
 
+      /*! \brief Update internal information when one iteration of Pg is successfull. */
+      void updateSuccessfullIteration(pg::FootAbsolutePosition &lLeftFootPosition,
+				      pg::FootAbsolutePosition &lRightFootPosition,
+				      MAL_VECTOR(&CurrentConfiguration,double),
+				      MAL_VECTOR(&ZMPTarget,double),
+				      pg::COMState & lCOMRefState, int time);
+
       /*! \name Keep information computed once for each time.
 	@{
       */
@@ -502,9 +509,14 @@ namespace dynamicgraph {
 
       /*! @} */
 
-      /*! \name Reimplement the interface of the plugin.
+      /*! \brief Members for implementing exhaustion.
 	@{
-      */
+       */
+      /*! \brief State to apply or not exhaustion. */
+      bool m_Exhaustion;
+
+      /*! \brief Iteration up to which apply exhaustion */
+      unsigned int m_ItUpToWhichDoExhaustion;
 
       /*! @} */
     protected:
@@ -524,6 +536,7 @@ namespace dynamicgraph {
       void addOnLineStep( const double & x, const double & y, const double & th);
       void addStep( const double & x, const double & y, const double & th);
       void pgCommandLine( const std::string & cmdline );
+      void setExhaustionIterationNumber(const unsigned int &itNb);
     };
 
 

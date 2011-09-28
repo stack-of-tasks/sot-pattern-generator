@@ -1488,7 +1488,6 @@ namespace dynamicgraph {
 
     VectorRollPitchYaw & PatternGenerator::getWaistAttitudeAbsolute(VectorRollPitchYaw &res, int time)
     {
-      cout << " m_WaistAttitudeAbsolute " << m_WaistAttitudeAbsolute << endl;
       sotDEBUGIN(5);
       OneStepOfControlS(time);
       sotDEBUG(15) << "I survived one step of control" << std::endl;

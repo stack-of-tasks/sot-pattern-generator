@@ -17,8 +17,8 @@
  *
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-//#define VP_DEBUG
-//#define VP_DEBUG_MODE 10
+#define VP_DEBUG
+#define VP_DEBUG_MODE 10
 #include <sot/core/debug.hh>
 
 
@@ -794,6 +794,8 @@ namespace dynamicgraph {
 	  m_WaistPositionAbsolute(i) = CurrentConfiguration(i);
 	  m_WaistAttitudeAbsolute(i) = CurrentConfiguration(i+3);
 	}
+      sotDEBUG(2) << "CurrentConfiguration(5) "<< CurrentConfiguration(5) << endl;
+
       m_COMRefPos(0) = lCOMRefState.x[0];
       m_COMRefPos(1) = lCOMRefState.y[0];
       m_COMRefPos(2) = lCOMRefState.z[0];
@@ -1090,13 +1092,10 @@ namespace dynamicgraph {
 					     lRightFootPosition,
 					     CurrentConfiguration,
 					     ZMPTarget,
-					 lCOMRefState,time);
+					     lCOMRefState,time);
 		}
 	      else
 		{
-		  sotDEBUG(1) << "Error while compute one step of PG."
-			      << m_dataInProcess << std::endl;
-		  // TODO: SOT_THROW
 		  if (m_dataInProcess==1)
 		    {
 		      MatrixHomogeneous invInitLeftFootRef,Diff;
@@ -1489,6 +1488,7 @@ namespace dynamicgraph {
 
     VectorRollPitchYaw & PatternGenerator::getWaistAttitudeAbsolute(VectorRollPitchYaw &res, int time)
     {
+      cout << " m_WaistAttitudeAbsolute " << m_WaistAttitudeAbsolute << endl;
       sotDEBUGIN(5);
       OneStepOfControlS(time);
       sotDEBUG(15) << "I survived one step of control" << std::endl;

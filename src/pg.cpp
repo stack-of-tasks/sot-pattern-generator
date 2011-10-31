@@ -559,7 +559,7 @@ ACCESSOR_BUILDER_WITH_ONESTEP_OF_CONTROL (getFlyingFootRef, MatrixHomogeneous, m
 
     }
 
-    void PatternGenerator::FromAbsoluteFootPosToDotHomogeneous(pg::FootAbsolutePosition aFootPosition,
+    void PatternGenerator::FromAbsoluteFootPosToDotHomogeneous(const pg::FootAbsolutePosition & aFootPosition,
 							       MatrixHomogeneous &aFootMH,
 							       MatrixHomogeneous &adotFootMH)
     {
@@ -587,7 +587,7 @@ ACCESSOR_BUILDER_WITH_ONESTEP_OF_CONTROL (getFlyingFootRef, MatrixHomogeneous, m
 
     }
 
-    void PatternGenerator::FromAbsoluteFootPosToHomogeneous(pg::FootAbsolutePosition aFootPosition,
+    void PatternGenerator::FromAbsoluteFootPosToHomogeneous(const pg::FootAbsolutePosition & aFootPosition,
 							    MatrixHomogeneous &aFootMH)
     {
       double c,s,co,so;

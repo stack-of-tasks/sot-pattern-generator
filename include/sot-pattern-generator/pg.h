@@ -371,14 +371,14 @@ namespace dynamicgraph {
 
       /*! \brief Transfert from a current absolute foot position
 	to a dot homogeneous matrix. */
-      void FromAbsoluteFootPosToDotHomogeneous(pg::FootAbsolutePosition aFootPosition,
+      void FromAbsoluteFootPosToDotHomogeneous(const pg::FootAbsolutePosition & aFootPosition,
 					       MatrixHomogeneous &aFootMH,
 					       MatrixHomogeneous &adotFootMH);
 
 
       /*! \brief Transfert from a current absolute foot position
 	to a homogeneous matrix. */
-      void FromAbsoluteFootPosToHomogeneous(pg::FootAbsolutePosition aFootPosition,
+      void FromAbsoluteFootPosToHomogeneous(const pg::FootAbsolutePosition & aFootPosition,
 					    MatrixHomogeneous &aFootMH);
 
 

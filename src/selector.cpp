@@ -17,8 +17,8 @@
  *
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-#define VP_DEBUG
-#define VP_DEBUG_MODE 50
+//#define VP_DEBUG
+//#define VP_DEBUG_MODE 50
 #include <sot/core/debug.hh>
 #ifdef VP_DEBUG
 class selector__INIT

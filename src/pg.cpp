@@ -17,8 +17,6 @@
  *
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-//#define VP_DEBUG
-//#define VP_DEBUG_MODE 10
 #include <sot/core/debug.hh>
 
 
@@ -206,10 +204,6 @@ namespace dynamicgraph {
       m_SupportFoot = 1; // Means that we do not know which support foot it is.
       m_ReferenceFrame = WORLD_FRAME;
 
-      /* TODO: To be removed and extract from
-	 Humanoid specificities.
-      */
-      m_AnkleSoilDistance = 0.105;
       sotDEBUGIN(5);
 
       firstSINTERN.setDependencyType(TimeDependency<int>::BOOL_DEPENDENT);
@@ -223,7 +217,7 @@ namespace dynamicgraph {
 
       //OneStepOfControlS.setDependencyType(TimeDependency<int>::ALWAYS_READY);
       //  OneStepOfControlS.setConstant(0);
-
+#if 0
       signalRegistration( jointPositionSIN <<
 			  motorControlJointPositionSIN <<
 			  ZMPPreviousControllerSIN <<
@@ -258,6 +252,45 @@ namespace dynamicgraph {
 			  InitRightFootRefSOUT <<
 			  comSIN <<
 			  velocitydesSIN);
+#else
+      signalRegistration( dataInProcessSOUT );
+
+      signalRegistration( jointPositionSIN <<
+			  motorControlJointPositionSIN <<
+			  ZMPPreviousControllerSIN <<
+			  ZMPRefSOUT <<
+			  CoMRefSOUT <<
+			  dCoMRefSOUT);
+
+      signalRegistration(comSIN <<
+			 velocitydesSIN <<
+			  LeftFootCurrentPosSIN <<
+			  RightFootCurrentPosSIN <<
+			  LeftFootRefSOUT <<
+			  RightFootRefSOUT);
+
+      signalRegistration( SupportFootSOUT <<
+			  jointWalkingErrorPositionSOUT <<
+			  comattitudeSOUT <<
+			  dcomattitudeSOUT <<
+			  waistattitudeSOUT );
+
+      signalRegistration( waistpositionSOUT <<
+			  waistattitudeabsoluteSOUT <<
+			  waistpositionabsoluteSOUT);
+
+
+      signalRegistration( dotLeftFootRefSOUT <<
+			  dotRightFootRefSOUT);
+
+      signalRegistration( InitZMPRefSOUT <<
+			  InitCoMRefSOUT <<
+			  InitWaistPosRefSOUT <<
+			  InitWaistAttRefSOUT <<
+			  InitLeftFootRefSOUT <<
+			  InitRightFootRefSOUT );
+      
+#endif
       initCommands();
 
       dataInProcessSOUT.setReference( &m_dataInProcess );
@@ -439,7 +472,28 @@ namespace dynamicgraph {
       // Parsing the file.
       string RobotFileName = m_vrmlDirectory + m_vrmlMainFile;
       dynamicsJRLJapan::parseOpenHRPVRMLFile(*aHDR,RobotFileName,m_xmlRankFile,m_xmlSpecificitiesFile);
+      bool ok=true;
 
+      if (aHDR!=0)
+	{
+	  CjrlFoot * rightFoot = aHDR->rightFoot();
+	  if (rightFoot!=0)
+	    {
+	      vector3d AnkleInFoot;
+	      rightFoot->getAnklePositionInLocalFrame(AnkleInFoot);
+	      m_AnkleSoilDistance = fabs(AnkleInFoot(2));
+	    }
+	  else ok=false;
+	}
+      else ok=false;
+      
+      if (!ok)
+	{
+	  SOT_THROW ExceptionPatternGenerator( ExceptionPatternGenerator::PATTERN_GENERATOR_JRL,
+					       "Error while creating humanoid robot dynamical model.",
+					       "(PG creation process for object %s).",
+					       getName().c_str());
+	}
       try
 	{
 	  m_PGI = PatternGeneratorJRL::patternGeneratorInterfaceFactory(aHDR);
@@ -889,6 +943,7 @@ namespace dynamicgraph {
 	      sotDEBUG(2) << "CurrentConfiguration.size()"<< CurrentConfiguration.size()<<endl;
 	      sotDEBUG(2) << "m_JointErrorValuesForWalking.size(): "<< m_JointErrorValuesForWalking.size() <<endl;
 
+	
 	      // In this setting we assume that there is a proper mapping between
 	      // CurrentState and CurrentConfiguration.
 	      unsigned int SizeCurrentState = CurrentState.size();
@@ -925,7 +980,7 @@ namespace dynamicgraph {
 			   << lCOMRefState.x[0] << " "
 			   << lCOMRefState.y[0] << " "
 			   << lCOMRefState.z[0] <<  endl;
-
+	
 	      /* Fill in the homogeneous matrix using the world reference frame*/
 	      FromAbsoluteFootPosToDotHomogeneous(lLeftFootPosition,
 						  m_LeftFootPosition,
@@ -972,7 +1027,7 @@ namespace dynamicgraph {
 		{
 		  lSupportFoot=m_SupportFoot;
 		}
-
+	
 	      /* Update the class related member. */
 	      m_SupportFoot = lSupportFoot;
 
@@ -1058,7 +1113,7 @@ namespace dynamicgraph {
 	      sotDEBUG(25) << "ZMPRefPos:  " << m_ZMPRefPos << endl;
 	      sotDEBUG(25) << "m_MotionSinceInstanciationToThisSequence" <<
 		m_MotionSinceInstanciationToThisSequence<< std::endl;
-
+	
 	      for(unsigned int i=0;i<3;i++)
 		m_ZMPPrevious[i] = m_ZMPRefPos(i);
 
@@ -1197,6 +1252,7 @@ namespace dynamicgraph {
       else if (FrameReference=="Waistcentered")return WAIST_CENTERED_FRAME;
       assert( false && "String name should be in the list "
 	      "World|Egocentered|LeftFootcentered|Waistcentered" );
+      return 0;
     }
     void PatternGenerator::
     setReferenceFromString( const std::string & str )

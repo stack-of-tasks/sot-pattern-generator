@@ -58,6 +58,8 @@ namespace dynamicgraph {
 			  firstSINTERN << jointPositionSIN ,"PatternGenerator("+name+")::onestepofcontrol" )
 
       ,m_dataInProcess(0)
+      ,m_rightFootContact(1) // It is assumed that the robot is standing.
+      ,m_leftFootContact(1)
       ,jointPositionSIN(NULL,"PatternGenerator("+name+")::input(vector)::position")
 
       ,motorControlJointPositionSIN(NULL,"PatternGenerator("+name+")::input(vector)::motorcontrol")
@@ -158,6 +160,12 @@ namespace dynamicgraph {
       ,InitRightFootRefSOUT( boost::bind(&PatternGenerator::getInitRightFootRef,this,_1,_2),
 			     OneStepOfControlS,
 			     "PatternGenerator("+name+")::output(homogeneousmatrix)::initrightfootref" )
+      ,leftFootContactSOUT( boost::bind(&PatternGenerator::getLeftFootContact,this,_1,_2),
+			     OneStepOfControlS,
+			    "PatternGenerator("+name+")::output(bool)::leftfootcontact" )
+      ,rightFootContactSOUT( boost::bind(&PatternGenerator::getRightFootContact,this,_1,_2),
+			     OneStepOfControlS,
+			     "PatternGenerator("+name+")::output(bool)::rightfootcontact")
 
 
     {
@@ -289,7 +297,10 @@ namespace dynamicgraph {
 			  InitWaistAttRefSOUT <<
 			  InitLeftFootRefSOUT <<
 			  InitRightFootRefSOUT );
-      
+
+      signalRegistration( leftFootContactSOUT <<
+			  rightFootContactSOUT);
+
 #endif
       initCommands();
 
@@ -735,6 +746,28 @@ namespace dynamicgraph {
       return FlyingFootRefval;
     }
 
+    unsigned int & PatternGenerator ::
+    getLeftFootContact(unsigned int &res, int time)
+    {
+      sotDEBUGIN(25);
+      OneStepOfControlS(time);
+      res = m_leftFootContact;
+      sotDEBUGOUT(25);
+      return res;
+      
+    }
+
+    unsigned int & PatternGenerator ::
+    getRightFootContact(unsigned int &res, int time)
+    {
+      sotDEBUGIN(25);
+      OneStepOfControlS(time);
+      res = m_rightFootContact;
+      sotDEBUGOUT(25);
+      return res;
+      
+    }
+
     int &PatternGenerator::
     InitOneStepOfControl(int &dummy, int /*time*/)
     {
@@ -1013,23 +1046,29 @@ namespace dynamicgraph {
 	      sotDEBUG(25) << "lLeftFootPosition.stepType: " << lLeftFootPosition.stepType
 			   << " lRightFootPosition.stepType: " << lRightFootPosition.stepType <<endl;
 	      // Find the support foot feet.
+	      m_leftFootContact = 1;
+	      m_rightFootContact = 1;
 	      if (lLeftFootPosition.stepType==-1)
 		{
-		  lSupportFoot=1;
+		  lSupportFoot=1; m_leftFootContact = 1;
+		  if (lRightFootPosition.stepType!=-1)
+		    m_rightFootContact = 0;
 		  m_DoubleSupportPhaseState = 0;
 		}
 	      else if (lRightFootPosition.stepType==-1)
 		{
-		  lSupportFoot=0;
+		  lSupportFoot=0; m_rightFootContact =1;
+		  if (lLeftFootPosition.stepType!=-1)
+		    m_leftFootContact = 0;
 		  m_DoubleSupportPhaseState = 0;
 		}
 	      else /* m_LeftFootPosition.z ==m_RightFootPosition.z
-		      We keep the previous support foot half the time of the double phase..
+		      We keep the previous support foot half the time of the double support phase..
 		   */
 		{
 		  lSupportFoot=m_SupportFoot;
 		}
-	
+	      std::cout << "contacts: " << m_leftFootContact << " " << m_rightFootContact << std::endl;
 	      /* Update the class related member. */
 	      m_SupportFoot = lSupportFoot;
 

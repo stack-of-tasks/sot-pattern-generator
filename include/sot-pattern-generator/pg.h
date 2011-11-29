@@ -357,6 +357,9 @@ namespace dynamicgraph {
        * working anymore/yet. */
       unsigned int m_dataInProcess;
 
+      /*! \brief Booleans used to indicate feet contacts */
+      unsigned int m_rightFootContact, m_leftFootContact;
+
       /*! @} */
 
       /*! Parsing a file of command by the walking pattern generator interface.
@@ -403,7 +406,11 @@ namespace dynamicgraph {
       /*! \brief Internal method to get the position of the right foot. */
       MatrixHomogeneous & getInitRightFootRef(MatrixHomogeneous &res, int time);
 
-
+      /*! \brief Internal method to get the information of contact or not on
+	the feet. */
+      unsigned int & getLeftFootContact(unsigned int & res,int time);
+      unsigned int & getRightFootContact(unsigned int & res,int time);
+      
     public:
 
       /*! \name External signals
@@ -500,6 +507,9 @@ namespace dynamicgraph {
       /*! \brief Externalize the right foot position reference. */
       SignalTimeDependent<MatrixHomogeneous,int> InitRightFootRefSOUT;
 
+      /*! \brief Booleans for contact of the feet */
+      SignalTimeDependent<unsigned int,int> leftFootContactSOUT;
+      SignalTimeDependent<unsigned int,int> rightFootContactSOUT;
       /*! @} */
 
       /*! \name Reimplement the interface of the plugin.

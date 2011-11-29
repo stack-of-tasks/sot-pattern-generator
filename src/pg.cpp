@@ -107,6 +107,14 @@ namespace dynamicgraph {
       ,SupportFootSOUT( boost::bind(&PatternGenerator::getSupportFoot,this,_1,_2),
 			OneStepOfControlS,
 			"PatternGenerator("+name+")::output(uint)::SupportFoot" )
+
+      ,rightContactSOUT( boost::bind(&PatternGenerator::getRightContact,this,_1,_2),
+			 OneStepOfControlS,
+			 "PatternGenerator("+name+")::output(bool)::rightContact" )
+      ,leftContactSOUT( boost::bind(&PatternGenerator::getLeftContact,this,_1,_2),
+			 OneStepOfControlS,
+			 "PatternGenerator("+name+")::output(bool)::leftContact" )
+
       ,jointWalkingErrorPositionSOUT(boost::bind(&PatternGenerator::getjointWalkingErrorPosition,this,_1,_2),
 				     OneStepOfControlS,
 				     "PatternGenerator("+name+")::output(vector)::walkingerrorposition")
@@ -202,6 +210,8 @@ namespace dynamicgraph {
       m_k_Waist_kp1.setIdentity();
 
       m_SupportFoot = 1; // Means that we do not know which support foot it is.
+      m_rightContact = true; m_leftContact = true; // NMSD: is it the proper init?
+
       m_ReferenceFrame = WORLD_FRAME;
 
       sotDEBUGIN(5);
@@ -232,6 +242,7 @@ namespace dynamicgraph {
 			  RightFootRefSOUT);
 
       signalRegistration( SupportFootSOUT <<
+			  rightContactSOUT << leftContactSOUT <<
 			  jointWalkingErrorPositionSOUT <<
 			  waistattitudeSOUT <<
 			  waistpositionSOUT <<
@@ -1030,6 +1041,8 @@ namespace dynamicgraph {
 	
 	      /* Update the class related member. */
 	      m_SupportFoot = lSupportFoot;
+	      m_rightContact = (lRightFootPosition.stepType!=-1);
+	      m_leftContact = (lLeftFootPosition.stepType!=-1);
 
 	      if ((m_ReferenceFrame==EGOCENTERED_FRAME) ||
 		  (m_ReferenceFrame==LEFT_FOOT_CENTERED_FRAME) ||
@@ -1464,6 +1477,19 @@ namespace dynamicgraph {
     getSupportFoot(unsigned int &res, int /*time*/)
     {
       res = m_SupportFoot;
+      return res;
+    }
+
+    bool & PatternGenerator::
+    getRightContact(bool &res, int /*time*/)
+    {
+      res = m_rightContact;
+      return res;
+    }
+    bool & PatternGenerator::
+    getLeftContact(bool &res, int /*time*/)
+    {
+      res = m_leftContact;
       return res;
     }
 

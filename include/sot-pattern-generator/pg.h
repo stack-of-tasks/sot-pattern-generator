@@ -144,6 +144,7 @@ namespace dynamicgraph {
 
       /*! \brief Integer for the support foot. */
       int m_SupportFoot;
+      bool m_rightContact,m_leftContact;
 
       /*! \brief Keep the frame reference */
       int m_ReferenceFrame;
@@ -281,6 +282,8 @@ namespace dynamicgraph {
 
       /*! \brief Getting the current support foot: 1 Left -1 Right. */
       unsigned int & getSupportFoot(unsigned int &res, int time);
+      bool & getRightContact(bool & res, int time);
+      bool & getLeftContact(bool & res, int time);
 
       /*! \brief Trigger the initialization of the algorithm */
       int & InitOneStepOfControl(int &dummy, int time);
@@ -457,6 +460,8 @@ namespace dynamicgraph {
 
       /*! \brief Externalize the support foot. */
       SignalTimeDependent<unsigned int,int> SupportFootSOUT;
+      SignalTimeDependent<bool,int> rightContactSOUT;
+      SignalTimeDependent<bool,int> leftContactSOUT;
 
       /*! \brief Externalize the joint values for walking. */
       SignalTimeDependent<ml::Vector,int> jointWalkingErrorPositionSOUT;

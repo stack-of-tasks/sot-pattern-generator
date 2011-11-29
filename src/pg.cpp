@@ -1068,7 +1068,7 @@ namespace dynamicgraph {
 		{
 		  lSupportFoot=m_SupportFoot;
 		}
-	      std::cout << "contacts: " << m_leftFootContact << " " << m_rightFootContact << std::endl;
+
 	      /* Update the class related member. */
 	      m_SupportFoot = lSupportFoot;
 

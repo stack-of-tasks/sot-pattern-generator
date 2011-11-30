@@ -50,6 +50,7 @@ SET(plugins
   step-queue
   selector
   step-checker
+  toes-handler-zmp
   # dependent on walkgenjrl
   next-step-pg-sot
   pg-manager

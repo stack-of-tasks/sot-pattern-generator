@@ -41,6 +41,9 @@
 #include <sot/core/vector-roll-pitch-yaw.hh>
 #include <sot/core/matrix-rotation.hh>
 
+#include <sot-dyninv/signal-helper.h>
+#include <sot-dyninv/entity-helper.h>
+
 /* Pattern Generator */
 #include <jrl/mal/matrixabstractlayer.hh>
 #include <jrl/walkgen/patterngeneratorinterface.hh>
@@ -77,6 +80,7 @@ namespace dynamicgraph {
     */
     class PatternGenerator_EXPORT PatternGenerator
       :public Entity
+      ,public ::dynamicgraph::EntityHelper<PatternGenerator>
     {
     public:
 
@@ -502,6 +506,27 @@ namespace dynamicgraph {
       /*! \brief Externalize the right foot position reference. */
       SignalTimeDependent<MatrixHomogeneous,int> InitRightFootRefSOUT;
 
+      //Some signals for the toe
+      /*! \brief a boolean indicating if the support zone
+       * for the left foot is the ankle (0) or the toe (1)*/
+      DECLARE_SIGNAL_OUT(LeftFootSupportZone, unsigned);
+
+      /*! \brief a boolean indicating if the support zone
+       * for the right foot is the ankle (0) or the toe (1)*/
+      DECLARE_SIGNAL_OUT(RightFootSupportZone, unsigned);
+
+      /*! \brief compute the depth of the zmp in the left toe zone (along the foot -> toe axis)*/
+      DECLARE_SIGNAL_OUT(LeftToeOverlap, double);
+
+      /*! \brief compute the depth of the zmp in the right toe zone (along the foot -> toe axis)*/
+      DECLARE_SIGNAL_OUT(RightToeOverlap, double);
+
+      /*! \brief Externalize the left toe position reference. */
+      DECLARE_SIGNAL_OUT(lefttoeref, MatrixHomogeneous);
+
+      /*! \brief Externalize the right toe position reference. */
+      DECLARE_SIGNAL_OUT(righttoeref, MatrixHomogeneous);
+
       /*! @} */
 
       /*! \name Reimplement the interface of the plugin.
@@ -526,10 +551,17 @@ namespace dynamicgraph {
       void addOnLineStep( const double & x, const double & y, const double & th);
       void addStep( const double & x, const double & y, const double & th);
       void pgCommandLine( const std::string & cmdline );
+
+    protected :
+      bool m_hasToes;
+
+      /*! \brief static transformation from the left feet to the toes */
+	  MatrixHomogeneous m_leftFoot2Toes_;
+
+	  /*! \brief static transformation from the right feet to the toes */
+	  MatrixHomogeneous m_rightFoot2Toes_;
+
     };
-
-
-
   } // namespace sot
 } // namespace dynamicgraph
 

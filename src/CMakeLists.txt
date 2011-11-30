@@ -61,6 +61,8 @@ SET(plugins
 SET(plugins_common_deps
   exception-pg)
 
+SET (pg-sot_code pg-tools)
+
 # Add specific plugins dependencies.
 SET (next-step-pg-sot_plugins_dependencies next-step pg)
 SET (step-computer_plugins_dependencies step-queue step-checker step-observer)
@@ -76,9 +78,15 @@ SET(PYTHON_LOCAL_PATH sot/pattern_generator)
 
 # --- PLUGIN COMPILATION/INSTALLATION
 FOREACH(LIBRARY_NAME ${plugins})
+  SET(LIBRARY_SRC ${LIBRARY_NAME}.cpp)
+  
+  FOREACH(dep ${${LIBRARY_NAME}-sot_code})
+    SET(LIBRARY_SRC ${LIBRARY_SRC} ${dep})
+  ENDFOREACH(dep)
+
   ADD_LIBRARY(${LIBRARY_NAME}
     SHARED
-    ${LIBRARY_NAME}.cpp)
+    ${LIBRARY_SRC})
 
   SET_TARGET_PROPERTIES(${LIBRARY_NAME}
     PROPERTIES

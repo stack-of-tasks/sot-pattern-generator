@@ -34,6 +34,7 @@
 #include <sot/core/matrix-homogeneous.hh>
 
 #include <sot-pattern-generator/pg.h>
+#include "pg-tools.h"
 
 using namespace std;
 namespace dynamicgraph {
@@ -137,7 +138,18 @@ typeName & PatternGenerator::functionName(typeName & res, int /*time*/)	 const	\
       ,InitLeftFootRefSOUT( PG_BIND(getInitLeftFootRef,  "output(homogeneousmatrix)::initleftfootref") )
       ,InitRightFootRefSOUT(PG_BIND(getInitRightFootRef, "output(homogeneousmatrix)::initrightfootref") )
 
+      , CONSTRUCT_SIGNAL_OUT(LeftFootSupportZone, unsigned, OneStepOfControlS)
+      , CONSTRUCT_SIGNAL_OUT(RightFootSupportZone, unsigned, OneStepOfControlS)
 
+      , CONSTRUCT_SIGNAL_OUT(LeftToeOverlap, double, OneStepOfControlS)
+      , CONSTRUCT_SIGNAL_OUT(RightToeOverlap, double, OneStepOfControlS)
+
+      , CONSTRUCT_SIGNAL_OUT(lefttoeref,  MatrixHomogeneous, OneStepOfControlS)
+      , CONSTRUCT_SIGNAL_OUT(righttoeref, MatrixHomogeneous, OneStepOfControlS)
+
+      , m_hasToes()
+      , m_leftFoot2Toes_()
+      , m_rightFoot2Toes_()
     {
       m_MotionSinceInstanciationToThisSequence.setIdentity();
 
@@ -220,6 +232,11 @@ typeName & PatternGenerator::functionName(typeName & res, int /*time*/)	 const	\
 			  InitRightFootRefSOUT <<
 			  comSIN <<
 			  velocitydesSIN);
+
+      signalRegistration( lefttoerefSOUT << righttoerefSOUT);
+      signalRegistration( LeftFootSupportZoneSOUT<< RightFootSupportZoneSOUT );
+      signalRegistration( LeftToeOverlapSOUT<< RightToeOverlapSOUT );
+
       initCommands();
 
       dataInProcessSOUT.setReference( &m_dataInProcess );
@@ -406,6 +423,18 @@ typeName & PatternGenerator::functionName(typeName & res, int /*time*/)	 const	\
       vector3d ankle;
       aHDR->leftFoot()->getAnklePositionInLocalFrame(ankle);
       m_AnkleSoilDistance = ankle[2];
+
+
+      // compute the tranformation matrix beween each foot and its toe.
+      if (aHDR->leftAnkle()->countChildJoints() > 0)
+      {
+  		detail::computeStaticTransformation(m_leftFoot2Toes_,  aHDR->leftAnkle());
+  		detail::computeStaticTransformation(m_rightFoot2Toes_, aHDR->rightAnkle());
+  		m_hasToes = true;
+      }
+      else
+    	  m_hasToes = false;
+
 
       try
 	{
@@ -1237,5 +1266,103 @@ ACCESSOR_BUILDER_WITH_ONESTEP_OF_CONTROL (getWaistAttitudeAbsolute, VectorRollPi
 ACCESSOR_BUILDER_WITH_ONESTEP_OF_CONTROL (getWaistPosition, ml::Vector, m_WaistPosition, 5)
 ACCESSOR_BUILDER_WITH_ONESTEP_OF_CONTROL (getWaistPositionAbsolute, ml::Vector, m_WaistPositionAbsolute, 5)
 ACCESSOR_BUILDER_WITH_ONESTEP_OF_CONTROL (getDataInProcess, unsigned, m_dataInProcess, 5)
+
+	MatrixHomogeneous& PatternGenerator::
+	lefttoerefSOUT_function( MatrixHomogeneous &res, int time )
+	{
+	  sotDEBUGIN(5);
+	  OneStepOfControlS(time);
+	  if (m_hasToes == false)
+		  res = m_LeftFootPosition;
+	  else
+		  res = m_LeftFootPosition * m_leftFoot2Toes_;
+
+	  sotDEBUGOUT(5);
+	  return res;
+	}
+
+	MatrixHomogeneous& PatternGenerator::
+	righttoerefSOUT_function( MatrixHomogeneous &res, int time )
+	{
+	  sotDEBUGIN(5);
+	  OneStepOfControlS(time);
+	  if (m_hasToes == false)
+		  res = m_RightFootPosition;
+	  else
+		  res = m_RightFootPosition * m_rightFoot2Toes_;
+
+	  sotDEBUGOUT(5);
+	  return res;
+	}
+
+	unsigned& PatternGenerator::
+	LeftFootSupportZoneSOUT_function( unsigned &res, int time )
+	{
+	  sotDEBUGIN(5);
+	  OneStepOfControlS(time);
+
+	  if (m_hasToes == false)
+		  res = 0;
+	  else
+	  {
+		double overlap = detail::computeToeOverlap(m_ZMPRefPos, m_LeftFootPosition, m_leftFoot2Toes_);
+		res = (overlap < 0) ? 0:1;
+	  }
+
+	  sotDEBUGOUT(5);
+	  return res;
+	}
+
+	// return 0 for the ankle, 1 for the toe
+	unsigned& PatternGenerator::
+	RightFootSupportZoneSOUT_function( unsigned &res, int time )
+	{
+	  sotDEBUGIN(5);
+	  OneStepOfControlS(time);
+
+	  if (m_hasToes == false)
+		  res = 0;
+	  else
+	  {
+		  double overlap = detail::computeToeOverlap(m_ZMPRefPos, m_RightFootPosition, m_rightFoot2Toes_);
+		  res = (overlap < 0) ? 0:1;
+	  }
+
+	  sotDEBUGOUT(5);
+	  return res;
+	}
+
+
+
+	double & PatternGenerator::
+	LeftToeOverlapSOUT_function( double &res, int time )
+	{
+	  sotDEBUGIN(5);
+	  OneStepOfControlS(time);
+
+	  if (m_hasToes == false)
+		  res = 0;
+	  else
+		  res = detail::computeToeOverlap(m_ZMPRefPos, m_LeftFootPosition, m_leftFoot2Toes_);
+
+	  sotDEBUGOUT(5);
+	  return res;
+	}
+
+	//
+	double& PatternGenerator::
+	RightToeOverlapSOUT_function( double &res, int time )
+	{
+	  sotDEBUGIN(5);
+	  OneStepOfControlS(time);
+
+	  if (m_hasToes == false)
+		  res = 0;
+	  else
+		  res = detail::computeToeOverlap(m_ZMPRefPos, m_RightFootPosition, m_rightFoot2Toes_);
+
+	  sotDEBUGOUT(5);
+	  return res;
+	}
   } // namespace dg
 } // namespace sot

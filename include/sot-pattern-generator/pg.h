@@ -358,7 +358,7 @@ namespace dynamicgraph {
       unsigned int m_dataInProcess;
 
       /*! \brief Booleans used to indicate feet contacts */
-      unsigned int m_rightFootContact, m_leftFootContact;
+      bool m_rightFootContact, m_leftFootContact;
 
       /*! @} */
 
@@ -408,8 +408,8 @@ namespace dynamicgraph {
 
       /*! \brief Internal method to get the information of contact or not on
 	the feet. */
-      unsigned int & getLeftFootContact(unsigned int & res,int time);
-      unsigned int & getRightFootContact(unsigned int & res,int time);
+      bool & getLeftFootContact(bool & res,int time);
+      bool & getRightFootContact(bool & res,int time);
       
     public:
 
@@ -508,8 +508,8 @@ namespace dynamicgraph {
       SignalTimeDependent<MatrixHomogeneous,int> InitRightFootRefSOUT;
 
       /*! \brief Booleans for contact of the feet */
-      SignalTimeDependent<unsigned int,int> leftFootContactSOUT;
-      SignalTimeDependent<unsigned int,int> rightFootContactSOUT;
+      SignalTimeDependent<bool,int> leftFootContactSOUT;
+      SignalTimeDependent<bool,int> rightFootContactSOUT;
       /*! @} */
 
       /*! \name Reimplement the interface of the plugin.
@@ -534,6 +534,8 @@ namespace dynamicgraph {
       void addOnLineStep( const double & x, const double & y, const double & th);
       void addStep( const double & x, const double & y, const double & th);
       void pgCommandLine( const std::string & cmdline );
+
+      void debug(void);
     };
 
 

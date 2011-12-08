@@ -17,7 +17,16 @@
  *
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
+//#define VP_DEBUG
+#define VP_DEBUG_MODE 45
 #include <sot/core/debug.hh>
+#ifdef VP_DEBUG
+ class sotPG__INIT
+ {
+ public:sotPG__INIT( void ) { dynamicgraph::sot::DebugTrace::openFile(); }
+ };
+ sotPG__INIT sotPG_initiator;
+#endif //#ifdef VP_DEBUG
 
 
 #include <jrl/mal/matrixabstractlayer.hh>
@@ -58,8 +67,8 @@ namespace dynamicgraph {
 			  firstSINTERN << jointPositionSIN ,"PatternGenerator("+name+")::onestepofcontrol" )
 
       ,m_dataInProcess(0)
-      ,m_rightFootContact(1) // It is assumed that the robot is standing.
-      ,m_leftFootContact(1)
+      ,m_rightFootContact(true) // It is assumed that the robot is standing.
+      ,m_leftFootContact(true)
       ,jointPositionSIN(NULL,"PatternGenerator("+name+")::input(vector)::position")
 
       ,motorControlJointPositionSIN(NULL,"PatternGenerator("+name+")::input(vector)::motorcontrol")
@@ -225,8 +234,21 @@ namespace dynamicgraph {
 
       //OneStepOfControlS.setDependencyType(TimeDependency<int>::ALWAYS_READY);
       //  OneStepOfControlS.setConstant(0);
+
+
+      OneStepOfControlS.addDependency( LeftFootCurrentPosSIN  );
+      OneStepOfControlS.addDependency( RightFootCurrentPosSIN );
+      OneStepOfControlS.addDependency( velocitydesSIN );
+      OneStepOfControlS.addDependency( firstSINTERN );
+      OneStepOfControlS.addDependency( motorControlJointPositionSIN );
+      OneStepOfControlS.addDependency( comSIN );
+
+      // For debug, register OSOC (not relevant for normal use).
+      signalRegistration( OneStepOfControlS );
+
 #if 0
-      signalRegistration( jointPositionSIN <<
+
+     signalRegistration( jointPositionSIN <<
 			  motorControlJointPositionSIN <<
 			  ZMPPreviousControllerSIN <<
 			  ZMPRefSOUT <<
@@ -304,7 +326,7 @@ namespace dynamicgraph {
 #endif
       initCommands();
 
-      dataInProcessSOUT.setReference( &m_dataInProcess );
+      //dataInProcessSOUT.setReference( &m_dataInProcess );
 
       sotDEBUGOUT(5);
     }
@@ -745,8 +767,8 @@ namespace dynamicgraph {
       return FlyingFootRefval;
     }
 
-    unsigned int & PatternGenerator ::
-    getLeftFootContact(unsigned int &res, int time)
+    bool & PatternGenerator ::
+    getLeftFootContact(bool &res, int time)
     {
       sotDEBUGIN(25);
       OneStepOfControlS(time);
@@ -756,8 +778,8 @@ namespace dynamicgraph {
       
     }
 
-    unsigned int & PatternGenerator ::
-    getRightFootContact(unsigned int &res, int time)
+    bool & PatternGenerator ::
+    getRightFootContact(bool &res, int time)
     {
       sotDEBUGIN(25);
       OneStepOfControlS(time);
@@ -1044,20 +1066,20 @@ namespace dynamicgraph {
 	      sotDEBUG(25) << "lLeftFootPosition.stepType: " << lLeftFootPosition.stepType
 			   << " lRightFootPosition.stepType: " << lRightFootPosition.stepType <<endl;
 	      // Find the support foot feet.
-	      m_leftFootContact = 1;
-	      m_rightFootContact = 1;
+	      m_leftFootContact = true;
+	      m_rightFootContact = true;
 	      if (lLeftFootPosition.stepType==-1)
 		{
-		  lSupportFoot=1; m_leftFootContact = 1;
+		  lSupportFoot=1; m_leftFootContact = true;
 		  if (lRightFootPosition.stepType!=-1)
-		    m_rightFootContact = 0;
+		    m_rightFootContact = false;
 		  m_DoubleSupportPhaseState = 0;
 		}
 	      else if (lRightFootPosition.stepType==-1)
 		{
-		  lSupportFoot=0; m_rightFootContact =1;
+		  lSupportFoot=0; m_rightFootContact = true;
 		  if (lLeftFootPosition.stepType!=-1)
-		    m_leftFootContact = 0;
+		    m_leftFootContact = false;
 		  m_DoubleSupportPhaseState = 0;
 		}
 	      else /* m_LeftFootPosition.z ==m_RightFootPosition.z
@@ -1262,7 +1284,27 @@ namespace dynamicgraph {
 				  docCommandVoid1("Send the command line to the internal pg object.",
 						  "string (command line)")));
       // Change next step : todo (deal with FootAbsolutePosition...).
+
+     addCommand("debug",
+       		 makeCommandVoid0(*this,
+				  (void (PatternGenerator::*) (void))&PatternGenerator::debug,
+				  docCommandVoid0("Launch a debug command.")));
+
     }
+
+    void PatternGenerator::debug(void)
+    {
+      std::cout << "t = " << dataInProcessSOUT.getTime() << std::endl;
+      std::cout << "deptype = " << dataInProcessSOUT.dependencyType << std::endl;
+      std::cout << "child = " << dataInProcessSOUT.updateFromAllChildren << std::endl;
+      std::cout << "last = " << dataInProcessSOUT.lastAskForUpdate << std::endl;
+
+      std::cout << "inprocess = " << dataInProcessSOUT.needUpdate(40) << std::endl;
+      std::cout << "onestep = " << OneStepOfControlS.needUpdate(40) << std::endl;
+
+      dataInProcessSOUT.Signal<unsigned int,int>::access(1);
+    }
+
 
     void PatternGenerator::addOnLineStep( const double & x, const double & y, const double & th)
     {

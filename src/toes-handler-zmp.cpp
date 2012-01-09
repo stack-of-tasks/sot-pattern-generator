@@ -125,6 +125,16 @@ namespace dynamicgraph {
     {
       return res;
     }
+    /* --------------------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
+
+    void FeatureToesHandlerZmp::addDependenciesFromReference( void ){}
+    void FeatureToesHandlerZmp::removeDependenciesFromReference( void ){}
+
+    /* --------------------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
 
     DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(FeatureToesHandlerZmp, "FeatureToesHandlerZmp");
   } // namespace sot

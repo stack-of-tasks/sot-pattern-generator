@@ -56,11 +56,19 @@ namespace dynamicgraph {
     class SOTTOESHANDLERZMP_EXPORT FeatureToesHandlerZmp
     	: public FeatureAbstract
         , public ::dynamicgraph::EntityHelper<FeatureToesHandlerZmp>
+    	, FeatureReferenceHelper<FeatureToesHandlerZmp>
     {
       DYNAMIC_GRAPH_ENTITY_DECL ();
 
       explicit FeatureToesHandlerZmp (const std::string& name);
       virtual ~FeatureToesHandlerZmp ();
+
+
+      /*! \name Dealing with the reference value to be reach with this feature.
+        @{
+      */
+      DECLARE_REFERENCE_FUNCTIONS(FeatureToesHandlerZmp);
+      /*! @} */
 
     protected:
 

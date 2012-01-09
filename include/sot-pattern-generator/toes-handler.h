@@ -55,12 +55,19 @@ namespace dynamicgraph {
 
     class SOTTOESHANDLER_EXPORT FeatureToesHandler
     	: public FeatureAbstract
+      	, public FeatureReferenceHelper<FeatureToesHandler>
         , public ::dynamicgraph::EntityHelper<FeatureToesHandler>
     {
       DYNAMIC_GRAPH_ENTITY_DECL ();
 	
       explicit FeatureToesHandler (const std::string& name);
       virtual ~FeatureToesHandler ();
+
+      /*! \name Dealing with the reference value to be reach with this feature.
+        @{
+      */
+      DECLARE_REFERENCE_FUNCTIONS(FeatureToesHandler);
+      /*! @} */
 
     protected:
 

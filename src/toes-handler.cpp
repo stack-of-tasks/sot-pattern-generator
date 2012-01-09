@@ -150,6 +150,18 @@ namespace dynamicgraph {
 
 
     DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(FeatureToesHandler, "FeatureToesHandler");
+
+    /* --------------------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
+
+    void FeatureToesHandler::addDependenciesFromReference( void ){}
+    void FeatureToesHandler::removeDependenciesFromReference( void ){}
+
+    /* --------------------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
+    /* --------------------------------------------------------------------- */
+
   } // namespace sot
 } // namespace dynamicgraph
 

@@ -1,5 +1,10 @@
 import sys
 import logging
+logger = logging.getLogger()
+logging.basicConfig()
+logger.setLevel(logging.DEBUG)
+
+
 from numpy import *
 from dynamic_graph import plug
 from dynamic_graph.sot.core import *
@@ -12,17 +17,17 @@ from dynamic_graph.sot.core.meta_task_6d import MetaTask6d,toFlags
 sys.path.append("/home/nddang/src/sotpy/sot-pattern-generator/python")
 from robotSpecific import pkgDataRootDir,modelName,robotDimension,initialConfig,gearRatio,inertiaRotor
 
+
 OPENHRP = True
 if "solver" not in globals().keys():
+    logger.debug("import solver and robot from tools")
     OPENHRP = False
     from dynamic_graph.sot.dynamics.tools import solver, robot
 
 import time
 robotName = 'hrp14small'
 
-logger = logging.getLogger()
-logging.basicConfig()
-logger.setLevel(logging.DEBUG)
+
 dt = 0.005
 def totuple( a ):
     al=a.tolist()
@@ -47,6 +52,10 @@ def inc():
     qs.append(state)
     if clt:
         clt.updateElementConfig('hrp', list(state) + 10*[0])
+
+
+
+logger.debug("Creating interactive function")
 
 from ThreadInterruptibleLoop import *
 @loopInThread
@@ -84,6 +93,9 @@ def t(): print robot.device.state.time-1
 def iter():         print 'iter = ',robot.device.state.time
 @optionalparentheses
 def status():       print runner.isPlay
+
+logger.debug("Done creating interactive function")
+
 
 # --- PG ---------------------------------------------------------
 from dynamic_graph.sot.pattern_generator import PatternGenerator,Selector
@@ -197,6 +209,7 @@ pg.parseCmd(':stepseq 0.0 -0.095 0.0 0.2 0.19 0.0 0.2 -0.19 0.0 0.2 0.19 0.0 0.2
 #pg.velocitydes.value =(0.1,0.0,0.0)
 
 # --- TRACER -----------------------------------------------------------------
+logger.debug("Creating tracer")
 from dynamic_graph.tracer import *
 from dynamic_graph.tracer_real_time import *
 tr = Tracer('tr')
@@ -205,4 +218,8 @@ tr.start()
 robot.device.after.addSignal('tr.triger')
 robot.device.before.addSignal(robot.device.name + ".zmp")
 tr.add(robot.device.name + ".zmp",'zmpref')
+logger.debug("Created tracer")
 
+
+while True:
+    inc()

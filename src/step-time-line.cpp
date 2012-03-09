@@ -146,18 +146,18 @@ namespace dynamicgraph {
 
     void StepTimeLine::setComputer(const std::string& name)
     {
-      Entity* entity = &g_pool.getEntity( name );
+      Entity* entity = &g_pool().getEntity( name );
       stepComputer = dynamic_cast<StepComputer*>(entity);
     }
     void StepTimeLine::setQueue(const std::string& name)
     {
-      Entity* entity = &g_pool.getEntity( name );
+      Entity* entity = &g_pool().getEntity( name );
       stepQueue = dynamic_cast<StepQueue*>(entity);
     }
 
     void StepTimeLine::setPGManager(const std::string& name)
     {
-      Entity* entity = &g_pool.getEntity( name );
+      Entity* entity = &g_pool().getEntity( name );
       pgManager = dynamic_cast<PGManager*>(entity);
     }
 

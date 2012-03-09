@@ -203,10 +203,8 @@ robot.device.before.addSignal('stepper.trigger')
 robot.device.before.addSignal('stepcomp.laststep')
 
 # #time.sleep(0.5)
-stepper.setState('start')
 # time.sleep(0.5)
 
-# pg.parseCmd(":StartOnLineStepSequencing 0.0 -0.095 0.0 0.0 0.19 0.0 0.0 -0.19 0.0 0.0 0.19 0.0")
 #pg.addStep(0,0.19,0)
 #pg.addStep(0,-0.19,0)
 
@@ -284,5 +282,12 @@ tr.add("pg.comref",'pg.comref')
 
 
 if __name__ == '__main__':
+    pg.parseCmd(":StartOnLineStepSequencing 0.0 -0.095 0.0 0.0 0.19 0.0 " 
+                + " 0.2 -0.19 0.0 0.0 0.19 0.0 " 
+                + " 0.2 -0.19 0.0 0.0 0.19 0.0 " 
+                + " 0.2 -0.19 0.0 0.0 0.19 0.0 " 
+                + " 0.2 -0.19 0.0 0.0 0.19 0.0 " 
+                )
+    #stepper.setState('start')
     while True:
         inc()

@@ -168,7 +168,7 @@ namespace dynamicgraph {
 
     void PGManager::initPg( const std::string& name )
     {
-      pgEntity = &g_pool.getEntity( name );
+      pgEntity = &g_pool().getEntity( name );
       PatternGenerator* spg = dynamic_cast<PatternGenerator*>(pgEntity);
       if (spg){ pgi = spg->GetPatternGeneratorInterface(); }
     }

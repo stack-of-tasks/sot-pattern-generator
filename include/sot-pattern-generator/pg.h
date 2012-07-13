@@ -105,11 +105,9 @@ namespace dynamicgraph {
 
       /*! Class name */
     protected:
-      /*! \brief The class name */
-      static const std::string CLASS_NAME;
 
     public:
-      virtual const std::string & getClassName(void) const { return CLASS_NAME; }
+      DYNAMIC_GRAPH_ENTITY_DECL();
 
     protected:
 

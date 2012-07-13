@@ -1837,6 +1837,110 @@ OneStepOfControl(int &dummy, int time)
     /* --- PARAMS --------------------------------------------------------------- */
 
     void PatternGenerator::
+    initCommands( void )
+    {
+      using namespace command;
+      addCommand("setVrmlDir",
+		 makeCommandVoid1(*this,&PatternGenerator::setVrmlDirectory,
+				  docCommandVoid1("Set VRML directory.",
+						  "string (path name)")));
+      addCommand("setVrml",
+		 makeCommandVoid1(*this,&PatternGenerator::setVrmlMainFile,
+				  docCommandVoid1("Set VRML main file.",
+						  "string (file name)")));
+      addCommand("setXmlSpec",
+		 makeCommandVoid1(*this,&PatternGenerator::setXmlSpecificitiesFile,
+				  docCommandVoid1("Set Xml file for specicifities.",
+						  "string (path/filename)")));
+      addCommand("setXmlRank",
+		 makeCommandVoid1(*this,&PatternGenerator::setXmlRankFile,
+				  docCommandVoid1("Set XML rank file.",
+						  "string (path/filename)")));
+      addCommand("setParamPreview",
+		 makeCommandVoid1(*this,&PatternGenerator::setParamPreviewFile,
+				  docCommandVoid1("Set [guess what!] file",
+						  "string (path/filename)")));
+      // for the setFiles, need to implement the makeCmdVoid5... later
+      // displayfiles... later too
+      addCommand("buildModel",
+       		 makeCommandVoid0(*this,
+				  (void (PatternGenerator::*) (void))&PatternGenerator::buildModel,
+				  docCommandVoid0("From the files, parse and build.")));
+      addCommand("initState",
+       		 makeCommandVoid0(*this,
+				  (void (PatternGenerator::*) (void))&PatternGenerator::InitState,
+				  docCommandVoid0("From q and model, compute the initial geometry.")));
+      addCommand("frameReference",
+       		 makeCommandVoid1(*this,
+				  &PatternGenerator::setReferenceFromString,
+				  docCommandVoid1("Set the reference.",
+						  "string among "
+						  "World|Egocentered|LeftFootcentered|Waistcentered")));
+
+      addCommand("getTimeStep",
+		 makeDirectGetter(*this,&m_TimeStep,docDirectGetter("timestep","double")));
+      addCommand("setTimeStep",
+		 makeDirectSetter(*this,&m_TimeStep,docDirectSetter("timestep","double")));
+
+      addCommand("getInitByRealState",
+		 makeDirectGetter(*this,&m_InitPositionByRealState,
+				  docDirectGetter("initByRealState","bool")));
+      addCommand("setInitByRealState",
+		 makeDirectSetter(*this,&m_InitPositionByRealState,
+				  docDirectSetter("initByRealState","bool")));
+
+      addCommand("addOnLineStep",
+       		 makeCommandVoid3(*this,&PatternGenerator::addOnLineStep,
+				  docCommandVoid3("Add a step on line.",
+						  "double (x)","double (y)","double (theta)")));
+      addCommand("addStep",
+       		 makeCommandVoid3(*this,&PatternGenerator::addOnLineStep,
+				  docCommandVoid3("Add a step in the stack.",
+						  "double (x)","double (y)","double (theta)")));
+      addCommand("parseCmd",
+       		 makeCommandVoid1(*this,&PatternGenerator::pgCommandLine,
+				  docCommandVoid1("Send the command line to the internal pg object.",
+						  "string (command line)")));
+      // Change next step : todo (deal with FootAbsolutePosition...).
+    }
+
+    void PatternGenerator::addOnLineStep( const double & x, const double & y, const double & th)
+    {
+      assert( m_PGI!=NULL );
+      m_PGI->AddOnLineStep(x,y,th);
+    }
+    void PatternGenerator::addStep( const double & x, const double & y, const double & th)
+    {
+      assert( m_PGI!=NULL );
+      m_PGI->AddStepInStack(x,y,th);
+    }
+    void PatternGenerator::pgCommandLine( const std::string & cmdline )
+    {
+      assert( m_PGI!=NULL );
+      std::istringstream cmdArgs( cmdline );
+      m_PGI->ParseCmd(cmdArgs);
+    }
+
+
+    int PatternGenerator::
+    stringToReferenceEnum( const std::string & FrameReference )
+    {
+      if (FrameReference=="World") return WORLD_FRAME;
+      else if (FrameReference=="Egocentered") return EGOCENTERED_FRAME;
+      else if (FrameReference=="LeftFootcentered")return LEFT_FOOT_CENTERED_FRAME;
+      else if (FrameReference=="Waistcentered")return WAIST_CENTERED_FRAME;
+      assert( false && "String name should be in the list "
+	      "World|Egocentered|LeftFootcentered|Waistcentered" );
+      return 0;
+    }
+
+    void PatternGenerator::
+    setReferenceFromString( const std::string & str )
+    {
+      m_ReferenceFrame = stringToReferenceEnum( str );
+    }
+
+    void PatternGenerator::
     commandLine( const std::string& cmdLine,
 		 std::istringstream& cmdArgs,
 		 std::ostream& os )

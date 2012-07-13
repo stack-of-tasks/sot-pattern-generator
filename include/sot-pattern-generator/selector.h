@@ -67,7 +67,6 @@ namespace dynamicgraph {
     {
     public:
       DYNAMIC_GRAPH_ENTITY_DECL();
-
     protected:
       /** Number of signal type. For each signal type, you have
        * one output and <nbEntries> inputs. */

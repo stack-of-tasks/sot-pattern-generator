@@ -132,7 +132,7 @@ namespace dynamicgraph {
 	  std::string name = "pg";
 	  cmdArgs >> std::ws;
 	  if( cmdArgs.good()){ cmdArgs >> name; }
-	  pgEntity = &(PoolStorage::getInstance()->getEntity( name ));
+	  pgEntity = & PoolStorage::getInstance()->getEntity( name );
 	  PatternGenerator* spg = dynamic_cast<PatternGenerator*>(pgEntity);
 	  if (spg){ pgi = spg->GetPatternGeneratorInterface(); }
 	}

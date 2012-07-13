@@ -1197,7 +1197,9 @@ namespace dynamicgraph {
       else if (FrameReference=="Waistcentered")return WAIST_CENTERED_FRAME;
       assert( false && "String name should be in the list "
 	      "World|Egocentered|LeftFootcentered|Waistcentered" );
+      return 0;
     }
+
     void PatternGenerator::
     setReferenceFromString( const std::string & str )
     {

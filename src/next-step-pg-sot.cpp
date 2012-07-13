@@ -31,6 +31,7 @@
 
 #define PI 3.1416
 
+namespace dg=dynamicgraph;
 namespace dynamicgraph {
   namespace sot {
 
@@ -317,7 +318,7 @@ namespace dynamicgraph {
 	{
 	  std::string name = "pg";
 	  cmdArgs >> std::ws; if( cmdArgs.good()) cmdArgs >> name;
-	  pgEntity = &g_pool.getEntity( name );
+	  pgEntity = & PoolStorage::getInstance()->getEntity( name );
 	  m_sPG = dynamic_cast<PatternGenerator *>(pgEntity);
 	  if (m_sPG!=0)
 	    m_PGI = m_sPG->GetPatternGeneratorInterface();

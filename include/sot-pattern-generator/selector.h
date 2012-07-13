@@ -66,8 +66,7 @@ namespace dynamicgraph {
       :public Entity
     {
     public:
-      static const std::string CLASS_NAME;
-
+      DYNAMIC_GRAPH_ENTITY_DECL();
     protected:
       /** Number of signal type. For each signal type, you have
        * one output and <nbEntries> inputs. */

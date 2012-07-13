@@ -63,11 +63,10 @@ namespace dynamicgraph {
       :public NextStep
     {
     public:
-      static const std::string CLASS_NAME;
+      DYNAMIC_GRAPH_ENTITY_DECL();      
       static const unsigned int ADDING_STEP=0;
       static const unsigned int CHANGING_STEP=1;
 
-      virtual const std::string& getClassName( void ) const { return CLASS_NAME; }
 
     protected:
 

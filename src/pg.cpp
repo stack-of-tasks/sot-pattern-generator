@@ -1337,6 +1337,7 @@ namespace dynamicgraph {
 	      "World|Egocentered|LeftFootcentered|Waistcentered" );
       return 0;
     }
+
     void PatternGenerator::
     setReferenceFromString( const std::string & str )
     {

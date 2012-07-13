@@ -31,6 +31,7 @@
 
 #define PI 3.1416
 
+namespace dg=dynamicgraph;
 namespace dynamicgraph {
   namespace sot {
 

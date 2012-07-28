@@ -355,6 +355,9 @@ namespace dynamicgraph {
        * working anymore/yet. */
       unsigned int m_dataInProcess;
 
+      /*! \brief Booleans used to indicate feet contacts */
+      bool m_rightFootContact, m_leftFootContact;
+
       /*! @} */
 
       /*! Parsing a file of command by the walking pattern generator interface.
@@ -401,7 +404,11 @@ namespace dynamicgraph {
       /*! \brief Internal method to get the position of the right foot. */
       MatrixHomogeneous & getInitRightFootRef(MatrixHomogeneous &res, int time);
 
-
+      /*! \brief Internal method to get the information of contact or not on
+	the feet. */
+      bool & getLeftFootContact(bool & res,int time);
+      bool & getRightFootContact(bool & res,int time);
+      
     public:
 
       /*! \name External signals
@@ -498,6 +505,9 @@ namespace dynamicgraph {
       /*! \brief Externalize the right foot position reference. */
       SignalTimeDependent<MatrixHomogeneous,int> InitRightFootRefSOUT;
 
+      /*! \brief Booleans for contact of the feet */
+      SignalTimeDependent<bool,int> leftFootContactSOUT;
+      SignalTimeDependent<bool,int> rightFootContactSOUT;
       /*! @} */
 
       /*! \name Reimplement the interface of the plugin.
@@ -522,6 +532,8 @@ namespace dynamicgraph {
       void addOnLineStep( const double & x, const double & y, const double & th);
       void addStep( const double & x, const double & y, const double & th);
       void pgCommandLine( const std::string & cmdline );
+
+      void debug(void);
     };
 
 

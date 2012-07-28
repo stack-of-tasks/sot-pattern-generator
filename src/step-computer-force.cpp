@@ -319,7 +319,7 @@ namespace dynamicgraph {
 	  std::string name = "stepobs";
 	  cmdArgs >> std::ws;
 	  if( cmdArgs.good()){ cmdArgs >> name; }
-	  Entity* entity = & PoolStorage::getInstance()->getEntity( name );
+	  Entity* entity = &(PoolStorage::getInstance()->getEntity( name ));
 	  twoHandObserver = dynamic_cast<StepObserver*>(entity);
 	}
       else { Entity::commandLine( cmdLine,cmdArgs,os); }

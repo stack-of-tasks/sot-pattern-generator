@@ -82,7 +82,8 @@ class MetaPG:
         # --- Build the converter object for the waist task
         self.waistReferenceVector = Stack_of_vector('waistReferenceVector')
         plug(self.pg.initwaistposref,self.waistReferenceVector.sin1)
-        plug(self.pg.initwaistattref,self.waistReferenceVector.sin2)
+        #plug(self.pg.initwaistattref,self.waistReferenceVector.sin2)
+        plug(self.pg.comattitude,self.waistReferenceVector.sin2)
         self.waistReferenceVector.selec1(0,3)
         self.waistReferenceVector.selec2(0,3)
 
@@ -97,6 +98,7 @@ class MetaPG:
 
     def plugWaistTask(self,taskWaist):
         plug(self.waistReference.sout,taskWaist.featureDes.position)
+        taskWaist.feature.selec.value = '111100'
 
     def startHerdt(self):
         self.pg.parseCmd(':SetAlgoForZmpTrajectory Herdt')
@@ -109,3 +111,84 @@ class MetaPG:
         # The next command must be runned after a OpenHRP.inc ... ???
         # Start the robot with a speed of 0.1 m/0.8 s.
         self.pg.parseCmd(':HerdtOnline 0.1 0.0 0.0')
+
+
+
+from math import atan2,pi
+from numpy import array,dot
+
+# --- WALK TRACKER -------------------------------------------------------------
+# --- WALK TRACKER -------------------------------------------------------------
+# --- WALK TRACKER -------------------------------------------------------------
+class WalkTracker:
+    '''
+    PD controller on the Herdt PG input: given a time-dependant function of the
+    target position, compute the velocity input to be apply on the PG to track
+    the target.
+    '''
+    def __init__(self,traj,dyn,pg,Kp=1.0,dt=0.005):
+        '''
+        traj is the functor (input T, output arrayX2 for the 2D position, or
+        pair of arrayX2 for position and derivative).  dyn and pg are the
+        entities of the dynamic model (to get the current position) and of the
+        PG computer (to send the reference). Kp is the gain of the PD. dt is
+        the period of the control, to be used to compute the target derivative
+        if traj returns only the position.
+        '''
+        self.Kp = Kp
+        self.trajfunction = traj
+        self.pg = pg
+        self.rate = 200
+        self.dyn = dyn
+        self.dt = dt
+
+    def setDisplay(self,viewer,target='zmp',vector='axis1'):
+        '''
+        If needed, the PD can be displayed on a viewer, using the two object
+        names given in input.
+        '''
+        self.viewer = viewer
+        self.viewTarget = target
+        self.viewVelocity = vector
+
+    def getPositionAndDerivative(self,t):
+        '''
+        Call the traj function, and if needed compute the numerical derivative.
+        '''
+        res = self.trajfunction(t)
+        if isinstance(res[0],float):
+            if 'trajprec' in self.__dict__ and 'dt' in self.__dict__:
+                deriv =  (res-self.trajprec) / ( (t-self.tprec)*self.dt)
+            else: deriv = array([0,0])
+            self.trajprec = res
+            self.tprec = t
+            res = (res,deriv)
+        return res
+
+    def update(self,t):
+        '''
+        Compute the PD law and send it to the PG. This function can be called
+        at every time iteration, but only works along the defined rate.
+        '''
+        if t%self.rate != 1: return
+
+        p = self.dyn.com.value[0:2]
+        waRwo = (array(self.dyn.waist.value)[0:2,0:2]).T
+        th = atan2(self.dyn.waist.value[1][0],self.dyn.waist.value[0][0])
+
+        (pref,v) = self.getPositionAndDerivative(t)
+        thref = atan2(v[1],v[0])
+
+        wo_vref = self.Kp*(pref-p)+v
+        wa_vref = dot(waRwo , wo_vref)
+
+        dth =  ( (thref-th+pi)%(2*pi)-pi)
+        vref = (wa_vref[0], wa_vref[1], self.Kp*dth )
+        self.pg.velocitydes.value = vref
+
+        if 'viewer' in self.__dict__:
+            self.viewer.updateElementConfig(self.viewTarget
+                                            ,(float(pref[0]),float(pref[1]),0,0,0,0))
+            self.viewer.updateElementConfig(self.viewVelocity
+                                            ,(float((p+10*v)[0]),float((p+10*v)[1])
+                                              ,0,0,0,thref))

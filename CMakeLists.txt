@@ -44,10 +44,10 @@ ADD_REQUIRED_DEPENDENCY("jrl-dynamics >= 1.16.1")
 ADD_REQUIRED_DEPENDENCY("sot-core >= 1.0")
 
 # Search for closed-source packages.
-ADD_REQUIRED_DEPENDENCY("hrp2-dynamics >= 1.3.0")
-ADD_REQUIRED_DEPENDENCY("hrp2-10-optimized >= 1.0")
+ADD_OPTIONAL_DEPENDENCY("hrp2-dynamics >= 1.3.0")
+ADD_OPTIONAL_DEPENDENCY("hrp2-10-optimized >= 1.0")
 
-ADD_REQUIRED_DEPENDENCY("hrp2-10 >= 1.0.0")
+ADD_OPTIONAL_DEPENDENCY("hrp2-10 >= 1.0.0")
 
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(include)

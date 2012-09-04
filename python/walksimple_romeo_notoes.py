@@ -9,16 +9,13 @@ import dynamic_graph.script_shortcuts
 from dynamic_graph.script_shortcuts import optionalparentheses
 from dynamic_graph.matlab import matlab
 from dynamic_graph.sot.core.meta_task_6d import MetaTask6d,toFlags
-from meta_double_task_6d import MetaDoubleTask6d
-from dynamic_graph.sot.pattern_generator.toes_handler import FeatureToesHandler
-from dynamic_graph.sot.pattern_generator.toes_handler_zmp import FeatureToesHandlerZmp
-from dynamic_graph.sot.dyninv import *
+from attime import attime
 
-from robotSpecific import *
-from robotSpecific_romeo import * 
+from robotSpecific 		        import *
+from robotSpecific_romeo_notoes import * 
 
 # robotName = 'hrp10small'
-robotName = 'romeo'
+robotName = 'romeo_notoes'
 
 from numpy import *
 def totuple( a ):
@@ -27,6 +24,9 @@ def totuple( a ):
     for i in range(a.shape[0]):
         res.append( tuple(al[i]) )
     return tuple(res)
+
+# initialConfig.clear()
+# initialConfig['hrp10small'] = (0,0,0.648697398115,0,0,0)+(0, 0, -0.4538, 0.8727, -0.4189, 0, 0, 0, -0.4538, 0.8727, -0.4189, 0, 0, 0, 0, 0, 0.2618, -0.1745, 0, -0.5236, 0, 0, 0, 0, 0.2618, 0.1745, 0, -0.5236, 0, 0, 0, 0 )
 
 # --- ROBOT SIMU ---------------------------------------------------------------
 # --- ROBOT SIMU ---------------------------------------------------------------
@@ -43,33 +43,34 @@ dt=5e-3
 # --- VIEWER -------------------------------------------------------------------
 # --- VIEWER -------------------------------------------------------------------
 try:
-   import robotviewer
+    import robotviewer
 
-   def stateFullSize(robot):
-       return [float(val) for val in robot.state.value]+10*[0.0]
-   RobotSimu.stateFullSize = stateFullSize
-   robot.viewer = robotviewer.client('XML-RPC')
-   # Check the connection
-   robot.viewer.updateElementConfig('hrp',robot.stateFullSize())
+    def stateFullSize(robot):
+        return [float(val) for val in robot.state.value]
+    RobotSimu.stateFullSize = stateFullSize
 
-   def refreshView( robot ):
-       robot.viewer.updateElementConfig('hrp',robot.stateFullSize())
-   RobotSimu.refresh = refreshView
-   def incrementView( robot,dt ):
-       robot.incrementNoView(dt)
-       robot.refresh()
-   RobotSimu.incrementNoView = RobotSimu.increment
-   RobotSimu.increment = incrementView
-   def setView( robot,*args ):
-       robot.setNoView(*args)
-       robot.refresh()
-   RobotSimu.setNoView = RobotSimu.set
-   RobotSimu.set = setView
+    robot.viewer = robotviewer.client('XML-RPC')
+#    robot.viewer.updateElementConfig('hrp',robot.stateFullSize())
 
-   robot.refresh()
+    def refreshView( robot ):
+        robot.viewer.updateElementConfig('hrp',robot.stateFullSize())
+    RobotSimu.refresh = refreshView
+    def incrementView( robot,dt ):
+        robot.incrementNoView(dt)
+        robot.refresh()
+    RobotSimu.incrementNoView = RobotSimu.increment
+    RobotSimu.increment = incrementView
+    def setView( robot,*args ):
+        robot.setNoView(*args)
+        robot.refresh()
+    RobotSimu.setNoView = RobotSimu.set
+    RobotSimu.set = setView
+
+    robot.refresh()
 except:
     print "No robot viewer, sorry."
     robot.viewer = None
+
 
 
 # --- MAIN LOOP ------------------------------------------
@@ -151,7 +152,6 @@ pg.buildModel()
 # Standard initialization
 pg.parseCmd(":samplingperiod 0.005")
 pg.parseCmd(":previewcontroltime 1.6")
-pg.parseCmd(":comheight 0.814")
 pg.parseCmd(":omega 0.0")
 pg.parseCmd(":stepheight 0.05")
 pg.parseCmd(":singlesupporttime 0.780")
@@ -161,6 +161,7 @@ pg.parseCmd(":LimitsFeasibility 0.0")
 pg.parseCmd(":ZMPShiftParameters 0.015 0.015 0.015 0.015")
 pg.parseCmd(":TimeDistributeParameters 2.0 3.5 1.0 3.0")
 pg.parseCmd(":UpperBodyMotionParameters 0.0 -0.5 0.0")
+pg.parseCmd(":comheight 0.814")
 pg.parseCmd(":SetAlgoForZmpTrajectory Morisawa")
 
 plug(dyn.position,pg.position)
@@ -176,13 +177,6 @@ geom.setFiles(modelDir, modelName[robotName],specificitiesPath,jointRankPath)
 geom.parse()
 geom.createOpPoint('rf','right-ankle')
 geom.createOpPoint('lf','left-ankle')
-
-# -- create the operational points for the toes
-dyn.createOpPoint('rt','right-toe')
-dyn.createOpPoint('lt','left-toe')
-
-# -- end toes
-
 plug(dyn.position,geom.position)
 geom.ffposition.value = 6*(0,)
 geom.velocity.value = robotDim*(0,)
@@ -248,117 +242,35 @@ plug(featureCom.errordot,taskComPD.errorDot)
 taskComPD.controlGain.value = 40
 taskComPD.setBeta(-1)
 
-# create a task with changeable objective
-# according to the position of the position of the zmp, the support zone is
-# either the ankle or the toe
-taskLFT=MetaDoubleTask6d('lft',dyn,'lf','left-ankle',pg.leftfootref, 'lt','left-toe',  pg.lefttoeref)
-taskLFT.task.controlGain.value = 40
-plug(pg.LeftFootSupportZone, taskLFT.selectorFT.selec)
+# --- TASK RIGHT FOOT
+# Task right hand
+taskRF=MetaTask6d('rf',dyn,'rf','right-ankle')
+taskLF=MetaTask6d('lf',dyn,'lf','left-ankle')
 
-taskRFT=MetaDoubleTask6d('rft',dyn,'rf','right-ankle',pg.rightfootref, 'rt','right-toe',  pg.righttoeref)
-taskRFT.task.controlGain.value = 40
-plug(pg.RightFootSupportZone, taskRFT.selectorFT.selec)
+plug(pg.rightfootref,taskRF.featureDes.position)
+taskRF.task.controlGain.value = 40
+plug(pg.leftfootref,taskLF.featureDes.position)
+taskLF.task.controlGain.value = 40
 
 # ---- WAIST TASK ORIENTATION ---
 #  set the orientation of the waist to be the same as the one of the foot.
 taskWaistOr=MetaTask6d('waistOr',dyn,'waist','waist')
-plug(taskRFT.featureDes.position,taskWaistOr.featureDes.position)
+plug(pg.rightfootref,taskWaistOr.featureDes.position)
 taskWaistOr.task.controlGain.value = 40
 taskWaistOr.feature.selec.value = '100000'
 
-# --- TASK Toe Zmp --------------------------------------------------
-# compute the toe angle using the position of the zmp
-featureToesZmp = FeatureToesHandlerZmp('featureToesZmp')
-featureToesZmp.displaySignals()
 
-taskToesZmp = Task('taskToesZmp')
-taskToesZmp.add('featureToesZmp')
-gainToesZmp = GainAdaptive('gainToesZmp')
-gainToesZmp.set(0.1,0.1,125e3)
-gainToesZmp.gain.value = 20
-plug(taskToesZmp.error,gainToesZmp.error)
-plug(gainToesZmp.gain,taskToesZmp.controlGain)
-
-plug(pg.LeftToeOverlap, featureToesZmp.leftToeOverlap)
-plug(pg.RightToeOverlap,featureToesZmp.rightToeOverlap)
-plug(dyn.position,featureToesZmp.state)
-
-
-# --- TASK Toe Pouet --------------------------------------------------
-featureSuperToes = FeatureToesHandler('featureSuperToes')
-featureSuperToes.dt.value = dt
-taskToes = Task('taskToes')
-taskToes.add('featureSuperToes')
-gainToes = GainAdaptive('gainToes')
-gainToes.set(0.1,0.1,125e3)
-gainToes.gain.value = 20
-plug(taskToes.error,gainToes.error)
-plug(gainToes.gain,taskToes.controlGain)
-
-plug(pg.LeftFootSupportZone,featureSuperToes.onLeftToe)
-plug(pg.RightFootSupportZone,featureSuperToes.onRightToe)
-plug(dyn.position,featureSuperToes.state)
-
-taskHead=MetaTask6d('head',dyn,'gaze','gaze')
-plug(taskRFT.featureDes.position, taskHead.featureDes.position)
-taskHead.feature.selec.value = '111000'
-taskHead.task.controlGain.value = 5
-
-# --- TASK POSTURE --------------------------------------------------
-# set a default position for the joints. 
-featurePosition = FeatureGeneric('featurePosition')
-featurePositionDes = FeatureGeneric('featurePositionDes')
-featurePosition.setReference('featurePositionDes')
-plug(dyn.position,featurePosition.errorIN)
-featurePositionDes.errorIN.value = initialConfig['romeo']
-featurePosition.jacobianIN.value = totuple( identity(robotDim) )
-
-taskPosition = Task('taskPosition')
-taskPosition.add('featurePosition')
-# featurePosition.selec.value = toFlags((6,24))
-
-gainPosition = GainAdaptive('gainPosition')
-gainPosition.set(0.1,0.1,125e3)
-gainPosition.gain.value = 5
-plug(taskPosition.error,gainPosition.error)
-plug(gainPosition.gain,taskPosition.controlGain)
-featurePosition.selec.value = '000000000000001111111111111100000000000'
-
-# Task on TaskJointLimits
-# to avoid wrong behavior for the toes...
-# --- TASK JL ------------------------------------------------------
-taskJL = TaskJointLimits('taskJL')
-plug(dyn.position,taskJL.position)
-plug(dyn.lowerJl,taskJL.referenceInf)
-plug(dyn.upperJl,taskJL.referenceSup)
-taskJL.dt.value = dt
-# taskJL.selec.value = toFlags(range(25,robotDim))
-taskJL.selec.value = toFlags((31,38))
 
 # ---- SOT ---------------------------------------------------------------------
 # The solver SOTH of dyninv is used, but normally, the SOT solver should be sufficient
 from dynamic_graph.sot.dyninv import SolverKine
 sot = SolverKine('sot')
 sot.setSize(robotDim)
-sot.push('taskJL')					# force the joint value to be within the limits
-sot.push(taskWaist.task.name)		# avoid the swing motion of the waist + constraint its height
-sot.push(taskLFT.task.name)			# constraint the position of the left foot or toe
-sot.push(taskRFT.task.name)			# constraint the position of the right foot or toe
-sot.push(taskComPD.name)			
-sot.push(taskWaistOr.task.name)		# constraint the waist orientation: follow the foot orientation
-
-# Meth 1: depending of the state of the support:
-#  if the foot lies on the ankle, set the joint toe hangle to 0
-#  if the foot lies on the toe, do nothing (should reduce the knee velocity)
-# requires the additional task taskJL
-sot.push('taskToes')
-
-# Meth 2: setting the toe angle using the zmp pos in the toe surface
-# sot.push('taskToesZmp')
-
-# Stun the upper part of the body.
-sot.push(taskHead.task.name)		# constraint the head orientation: look straight ahead
-sot.push('taskPosition')			# stun the arms.
+sot.push(taskWaist.task.name)
+sot.push(taskRF.task.name)
+sot.push(taskLF.task.name)
+sot.push(taskComPD.name)
+sot.push(taskWaistOr.task.name)
 
 plug(sot.control,robot.control)
 
@@ -370,7 +282,8 @@ pg.parseCmd(':singlesupporttime 0.7')
 # When velocity reference is at zero, the robot stops all motion after n steps
 pg.parseCmd(':numberstepsbeforestop 4')
 # Set constraints on XY
-# pg.parseCmd(':setfeetconstraint XY 0.04 0.04')
+# To be determined. But not 0.09 0.06 !!!
+# pg.parseCmd(':setfeetconstraint XY 0.09 0.06')
 
 # The next command must be runned after a OpenHRP.inc ... ???
 # Start the robot with a speed of 0.1 m/0.8 s.
@@ -378,3 +291,21 @@ pg.parseCmd(':HerdtOnline 0.1 0.0 0.0')
 
 # You can now modifiy the speed of the robot using set pg.velocitydes [3]( x, y, yaw)
 pg.velocitydes.value =(0.1,0.0,0.0)
+# pg.velocitydes.value = (0.01, 0, -0.2)
+
+# --- TRACER -----------------------------------------------------------------
+from dynamic_graph.tracer import *
+from dynamic_graph.tracer_real_time import *
+tr = Tracer('tr')
+tr.open('/tmp/','','.dat')
+tr.start()
+robot.after.addSignal('tr.triger')
+
+#tr.add(dyn.name+'.ffposition','ff')
+tr.add(taskRF.featureDes.name+'.position','refr')
+tr.add(taskLF.featureDes.name+'.position','refl')
+
+@attime(100)
+def m1():
+    "Timer 1... done"
+

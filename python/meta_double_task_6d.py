@@ -50,7 +50,7 @@ class MetaDoubleTask6d(object):
         self.gain.set(0.1,0.1,125e3)
 
     def plugEverything(self):
-        self.feature.sdes.value = self.featureDes.name
+        self.feature.setReference(self.featureDes.name)
         plug(self.selectorFT.jacobian,self.feature.signal('Jq'))
         plug(self.selectorFT.position,self.feature.signal('position'))
         plug(self.selectorFT.positionDes, self.featureDes.position)

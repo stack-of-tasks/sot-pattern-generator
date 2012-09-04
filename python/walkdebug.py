@@ -153,7 +153,7 @@ featureCom    = FeatureGeneric('featureCom')
 featureComDes = FeatureGeneric('featureComDes')
 plug(dyn.com,featureCom.errorIN)
 plug(dyn.Jcom,featureCom.jacobianIN)
-featureCom.sdes.value = 'featureComDes'
+featureCom.setReference('featureComDes')
 featureComDes.errorIN.value = (0.0478408688115,-0.0620357207995,0.684865189311)
 
 taskCom = Task('taskCom')
@@ -299,8 +299,8 @@ plug(footSelection.Jfoot,featureTwoFeet.Jq)
 plug(footSelection.JrefFoot,featureTwoFeet.JqRef)
 featureTwoFeetDes = FeaturePoint6dRelative('featureTwoFeetDes')
 #featureTwoFeet.initSdes('featureTwoFeetDes')
-featureTwoFeetDes.sdes.value = 'featureTwoFeetDes'
-featureTwoFeet.sdes.value = 'featureTwoFeetDes'
+featureTwoFeetDes.setReference('featureTwoFeetDes')
+featureTwoFeet.setReference('featureTwoFeetDes')
 plug(footSelection.desFoot,featureTwoFeetDes.position)
 plug(footSelection.desRefFoot,featureTwoFeetDes.positionRef)
 
@@ -313,7 +313,7 @@ featureCom = FeatureGeneric('featureCom')
 plug(dyn.com,featureCom.errorIN)
 plug(dyn.Jcom,featureCom.jacobianIN)
 featureComDes = FeatureGeneric('featureComDes')
-featureCom.sdes.value = 'featureComDes'
+featureCom.setReference('featureComDes')
 plug(pgSelec.scomref,featureComDes.errorIN)
 featureCom.selec.value = '011'
 

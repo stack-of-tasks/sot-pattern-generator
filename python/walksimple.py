@@ -227,7 +227,7 @@ featureCom = FeatureGeneric('featureCom')
 plug(dyn.com,featureCom.errorIN)
 plug(dyn.Jcom,featureCom.jacobianIN)
 featureComDes = FeatureGeneric('featureComDes')
-featureCom.sdes.value = 'featureComDes'
+featureCom.setReference('featureComDes')
 plug(comRef.ref,featureComDes.errorIN)
 featureCom.selec.value = '011'
 

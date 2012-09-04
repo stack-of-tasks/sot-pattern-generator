@@ -46,11 +46,11 @@ try:
    import robotviewer
 
    def stateFullSize(robot):
-       return [float(val) for val in robot.state.value]+10*[0.0]
+       return [float(val) for val in robot.state.value]
    RobotSimu.stateFullSize = stateFullSize
+
    robot.viewer = robotviewer.client('XML-RPC')
-   # Check the connection
-   robot.viewer.updateElementConfig('hrp',robot.stateFullSize())
+#    robot.viewer.updateElementConfig('hrp',robot.stateFullSize())
 
    def refreshView( robot ):
        robot.viewer.updateElementConfig('hrp',robot.stateFullSize())

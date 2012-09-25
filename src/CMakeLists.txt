@@ -131,7 +131,8 @@ SET(LOCAL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_graph/${PYTHON_LOCAL_PATH})
 SET(PYFILES 
 __init__.py 
 meta_selector.py
-meta_pg.py)
+meta_pg.py
+walking.py)
 
 FOREACH(PYFILE ${PYFILES})
   PYTHON_INSTALL_ON_SITE("${PYTHON_MODULE}" "${PYFILE}" )

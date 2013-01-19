@@ -100,14 +100,27 @@ class MetaPG:
         plug(self.waistReference.sout,taskWaist.featureDes.position)
         taskWaist.feature.selec.value = '111100'
 
-    def startHerdt(self):
+    def plugComTask(self,taskCom):
+        plug(self.comRef.ref,taskCom.featureDes.errorIN)
+        plug(self.pg.dcomref,taskCom.featureDes.errordotIN)
+        taskCom.task = TaskPD('taskComPD')
+        taskCom.task.add(taskCom.feature.name)
+        # This next line is not very nice. The principle should be reported in Task.
+        plug(taskCom.feature.errordot,taskCom.task.errorDot)
+        plug(taskCom.task.error,taskCom.gain.error)
+        plug(taskCom.gain.gain,taskCom.task.controlGain)
+        taskCom.gain.setConstant(40)
+        taskCom.task.setBeta(-1)
+
+    def startHerdt(self,xyconstraint=True):
         self.pg.parseCmd(':SetAlgoForZmpTrajectory Herdt')
         self.pg.parseCmd(':doublesupporttime 0.1')
         self.pg.parseCmd(':singlesupporttime 0.7')
         # When velocity reference is at zero, the robot stops all motion after n steps
         self.pg.parseCmd(':numberstepsbeforestop 2')
         # Set constraints on XY
-        self.pg.parseCmd(':setfeetconstraint XY 0.09 0.06')
+        if xyconstraint:
+            self.pg.parseCmd(':setfeetconstraint XY 0.09 0.06')
         # The next command must be runned after a OpenHRP.inc ... ???
         # Start the robot with a speed of 0.1 m/0.8 s.
         self.pg.parseCmd(':HerdtOnline 0.1 0.0 0.0')

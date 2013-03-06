@@ -542,7 +542,6 @@ namespace dynamicgraph {
 
       m_init = true;
       return false;
-
     }
 
     PatternGenerator::
@@ -891,7 +890,6 @@ namespace dynamicgraph {
       // Default value
       m_JointErrorValuesForWalking.fill(0.0);
       const int robotSize = m_JointErrorValuesForWalking.size()+6;
-
 
       try
 	{

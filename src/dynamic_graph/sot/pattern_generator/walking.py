@@ -16,7 +16,7 @@ def addPgToRobot(robot):
   robotName=robot.modelName
   specificitiesPath=robot.specificitiesPath
   jointRankPath=robot.jointRankPath
-  
+
   robot.pg = PatternGenerator('pg')
   robot.pg.setVrmlDir(modelDir+'/')
   robot.pg.setVrml(robotName)
@@ -43,17 +43,16 @@ def addPgToRobot(robot):
   robot.pg.parseCmd(":SetAlgoForZmpTrajectory Morisawa")
 
   plug(robot.dynamic.position,robot.pg.position)
-  plug(robot.dynamic.com,robot.pg.com)
+  plug(robot.com, robot.pg.com)
   plug(robot.dynamic.signal('left-ankle'), robot.pg.leftfootcurrentpos)
   plug(robot.dynamic.signal('right-ankle'), robot.pg.rightfootcurrentpos)
-  # plug(robot.device.motorcontrol,robot.pg.motorcontrol)
   robotDim = len(robot.dynamic.velocity.value)
   robot.pg.motorcontrol.value = robotDim*(0,)
   robot.pg.zmppreviouscontroller.value = (0,0,0)
-  
+
   robot.pg.initState()
-  
-  
+
+
 def addPgTaskToRobot(robot,solver):
   # --- ROBOT.PG INIT FRAMES ---
   robot.geom = Dynamic("geom")
@@ -76,18 +75,19 @@ def initRobotGeom(robot):
 
 def initZMPRef(robot):
   # --- Selector of Com Ref: when robot.pg is stopped, pg.inprocess becomes 0
-  robot.comRef = Selector('comRef',['vector','ref',robot.dynamic.com,robot.pg.comref])
-  plug(robot.pg.inprocess,robot.comRef.selec)
+  robot.comSelector = Selector('comSelector',['vector', 'ref', robot.com,
+                                              robot.pg.comref])
+  plug(robot.pg.inprocess,robot.comSelector.selec)
 
   selecSupportFoot = Selector('selecSupportFoot' \
        ,['matrixHomo','pg_H_sf',robot.pg.rightfootref,robot.pg.leftfootref] \
        ,['matrixHomo','wa_H_sf',robot.geom.rf2,robot.geom.lf2])
 
-  robot.addTrace(robot.pg.name,'rightfootref')  
-  robot.addTrace(robot.pg.name,'leftfootref')        
-  robot.addTrace(robot.pg.name,'comref')         
+  robot.addTrace(robot.pg.name,'rightfootref')
+  robot.addTrace(robot.pg.name,'leftfootref')
+  robot.addTrace(robot.pg.name,'comref')
   robot.addTrace(robot.pg.name,'zmpref')
-  robot.addTrace(robot.pg.name,'inprocess')         
+  robot.addTrace(robot.pg.name,'inprocess')
 
   plug(robot.pg.SupportFoot,selecSupportFoot.selec)
   sf_H_wa = Inverse_of_matrixHomo('sf_H_wa')
@@ -104,17 +104,13 @@ def initZMPRef(robot):
   plug(robot.pg.zmpref,wa_zmp.sin2)
   # Connect the ZMPref to OpenHRP in the waist reference frame.
   robot.pg.parseCmd(':SetZMPFrame world')
-  #plug(wa_zmp.sout,robot.device.zmp)
-  plug(robot.pg.zmpref,robot.device.zmp)    
+  plug(robot.pg.zmpref,robot.device.zmp)
 
   robot.addTrace(robot.device.name,'zmp')
   robot.addTrace(pg_H_wa.name,'sout')
 
 def initWaistCoMTasks(robot):
     # ---- TASKS -------------------------------------------------------------------
-
-  # ---- WAIST TASK ---
-  robot.taskWaist=MetaTask6d('waist',robot.dynamic,'waist','waist')
 
   # Build the reference waist pos homo-matrix from PG.
   waistReferenceVector = Stack_of_vector('waistReferenceVector')
@@ -124,21 +120,15 @@ def initWaistCoMTasks(robot):
   waistReferenceVector.selec2(0,3)
   waistReference=PoseRollPitchYawToMatrixHomo('waistReference')
   robot.addTrace(waistReference.name,'sout')
-  robot.addTrace(robot.geom.name,'position')  
-  robot.addTrace(robot.pg.name,'initwaistposref')  
+  robot.addTrace(robot.geom.name,'position')
+  robot.addTrace(robot.pg.name,'initwaistposref')
   plug(waistReferenceVector.sout,waistReference.sin)
-  plug(waistReference.sout,robot.taskWaist.featureDes.position)
+  plug(waistReference.sout,robot.waist.reference)
 
-  robot.taskWaist.feature.selec.value = '011100'
-  robot.taskWaist.task.controlGain.value = 200
+  robot.tasks ['waist'].controlGain.value = 200
 
 
 def initFeetTask(robot):
-  # --- TASK RIGHT FOOT
-  # Task right hand
-  #taskRF=MetaTask6d('rf',robot.dynamic,'rf','right-ankle')
-  #taskLF=MetaTask6d('lf',robot.dynamic,'lf','left-ankle')
-
   robot.selecFeet = Selector('selecFeet',['matrixHomo','leftfootref',robot.dynamic.signal('left-ankle'),robot.pg.leftfootref],['matrixHomo','rightfootref',robot.dynamic.signal('right-ankle'),robot.pg.rightfootref])
 
   plug(robot.pg.inprocess,robot.selecFeet.selec)
@@ -151,45 +141,16 @@ def pushTasks(robot,solver):
 
 
   # --- TASK COM ---
-  plug(robot.pg.dcomref,robot.featureComDes.errordotIN)
-  plug(robot.comRef.ref,robot.featureComDes.errorIN)      
-
-  robot.taskComPD = TaskPD('taskComPD')
-  robot.taskComPD.add(robot.featureCom.name)
-  plug(robot.pg.dcomref,robot.featureComDes.errordotIN)
-  plug(robot.featureCom.errordot,robot.taskComPD.errorDot)
-  robot.taskComPD.controlGain.value = 40
-  robot.taskComPD.setBeta(-1)
+  plug(robot.pg.dcomref,robot.comdot)
+  robot.addTrace (robot.pg.name, 'dcomref')
+  plug(robot.comSelector.ref, robot.comRef)
 
   # --- Plug foot ref ---
-  plug(robot.pg.rightfootref,robot.features['right-ankle'].reference)
-  plug(robot.pg.leftfootref,robot.features['left-ankle'].reference)
+  plug(robot.pg.rightfootref,robot.rightAnkle.reference)
+  plug(robot.pg.leftfootref,robot.leftAnkle.reference)
 
-  #robot.taskRF=MetaTask6d('rf',robot.dynamic,'rf','right-ankle')
-  #plug(robot.pg.rightfootref,robot.taskRF.featureDes.position)
-  #robot.taskRF.task.controlGain.value = 200
-
-  #robot.taskLF=MetaTask6d('lf',robot.dynamic,'lf','left-ankle')
-  #plug(robot.pg.leftfootref,robot.taskLF.featureDes.position)
-  #robot.taskLF.task.controlGain.value = 200
-
-  #solver.sot.push(robot.taskRF.task.name)
-  #solver.sot.push(robot.taskLF.task.name)
-  solver.sot.remove("robot_task_com")
-  solver.sot.remove("robot_task_left-ankle")
-  solver.sot.remove("robot_task_right-ankle")
-  solver.sot.push(robot.taskWaist.task.name)
-  solver.sot.push("robot_task_left-ankle")
-  solver.sot.push("robot_task_right-ankle")
-  solver.sot.push(robot.taskComPD.name)
-
-
-  #solver.sot.remove(robot.tasks['left-ankle'].name)
-  #solver.sot.remove(robot.tasks['right-ankle'].name)
-
-  #solver.sot.push(robot.tasks['right-ankle'].name)
-  #solver.sot.push(robot.tasks['left-ankle'].name)
-  #solver.sot.push(robot.comTask.name)
+  solver.push(robot.tasks ['waist'])
+  robot.tasks ['com'].controlGain.value = 180
 
 def createGraph(robot,solver):
   initRobotGeom(robot)

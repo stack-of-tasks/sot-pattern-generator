@@ -30,7 +30,7 @@ from dynamic_graph.ros import *
 ros = Ros(robot)
 
 # Create a solver.
-from dynamic_graph.sot.dynamics.solver import Solver
+from dynamic_graph.sot.application.velocity.precomputed_tasks import Solver
 
 solver = Solver(robot)
 

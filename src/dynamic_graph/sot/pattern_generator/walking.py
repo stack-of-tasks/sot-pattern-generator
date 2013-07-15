@@ -97,6 +97,8 @@ def initZMPRef(robot):
   robot.addTrace(robot.pg.name,'comref')
   robot.addTrace(robot.pg.name,'zmpref')
   robot.addTrace(robot.pg.name,'inprocess')
+  robot.addTrace(robot.device.name,'forceLLEG')
+  robot.addTrace(robot.device.name,'forceRLEG')
 
   plug(robot.pg.SupportFoot,selecSupportFoot.selec)
   sf_H_wa = Inverse_of_matrixHomo('sf_H_wa')
@@ -232,12 +234,13 @@ def walkFewStepsCircular(robot):
   robot.pg.parseCmd(":stepseq 0.0 0.1025 0.0 0.1 -0.205 10.0 0.1 0.205 10.0 0.1 -0.205 10.0 0.1 0.205 10.0 0.0 -0.205 0.0")
 
 def walkAndrei(robot):
+  robot.startTracer()
   robot.pg.parseCmd(":SetAlgoForZmpTrajectory Herdt")
   robot.pg.parseCmd(":doublesupporttime 0.1")
   robot.pg.parseCmd(":singlesupporttime 0.8")
-  robot.pg.velocitydes.value=(0.1,0.0,0.0)
+  robot.pg.velocitydes.value=(0.01,0.0,0.0)
   robot.pg.parseCmd(":numberstepsbeforestop 4")
   robot.pg.parseCmd(":setfeetconstraint XY 0.02 0.02")
-  robot.pg.parseCmd(":setVelReference 0.1 0.0 0.0")
-  robot.pg.parseCmd(":HerdtOnline 0.1 0.0 0.0")
+  robot.pg.parseCmd(":setVelReference 0.01 0.0 0.0")
+  robot.pg.parseCmd(":HerdtOnline 0.01 0.0 0.0")
 

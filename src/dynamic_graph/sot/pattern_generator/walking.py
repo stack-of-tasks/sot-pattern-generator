@@ -5,13 +5,22 @@ from dynamic_graph.sot.dynamics import Dynamic
 import dynamic_graph.script_shortcuts
 from dynamic_graph.script_shortcuts import optionalparentheses
 from dynamic_graph.matlab import matlab
+from dynamic_graph.sot.core import *
+from dynamic_graph.sot.dynamics import *
 from dynamic_graph.sot.core.meta_task_6d import MetaTask6d,toFlags
 from dynamic_graph.sot.pattern_generator import PatternGenerator,Selector
-from dynamic_graph.sot.core import FeatureGeneric, FeaturePoint6d, TaskPD
+# from dynamic_graph.sot.core import FeatureGeneric, FeaturePoint6d, Task, TaskPD
+from dynamic_graph.sot.core import FeaturePosture
 
+from numpy import *
+def totuple( a ):
+    al=a.tolist()
+    res=[]
+    for i in range(a.shape[0]):
+        res.append( tuple(al[i]) )
+    return tuple(res)
 
 def addPgToRobot(robot):
-
   modelDir=robot.modelDir+'/'
   robotName=robot.modelName
   specificitiesPath=robot.specificitiesPath
@@ -110,7 +119,9 @@ def initZMPRef(robot):
   robot.addTrace(pg_H_wa.name,'sout')
 
 def initWaistCoMTasks(robot):
-    # ---- TASKS -------------------------------------------------------------------
+  # ---- TASKS -------------------------------------------------------------------
+  # Make sure that the CoM is not controlling the Z
+  robot.featureCom.selec.value='011'
 
   # Build the reference waist pos homo-matrix from PG.
   waistReferenceVector = Stack_of_vector('waistReferenceVector')
@@ -137,9 +148,51 @@ def initFeetTask(robot):
 
   print "After Task for Right and Left Feet"
 
+def initPostureTask(robot):
+  # --- TASK POSTURE --------------------------------------------------
+  # set a default position for the joints. 
+  robot.features['featurePosition'] = FeaturePosture('featurePosition')
+  plug(robot.device.state,robot.features['featurePosition'].state)
+  robotDim = len(robot.dynamic.velocity.value)
+  robot.features['featurePosition'].posture.value = robot.halfSitting
+
+  postureTaskDofs = [ False,False,False,False,False,False, False,False,False,False,False,False, \
+                      True,True,True,True, \
+                      True,True,True,True,True,True,True, \
+                      True,True,True,True,True,True,True ]
+  for dof,isEnabled in enumerate(postureTaskDofs):
+    robot.features['featurePosition'].selectDof(dof+6,isEnabled)
+    
+  robot.tasks['robot_task_position']=Task('robot_task_position')
+  robot.tasks['robot_task_position'].add('featurePosition')
+  # featurePosition.selec.value = toFlags((6,24))
+
+  gainPosition = GainAdaptive('gainPosition')
+  gainPosition.set(0.1,0.1,125e3)
+  gainPosition.gain.value = 5
+  plug(robot.tasks['robot_task_position'].error,gainPosition.error)
+  plug(gainPosition.gain,robot.tasks['robot_task_position'].controlGain)
+
+def initPostureTask2(robot):
+  robot.features['featurePosition'] = FeatureGeneric('featurePosition')
+  robot.features['featurePositionDes'] = FeatureGeneric('featurePositionDes')
+  robot.features['featurePosition'].setReference('featurePositionDes')
+  plug(robot.dynamic.position,robot.features['featurePosition'].errorIN)
+  robot.features['featurePositionDes'].errorIN.value = robot.halfSitting
+  robot.features['featurePosition'].jacobianIN.value = totuple( identity(size(robot.dynamic.position.value)) )
+
+  robot.tasks['robot_task_position'] = Task('robot_task_position')
+  robot.tasks['robot_task_position'].add('featurePosition')
+
+  #gainPosition = GainAdaptive('gainPosition')
+  #gainPosition.set(0.1,0.1,125e3)
+  #gainPosition.gain.value = 5
+  #plug(robot.tasks['robot_task_position'].error,gainPosition.error)
+  #plug(gainPosition.gain,robot.tasks['robot_task_position'].controlGain)
+  robot.tasks['robot_task_position'].controlGain.value =2.
+  robot.features['featurePosition'].selec.value = 14*'1' + 2*'1' + 2*'1' + 12*'0' + 6*'0'
+  
 def pushTasks(robot,solver):
-
-
   # --- TASK COM ---
   plug(robot.pg.dcomref,robot.comdot)
   robot.addTrace (robot.pg.name, 'dcomref')
@@ -149,14 +202,16 @@ def pushTasks(robot,solver):
   plug(robot.pg.rightfootref,robot.rightAnkle.reference)
   plug(robot.pg.leftfootref,robot.leftAnkle.reference)
 
-  solver.push(robot.tasks ['waist'])
-  robot.tasks ['com'].controlGain.value = 180
+  solver.push(robot.tasks['waist'])
+  solver.push(robot.tasks['robot_task_position'])
+  robot.tasks['com'].controlGain.value = 180
 
 def createGraph(robot,solver):
   initRobotGeom(robot)
   initZMPRef(robot)
   initWaistCoMTasks(robot)
   initFeetTask(robot)
+  initPostureTask(robot)
   pushTasks(robot,solver)
   
 

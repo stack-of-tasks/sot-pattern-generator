@@ -95,6 +95,8 @@ def initZMPRef(robot):
   robot.addTrace(robot.pg.name,'comref')
   robot.addTrace(robot.pg.name,'zmpref')
   robot.addTrace(robot.pg.name,'inprocess')
+  robot.addTrace(robot.device.name,'forceLLEG')
+  robot.addTrace(robot.device.name,'forceRLEG')
 
   plug(robot.pg.SupportFoot,selecSupportFoot.selec)
   sf_H_wa = Inverse_of_matrixHomo('sf_H_wa')

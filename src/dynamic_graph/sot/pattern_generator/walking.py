@@ -1,6 +1,6 @@
 # --- PG ---------------------------------------------------------
 from dynamic_graph import plug
-from dynamic_graph.sot.core.math_small_entities import Derivator_of_Matrix, Inverse_of_matrixHomo, Multiply_of_matrixHomo, Stack_of_vector, PoseRollPitchYawToMatrixHomo, Multiply_matrixHomo_vector
+from dynamic_graph.sot.core.math_small_entities import Derivator_of_Matrix, Inverse_of_matrixHomo, Multiply_of_matrixHomo, Stack_of_vector, PoseRollPitchYawToMatrixHomo, MatrixHomoToPoseRollPitchYaw, Multiply_matrixHomo_vector
 from dynamic_graph.sot.dynamics import Dynamic
 import dynamic_graph.script_shortcuts
 from dynamic_graph.script_shortcuts import optionalparentheses
@@ -126,12 +126,29 @@ def initWaistCoMTasks(robot):
   robot.featureCom.selec.value='011'
 
   # Build the reference waist pos homo-matrix from PG.
+
+  # Build a left foot roll pitch yaw representation from left foot current pos.
+  curLeftPRPY = MatrixHomoToPoseRollPitchYaw('curLeftPRPY')
+  plug(robot.dynamic.signal('left-ankle'),curLeftPRPY.sin)
+  selecRPYfromCurLeftPRPY = Selec_of_vector('selecRPYfromCurLeftPRPY')
+  selecRPYfromCurLeftPRPY.selec(3,6);
+
+  plug(curLeftPRPY.sout,selecRPYfromCurLeftPRPY.sin)
+
+  # Build a reference vector from init waist pos and 
+  # init left foot roll pitch representation
   waistReferenceVector = Stack_of_vector('waistReferenceVector')
   plug(robot.pg.initwaistposref,waistReferenceVector.sin1)
-  plug(robot.pg.initwaistattref,waistReferenceVector.sin2)
+  #plug(robot.pg.initwaistattref,waistReferenceVector.sin2)
+  plug(selecRPYfromCurLeftPRPY.sout,waistReferenceVector.sin2)
+
   waistReferenceVector.selec1(0,3)
   waistReferenceVector.selec2(0,3)
   waistReference=PoseRollPitchYawToMatrixHomo('waistReference')
+
+  # Controlling also the yaw.
+  robot.waist.selec.value = '111100'
+
   robot.addTrace(waistReference.name,'sout')
   robot.addTrace(robot.geom.name,'position')
   robot.addTrace(robot.pg.name,'initwaistposref')
@@ -142,7 +159,13 @@ def initWaistCoMTasks(robot):
 
 
 def initFeetTask(robot):
-  robot.selecFeet = Selector('selecFeet',['matrixHomo','leftfootref',robot.dynamic.signal('left-ankle'),robot.pg.leftfootref],['matrixHomo','rightfootref',robot.dynamic.signal('right-ankle'),robot.pg.rightfootref])
+  robot.selecFeet = Selector('selecFeet',
+                             ['matrixHomo','leftfootref', \
+                               robot.dynamic.signal('left-ankle'),\
+                               robot.pg.leftfootref], \
+                             ['matrixHomo','rightfootref', \
+                              robot.dynamic.signal('right-ankle'), \
+                              robot.pg.rightfootref])
 
   plug(robot.pg.inprocess,robot.selecFeet.selec)
   robot.tasks['right-ankle'].controlGain.value = 180

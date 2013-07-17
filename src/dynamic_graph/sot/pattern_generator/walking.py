@@ -9,6 +9,7 @@ from dynamic_graph.sot.core import *
 from dynamic_graph.sot.dynamics import *
 from dynamic_graph.sot.core.meta_task_6d import MetaTask6d,toFlags
 from dynamic_graph.sot.pattern_generator import PatternGenerator,Selector
+from dynamic_graph.sot.core.matrix_util import matrixToTuple
 # from dynamic_graph.sot.core import FeatureGeneric, FeaturePoint6d, Task, TaskPD
 from dynamic_graph.sot.core import FeaturePosture
 
@@ -135,12 +136,33 @@ def initWaistCoMTasks(robot):
 
   plug(curLeftPRPY.sout,selecRPYfromCurLeftPRPY.sin)
 
+  curRightPRPY = MatrixHomoToPoseRollPitchYaw('curRightPRPY')
+  plug(robot.dynamic.signal('right-ankle'),curRightPRPY.sin)
+  selecRPYfromCurRightPRPY = Selec_of_vector('selecRPYfromCurRightPRPY')
+  selecRPYfromCurRightPRPY.selec(3,6);
+
+  plug(curRightPRPY.sout,selecRPYfromCurRightPRPY.sin)
+
+  addLeftRightRPY = Add_of_vector('addLeftRightRPY')
+  plug(selecRPYfromCurLeftPRPY.sout,addLeftRightRPY.sin1)
+  plug(selecRPYfromCurLeftPRPY.sout,addLeftRightRPY.sin2)
+  
+  mulLeftRightRPY = Multiply_double_vector('mulLeftRightRPY')
+  mulLeftRightRPY.sin1.value=0.5
+  plug(addLeftRightRPY.sout,mulLeftRightRPY.sin2)
+
+  YawFromLeftRightRPY = Multiply_matrix_vector('YawFromLeftRightRPY')
+  YawFromLeftRightRPY.sin1.value=matrixToTuple(array([[ 0.,  0.,  0.], \
+       [ 0.,  0.,  0.,  ],
+       [ 0.,  0.,  1.,  ]]))
+  plug(mulLeftRightRPY.sout,YawFromLeftRightRPY.sin2)
+
   # Build a reference vector from init waist pos and 
   # init left foot roll pitch representation
   waistReferenceVector = Stack_of_vector('waistReferenceVector')
   plug(robot.pg.initwaistposref,waistReferenceVector.sin1)
   #plug(robot.pg.initwaistattref,waistReferenceVector.sin2)
-  plug(selecRPYfromCurLeftPRPY.sout,waistReferenceVector.sin2)
+  plug(YawFromLeftRightRPY.sout,waistReferenceVector.sin2)
 
   waistReferenceVector.selec1(0,3)
   waistReferenceVector.selec2(0,3)

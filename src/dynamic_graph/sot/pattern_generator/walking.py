@@ -38,7 +38,6 @@ def addPgToRobot(robot):
   # Standard initialization
   robot.pg.parseCmd(":samplingperiod 0.005")
   robot.pg.parseCmd(":previewcontroltime 1.6")
-  robot.pg.parseCmd(":comheight 0.814")
   robot.pg.parseCmd(":walkmode 0")
   robot.pg.parseCmd(":omega 0.0")
   robot.pg.parseCmd(":stepheight 0.05")

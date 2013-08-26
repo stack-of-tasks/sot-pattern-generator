@@ -201,10 +201,24 @@ def initPostureTask(robot):
   robotDim = len(robot.dynamic.velocity.value)
   robot.features['featurePosition'].posture.value = robot.halfSitting
 
-  postureTaskDofs = [ False,False,False,False,False,False, False,False,False,False,False,False, \
-                      True,True,True,True, \
-                      True,True,True,True,True,True,True, \
-                      True,True,True,True,True,True,True ]
+  if robot.device.name == 'HRP2LAAS' or \
+     robot.device.name == 'HRP2JRL':
+    postureTaskDofs = [ False,False,False,False,False,False, \
+                        False,False,False,False,False,False, \
+                        True,True,True,True, \
+                        True,True,True,True,True,True,True, \
+                        True,True,True,True,True,True,True ]
+  elif robot.device.name == 'HRP4LIRMM':
+    # Right Leg, Left leg, chest, right arm, left arm
+    postureTaskDofs = [False]*6 +  [False]*6 + [True]*4 + [True]*9 + [True]*9
+  elif robot.device.name == 'ROMEO':
+    # chest, left/right arms, left/right legs
+    postureTaskDofs = [True]*5 + [True]*7 + [True]*7 + [False]*7 + [False]*7
+  else:
+    print "/!\\ walking.py: The robot " +robot.device.name+ " is unknown."
+    print "  Default posture task froze all the dofs"
+    postureTaskDofs=[True] * (robot.dimension-6)
+
   for dof,isEnabled in enumerate(postureTaskDofs):
     robot.features['featurePosition'].selectDof(dof+6,isEnabled)
     
@@ -235,7 +249,23 @@ def initPostureTask2(robot):
   #plug(robot.tasks['robot_task_position'].error,gainPosition.error)
   #plug(gainPosition.gain,robot.tasks['robot_task_position'].controlGain)
   robot.tasks['robot_task_position'].controlGain.value =2.
-  robot.features['featurePosition'].selec.value = 14*'1' + 2*'1' + 2*'1' + 12*'0' + 6*'0'
+
+  #TODO: this is ??? specific.
+  if robot.device.name == 'HRP2LAAS' or \
+     robot.device.name == 'HRP2JRL':
+    # reverse polish arms(1), head(1), chest(1), legs(0), waist(0)
+    robot.features['featurePosition'].selec.value = \
+      14*'1' + 2*'1' + 2*'1' + 12*'0' + 6*'0'
+  elif robot.device.name == 'HRP4LIRMM':
+    # reverse polish arms(1), head(1), chest(1), legs(0), waist(0)
+    robot.features['featurePosition'].selec.value = \
+      18*'1' + 2*'1' + 2*'1' + 12*'0' + 6*'0'
+  elif robot.device.name == 'ROMEO':
+    # reverse polish legs, arms, chest, waist
+    robot.features['featurePosition'].selec.value = \
+      14*'0' + 14*'1' + 5*'1' + 6*'0'
+  else:
+    robot.features['featurePosition'].selec.value = '1' * robot.dimension
   
 def pushTasks(robot,solver):
   # --- TASK COM ---

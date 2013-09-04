@@ -23,7 +23,6 @@
 #ifndef WIN32
 # include <sys/time.h>
 #else
-# include <jrl/mal/boost.hh>
 # include <sot/core/utils-windows.hh>
 # include <Winsock2.h>
 #endif /*WIN32*/
@@ -85,7 +84,7 @@ namespace dynamicgraph {
 
       const FootPrint& step = queue.getFirstStep();
 
-      ml::Vector joyin;
+      dynamicgraph::Vector joyin;
       joyin.resize(3);
       try
 	{
@@ -162,7 +161,7 @@ namespace dynamicgraph {
       else { Entity::commandLine( cmdLine,cmdArgs,os); }
     }
 
-    ml::Vector & StepComputerJoystick::getlaststep(ml::Vector& res, int time)
+    dynamicgraph::Vector & StepComputerJoystick::getlaststep(dynamicgraph::Vector& res, int time)
     {
       if (res.size()!=4)
 	res.resize(4);

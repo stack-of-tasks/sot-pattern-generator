@@ -25,10 +25,6 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-/* Matrix */
-#include <jrl/mal/boost.hh>
-namespace ml = maal::boost;
-
 /* SOT */
 #include <dynamic-graph/entity.h>
 #include <dynamic-graph/signal-ptr.h>
@@ -76,19 +72,19 @@ namespace dynamicgraph {
     public:
 
       SignalPtr< MatrixHomogeneous,int > referencePositionLeftSIN;
-      SignalPtr< ml::Vector,int > referenceVelocityLeftSIN;
-      SignalPtr< ml::Vector,int > referenceAccelerationLeftSIN;
+      SignalPtr< dynamicgraph::Vector,int > referenceVelocityLeftSIN;
+      SignalPtr< dynamicgraph::Vector,int > referenceAccelerationLeftSIN;
       SignalPtr< MatrixHomogeneous,int > leftFootPositionSIN;
 
       SignalPtr< MatrixHomogeneous,int > referencePositionRightSIN;
-      SignalPtr< ml::Vector,int > referenceVelocityRightSIN;
-      SignalPtr< ml::Vector,int > referenceAccelerationRightSIN;
+      SignalPtr< dynamicgraph::Vector,int > referenceVelocityRightSIN;
+      SignalPtr< dynamicgraph::Vector,int > referenceAccelerationRightSIN;
       SignalPtr< MatrixHomogeneous,int > rightFootPositionSIN;
 
       SignalTimeDependent< MatrixHomogeneous,int > referencePositionLeftSOUT;
       SignalTimeDependent< MatrixHomogeneous,int > referencePositionRightSOUT;
-      SignalTimeDependent< ml::Vector,int > referenceVelocitySOUT;
-      SignalTimeDependent< ml::Vector,int > referenceAccelerationSOUT;
+      SignalTimeDependent< dynamicgraph::Vector,int > referenceVelocitySOUT;
+      SignalTimeDependent< dynamicgraph::Vector,int > referenceAccelerationSOUT;
 
     public:
 
@@ -96,30 +92,8 @@ namespace dynamicgraph {
 
       MatrixHomogeneous& computeReferencePositionLeft( MatrixHomogeneous& res,int timeCurr );
       MatrixHomogeneous& computeReferencePositionRight( MatrixHomogeneous& res,int timeCurr );
-      ml::Vector& computeReferenceVelocity( const ml::Vector& right,const ml::Vector& left,ml::Vector& res );
-      ml::Vector& computeReferenceAcceleration( const ml::Vector& right,const ml::Vector& left,ml::Vector& res );
-
-      SignalArray<int> getSignals( void );
-      operator SignalArray<int> ();
-
-    private:
-
-      MatrixHomogeneous& computeRefPos( MatrixHomogeneous& res,int timeCurr,const MatrixHomogeneous& wMsf );
-    };
-
-      SignalTimeDependent< MatrixHomogeneous,int > referencePositionLeftSOUT;
-      SignalTimeDependent< MatrixHomogeneous,int > referencePositionRightSOUT;
-      SignalTimeDependent< ml::Vector,int > referenceVelocitySOUT;
-      SignalTimeDependent< ml::Vector,int > referenceAccelerationSOUT;
-
-    public:
-
-      NextStepTwoHandObserver( const std::string & name );
-
-      MatrixHomogeneous& computeReferencePositionLeft( MatrixHomogeneous& res,int timeCurr );
-      MatrixHomogeneous& computeReferencePositionRight( MatrixHomogeneous& res,int timeCurr );
-      ml::Vector& computeReferenceVelocity( const ml::Vector& right,const ml::Vector& left,ml::Vector& res );
-      ml::Vector& computeReferenceAcceleration( const ml::Vector& right,const ml::Vector& left,ml::Vector& res );
+      dynamicgraph::Vector& computeReferenceVelocity( const dynamicgraph::Vector& right,const dynamicgraph::Vector& left,dynamicgraph::Vector& res );
+      dynamicgraph::Vector& computeReferenceAcceleration( const dynamicgraph::Vector& right,const dynamicgraph::Vector& left,dynamicgraph::Vector& res );
 
       SignalArray<int> getSignals( void );
       operator SignalArray<int> ();
@@ -131,7 +105,6 @@ namespace dynamicgraph {
 
 
     /* --- Next Step (stepper) --------------------------------------------- */
-
 
     /*!
      * Generates footsteps depending on the frame computed by the
@@ -223,7 +196,7 @@ namespace dynamicgraph {
       virtual void starter( const int & timeCurr );
       virtual void stoper( const int & timeCurr );
 
-      virtual void introductionCallBack( const int & timeCurr ) {};
+      virtual void introductionCallBack( const int & ) {};
 
       int& triggerCall( int& dummy,int timeCurr );
 

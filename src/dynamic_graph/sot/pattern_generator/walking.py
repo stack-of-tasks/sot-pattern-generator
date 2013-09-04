@@ -289,20 +289,15 @@ def createGraph(robot,solver):
   initFeetTask(robot)
   initPostureTask(robot)
   pushTasks(robot,solver)
-  
 
 def CreateEverythingForPG(robot,solver):
   robot.initializeTracer()
   addPgToRobot(robot)
   addPgTaskToRobot(robot,solver)
-  robot.addTrace(solver.sot.name,'control')         
-  robot.startTracer()
   createGraph(robot,solver)
 
-  
-
 def walkFewSteps(robot):
-  robot.pg.parseCmd(":stepseq 0.0 0.095 0.0 0.17 -0.19 0.0 0.17 0.19 0.0 0.17 -0.19 0.0 0.17 0.19 0.0 0.0 -0.19 0.0")
+  robot.pg.parseCmd(":stepseq 0.0 0.1025 0.0 0.17 -0.205 0.0 0.17 0.205 0.0 0.17 -0.205 0.0 0.17 0.205 0.0 0.0 -0.205 0.0")
 
 def walkFewStepsCircular(robot):
   robot.pg.parseCmd(":stepseq 0.0 0.1025 0.0 0.1 -0.205 10.0 0.1 0.205 10.0 0.1 -0.205 10.0 0.1 0.205 10.0 0.0 -0.205 0.0")

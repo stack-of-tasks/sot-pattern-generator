@@ -32,7 +32,6 @@
 #define PI 3.1416
 
 namespace dg=dynamicgraph;
-
 namespace dynamicgraph {
   namespace sot {
 
@@ -148,7 +147,7 @@ namespace dynamicgraph {
     }
 
     void NextStepPgSot::
-    stoper( const int & timeCurr )
+    stoper( const int & )
     {
       sotDEBUGIN(15);
 
@@ -319,7 +318,6 @@ namespace dynamicgraph {
 	{
 	  std::string name = "pg";
 	  cmdArgs >> std::ws; if( cmdArgs.good()) cmdArgs >> name;
-
 	  pgEntity = &(PoolStorage::getInstance()->getEntity( name ));
 	  m_sPG = dynamic_cast<PatternGenerator *>(pgEntity);
 	  if (m_sPG!=0)

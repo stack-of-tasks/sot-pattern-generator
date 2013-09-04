@@ -26,10 +26,6 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-/* Matrix */
-#include <jrl/mal/boost.hh>
-namespace ml = maal::boost;
-
 /* SOT */
 #include <sot-pattern-generator/next-step.h>
 #include <sot-pattern-generator/pg.h>
@@ -67,7 +63,6 @@ namespace dynamicgraph {
       static const unsigned int ADDING_STEP=0;
       static const unsigned int CHANGING_STEP=1;
 
-      static const std::string CLASS_NAME;
 
     protected:
 

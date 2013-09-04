@@ -108,12 +108,12 @@ namespace dynamicgraph {
       sotDEBUGIN(15);
 
       MatrixRotation worldRwaist;
-      worldRsensor.multiply( waistRsensor.transpose(),worldRwaist );
+      worldRwaist = worldRsensor* ( waistRsensor.transpose());
 
-      ml::Vector trans(3); trans.fill(0);
+      dynamicgraph::Vector trans(3); trans.fill(0);
       MatrixHomogeneous worldMwaist; worldMwaist.buildFrom(worldRwaist,trans);
 
-      worldMwaist.multiply(waistMfoot,worldMfoot );
+      worldMfoot = worldMwaist*waistMfoot;
 
       sotDEBUGOUT(15);
       return worldMfoot;

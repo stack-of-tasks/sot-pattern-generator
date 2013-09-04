@@ -61,7 +61,7 @@ namespace dynamicgraph {
     }
 
 
-    void PGManager::stopSequence( const StepQueue& seq )
+    void PGManager::stopSequence( const StepQueue& )
     {
       if(!pgEntity) {
 	sotERROR <<"PG not set" << std::endl;

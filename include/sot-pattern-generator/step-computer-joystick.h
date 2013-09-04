@@ -25,10 +25,6 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-/* Matrix */
-#include <jrl/mal/boost.hh>
-namespace ml = maal::boost;
-
 /* SOT */
 #include <dynamic-graph/entity.h>
 #include <dynamic-graph/signal-ptr.h>
@@ -92,14 +88,14 @@ namespace dynamicgraph {
     public: // Signals
 
       /*! \brief Entry of the joystick (x,y,theta)*/
-      SignalPtr< ml::Vector,int > joystickSIN;
+      SignalPtr< dynamicgraph::Vector,int > joystickSIN;
       /*! \brief Getting the support foot */
       SignalPtr< unsigned,int > contactFootSIN;
       /*! \brief Externalize the last step . */
-      SignalTimeDependent<ml::Vector,int> laststepSOUT;
+      SignalTimeDependent<dynamicgraph::Vector,int> laststepSOUT;
 
     protected:
-      ml::Vector& getlaststep(ml::Vector &res, int time);
+      dynamicgraph::Vector& getlaststep(dynamicgraph::Vector &res, int time);
 
     public: // Entity
 

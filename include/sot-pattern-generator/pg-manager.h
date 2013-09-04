@@ -26,10 +26,6 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-/* Matrix */
-#include <jrl/mal/boost.hh>
-namespace ml = maal::boost;
-
 /* SOT */
 #include <dynamic-graph/entity.h>
 #include <dynamic-graph/signal-ptr.h>
@@ -69,9 +65,6 @@ namespace dynamicgraph {
     {
     public: // Entity name
       DYNAMIC_GRAPH_ENTITY_DECL();
-
-      static const std::string CLASS_NAME;
-      virtual const std::string& getClassName( void ) const { return CLASS_NAME; }
 
     public: // Construction
 

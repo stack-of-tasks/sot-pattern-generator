@@ -25,10 +25,6 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-/* Matrix */
-#include <jrl/mal/boost.hh>
-namespace ml = maal::boost;
-
 /* SOT */
 #include <dynamic-graph/entity.h>
 #include <dynamic-graph/signal-ptr.h>
@@ -91,23 +87,23 @@ namespace dynamicgraph {
       SignalPtr< MatrixHomogeneous,int > waistMlhandSIN;
       SignalPtr< MatrixHomogeneous,int > waistMrhandSIN;
       SignalPtr< MatrixHomogeneous,int > referencePositionWaistSIN;
-      SignalPtr< ml::Vector,int > stiffnessSIN;
-      SignalPtr< ml::Vector,int > velocitySIN;
+      SignalPtr< dynamicgraph::Vector,int > stiffnessSIN;
+      SignalPtr< dynamicgraph::Vector,int > velocitySIN;
       SignalPtr< unsigned,int > contactFootSIN;
 
-      SignalTimeDependent< ml::Vector,int > displacementSOUT;
-      SignalTimeDependent< ml::Vector,int > forceSOUT;
-      SignalTimeDependent< ml::Vector,int > forceLhandSOUT;
-      SignalTimeDependent< ml::Vector,int > forceRhandSOUT;
+      SignalTimeDependent< dynamicgraph::Vector,int > displacementSOUT;
+      SignalTimeDependent< dynamicgraph::Vector,int > forceSOUT;
+      SignalTimeDependent< dynamicgraph::Vector,int > forceLhandSOUT;
+      SignalTimeDependent< dynamicgraph::Vector,int > forceRhandSOUT;
 
-      ml::Vector& computeDisplacement( ml::Vector& res,int timeCurr );
-      ml::Vector& computeForce( ml::Vector& res,int timeCurr );
-      ml::Vector& computeForceL( ml::Vector& res,int timeCurr );
-      ml::Vector& computeForceR( ml::Vector& res,int timeCurr );
-      ml::Vector& computeHandForce( ml::Vector& res,
+      dynamicgraph::Vector& computeDisplacement( dynamicgraph::Vector& res,int timeCurr );
+      dynamicgraph::Vector& computeForce( dynamicgraph::Vector& res,int timeCurr );
+      dynamicgraph::Vector& computeForceL( dynamicgraph::Vector& res,int timeCurr );
+      dynamicgraph::Vector& computeForceR( dynamicgraph::Vector& res,int timeCurr );
+      dynamicgraph::Vector& computeHandForce( dynamicgraph::Vector& res,
 				    const MatrixHomogeneous& waMh,
 				    const MatrixHomogeneous& waMref,
-				    const ml::Vector& F );
+				    const dynamicgraph::Vector& F );
 
     public: // Entity
 

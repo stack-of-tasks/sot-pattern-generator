@@ -77,23 +77,23 @@ namespace dynamicgraph {
       const MatrixHomogeneous& wMrh = rightHandPositionSIN( timeCurr );
 
       MatrixHomogeneous refMw; wMref.inverse(refMw);
-      MatrixHomogeneous sfMlh; refMw.multiply(wMlh, sfMlh);
-      MatrixHomogeneous sfMrh; refMw.multiply(wMrh, sfMrh);
+      MatrixHomogeneous sfMlh; sfMlh = refMw*wMlh;
+      MatrixHomogeneous sfMrh; sfMrh = refMw*wMrh;
 
       MatrixRotation R;
       VectorRollPitchYaw rpy;
 
-      ml::Vector prh(3); sfMrh.extract(prh);
+      dynamicgraph::Vector prh(3); sfMrh.extract(prh);
       sfMrh.extract(R);
       VectorRollPitchYaw rpy_rh; rpy_rh.fromMatrix(R);
 
-      ml::Vector plh(3); sfMlh.extract(plh);
+      dynamicgraph::Vector plh(3); sfMlh.extract(plh);
       sfMlh.extract(R);
       VectorRollPitchYaw rpy_lh; rpy_lh.fromMatrix(R);
 
       rpy.fill(0.);
       rpy(2) = std::atan2(prh(0) - plh(0), plh(1) - prh(1));
-      ml::Vector p = .5 * (plh + prh);
+      dynamicgraph::Vector p = .5 * (plh + prh);
 
       rpy.toMatrix(R);
       res.buildFrom(R, p);

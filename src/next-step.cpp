@@ -283,7 +283,7 @@ namespace dynamicgraph {
     }
 
     void NextStep::
-    stoper( const int & timeCurr )
+    stoper( const int &  )
     {
       sotDEBUGIN(15);
 

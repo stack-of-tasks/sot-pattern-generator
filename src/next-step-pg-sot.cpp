@@ -147,7 +147,7 @@ namespace dynamicgraph {
     }
 
     void NextStepPgSot::
-    stoper( const int & timeCurr )
+    stoper( const int &  )
     {
       sotDEBUGIN(15);
 

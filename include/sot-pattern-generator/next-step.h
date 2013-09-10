@@ -200,7 +200,7 @@ namespace dynamicgraph {
       virtual void starter( const int & timeCurr );
       virtual void stoper( const int & timeCurr );
 
-      virtual void introductionCallBack( const int & timeCurr ) {};
+      virtual void introductionCallBack( const int &  ) {};
 
       int& triggerCall( int& dummy,int timeCurr );
 

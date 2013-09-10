@@ -20,6 +20,10 @@
 //#define VP_DEBUG
 #define VP_DEBUG_MODE 45
 #include <sot/core/debug.hh>
+
+#define ODEBUG(x) 
+#define ODEBUG3(x) std::cout << x << std::endl;
+
 #ifdef VP_DEBUG
  class sotPG__INIT
  {
@@ -44,6 +48,30 @@
 
 using namespace std;
 namespace dynamicgraph {
+  namespace command {
+    // Command setSensorPosition
+    class SetSensorTransformationCmd : public Command
+    {
+    public:
+      virtual ~SetSensorTransformationCmd() {}
+      /// Create command and store it in Entity
+      /// \param entity instance of Entity owning this command
+      /// \param docstring documentation of the command
+      SetSensorTransformationCmd(sot::PatternGenerator& entity, const std::string& docstring) :
+	Command(entity, boost::assign::list_of(Value::MATRIX), docstring)
+      {
+      }
+      virtual Value doExecute()
+      {
+        sot::PatternGenerator& pg = static_cast<sot::PatternGenerator&>(owner());
+	std::vector<Value> values = getParameterValues();
+	maal::boost::Matrix SensorTransformation = values[0].value();
+	pg.setSensorTransformation(SensorTransformation);
+	return Value();
+      }
+    }; // class CreateJoint
+
+  }
   namespace sot {
 
     DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(PatternGenerator,"PatternGenerator");
@@ -89,11 +117,15 @@ namespace dynamicgraph {
 
       ,comSIN(NULL,"PatternGenerator("+name+")::input(vector)::com")
 
+      ,gazeSIN(NULL,"PatternGenerator("+name+")::input(homogeneousmatrix)::gaze")
+
       ,velocitydesSIN(NULL,"PatternGenerator("+name+")::input(vector)::velocitydes")
 
       ,LeftFootCurrentPosSIN(NULL,"PatternGenerator("+name+")::input(homogeneousmatrix)::leftfootcurrentpos")
 
       ,RightFootCurrentPosSIN(NULL,"PatternGenerator("+name+")::input(homogeneousmatrix)::rightfootcurrentpos")
+
+      ,ObjectPositionInCameraSIN(NULL,"PatternGenerator("+name+")::input(homogeneousmatrix)::objectpositionincamera")
 
       ,LeftFootRefSOUT( boost::bind(&PatternGenerator::getLeftFootRef,this,_1,_2),
 			OneStepOfControlS,
@@ -217,7 +249,9 @@ namespace dynamicgraph {
       m_WaistPositionAbsolute.fill(0);
 
       m_k_Waist_kp1.setIdentity();
-
+      
+      m_ObjectPositionInCamera.setIdentity();
+      m_gaze.setIdentity();
       m_SupportFoot = 1; // Means that we do not know which support foot it is.
       m_ReferenceFrame = WORLD_FRAME;
 
@@ -258,6 +292,8 @@ namespace dynamicgraph {
       signalRegistration( dataInProcessSOUT <<
 			  LeftFootCurrentPosSIN <<
 			  RightFootCurrentPosSIN <<
+                          ObjectPositionInCameraSIN <<
+                          gazeSIN << 
 			  LeftFootRefSOUT <<
 			  RightFootRefSOUT);
 
@@ -296,6 +332,8 @@ namespace dynamicgraph {
 			 velocitydesSIN <<
 			  LeftFootCurrentPosSIN <<
 			  RightFootCurrentPosSIN <<
+                          ObjectPositionInCameraSIN <<
+                          gazeSIN <<
 			  LeftFootRefSOUT <<
 			  RightFootRefSOUT);
 
@@ -324,6 +362,8 @@ namespace dynamicgraph {
 			  rightFootContactSOUT);
 
 #endif
+
+      MAL_MATRIX_RESIZE(m_Oinit_M_WorldPG,4,4);
       initCommands();
 
       //dataInProcessSOUT.setReference( &m_dataInProcess );
@@ -489,6 +529,63 @@ namespace dynamicgraph {
       sotDEBUGOUT(5);
       return true;
     }
+
+    void PatternGenerator::ComputeCameraInCOM()
+    {
+      if (!comSIN.isPluged() ||
+          !gazeSIN.isPluged())
+        return;
+
+      MatrixHomogeneous comMH;
+      ml::Vector com = comSIN(m_LocalTime);
+      MatrixHomogeneous gaze = gazeSIN(m_LocalTime);
+
+      comMH=m_LeftFootPosition;
+      for(unsigned int i=0;i<3;i++)
+        comMH(i,3) = com(i);
+      m_CameraPositionInCOM = comMH.inverse()*gaze;
+      
+    }
+
+    bool PatternGenerator::InitOInitMWorldPG(void)
+    {
+      sotDEBUGIN(5);
+
+      if (!ObjectPositionInCameraSIN.isPluged())
+        {
+          std::cerr<< "objectpositionincamera is not plugged." << std::endl;
+          return false;
+        }
+
+      ComputeCameraInCOM();
+      MatrixHomogeneous Com_M_Oinit;
+      MatrixHomogeneous ObjectPositionInCamera=
+        ObjectPositionInCameraSIN(m_LocalTime);
+      Com_M_Oinit = m_CameraPositionInCOM * m_sensorTransformation * ObjectPositionInCamera;
+      
+      ODEBUG("m_CameraPositionInCOM:" << m_CameraPositionInCOM);
+      ODEBUG("m_sensorTransformation:" << m_sensorTransformation);
+      ODEBUG("ObjectPositionInCamera:" << ObjectPositionInCamera);
+      ODEBUG("Com_M_Oinit:" << Com_M_Oinit);
+      MatrixHomogeneous WorldPG_M_Com;
+      // WARNING: Assume that Init left foot position and CoM are aligned.
+      WorldPG_M_Com = m_InitLeftFootPosition;
+      WorldPG_M_Com(0,3) = m_InitCOMRefPos(0);
+      WorldPG_M_Com(1,3) = m_InitCOMRefPos(1);
+      WorldPG_M_Com(2,3) = m_InitCOMRefPos(2);
+      ODEBUG3("WorldPG_M_Com:"<< WorldPG_M_Com);
+
+      MatrixHomogeneous WorldPG_M_Oinit,Oinit_M_WorldPG;
+      WorldPG_M_Oinit = WorldPG_M_Com * Com_M_Oinit;
+      Oinit_M_WorldPG = WorldPG_M_Oinit.inverse();
+      for(unsigned int i=0;i<4;i++)
+        for(unsigned int j=0;j<4;j++)
+          m_Oinit_M_WorldPG(i,j) = Oinit_M_WorldPG(i,j);
+
+      sotDEBUGOUT(5);
+      return true;
+    }
+
     bool PatternGenerator::buildModel( void )
     {
 
@@ -950,18 +1047,47 @@ namespace dynamicgraph {
 		       << lCOMRefState.y[0] << " " << lCOMRefState.z[0] << endl;
 	  sotDEBUG(4) << " VelocityReference " << m_VelocityReference << endl;
 
+          // Set velocity reference.
 	  m_PGI->setVelocityReference(m_VelocityReference(0),
 				      m_VelocityReference(1),
 				      m_VelocityReference(2));
 
-	  // Test if the pattern value has some value to provide.
+          // 
+          ComputeCameraInCOM();
+          MAL_MATRIX_DIM(malCam_M_WorldPG,double,4,4);
+          MAL_MATRIX_DIM(malCam_M_o,double,4,4);
+          MAL_MATRIX_DIM(malCom_M_Cam,double,4,4);
+          if (ObjectPositionInCameraSIN.isPluged())
+            m_ObjectPositionInCamera = ObjectPositionInCameraSIN(m_LocalTime);
+          else
+            m_ObjectPositionInCamera.setIdentity();
+
+          for(unsigned int i=0;i<3;i++)
+            for(unsigned int j=0;j<4;j++)
+              {
+                malCam_M_o(i,j) = m_ObjectPositionInCamera(i,j);
+                malCom_M_Cam(i,j) = m_CameraPositionInCOM(i,j);
+              }
+
+          ODEBUG("malCam_M_o: " << malCam_M_o);
+          ODEBUG("malCom_M_Cam:" << malCom_M_Cam);
+
+          // Compute the position of the camera in the world coordinates.          
+          MAL_C_eq_A_by_B(malCam_M_WorldPG, malCam_M_o , m_Oinit_M_WorldPG);
+
+          ODEBUG3("malCam_M_WorldPG:" << malCam_M_WorldPG);
+          ODEBUG3("m_Oinit_M_WorldPG:" << m_Oinit_M_WorldPG);
+                    
+	  // Test if the pattern generator has some value to provide.
 	  if (m_PGI->RunOneStepOfTheControlLoop(CurrentConfiguration,
 						CurrentVelocity,
 						CurrentAcceleration,
 						ZMPTarget,
 						lCOMRefState,
 						lLeftFootPosition,
-						lRightFootPosition))
+						lRightFootPosition,
+                                                &malCam_M_WorldPG,
+                                                &malCom_M_Cam))
 	    {
 	      sotDEBUG(25) << "After One Step of control " << endl
 			   << "CurrentState:" << CurrentState << endl
@@ -1252,6 +1378,11 @@ namespace dynamicgraph {
        		 makeCommandVoid0(*this,
 				  (void (PatternGenerator::*) (void))&PatternGenerator::InitState,
 				  docCommandVoid0("From q and model, compute the initial geometry.")));
+      addCommand("initWorldPGMOinit",
+       		 makeCommandVoid0(*this,
+				  (void (PatternGenerator::*) (void))&PatternGenerator::InitOInitMWorldPG,
+				  docCommandVoid0("Compute the transform between an object pose and the reference frame of the PG")));
+
       addCommand("frameReference",
        		 makeCommandVoid1(*this,
 				  &PatternGenerator::setReferenceFromString,
@@ -1289,7 +1420,18 @@ namespace dynamicgraph {
        		 makeCommandVoid0(*this,
 				  (void (PatternGenerator::*) (void))&PatternGenerator::debug,
 				  docCommandVoid0("Launch a debug command.")));
-
+     std::string docstring;
+     docstring=
+       "\n"
+       "     Define the sensorTransformation from camera frame to head joint frame.\n"
+       "\n"
+       "     Input:\n"
+       "       - a matrix: the transformation.\n";
+     addCommand("setSensorTransformation",new command::SetSensorTransformationCmd(*this,docstring));
+    }
+    void PatternGenerator::setSensorTransformation(maal::boost::Matrix & aml)
+    {
+      m_sensorTransformation = aml;
     }
 
     void PatternGenerator::debug(void)
@@ -1341,7 +1483,6 @@ namespace dynamicgraph {
     {
       m_ReferenceFrame = stringToReferenceEnum( str );
     }
-
     void PatternGenerator::
     commandLine( const std::string& cmdLine,
 		 std::istringstream& cmdArgs,

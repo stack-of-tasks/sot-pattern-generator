@@ -178,6 +178,12 @@ namespace dynamicgraph {
       /*! \brief Initialize the state of the robot. */
       bool InitState( void );
 
+      /*! \brief Initialize the world PG transform to the initial object pose. */
+      bool InitOInitMWorldPG(void);
+
+      /*! \brief Compute the camera in the CoM reference frame. */
+      void ComputeCameraInCOM(void);
+
       /*! \brief Set the directory which contains the parameters for the preview control. */
       void setPreviewControlParametersFile( const std::string& filename );
 
@@ -205,6 +211,8 @@ namespace dynamicgraph {
 	{ return m_PGI;};
 
       /*! @} */
+
+      void setSensorTransformation(maal::boost::Matrix & aml);
 
     public: /* --- SIGNALS --- */
 
@@ -308,6 +316,9 @@ namespace dynamicgraph {
       /*! \brief Relative Position of the flying foot. */
       MatrixHomogeneous m_FlyingFootPosition;
 
+      /*! \brief Position of the world PG relative to an object*/
+      MAL_MATRIX( m_Oinit_M_WorldPG,double);
+
       /*! \brief Absolute position of the reference ZMP. */
       ml::Vector m_ZMPRefPos;
 
@@ -359,6 +370,17 @@ namespace dynamicgraph {
       bool m_rightFootContact, m_leftFootContact;
 
       /*! @} */
+
+      /*! \brief Position of the world in the camera reference frame. */
+      MatrixHomogeneous m_ObjectPositionInCamera;
+
+      /*! \brief Position of the gaze in the free flyer reference frame. */
+      MatrixHomogeneous m_gaze;
+
+      /*! \brief Position of the Camera in the CoM. */
+      MatrixHomogeneous m_CameraPositionInCOM;
+
+      MatrixHomogeneous m_sensorTransformation;
 
       /*! Parsing a file of command by the walking pattern generator interface.
 	\par[in] The command line (optional option)
@@ -435,6 +457,9 @@ namespace dynamicgraph {
       /*! \brief Take the current CoM. */
       SignalPtr<ml::Vector,int> comSIN;
 
+      /*! \brief Take the current gaze homogeneous matrix. */
+      SignalPtr<MatrixHomogeneous,int> gazeSIN;
+
       /*! \brief Take the current desired velocity. */
       SignalPtr<ml::Vector,int> velocitydesSIN;
 
@@ -443,6 +468,9 @@ namespace dynamicgraph {
 
       /*! \brief Take the current right foot homogeneous position. */
       SignalPtr<MatrixHomogeneous,int> RightFootCurrentPosSIN;
+
+      /*! \brief Position of the world in the camera reference frame. */
+      SignalPtr<MatrixHomogeneous, int> ObjectPositionInCameraSIN;
 
       /*! \brief Externalize the left foot position reference. */
       SignalTimeDependent<MatrixHomogeneous,int> LeftFootRefSOUT;

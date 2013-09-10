@@ -54,6 +54,7 @@ def addPgToRobot(robot):
 
   plug(robot.dynamic.position,robot.pg.position)
   plug(robot.com, robot.pg.com)
+  plug(robot.dynamic.gaze, robot.pg.gaze)
   plug(robot.dynamic.signal('left-ankle'), robot.pg.leftfootcurrentpos)
   plug(robot.dynamic.signal('right-ankle'), robot.pg.rightfootcurrentpos)
   robotDim = len(robot.dynamic.velocity.value)

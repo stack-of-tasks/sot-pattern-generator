@@ -136,7 +136,7 @@ namespace dynamicgraph {
 	  std::string name = "stepcomp";
 	  cmdArgs >> std::ws;
 	  if( cmdArgs.good()){ cmdArgs >> name; }
-	  Entity* entity = &(PoolStorage::getInstance()->getEntity( name ));
+	  Entity* entity = & PoolStorage::getInstance()->getEntity( name );
 	  stepComputer = dynamic_cast<StepComputer*>(entity);
 	}
       else if( cmdLine == "setQueue" )
@@ -144,7 +144,7 @@ namespace dynamicgraph {
 	  std::string name = "stepqueue";
 	  cmdArgs >> std::ws;
 	  if( cmdArgs.good()){ cmdArgs >> name; }
-	  Entity* entity = &(PoolStorage::getInstance()->getEntity( name ));
+	  Entity* entity = & PoolStorage::getInstance()->getEntity( name );
 	  stepQueue = dynamic_cast<StepQueue*>(entity);
 	}
       else if( cmdLine == "setPGManager" )
@@ -152,7 +152,7 @@ namespace dynamicgraph {
 	  std::string name = "steppg";
 	  cmdArgs >> std::ws;
 	  if( cmdArgs.good()){ cmdArgs >> name; }
-	  Entity* entity = &(PoolStorage::getInstance()->getEntity( name ));
+	  Entity* entity = & PoolStorage::getInstance()->getEntity( name );
 	  pgManager = dynamic_cast<PGManager*>(entity);
 	}
       else if( cmdLine == "state" )

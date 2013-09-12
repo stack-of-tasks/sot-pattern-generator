@@ -1,1 +1,169 @@
-Write in this file the modifications you commit.
+CHANGELOG
+----------------------
+
+[Current]
+ * Adapt postureTaskDofs to the corresponding robot.
+ * Fix waist orientation as the average value between the right and the left foot.
+ * Fix orientation of the waist. It is following now the direction of the left foot.
+ * Add feedback from experiments.
+ * Add posture task to forbid arm, head, and chest motions.
+ * Update the walk_romeo sample.
+ * Clean up code.
+ * Add a walk kinematic test for the humanoid robot Romeo.
+ * Correct the Python_module handling
+ * Update to cope with the new management of the singletons.
+ * Minor rewrital (indentation, white space).
+ * Commit modification validated on a real HRP-2 (N14)
+ * Fix class name declaration + minor typos.
+ * synchronize.
+ * Make the dependency in hrp2 optional.
+ * Modif the python meta pg to account for Romeo.
+ * Synchronize
+ * Add a python script allowing to make the robot walk.
+ * iAdded the tracker for PD walk control.
+ * ivigit.
+ * Synchronize cmake
+ * Update to cope with the new management of the singletons.
+ * Changes the uint of contact into bool.
+ * Remove debug output.
+ * Indicates when there is contact on the left and right feet.
+ * Distance to soil extracted automatically.
+ * Fix wrong install of some python files.
+ * Synchronize
+ * Synchronize
+ * Adapt to topic/singleton
+ * First working version. The code is not completely clean, since it is still using the thread structure built in sot-dyninv, while the package is not suppose to depend from it. And still using the solver from dyninv, same remark.
+ * IVIGIT.
+ * IVIGIT: working version, without the selector for feet references.
+ * First walking working version with sot-v2.
+ * IVIGIT.
+ * Passed to sot-py.
+ * Passed to sot-py.
+ * IVIGIT.
+ * Minor rewrital (indentation, white space).
+ * Remove the hard-coded robot size.
+ * Removed trailing ws.
+ * Initialize properly m_AnkleSoilDistance
+ * Remove the hard coded size of the robot
+ * Correct a typo
+ * [debian] Fix pb related to version number on libsot-dynamic.
+ * [debian] Fix dependency.
+ * [debian] Put variable for testing.
+ * [debian] Fix hrp2 library package names.
+ * [debian] Fix dependency name.
+ * [debian] Adding dependencies for needed libraries.
+ * Fix name of sot-dynamic.
+ * Change the name of hrp2-10 package.
+ * Synchronize cmake.
+ * [debian] Fix version number and install directories.
+ * Force angular velocity to be updated, e.g. dcomattitude signal.
+ * Synchronize.
+
+[v1.1.1]
+ * Synchronize
+ * Synchonize
+ * Remove dependency to fake package.
+ * Synchronize
+ * Add version release when detecting robots.
+ * Synchronize
+ * Synchronize
+ * Add package generation for Ubuntu 8.04
+ * Synchronize
+ * Switch to automatic version numbers.
+ * Synchronize
+ * * dynamicsJRLJapan -> jrl-dynamics * walkGenJRL -> jrl-walkgen * Use PKG_CONFIG_USE_DEPENDENCY
+ * Synchronize.
+ * Fix include path.
+ * Updated documentation with basic information.
+ * Update to new APIs.
+ * Fix TAGFILES in Doxyfile.extra.in.
+ * Switch to submodule.
+ * Add build dependencies.
+ * Add missing dependency.
+ * Add missing build requirements.
+ * Remove useless ldconfig call.
+ * Fix install files for Debian package.
+ * Increase build number.
+ * Update description.
+ * Uniformize NEWS file.
+ * Update README filename.
+ * Update documentation.
+ * Debianize package.
+ * Add mailmap file.
+ * Release 1.1
+
+[v1.1]
+
+[hri.1.0.0]
+ * Added CoM position reference input (supported by jrl-walkgen on branch topic/hri).
+ * Initialize properly m_AnkleSoilDistance
+ * Remove the hard coded size of the robot
+ * Correct a typo
+ * [debian] Fix pb related to version number on libsot-dynamic.
+ * [debian] Fix dependency.
+ * [debian] Put variable for testing.
+ * [debian] Fix hrp2 library package names.
+ * [debian] Fix dependency name.
+ * [debian] Adding dependencies for needed libraries.
+ * Fix name of sot-dynamic.
+ * Change the name of hrp2-10 package.
+ * Synchronize cmake.
+ * [debian] Fix version number and install directories.
+ * Force angular velocity to be updated, e.g. dcomattitude signal.
+ * Synchronize.
+ * Synchronize
+ * Synchonize
+ * Remove dependency to fake package.
+ * Synchronize
+ * Add version release when detecting robots.
+ * Synchronize
+ * Synchronize
+ * Add package generation for Ubuntu 8.04
+ * Synchronize
+ * Switch to automatic version numbers.
+ * Synchronize
+ * * dynamicsJRLJapan -> jrl-dynamics * walkGenJRL -> jrl-walkgen * Use PKG_CONFIG_USE_DEPENDENCY
+ * Synchronize.
+ * Fix include path.
+ * Updated documentation with basic information.
+ * Update to new APIs.
+ * Fix TAGFILES in Doxyfile.extra.in.
+ * Switch to submodule.
+ * Add build dependencies.
+ * Add missing dependency.
+ * Add missing build requirements.
+ * Remove useless ldconfig call.
+ * Fix install files for Debian package.
+ * Increase build number.
+ * Update description.
+ * Uniformize NEWS file.
+ * Update README filename.
+ * Update documentation.
+ * Debianize package.
+ * Add mailmap file.
+ * Release 1.1
+ * Corrected throw specifier following changes in sot-core exceptions.
+ * Lighten the src/CMakeLists.txt
+ * Correct the Dependencies in unitTesting/CMakeLists.txt
+ * Correct the src/CMakeLists.txt
+ * Correct the name of the macro used to define the API
+ * Add missing API for exception-pg.h
+ * Win32: Add compile flags to hide too verbose warnings
+ * Correct the name of the pkg-config executable
+ * Implemented commit 609c102da4ce1c from StackOfTasks.
+ * Changed the lib names listed in the .pc
+ * Ported SOT commit d7f4b7e7244407b0
+ * Corrected library versions.
+ * Link test with all libraries. Made exception-pg a library, which was causing a memory error (repeated free) when compiled separately with each library.
+ * Activated unit tests, renamed a class.
+ * Corrected target of plugins.
+ * Corrected wrong library prefix and path.
+ * Added the 4 remaining plugins + dependencies.
+ * Added StepComputer, StepObserver and StepTimeLine classes.
+ * Added Selector and StepChecker classes.
+ * Renamed pg class, added forgotten files.
+ * Added stepqueue and pgmanager classes.
+ * Renamed pattern generator class
+ * Converted sot::pg and sot::NextStepPgSot
+ * Converted plugin next-step
+ * Initialized git repository.

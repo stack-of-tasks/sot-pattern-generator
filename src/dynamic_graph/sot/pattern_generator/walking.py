@@ -26,7 +26,6 @@ def addPgToRobot(robot):
   robotName=robot.modelName
   specificitiesPath=robot.specificitiesPath
   jointRankPath=robot.jointRankPath
-
   robot.pg = PatternGenerator('pg')
   robot.pg.setVrmlDir(modelDir+'/')
   robot.pg.setVrml(robotName)

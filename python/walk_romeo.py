@@ -4,54 +4,56 @@
 # ______________________________________________________________________________
 # ******************************************************************************
 
-from dynamic_graph import plug
+# from dynamic_graph.sot.romeo.sot_romeo_controller import *
+# Create the robot.
 from dynamic_graph.sot.core import *
 from dynamic_graph.sot.dynamics import *
-from dynamic_graph.sot.core.matrix_util import matrixToTuple, vectorToTuple,rotate, matrixToRPY
-from dynamic_graph.sot.core.meta_tasks_kine import *
-from dynamic_graph.sot.core.utils.thread_interruptible_loop import loopInThread,loopShortcuts
-from dynamic_graph.sot.core.utils.viewer_helper import addRobotViewer,VisualPinger,updateComDisplay
-
-from numpy import *
-def totuple( a ):
-    al=a.tolist()
-    res=[]
-    for i in range(a.shape[0]):
-        res.append( tuple(al[i]) )
-    return tuple(res)
-
-# Create the robot.
-from dynamic_graph.sot.romeo.romeo import *
-robot = Robot('romeo', device=RobotSimu('romeo'))
+from dynamic_graph.sot.romeo.robot import *
+robot = Robot('ROMEO', device=RobotSimu('ROMEO'))
 plug(robot.device.state, robot.dynamic.position)
+
 
 # Binds with ros, export joint_state.
 from dynamic_graph.ros import *
 ros = Ros(robot)
 
 # Create a solver.
-from dynamic_graph.sot.application.velocity.precomputed_tasks import Solver
+from dynamic_graph.sot.application.velocity.precomputed_tasks import initialize
+solver = initialize ( robot )
 
-solver = Solver(robot)
+from dynamic_graph.sot.pattern_generator.walking import CreateEverythingForPG , walkFewSteps, walkAndrei
+CreateEverythingForPG ( robot , solver )
+# walkFewSteps ( robot )
+walkAndrei( robot )
 
 # Alternate visualization tool
-addRobotViewer(robot.device,small=True,small_extra=24,verbose=False)
+from dynamic_graph.sot.core.utils.viewer_helper import addRobotViewer
+addRobotViewer(robot.device,small=True,small_extra=0,verbose=False)
 
 
 #-------------------------------------------------------------------------------
 #----- MAIN LOOP ---------------------------------------------------------------
 #-------------------------------------------------------------------------------
 
+<<<<<<< HEAD
 dt=5e-3
 
 @loopInThread
 def inc():
     robot.device.increment(dt)
     updateComDisplay(robot.device,robot.dynamic.com)
+=======
+from dynamic_graph.sot.core.utils.thread_interruptible_loop import loopInThread,loopShortcuts
+dt=5e-3
+@loopInThread
+def inc():
+    robot.device.increment(dt)
+>>>>>>> topic/python
 
 runner=inc()
 [go,stop,next,n]=loopShortcuts(runner)
 
+<<<<<<< HEAD
 # --- PG ---------------------------------------------------------
 from dynamic_graph.sot.pattern_generator.meta_pg import MetaPG
 pg = MetaPG(robot.dynamic)
@@ -145,10 +147,20 @@ solver.push(taskPosition)			# stun the arms.
 # --- HERDT PG AND START -------------------------------------------------------
 # Set the algorithm generating the ZMP reference trajectory to Herdt's one.
 pg.startHerdt(False)
+=======
+# --- HERDT PG AND START -------------------------------------------------------
+# Set the algorithm generating the ZMP reference trajectory to Herdt's one.
+# pg.startHerdt(False)
+>>>>>>> topic/python
 
 print('You can now modifiy the speed of the robot by setting pg.pg.velocitydes')
 print('example : pg.pg.velocitydes.value =(0.1,0.0,0.0)\n')
 
+<<<<<<< HEAD
+=======
+robot.pg.velocitydes.value =(0.1,0.0,0.0)
+
+>>>>>>> topic/python
 go()
 
 

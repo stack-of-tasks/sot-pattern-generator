@@ -289,7 +289,6 @@ def createGraph(robot,solver):
   initPostureTask(robot)
   pushTasks(robot,solver)
 
-
 def CreateEverythingForPG(robot,solver):
   robot.initializeTracer()
   addPgToRobot(robot)

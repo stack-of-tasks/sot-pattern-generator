@@ -188,8 +188,8 @@ def initFeetTask(robot):
                               robot.pg.rightfootref])
 
   plug(robot.pg.inprocess,robot.selecFeet.selec)
-  robot.tasks['right-ankle'].controlGain.value = 180
-  robot.tasks['left-ankle'].controlGain.value = 180
+  robot.tasks['right-ankle'].controlGain.value = 200
+  robot.tasks['left-ankle'].controlGain.value = 200
 
   print "After Task for Right and Left Feet"
 
@@ -305,10 +305,10 @@ def walkAndrei(robot):
   robot.startTracer()
   robot.pg.parseCmd(":SetAlgoForZmpTrajectory Herdt")
   robot.pg.parseCmd(":doublesupporttime 0.1")
-  robot.pg.parseCmd(":singlesupporttime 0.8")
+  robot.pg.parseCmd(":singlesupporttime 0.7")
   robot.pg.velocitydes.value=(0.01,0.0,0.0)
   robot.pg.parseCmd(":numberstepsbeforestop 4")
-  robot.pg.parseCmd(":setfeetconstraint XY 0.02 0.02")
+  robot.pg.parseCmd(":setfeetconstraint XY 0.09 0.06")
   robot.pg.parseCmd(":setVelReference 0.01 0.0 0.0")
   robot.pg.parseCmd(":HerdtOnline 0.01 0.0 0.0")
 

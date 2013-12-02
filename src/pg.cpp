@@ -340,10 +340,16 @@ namespace dynamicgraph {
       // Instead of copy value (ml::Vector pos) it could be rather
       // used reference (const ml::Vector & post)
       ml::Vector res;
+	  MAL_VECTOR_TYPE(double) lWaistPosition;
       if (m_InitPositionByRealState)
 	{
 	  const ml::Vector& pos = jointPositionSIN(m_LocalTime);
 
+      MAL_VECTOR_RESIZE(lWaistPosition, 6);
+      for(unsigned int i = 0; i < 6; ++i)
+      {
+        lWaistPosition(i) = pos(i);
+      }
 	  //  m_ZMPPrevious[2] =m_AnkleSoilDistance; // Changed the reference frame.
 
 	  res.resize( pos.size()-6);
@@ -380,7 +386,6 @@ namespace dynamicgraph {
 	  // according to the state of the robot.
 	  PatternGeneratorJRL::COMState lStartingCOMState;
 	  MAL_S3_VECTOR_TYPE(double) lStartingZMPPosition;
-	  MAL_VECTOR_TYPE(double) lWaistPosition;
 	  PatternGeneratorJRL::FootAbsolutePosition InitLeftFootAbsPos;
 	  PatternGeneratorJRL::FootAbsolutePosition InitRightFootAbsPos;
 

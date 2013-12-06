@@ -1,7 +1,37 @@
 CHANGELOG
 ----------------------
 
-[Current]
+[v2.8.0]
+	rq: jump in version number to synchronize with robotpkg version
+ * Reduce the FeetConstraintXY for HRP4 and Romeo.
+ * Merge pull request #6 from gergondet/fixDefaultSelectorConstructor
+ * Fix Selector(name) constructor
+ * Merge pull request #5 from gergondet/topic/fixWalkingPy
+ * Fix some parameters in walking.py for real walking
+ * [travis] Add dependency in jrl-walkgen.
+ * Remove merge traces in the walk_romeo python script.
+
+
+[v1.1.2]
+ * (v1.1.2) Merge branch 'topic/python'
+ * Synchronize.
+ * (origin/topic/python) Simplify walkromeo by using the routines in walking.py
+ * Correct the path to the plugin directory of dynamic-graph.
+ * Synchronize
+ * Update README.md
+ * [travis] Add support
+ * Update Changelog. Merge topic/python in master. Fix issue #2 in github.
+ * Adapt postureTaskDofs to the corresponding robot.
+ * Fix waist orientation as the average value between the right and the left foot.
+ * Fix orientation of the waist. It is following now the direction of the left foot.
+ * Add feedback from experiments.
+ * Add posture task to forbid arm, head, and chest motions.
+ * Update the walk_romeo sample.
+ * Clean up code.
+ * Add a walk kinematic test for the humanoid robot Romeo.
+ * Correct the Python_module handling
+ * Update to cope with the new management of the singletons.
+ * Minor rewrital (indentation, white space).
  * Adapt postureTaskDofs to the corresponding robot.
  * Fix waist orientation as the average value between the right and the left foot.
  * Fix orientation of the waist. It is following now the direction of the left foot.
@@ -32,7 +62,8 @@ CHANGELOG
  * Synchronize
  * Synchronize
  * Adapt to topic/singleton
- * First working version. The code is not completely clean, since it is still using the thread structure built in sot-dyninv, while the package is not suppose to depend from it. And still using the solver from dyninv, same remark.
+ * First working version. The code is not completely clean, since it is still using the thread structure built in sot-dyninv, while the package is not suppose to depend from it. And sti
+ll using the solver from dyninv, same remark.
  * IVIGIT.
  * IVIGIT: working version, without the selector for feet references.
  * First walking working version with sot-v2.

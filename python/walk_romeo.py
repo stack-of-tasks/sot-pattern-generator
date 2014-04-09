@@ -10,6 +10,7 @@ from dynamic_graph.sot.core import *
 from dynamic_graph.sot.dynamics import *
 from dynamic_graph.sot.romeo.robot import *
 robot = Robot('ROMEO', device=RobotSimu('ROMEO'))
+from dynamic_graph import plug
 plug(robot.device.state, robot.dynamic.position)
 
 
@@ -21,8 +22,8 @@ ros = Ros(robot)
 from dynamic_graph.sot.application.velocity.precomputed_tasks import initialize
 solver = initialize ( robot )
 
-from dynamic_graph.sot.pattern_generator.walking import CreateEverythingForPG , walkFewSteps, walkAndrei
-CreateEverythingForPG ( robot , solver )
+from dynamic_graph.sot.pattern_generator.walking import CreateEverythingForPGwithUrdf , walkFewSteps, walkAndrei
+CreateEverythingForPGwithUrdf ( robot , solver )
 # walkFewSteps ( robot )
 walkAndrei( robot )
 
@@ -54,5 +55,4 @@ print('example : pg.pg.velocitydes.value =(0.1,0.0,0.0)\n')
 robot.pg.velocitydes.value =(0.1,0.0,0.0)
 
 go()
-
 

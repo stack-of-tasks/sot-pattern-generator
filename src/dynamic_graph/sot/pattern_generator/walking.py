@@ -26,6 +26,7 @@ def addPgToRobot(robot):
   robotName=robot.modelName
   specificitiesPath=robot.specificitiesPath
   jointRankPath=robot.jointRankPath
+
   robot.pg = PatternGenerator('pg')
   robot.pg.setVrmlDir(modelDir+'/')
   robot.pg.setVrml(robotName)
@@ -33,6 +34,41 @@ def addPgToRobot(robot):
   robot.pg.setXmlRank(jointRankPath)
   print "At this stage"
   robot.pg.buildModel()
+
+  # Standard initialization
+  robot.pg.parseCmd(":samplingperiod 0.005")
+  robot.pg.parseCmd(":previewcontroltime 1.6")
+  robot.pg.parseCmd(":walkmode 0")
+  robot.pg.parseCmd(":omega 0.0")
+  robot.pg.parseCmd(":stepheight 0.05")
+  robot.pg.parseCmd(":singlesupporttime 0.780")
+  robot.pg.parseCmd(":doublesupporttime 0.020")
+  robot.pg.parseCmd(":armparameters 0.5")
+  robot.pg.parseCmd(":LimitsFeasibility 0.0")
+  robot.pg.parseCmd(":ZMPShiftParameters 0.015 0.015 0.015 0.015")
+  robot.pg.parseCmd(":TimeDistributeParameters 2.0 3.5 1.0 3.0")
+  robot.pg.parseCmd(":UpperBodyMotionParameters 0.0 -0.5 0.0")
+  robot.pg.parseCmd(":comheight 0.814")
+  robot.pg.parseCmd(":SetAlgoForZmpTrajectory Morisawa")
+
+  plug(robot.dynamic.position,robot.pg.position)
+  plug(robot.com, robot.pg.com)
+  plug(robot.dynamic.signal('left-ankle'), robot.pg.leftfootcurrentpos)
+  plug(robot.dynamic.signal('right-ankle'), robot.pg.rightfootcurrentpos)
+  robotDim = len(robot.dynamic.velocity.value)
+  robot.pg.motorcontrol.value = robotDim*(0,)
+  robot.pg.zmppreviouscontroller.value = (0,0,0)
+
+  robot.pg.initState()
+
+def addPgToUrdfRobot(robot):
+  robot.pg = PatternGenerator('pg')
+  robot.pg.setUrdfDir('package://romeo_description/urdf/')
+  robot.pg.setUrdf('romeo_small.urdf')
+  robot.pg.addJointMapping('BODY','body')
+
+  print "At this stage"
+  robot.pg.buildModelUrdf()
 
   # Standard initialization
   robot.pg.parseCmd(":samplingperiod 0.005")
@@ -188,8 +224,8 @@ def initFeetTask(robot):
                               robot.pg.rightfootref])
 
   plug(robot.pg.inprocess,robot.selecFeet.selec)
-  robot.tasks['right-ankle'].controlGain.value = 200
-  robot.tasks['left-ankle'].controlGain.value = 200
+  robot.tasks['right-ankle'].controlGain.value = 180
+  robot.tasks['left-ankle'].controlGain.value = 180
 
   print "After Task for Right and Left Feet"
 
@@ -295,6 +331,12 @@ def CreateEverythingForPG(robot,solver):
   addPgTaskToRobot(robot,solver)
   createGraph(robot,solver)
 
+def CreateEverythingForPGwithUrdf(robot,solver):
+  robot.initializeTracer()
+  addPgToUrdfRobot(robot)
+  addPgTaskToRobot(robot,solver)
+  createGraph(robot,solver)
+
 def walkFewSteps(robot):
   robot.pg.parseCmd(":stepseq 0.0 0.1025 0.0 0.17 -0.205 0.0 0.17 0.205 0.0 0.17 -0.205 0.0 0.17 0.205 0.0 0.0 -0.205 0.0")
 
@@ -305,9 +347,10 @@ def walkAndrei(robot):
   robot.startTracer()
   robot.pg.parseCmd(":SetAlgoForZmpTrajectory Herdt")
   robot.pg.parseCmd(":doublesupporttime 0.1")
-  robot.pg.parseCmd(":singlesupporttime 0.7")
+  robot.pg.parseCmd(":singlesupporttime 0.8")
   robot.pg.velocitydes.value=(0.01,0.0,0.0)
   robot.pg.parseCmd(":numberstepsbeforestop 4")
+  robot.pg.parseCmd(":setfeetconstraint XY 0.02 0.02")
   robot.pg.parseCmd(":setVelReference 0.01 0.0 0.0")
   robot.pg.parseCmd(":HerdtOnline 0.01 0.0 0.0")
   if robot.device.name == 'HRP2LAAS' or \

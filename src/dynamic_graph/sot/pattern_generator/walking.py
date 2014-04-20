@@ -12,6 +12,8 @@ from dynamic_graph.sot.pattern_generator import PatternGenerator,Selector
 from dynamic_graph.sot.core.matrix_util import matrixToTuple
 # from dynamic_graph.sot.core import FeatureGeneric, FeaturePoint6d, Task, TaskPD
 from dynamic_graph.sot.core import FeaturePosture
+from dynamic_graph.ros import RosRobotModel
+
 
 from numpy import *
 def totuple( a ):
@@ -107,6 +109,11 @@ def addPgTaskToRobot(robot,solver):
 
   robot.geom.setFiles(robot.modelDir, robot.modelName,robot.specificitiesPath,robot.jointRankPath)
   robot.geom.parse()
+
+def addPgTaskToUrdfRobot(robot,solver):
+  # --- ROBOT.PG INIT FRAMES ---
+  robot.geom = RosRobotModel("geom")
+  robot.geom.loadFromParameterServer()
 
 def initRobotGeom(robot):
   robot.geom.createOpPoint('rf2','right-ankle')
@@ -334,7 +341,7 @@ def CreateEverythingForPG(robot,solver):
 def CreateEverythingForPGwithUrdf(robot,solver):
   robot.initializeTracer()
   addPgToUrdfRobot(robot)
-  addPgTaskToRobot(robot,solver)
+  addPgTaskToUrdfRobot(robot,solver)
   createGraph(robot,solver)
 
 def walkFewSteps(robot):

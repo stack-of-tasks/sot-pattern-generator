@@ -236,6 +236,13 @@ def initFeetTask(robot):
 
   print "After Task for Right and Left Feet"
 
+def removeDofUsed(jacobian, target):
+  for i in range(0,len(jacobian)):
+    for j in range(6,len(jacobian[i])):
+      if jacobian[i][j] != 0:
+        target[j- 6] = False
+  return target
+
 def initPostureTask(robot):
   # --- TASK POSTURE --------------------------------------------------
   # set a default position for the joints. 
@@ -244,30 +251,18 @@ def initPostureTask(robot):
   robotDim = len(robot.dynamic.velocity.value)
   robot.features['featurePosition'].posture.value = robot.halfSitting
 
-  if robot.device.name == 'HRP2LAAS' or \
-     robot.device.name == 'HRP2JRL':
-    postureTaskDofs = [ False,False,False,False,False,False, \
-                        False,False,False,False,False,False, \
-                        True,True,True,True, \
-                        True,True,True,True,True,True,True, \
-                        True,True,True,True,True,True,True ]
-  elif robot.device.name == 'HRP4LIRMM':
-    # Right Leg, Left leg, chest, right arm, left arm
-    postureTaskDofs = [False]*6 +  [False]*6 + [True]*4 + [True]*9 + [True]*9
-  elif robot.device.name == 'ROMEO':
-    # chest, left/right arms, left/right legs
-    postureTaskDofs = [True]*5 + [True]*7 + [True]*7 + [False]*7 + [False]*7
-  else:
-    print "/!\\ walking.py: The robot " +robot.device.name+ " is unknown."
-    print "  Default posture task froze all the dofs"
-    postureTaskDofs=[True] * (robot.dimension-6)
+  # Remove the dofs of the feet.
+  postureTaskDofs = [True] * (len(robot.dynamic.position.value) - 6)
+  jla = robot.dynamic.signal('Jleft-ankle').value
+  postureTaskDofs = removeDofUsed(jla, postureTaskDofs)
+  jra = robot.dynamic.signal('Jright-ankle').value
+  postureTaskDofs = removeDofUsed(jra, postureTaskDofs)
 
   for dof,isEnabled in enumerate(postureTaskDofs):
     robot.features['featurePosition'].selectDof(dof+6,isEnabled)
     
   robot.tasks['robot_task_position']=Task('robot_task_position')
   robot.tasks['robot_task_position'].add('featurePosition')
-  # featurePosition.selec.value = toFlags((6,24))
 
   gainPosition = GainAdaptive('gainPosition')
   gainPosition.set(0.1,0.1,125e3)

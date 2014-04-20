@@ -138,6 +138,12 @@ namespace dynamicgraph {
       /*! \brief Name of the VRML file which containes the robot's model. */
       std::string m_urdfMainFile; 
 
+      /*! \brief Lenght of the sole */
+      double m_soleLength;
+
+      /*! \brief Width of the sole */
+      double m_soleWidth;
+
       /* \brief Special joints map for the parser */
       std::map<std::string, std::string> specialJoints_;     
 
@@ -217,6 +223,9 @@ namespace dynamicgraph {
       
       /*! \brief Set the name of the urdf file. */
       void setUrdfMainFile( const std::string& filename );
+
+      /*! \brief Set the foot parameters */
+      void setSoleParameters(const double& inSoleLength, const double& inSoleWidth);
  
       /*! \brief Set mapping between a link and actual robot name */
        void addJointMapping(const std::string& link, const std::string& repName);

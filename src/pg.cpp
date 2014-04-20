@@ -58,7 +58,10 @@ namespace dynamicgraph {
       ,m_vrmlMainFile()
       ,m_xmlSpecificitiesFile()
       ,m_xmlRankFile()
-
+      ,m_urdfDirectory("")
+      ,m_urdfMainFile("")
+      ,m_soleLength(0)
+      ,m_soleWidth(0)
       ,m_init(false)
       ,m_InitPositionByRealState(true)
       ,firstSINTERN( boost::bind(&PatternGenerator::InitOneStepOfControl,this,_1,_2),
@@ -576,6 +579,8 @@ namespace dynamicgraph {
       	      vector3d AnkleInFoot;
       	      rightFoot->getAnklePositionInLocalFrame(AnkleInFoot);
 	            m_AnkleSoilDistance = fabs(AnkleInFoot[2]);
+	            aHDR->leftFoot()->setSoleSize(m_soleLength, m_soleWidth);
+	            aHDR->rightFoot()->setSoleSize(m_soleLength, m_soleWidth);
       	    }
       	  else ok=false;
       	}
@@ -1303,7 +1308,7 @@ namespace dynamicgraph {
 		 makeCommandVoid1(*this,&PatternGenerator::setVrmlMainFile,
 				  docCommandVoid1("Set VRML main file.",
 						  "string (file name)")));
-     addCommand("setUrdfDir",
+      addCommand("setUrdfDir",
 		 makeCommandVoid1(*this,&PatternGenerator::setUrdfDirectory,
 				  docCommandVoid1("Set Urdf directory.",
 						  "string (path name)")));
@@ -1311,6 +1316,18 @@ namespace dynamicgraph {
 		 makeCommandVoid1(*this,&PatternGenerator::setUrdfMainFile,
 				  docCommandVoid1("Set Urdf main file.",
 						  "string (file name)")));
+
+      std::string docstring = "    \n"
+        "    Set foot parameters\n"
+        "      Input:\n"
+        "        - a floating point number: the sole length,\n"
+        "        - a floating point number: the sole width,\n"
+        "    \n";
+      addCommand("setSoleParameters",
+		 makeCommandVoid2(*this,&PatternGenerator::setSoleParameters, 
+                        docstring));
+
+
       addCommand("addJointMapping",
 		 makeCommandVoid2(*this,&PatternGenerator::addJointMapping,
 				  docCommandVoid1("Map link names.",
@@ -1733,5 +1750,11 @@ namespace dynamicgraph {
       return res;
     }
 
+    void PatternGenerator::
+    setSoleParameters(const double& inSoleLength, const double& inSoleWidth)
+    {
+      m_soleLength = inSoleLength;
+      m_soleWidth  = inSoleWidth;
+    }
   } // namespace dg
 } // namespace sot

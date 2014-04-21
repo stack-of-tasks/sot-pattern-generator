@@ -65,8 +65,9 @@ def addPgToRobot(robot):
 
 def addPgToUrdfRobot(robot):
   robot.pg = PatternGenerator('pg')
-  robot.pg.setUrdfDir('package://romeo_description/urdf/')
-  robot.pg.setUrdf('romeo_small.urdf')
+  robot.pg.setUrdfDir(robot.urdfDir)
+  robot.pg.setUrdf(robot.urdfName)
+  robot.pg.setSoleParameters(robot.ankleLength, robot.ankleWidth)
   robot.pg.addJointMapping('BODY','body')
 
   print "At this stage"

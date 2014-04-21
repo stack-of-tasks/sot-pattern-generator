@@ -553,11 +553,6 @@ namespace dynamicgraph {
 
     public: /* --- PARAMS --- */
       void initCommands( void );
-      /*! \brief This method pass on to the Pattern Generator Interface to interpret the commands.
-       */
-      virtual void commandLine( const std::string& cmdLine,
-				std::istringstream& cmdArgs,
-				std::ostream& os );
       int stringToReferenceEnum( const std::string & FrameReference );
       void setReferenceFromString( const std::string & str );
       void addOnLineStep( const double & x, const double & y, const double & th);

@@ -270,41 +270,6 @@ def initPostureTask(robot):
   gainPosition.gain.value = 5
   plug(robot.tasks['robot_task_position'].error,gainPosition.error)
   plug(gainPosition.gain,robot.tasks['robot_task_position'].controlGain)
-
-def initPostureTask2(robot):
-  robot.features['featurePosition'] = FeatureGeneric('featurePosition')
-  robot.features['featurePositionDes'] = FeatureGeneric('featurePositionDes')
-  robot.features['featurePosition'].setReference('featurePositionDes')
-  plug(robot.dynamic.position,robot.features['featurePosition'].errorIN)
-  robot.features['featurePositionDes'].errorIN.value = robot.halfSitting
-  robot.features['featurePosition'].jacobianIN.value = totuple( identity(size(robot.dynamic.position.value)) )
-
-  robot.tasks['robot_task_position'] = Task('robot_task_position')
-  robot.tasks['robot_task_position'].add('featurePosition')
-
-  #gainPosition = GainAdaptive('gainPosition')
-  #gainPosition.set(0.1,0.1,125e3)
-  #gainPosition.gain.value = 5
-  #plug(robot.tasks['robot_task_position'].error,gainPosition.error)
-  #plug(gainPosition.gain,robot.tasks['robot_task_position'].controlGain)
-  robot.tasks['robot_task_position'].controlGain.value =2.
-
-  #TODO: this is ??? specific.
-  if robot.device.name == 'HRP2LAAS' or \
-     robot.device.name == 'HRP2JRL':
-    # reverse polish arms(1), head(1), chest(1), legs(0), waist(0)
-    robot.features['featurePosition'].selec.value = \
-      14*'1' + 2*'1' + 2*'1' + 12*'0' + 6*'0'
-  elif robot.device.name == 'HRP4LIRMM':
-    # reverse polish arms(1), head(1), chest(1), legs(0), waist(0)
-    robot.features['featurePosition'].selec.value = \
-      18*'1' + 2*'1' + 2*'1' + 12*'0' + 6*'0'
-  elif robot.device.name == 'ROMEO':
-    # reverse polish legs, arms, chest, waist
-    robot.features['featurePosition'].selec.value = \
-      14*'0' + 14*'1' + 5*'1' + 6*'0'
-  else:
-    robot.features['featurePosition'].selec.value = '1' * robot.dimension
   
 def pushTasks(robot,solver):
   # --- TASK COM ---

@@ -114,7 +114,7 @@ def addPgTaskToRobot(robot,solver):
 def addPgTaskToUrdfRobot(robot,solver):
   # --- ROBOT.PG INIT FRAMES ---
   robot.geom = RosRobotModel("geom")
-  robot.geom.loadFromParameterServer()
+  robot.geom.loadUrdf(robot.urdfDir + robot.urdfName)
 
 def initRobotGeom(robot):
   robot.geom.createOpPoint('rf2','right-ankle')

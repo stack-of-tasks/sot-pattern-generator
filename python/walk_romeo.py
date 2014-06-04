@@ -22,8 +22,8 @@ ros = Ros(robot)
 from dynamic_graph.sot.application.velocity.precomputed_tasks import initialize
 solver = initialize ( robot )
 
-from dynamic_graph.sot.pattern_generator.walking import CreateEverythingForPGwithUrdf , walkFewSteps, walkAndrei
-CreateEverythingForPGwithUrdf ( robot , solver )
+from dynamic_graph.sot.pattern_generator.walking import CreateEverythingForPG , walkFewSteps, walkAndrei
+CreateEverythingForPG ( robot , solver )
 # walkFewSteps ( robot )
 walkAndrei( robot )
 

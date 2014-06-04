@@ -23,84 +23,66 @@ def totuple( a ):
         res.append( tuple(al[i]) )
     return tuple(res)
 
-def addPgToRobot(robot):
+def initPg(robot):
+  # Standard initialization
+  robot.pg.parseCmd(":samplingperiod 0.005")
+  robot.pg.parseCmd(":previewcontroltime 1.6")
+  robot.pg.parseCmd(":walkmode 0")
+  robot.pg.parseCmd(":omega 0.0")
+  robot.pg.parseCmd(":stepheight 0.05")
+  robot.pg.parseCmd(":singlesupporttime 0.780")
+  robot.pg.parseCmd(":doublesupporttime 0.020")
+  robot.pg.parseCmd(":armparameters 0.5")
+  robot.pg.parseCmd(":LimitsFeasibility 0.0")
+  robot.pg.parseCmd(":ZMPShiftParameters 0.015 0.015 0.015 0.015")
+  robot.pg.parseCmd(":TimeDistributeParameters 2.0 3.5 1.0 3.0")
+  robot.pg.parseCmd(":UpperBodyMotionParameters 0.0 -0.5 0.0")
+  robot.pg.parseCmd(":comheight 0.814")
+  robot.pg.parseCmd(":SetAlgoForZmpTrajectory Morisawa")
+
+  plug(robot.dynamic.position,robot.pg.position)
+  plug(robot.com, robot.pg.com)
+  plug(robot.dynamic.signal('left-ankle'), robot.pg.leftfootcurrentpos)
+  plug(robot.dynamic.signal('right-ankle'), robot.pg.rightfootcurrentpos)
+  robotDim = len(robot.dynamic.velocity.value)
+  robot.pg.motorcontrol.value = robotDim*(0,)
+  robot.pg.zmppreviouscontroller.value = (0,0,0)
+
+  robot.pg.initState()
+
+def addPgToVRMLRobot(robot):
+  # Configure Pattern Generator
   modelDir=robot.modelDir+'/'
   robotName=robot.modelName
   specificitiesPath=robot.specificitiesPath
   jointRankPath=robot.jointRankPath
-
   robot.pg = PatternGenerator('pg')
   robot.pg.setVrmlDir(modelDir+'/')
   robot.pg.setVrml(robotName)
   robot.pg.setXmlSpec(specificitiesPath)
   robot.pg.setXmlRank(jointRankPath)
-  print "At this stage"
+  # Build Pattern Generator
   robot.pg.buildModel()
-
-  # Standard initialization
-  robot.pg.parseCmd(":samplingperiod 0.005")
-  robot.pg.parseCmd(":previewcontroltime 1.6")
-  robot.pg.parseCmd(":walkmode 0")
-  robot.pg.parseCmd(":omega 0.0")
-  robot.pg.parseCmd(":stepheight 0.05")
-  robot.pg.parseCmd(":singlesupporttime 0.780")
-  robot.pg.parseCmd(":doublesupporttime 0.020")
-  robot.pg.parseCmd(":armparameters 0.5")
-  robot.pg.parseCmd(":LimitsFeasibility 0.0")
-  robot.pg.parseCmd(":ZMPShiftParameters 0.015 0.015 0.015 0.015")
-  robot.pg.parseCmd(":TimeDistributeParameters 2.0 3.5 1.0 3.0")
-  robot.pg.parseCmd(":UpperBodyMotionParameters 0.0 -0.5 0.0")
-  robot.pg.parseCmd(":comheight 0.814")
-  robot.pg.parseCmd(":SetAlgoForZmpTrajectory Morisawa")
-
-  plug(robot.dynamic.position,robot.pg.position)
-  plug(robot.com, robot.pg.com)
-  plug(robot.dynamic.signal('left-ankle'), robot.pg.leftfootcurrentpos)
-  plug(robot.dynamic.signal('right-ankle'), robot.pg.rightfootcurrentpos)
-  robotDim = len(robot.dynamic.velocity.value)
-  robot.pg.motorcontrol.value = robotDim*(0,)
-  robot.pg.zmppreviouscontroller.value = (0,0,0)
-
-  robot.pg.initState()
+  # Initialise Pattern Generator
+  initPg(robot)
 
 def addPgToUrdfRobot(robot):
+  # Configure Pattern Generator    
   robot.pg = PatternGenerator('pg')
   robot.pg.setUrdfDir(robot.urdfDir)
   robot.pg.setUrdf(robot.urdfName)
   robot.pg.setSoleParameters(robot.ankleLength, robot.ankleWidth)
-  robot.pg.addJointMapping('BODY','body')
-
-  print "At this stage"
+  if(hasattr(robot, 'jointMap')):
+      print "some joints need to be mapped"
+      for i in robot.jointMap:
+          robot.pg.addJointMapping(i, robot.jointMap[i])
+  # Build Pattern Generator
   robot.pg.buildModelUrdf()
-
-  # Standard initialization
-  robot.pg.parseCmd(":samplingperiod 0.005")
-  robot.pg.parseCmd(":previewcontroltime 1.6")
-  robot.pg.parseCmd(":walkmode 0")
-  robot.pg.parseCmd(":omega 0.0")
-  robot.pg.parseCmd(":stepheight 0.05")
-  robot.pg.parseCmd(":singlesupporttime 0.780")
-  robot.pg.parseCmd(":doublesupporttime 0.020")
-  robot.pg.parseCmd(":armparameters 0.5")
-  robot.pg.parseCmd(":LimitsFeasibility 0.0")
-  robot.pg.parseCmd(":ZMPShiftParameters 0.015 0.015 0.015 0.015")
-  robot.pg.parseCmd(":TimeDistributeParameters 2.0 3.5 1.0 3.0")
-  robot.pg.parseCmd(":UpperBodyMotionParameters 0.0 -0.5 0.0")
-  robot.pg.parseCmd(":comheight 0.814")
-  robot.pg.parseCmd(":SetAlgoForZmpTrajectory Morisawa")
-
-  plug(robot.dynamic.position,robot.pg.position)
-  plug(robot.com, robot.pg.com)
-  plug(robot.dynamic.signal('left-ankle'), robot.pg.leftfootcurrentpos)
-  plug(robot.dynamic.signal('right-ankle'), robot.pg.rightfootcurrentpos)
-  robotDim = len(robot.dynamic.velocity.value)
-  robot.pg.motorcontrol.value = robotDim*(0,)
-  robot.pg.zmppreviouscontroller.value = (0,0,0)
-
-  robot.pg.initState()
+  # Initialise Pattern Generator
+  initPg(robot)
 
 
-def addPgTaskToRobot(robot,solver):
+def addPgTaskToVRMLRobot(robot,solver):
   # --- ROBOT.PG INIT FRAMES ---
   robot.geom = Dynamic("geom")
   print("modelDir: ",robot.modelDir)
@@ -294,9 +276,15 @@ def createGraph(robot,solver):
   pushTasks(robot,solver)
 
 def CreateEverythingForPG(robot,solver):
+  if hasattr(robot, 'urdfName'):
+      CreateEverythingForPGwithUrdf(robot,solver)
+  else:
+      CreateEverythingForPGwithVRML(robot,solver)
+
+def CreateEverythingForPGwithVRML(robot,solver):
   robot.initializeTracer()
-  addPgToRobot(robot)
-  addPgTaskToRobot(robot,solver)
+  addPgToVRMLRobot(robot)
+  addPgTaskToVRMLRobot(robot,solver)
   createGraph(robot,solver)
 
 def CreateEverythingForPGwithUrdf(robot,solver):

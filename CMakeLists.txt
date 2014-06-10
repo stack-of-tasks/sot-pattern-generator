@@ -40,6 +40,7 @@ SETUP_PROJECT()
 # Search for dependencies.
 ADD_REQUIRED_DEPENDENCY("jrl-walkgen >= 3.0.0")
 ADD_REQUIRED_DEPENDENCY("jrl-dynamics >= 1.16.1")
+ADD_REQUIRED_DEPENDENCY("jrl-dynamics-urdf")
 
 ADD_REQUIRED_DEPENDENCY("dynamic-graph >= 1.0.0")
 ADD_REQUIRED_DEPENDENCY("sot-core >= 1.0")

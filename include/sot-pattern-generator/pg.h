@@ -131,7 +131,23 @@ namespace dynamicgraph {
 
       /*! \brief Name of the XML file which specificies the rank of the Joints in the state vector. */
       std::string m_xmlRankFile;
-      /*! @} */
+
+      /*! \brief Directory where the VRML file of the robot's model is located. */
+      std::string m_urdfDirectory;
+
+      /*! \brief Name of the VRML file which containes the robot's model. */
+      std::string m_urdfMainFile; 
+
+      /*! \brief Lenght of the sole */
+      double m_soleLength;
+
+      /*! \brief Width of the sole */
+      double m_soleWidth;
+
+      /* \brief Special joints map for the parser */
+      std::map<std::string, std::string> specialJoints_;     
+
+     /*! @} */
 
       /*! \brief Boolean variable to initialize the object by loading an object. */
       bool m_init;
@@ -175,6 +191,9 @@ namespace dynamicgraph {
       /*! \brief Build the pattern generator interface. */
       bool buildModel( void );
 
+     /*! \brief Build the pattern generator interface from a Urdf file. */
+      bool buildModelUrdf( void );
+
       /*! \brief Initialize the state of the robot. */
       bool InitState( void );
 
@@ -199,6 +218,18 @@ namespace dynamicgraph {
 	of the preview control. */
       void setParamPreviewFile(const std::string &filename);
 
+      /*! \brief Set the directory which contains the urdf files robot's model. */
+      void setUrdfDirectory( const std::string& filename );
+      
+      /*! \brief Set the name of the urdf file. */
+      void setUrdfMainFile( const std::string& filename );
+
+      /*! \brief Set the foot parameters */
+      void setSoleParameters(const double& inSoleLength, const double& inSoleWidth);
+ 
+      /*! \brief Set mapping between a link and actual robot name */
+       void addJointMapping(const std::string& link, const std::string& repName);
+     
       /*! \brief Give access directly to the pattern generator...
 	You really have to know what your are doing. */
       pg::PatternGeneratorInterface * GetPatternGeneratorInterface()
@@ -522,11 +553,6 @@ namespace dynamicgraph {
 
     public: /* --- PARAMS --- */
       void initCommands( void );
-      /*! \brief This method pass on to the Pattern Generator Interface to interpret the commands.
-       */
-      virtual void commandLine( const std::string& cmdLine,
-				std::istringstream& cmdArgs,
-				std::ostream& os );
       int stringToReferenceEnum( const std::string & FrameReference );
       void setReferenceFromString( const std::string & str );
       void addOnLineStep( const double & x, const double & y, const double & th);

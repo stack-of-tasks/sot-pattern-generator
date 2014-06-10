@@ -5,10 +5,14 @@ env:
   global:
     secure: goTy8NYzvup6j3wRWVi2SdyHB4U+ObWD1l9s3qLudbQl0yO6+ojrcqi1anGKXTWgYZzv0bZXDItXzL74w90HMWhh5I15uIta9bd7WWfgRWgYRqtiMkap+NyPxz84tfTQMfaXxODb8ttpEzemsAQxJ2uPdbgm75nx8bSeeWFne94=
 before_install:
+- sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -sc` main" > /etc/apt/sources.list.d/ros-latest.list'
+- wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
 - git submodule update --init --recursive
 - sudo apt-get update -qq
-- sudo apt-get install -qq doxygen doxygen-latex libboost-all-dev libeigen3-dev liblapack-dev libblas-dev gfortran python-dev python-sphinx python-numpy
+- sudo apt-get install -qq doxygen doxygen-latex libboost-all-dev libeigen3-dev liblapack-dev libblas-dev gfortran python-dev python-sphinx python-numpy 
+ ros-hydro-urdfdom ros-hydro-urdfdom-headers ros-hydro-roscpp ros-hydro-resource-retriever
 - sudo pip install cpp-coveralls --use-mirrors
+- source /opt/ros/hydro/setup.bash
 matrix:
   allow_failures:
   - compiler: clang
@@ -22,7 +26,6 @@ after_success:
 script: ./.travis/build
 language: cpp
 compiler:
-- clang
 - gcc
 branches:
   only:

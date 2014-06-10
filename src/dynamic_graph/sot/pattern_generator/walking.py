@@ -12,6 +12,8 @@ from dynamic_graph.sot.pattern_generator import PatternGenerator,Selector
 from dynamic_graph.sot.core.matrix_util import matrixToTuple
 # from dynamic_graph.sot.core import FeatureGeneric, FeaturePoint6d, Task, TaskPD
 from dynamic_graph.sot.core import FeaturePosture
+from dynamic_graph.ros import RosRobotModel
+
 
 from numpy import *
 def totuple( a ):
@@ -21,19 +23,7 @@ def totuple( a ):
         res.append( tuple(al[i]) )
     return tuple(res)
 
-def addPgToRobot(robot):
-  modelDir=robot.modelDir+'/'
-  robotName=robot.modelName
-  specificitiesPath=robot.specificitiesPath
-  jointRankPath=robot.jointRankPath
-  robot.pg = PatternGenerator('pg')
-  robot.pg.setVrmlDir(modelDir+'/')
-  robot.pg.setVrml(robotName)
-  robot.pg.setXmlSpec(specificitiesPath)
-  robot.pg.setXmlRank(jointRankPath)
-  print "At this stage"
-  robot.pg.buildModel()
-
+def initPg(robot):
   # Standard initialization
   robot.pg.parseCmd(":samplingperiod 0.005")
   robot.pg.parseCmd(":previewcontroltime 1.6")
@@ -66,8 +56,39 @@ def addPgToRobot(robot):
 
   robot.pg.initState()
 
+def addPgToVRMLRobot(robot):
+  # Configure Pattern Generator
+  modelDir=robot.modelDir+'/'
+  robotName=robot.modelName
+  specificitiesPath=robot.specificitiesPath
+  jointRankPath=robot.jointRankPath
+  robot.pg = PatternGenerator('pg')
+  robot.pg.setVrmlDir(modelDir+'/')
+  robot.pg.setVrml(robotName)
+  robot.pg.setXmlSpec(specificitiesPath)
+  robot.pg.setXmlRank(jointRankPath)
+  # Build Pattern Generator
+  robot.pg.buildModel()
+  # Initialise Pattern Generator
+  initPg(robot)
 
-def addPgTaskToRobot(robot,solver):
+def addPgToUrdfRobot(robot):
+  # Configure Pattern Generator    
+  robot.pg = PatternGenerator('pg')
+  robot.pg.setUrdfDir(robot.urdfDir)
+  robot.pg.setUrdf(robot.urdfName)
+  robot.pg.setSoleParameters(robot.ankleLength, robot.ankleWidth)
+  if(hasattr(robot, 'jointMap')):
+      print "some joints need to be mapped"
+      for i in robot.jointMap:
+          robot.pg.addJointMapping(i, robot.jointMap[i])
+  # Build Pattern Generator
+  robot.pg.buildModelUrdf()
+  # Initialise Pattern Generator
+  initPg(robot)
+
+
+def addPgTaskToVRMLRobot(robot,solver):
   # --- ROBOT.PG INIT FRAMES ---
   robot.geom = Dynamic("geom")
   print("modelDir: ",robot.modelDir)
@@ -77,6 +98,11 @@ def addPgTaskToRobot(robot,solver):
 
   robot.geom.setFiles(robot.modelDir, robot.modelName,robot.specificitiesPath,robot.jointRankPath)
   robot.geom.parse()
+
+def addPgTaskToUrdfRobot(robot,solver):
+  # --- ROBOT.PG INIT FRAMES ---
+  robot.geom = RosRobotModel("geom")
+  robot.geom.loadUrdf(robot.urdfDir + robot.urdfName)
 
 def initRobotGeom(robot):
   robot.geom.createOpPoint('rf2','right-ankle')
@@ -194,10 +220,17 @@ def initFeetTask(robot):
                               robot.pg.rightfootref])
 
   plug(robot.pg.inprocess,robot.selecFeet.selec)
-  robot.tasks['right-ankle'].controlGain.value = 200
-  robot.tasks['left-ankle'].controlGain.value = 200
+  robot.tasks['right-ankle'].controlGain.value = 180
+  robot.tasks['left-ankle'].controlGain.value = 180
 
   print "After Task for Right and Left Feet"
+
+def removeDofUsed(jacobian, target):
+  for i in range(0,len(jacobian)):
+    for j in range(6,len(jacobian[i])):
+      if jacobian[i][j] != 0:
+        target[j- 6] = False
+  return target
 
 def initPostureTask(robot):
   # --- TASK POSTURE --------------------------------------------------
@@ -207,71 +240,24 @@ def initPostureTask(robot):
   robotDim = len(robot.dynamic.velocity.value)
   robot.features['featurePosition'].posture.value = robot.halfSitting
 
-  if robot.device.name == 'HRP2LAAS' or \
-     robot.device.name == 'HRP2JRL':
-    postureTaskDofs = [ False,False,False,False,False,False, \
-                        False,False,False,False,False,False, \
-                        True,True,True,True, \
-                        True,True,True,True,True,True,True, \
-                        True,True,True,True,True,True,True ]
-  elif robot.device.name == 'HRP4LIRMM':
-    # Right Leg, Left leg, chest, right arm, left arm
-    postureTaskDofs = [False]*6 +  [False]*6 + [True]*4 + [True]*9 + [True]*9
-  elif robot.device.name == 'ROMEO':
-    # chest, left/right arms, left/right legs
-    postureTaskDofs = [True]*5 + [True]*7 + [True]*7 + [False]*7 + [False]*7
-  else:
-    print "/!\\ walking.py: The robot " +robot.device.name+ " is unknown."
-    print "  Default posture task froze all the dofs"
-    postureTaskDofs=[True] * (robot.dimension-6)
+  # Remove the dofs of the feet.
+  postureTaskDofs = [True] * (len(robot.dynamic.position.value) - 6)
+  jla = robot.dynamic.signal('Jleft-ankle').value
+  postureTaskDofs = removeDofUsed(jla, postureTaskDofs)
+  jra = robot.dynamic.signal('Jright-ankle').value
+  postureTaskDofs = removeDofUsed(jra, postureTaskDofs)
 
   for dof,isEnabled in enumerate(postureTaskDofs):
     robot.features['featurePosition'].selectDof(dof+6,isEnabled)
     
   robot.tasks['robot_task_position']=Task('robot_task_position')
   robot.tasks['robot_task_position'].add('featurePosition')
-  # featurePosition.selec.value = toFlags((6,24))
 
   gainPosition = GainAdaptive('gainPosition')
   gainPosition.set(0.1,0.1,125e3)
   gainPosition.gain.value = 5
   plug(robot.tasks['robot_task_position'].error,gainPosition.error)
   plug(gainPosition.gain,robot.tasks['robot_task_position'].controlGain)
-
-def initPostureTask2(robot):
-  robot.features['featurePosition'] = FeatureGeneric('featurePosition')
-  robot.features['featurePositionDes'] = FeatureGeneric('featurePositionDes')
-  robot.features['featurePosition'].setReference('featurePositionDes')
-  plug(robot.dynamic.position,robot.features['featurePosition'].errorIN)
-  robot.features['featurePositionDes'].errorIN.value = robot.halfSitting
-  robot.features['featurePosition'].jacobianIN.value = totuple( identity(size(robot.dynamic.position.value)) )
-
-  robot.tasks['robot_task_position'] = Task('robot_task_position')
-  robot.tasks['robot_task_position'].add('featurePosition')
-
-  #gainPosition = GainAdaptive('gainPosition')
-  #gainPosition.set(0.1,0.1,125e3)
-  #gainPosition.gain.value = 5
-  #plug(robot.tasks['robot_task_position'].error,gainPosition.error)
-  #plug(gainPosition.gain,robot.tasks['robot_task_position'].controlGain)
-  robot.tasks['robot_task_position'].controlGain.value =2.
-
-  #TODO: this is ??? specific.
-  if robot.device.name == 'HRP2LAAS' or \
-     robot.device.name == 'HRP2JRL':
-    # reverse polish arms(1), head(1), chest(1), legs(0), waist(0)
-    robot.features['featurePosition'].selec.value = \
-      14*'1' + 2*'1' + 2*'1' + 12*'0' + 6*'0'
-  elif robot.device.name == 'HRP4LIRMM':
-    # reverse polish arms(1), head(1), chest(1), legs(0), waist(0)
-    robot.features['featurePosition'].selec.value = \
-      18*'1' + 2*'1' + 2*'1' + 12*'0' + 6*'0'
-  elif robot.device.name == 'ROMEO':
-    # reverse polish legs, arms, chest, waist
-    robot.features['featurePosition'].selec.value = \
-      14*'0' + 14*'1' + 5*'1' + 6*'0'
-  else:
-    robot.features['featurePosition'].selec.value = '1' * robot.dimension
   
 def pushTasks(robot,solver):
   # --- TASK COM ---
@@ -296,9 +282,21 @@ def createGraph(robot,solver):
   pushTasks(robot,solver)
 
 def CreateEverythingForPG(robot,solver):
+  if hasattr(robot, 'urdfName'):
+      CreateEverythingForPGwithUrdf(robot,solver)
+  else:
+      CreateEverythingForPGwithVRML(robot,solver)
+
+def CreateEverythingForPGwithVRML(robot,solver):
   robot.initializeTracer()
-  addPgToRobot(robot)
-  addPgTaskToRobot(robot,solver)
+  addPgToVRMLRobot(robot)
+  addPgTaskToVRMLRobot(robot,solver)
+  createGraph(robot,solver)
+
+def CreateEverythingForPGwithUrdf(robot,solver):
+  robot.initializeTracer()
+  addPgToUrdfRobot(robot)
+  addPgTaskToUrdfRobot(robot,solver)
   createGraph(robot,solver)
 
 def walkFewSteps(robot):
@@ -311,9 +309,10 @@ def walkAndrei(robot):
   robot.startTracer()
   robot.pg.parseCmd(":SetAlgoForZmpTrajectory Herdt")
   robot.pg.parseCmd(":doublesupporttime 0.1")
-  robot.pg.parseCmd(":singlesupporttime 0.7")
+  robot.pg.parseCmd(":singlesupporttime 0.8")
   robot.pg.velocitydes.value=(0.01,0.0,0.0)
   robot.pg.parseCmd(":numberstepsbeforestop 4")
+  robot.pg.parseCmd(":setfeetconstraint XY 0.02 0.02")
   robot.pg.parseCmd(":setVelReference 0.01 0.0 0.0")
   robot.pg.parseCmd(":HerdtOnline 0.01 0.0 0.0")
   if robot.device.name == 'HRP2LAAS' or \

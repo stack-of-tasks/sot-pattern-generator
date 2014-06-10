@@ -10,6 +10,7 @@ from dynamic_graph.sot.core import *
 from dynamic_graph.sot.dynamics import *
 from dynamic_graph.sot.romeo.robot import *
 robot = Robot('ROMEO', device=RobotSimu('ROMEO'))
+from dynamic_graph import plug
 plug(robot.device.state, robot.dynamic.position)
 
 
@@ -49,10 +50,9 @@ runner=inc()
 # pg.startHerdt(False)
 
 print('You can now modifiy the speed of the robot by setting pg.pg.velocitydes')
-print('example : pg.pg.velocitydes.value =(0.1,0.0,0.0)\n')
+print('example : robot.pg.velocitydes.value =(0.1,0.0,0.0)\n')
 
 robot.pg.velocitydes.value =(0.1,0.0,0.0)
 
 go()
-
 

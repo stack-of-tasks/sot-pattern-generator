@@ -41,6 +41,7 @@
 #include <sot/core/matrix-homogeneous.hh>
 
 #include <sot-pattern-generator/pg.h>
+#include <jrl/dynamics/urdf/parser.hh>
 
 using namespace std;
 namespace dynamicgraph {
@@ -57,7 +58,10 @@ namespace dynamicgraph {
       ,m_vrmlMainFile()
       ,m_xmlSpecificitiesFile()
       ,m_xmlRankFile()
-
+      ,m_urdfDirectory("")
+      ,m_urdfMainFile("")
+      ,m_soleLength(0)
+      ,m_soleWidth(0)
       ,m_init(false)
       ,m_InitPositionByRealState(true)
       ,firstSINTERN( boost::bind(&PatternGenerator::InitOneStepOfControl,this,_1,_2),
@@ -549,6 +553,60 @@ namespace dynamicgraph {
       return false;
     }
 
+    bool PatternGenerator::buildModelUrdf( void )
+    {
+      jrl::dynamics::urdf::Parser parser;
+
+      // Creating the humanoid robot.
+      dynamicsJRLJapan::ObjectFactory aRobotDynamicsObjectConstructor;
+      CjrlHumanoidDynamicRobot * aHDR = 0;
+
+      // Parsing the file.
+      string RobotFileName = m_urdfDirectory + m_urdfMainFile;
+
+      std::map<std::string, std::string>::const_iterator it = specialJoints_.begin();
+      for (;it!=specialJoints_.end();++it) {
+        parser.specifyREPName(it->first, it->second);
+      }
+      aHDR = parser.parse(RobotFileName);
+      bool ok=true;
+
+      if (aHDR!=0)
+      	{
+      	  CjrlFoot * rightFoot = aHDR->rightFoot();
+      	  if (rightFoot!=0)
+      	    {
+      	      vector3d AnkleInFoot;
+      	      rightFoot->getAnklePositionInLocalFrame(AnkleInFoot);
+	            m_AnkleSoilDistance = fabs(AnkleInFoot[2]);
+	            aHDR->leftFoot()->setSoleSize(m_soleLength, m_soleWidth);
+	            aHDR->rightFoot()->setSoleSize(m_soleLength, m_soleWidth);
+      	    }
+      	  else ok=false;
+      	}
+      else ok=false;
+      if (!ok)
+      	{
+      	  SOT_THROW ExceptionPatternGenerator( ExceptionPatternGenerator::PATTERN_GENERATOR_JRL,
+      					       "Error while creating humanoid robot dynamical model.",
+      					       "(PG creation process for object %s).",
+      					       getName().c_str());
+      	}
+      try
+      	{
+      	  m_PGI = PatternGeneratorJRL::patternGeneratorInterfaceFactory(aHDR);
+      	}
+      catch (...)
+      	{
+      	  SOT_THROW ExceptionPatternGenerator( ExceptionPatternGenerator::PATTERN_GENERATOR_JRL,
+      					       "Error while allocating the Pattern Generator.",
+      					       "(PG creation process for object %s).",
+      					       getName().c_str());
+      	}
+      m_init = true;
+      return false;
+    }
+
     PatternGenerator::
     ~PatternGenerator( void )
     {
@@ -596,6 +654,21 @@ namespace dynamicgraph {
       m_PreviewControlParametersFile = filename;
     }
 
+    void PatternGenerator::
+    setUrdfDirectory( const std::string& filename )
+    {
+      m_urdfDirectory = filename;
+    }
+    void PatternGenerator::
+    setUrdfMainFile( const std::string& filename )
+    {
+      m_urdfMainFile = filename;
+    }
+    void PatternGenerator::
+    addJointMapping(const std::string &link, const std::string &repName)
+    {
+      specialJoints_[link] = repName;
+    }
 
     /* --- COMPUTE -------------------------------------------------------------- */
     /* --- COMPUTE -------------------------------------------------------------- */
@@ -1235,6 +1308,31 @@ namespace dynamicgraph {
 		 makeCommandVoid1(*this,&PatternGenerator::setVrmlMainFile,
 				  docCommandVoid1("Set VRML main file.",
 						  "string (file name)")));
+      addCommand("setUrdfDir",
+		 makeCommandVoid1(*this,&PatternGenerator::setUrdfDirectory,
+				  docCommandVoid1("Set Urdf directory.",
+						  "string (path name)")));
+      addCommand("setUrdf",
+		 makeCommandVoid1(*this,&PatternGenerator::setUrdfMainFile,
+				  docCommandVoid1("Set Urdf main file.",
+						  "string (file name)")));
+
+      std::string docstring = "    \n"
+        "    Set foot parameters\n"
+        "      Input:\n"
+        "        - a floating point number: the sole length,\n"
+        "        - a floating point number: the sole width,\n"
+        "    \n";
+      addCommand("setSoleParameters",
+		 makeCommandVoid2(*this,&PatternGenerator::setSoleParameters, 
+                        docstring));
+
+
+      addCommand("addJointMapping",
+		 makeCommandVoid2(*this,&PatternGenerator::addJointMapping,
+				  docCommandVoid1("Map link names.",
+						  "string (link name)"
+						  "string (rep name)")));
       addCommand("setXmlSpec",
 		 makeCommandVoid1(*this,&PatternGenerator::setXmlSpecificitiesFile,
 				  docCommandVoid1("Set Xml file for specicifities.",
@@ -1252,6 +1350,10 @@ namespace dynamicgraph {
       addCommand("buildModel",
        		 makeCommandVoid0(*this,
 				  (void (PatternGenerator::*) (void))&PatternGenerator::buildModel,
+				  docCommandVoid0("From the files, parse and build.")));
+     addCommand("buildModelUrdf",
+       		 makeCommandVoid0(*this,
+				  (void (PatternGenerator::*) (void))&PatternGenerator::buildModelUrdf,
 				  docCommandVoid0("From the files, parse and build.")));
       addCommand("initState",
        		 makeCommandVoid0(*this,
@@ -1345,193 +1447,6 @@ namespace dynamicgraph {
     setReferenceFromString( const std::string & str )
     {
       m_ReferenceFrame = stringToReferenceEnum( str );
-    }
-
-    void PatternGenerator::
-    commandLine( const std::string& cmdLine,
-		 std::istringstream& cmdArgs,
-		 std::ostream& os )
-    {
-      sotDEBUG(25) << "# In { Cmd " << cmdLine <<endl;
-
-      std::string filename;
-      if( cmdLine == "setVrmlDir" )
-	{  cmdArgs>>filename; setVrmlDirectory( filename );  }
-      else if( cmdLine == "setVrml" )
-	{  cmdArgs>>filename; setVrmlMainFile( filename );  }
-      else if( cmdLine == "setXmlSpec" )
-	{  cmdArgs>>filename; setXmlSpecificitiesFile( filename );  }
-      else if( cmdLine == "setXmlRank" )
-	{  cmdArgs>>filename; setXmlRankFile( filename );  }
-      else if( cmdLine == "setParamPreview")
-	{cmdArgs>>filename; setParamPreviewFile( filename );  }
-      else if( cmdLine == "setFiles" )
-	{
-	  cmdArgs>>filename; setParamPreviewFile( filename );
-	  cmdArgs>>filename; setVrmlDirectory( filename );
-	  cmdArgs>>filename; setVrmlMainFile( filename );
-	  cmdArgs>>filename; setXmlSpecificitiesFile( filename );
-	  cmdArgs>>filename; setXmlRankFile( filename );
-	}
-      else if( cmdLine == "displayFiles" )
-	{
-	  cmdArgs >> ws; bool filespecified = false;
-	  if( cmdArgs.good() )
-	    {
-	      filespecified = true;
-	      std::string filetype; cmdArgs >> filetype;
-	      sotDEBUG(15) << " Request: " << filetype << std::endl;
-	      if( "vrmldir" == filetype ) { os << m_vrmlDirectory << std::endl; }
-	      else if( "xmlspecificity" == filetype ) { os << m_xmlSpecificitiesFile << std::endl; }
-	      else if( "xmlrank" == filetype ) { os << m_xmlRankFile << std::endl; }
-	      else if( "vrmlmain" == filetype ) { os << m_vrmlMainFile << std::endl; }
-	      else filespecified = false;
-	    }
-	  if( ! filespecified )
-	    {
-	      os << "  - VRML Directory:\t\t\t" << m_vrmlDirectory <<endl
-		 << "  - XML Specificities File:\t\t" << m_xmlSpecificitiesFile <<endl
-		 << "  - XML Rank File:\t\t\t" << m_xmlRankFile <<endl
-		 << "  - VRML Main File:\t\t\t" << m_vrmlMainFile <<endl;
-	    }
-	}
-      else if( cmdLine == "buildModel" )
-	{
-	  if(! m_init )buildModel(); else os << "  !! Already parsed." <<endl;
-	}
-      else if( cmdLine == "initState" )
-	{
-	  InitState();
-	}
-      else if (cmdLine == "FrameReference" )
-	{
-	  string FrameReference;
-	  cmdArgs >> FrameReference;
-	  if (FrameReference=="World")
-	    {
-	      m_ReferenceFrame = WORLD_FRAME;
-	    }
-	  else if (FrameReference=="Egocentered")
-	    {
-	      m_ReferenceFrame = EGOCENTERED_FRAME;
-	    }
-	  else if (FrameReference=="LeftFootcentered")
-	    {
-	      m_ReferenceFrame = LEFT_FOOT_CENTERED_FRAME;
-	    }
-	  else if (FrameReference=="Waistcentered")
-	    {
-	      m_ReferenceFrame = WAIST_CENTERED_FRAME;
-	    }
-	  else
-	    {
-	      if (m_ReferenceFrame == EGOCENTERED_FRAME)
-		os << "Egocentered" <<endl;
-	      else if (m_ReferenceFrame == WORLD_FRAME)
-		os << "World" <<endl;
-	      else if (m_ReferenceFrame == LEFT_FOOT_CENTERED_FRAME)
-		os << "LeftFootcentered" <<endl;
-	      else if (m_ReferenceFrame == WAIST_CENTERED_FRAME)
-		os << "Waistcentered" <<endl;
-	      else
-		os << "Something wrong reference frame ill-defined."<< endl;
-	    }
-
-	}
-      else if (cmdLine == "timestep")
-	{
-	  if (cmdArgs.eof())
-	    {
-	      os << "Timestep: " << m_TimeStep << endl;
-	    }
-	  else
-	    {
-	      double ldt;
-	      cmdArgs >> ldt;
-	      if (ldt<0.0)
-		{
-		  os << "\tNot a valid value for timestep.\n\tIt should be positive." <<endl;
-		}
-	    }
-	}
-      else if( cmdLine == "InitPositionByRealState" )
-	{
-	  if (cmdArgs.eof())
-	    {
-	      os << "InitPositionByRealState:" << m_InitPositionByRealState <<endl;
-	    }
-	  else
-	    {
-	      cmdArgs >> m_InitPositionByRealState;
-	    }
-	}
-      else if( cmdLine == "help" )
-	{
-	  os << "PatternGenerator:"<<endl
-	     << "  - setVrmlDir - setVrml - setXmlSpec - setXmlRank - setParamPreview <file>" <<endl
-	     << "\t\t\t\t:set the config files" <<endl
-	     << "  - setFiles <%1> ... <%5>\t:set files in the order cited above" <<endl
-	     << "  - displayFiles\t\t\t:display the 5 config files" <<endl
-	     << "  - buildModel\t\t\t:parse the files set unsing the set{Xml|Vrml} \
-                  commands and create internal models." << endl
-	     << "  - parsecmd\t\t\t: Command send directly to the Humanoid Walking Pattern Generator framework" << endl
-	     << "  - timestep\t\t\t: without arguments display the internal time step, " << endl
-	     << "     with a double dt set timestep to dt."
-	     << "  - FrameReference\t\t\t: Change the reference frame used to compute the " << endl
-	     << "                  \t\t\t  features reference trajectories. Possible values are:"  << endl
-	     << "                  \t\t\t  World, LeftFootcentered, Waistcentered, Egocentered"
-	     << "  - InitPositionByRealState:\n\t\t if true InitPosition is initialized on the real state of the robot"
-	     << endl;
-
-	  Entity::commandLine(cmdLine,cmdArgs,os);
-
-	}
-      else if( cmdLine == "parsecmd")
-	{
-	  if (m_PGI!=NULL)
-	    m_PGI->ParseCmd(cmdArgs);
-
-	}
-      else if( cmdLine == "addOnLineStep" )
-	{
-	  double x,y,th(0.0);
-	  cmdArgs >> std::ws >> x  >> std::ws >> y  >> std::ws;
-	  if( cmdArgs.good() ) {
-	    cmdArgs  >> th;
-	    m_PGI->AddOnLineStep(x,y,th);
-	  }
-	  else {
-	    os << "!! Error while introducing step " << x  << " " << y << " " << th << std::endl;
-	  }
-	}
-      else if( cmdLine == "addStep" )
-	{
-	  double x,y,th(0.0);
-	  cmdArgs >> std::ws >> x  >> std::ws >> y  >> std::ws;
-	  if( cmdArgs.good() ) { cmdArgs  >> th;  m_PGI->AddStepInStack(x,y,th); }
-	  else { os << "!! Error while introducing step " << x  << " " << y << " " << th << std::endl; }
-	}
-      else if( cmdLine == "ChangeNextStep" )
-	{
-	  sotDEBUG(15) << "ChangeNextStep :begin"<<std::endl;
-	  PatternGeneratorJRL::FootAbsolutePosition aFAP;
-	  double NextStepTime,NextNextStepTime;
-	  cmdArgs >> std::ws >> NextStepTime >> std::ws >> aFAP.x  >> std::ws >> aFAP.y  >> std::ws;
-	  if( cmdArgs.good() )
-	    {
-	      cmdArgs  >> aFAP.theta;  m_PGI->ChangeOnLineStep(NextStepTime,aFAP,NextNextStepTime);
-	      os << NextNextStepTime << std::endl; ;
-	    }
-	  else { sotDEBUG(15) << "!! Error while introducing step " << aFAP.x
-			      << " " << aFAP.y << " " << aFAP.theta << std::endl; }
-	  sotDEBUG(15) << "ChangeNextStep : end"<<std::endl;
-	}
-      else {
-	Entity::commandLine( cmdLine,cmdArgs,os);
-      }
-
-      sotDEBUGOUT(15) ;
-
     }
 
     ml::Vector & PatternGenerator::getjointWalkingErrorPosition(ml::Vector &res,int time)
@@ -1632,5 +1547,11 @@ namespace dynamicgraph {
       return res;
     }
 
+    void PatternGenerator::
+    setSoleParameters(const double& inSoleLength, const double& inSoleWidth)
+    {
+      m_soleLength = inSoleLength;
+      m_soleWidth  = inSoleWidth;
+    }
   } // namespace dg
 } // namespace sot

@@ -102,6 +102,9 @@ def addPgTaskToVRMLRobot(robot,solver):
 def addPgTaskToUrdfRobot(robot,solver):
   # --- ROBOT.PG INIT FRAMES ---
   robot.geom = RosRobotModel("geom")
+  if(hasattr(robot, 'jointMap')):
+      for i in robot.jointMap:
+          robot.geom.addJointMapping(i, robot.jointMap[i])
   robot.geom.loadUrdf(robot.urdfDir + robot.urdfName)
 
 def initRobotGeom(robot):

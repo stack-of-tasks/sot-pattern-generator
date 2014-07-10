@@ -9,10 +9,10 @@
 from dynamic_graph.sot.core import *
 from dynamic_graph.sot.dynamics import *
 from dynamic_graph.sot.romeo.robot import *
-robot = Robot('ROMEO', device=RobotSimu('ROMEO'))
+robot = Robot('romeo', device=RobotSimu('romeo'))
+
 from dynamic_graph import plug
 plug(robot.device.state, robot.dynamic.position)
-
 
 # Binds with ros, export joint_state.
 from dynamic_graph.ros import *
@@ -26,11 +26,6 @@ from dynamic_graph.sot.pattern_generator.walking import CreateEverythingForPG , 
 CreateEverythingForPG ( robot , solver )
 # walkFewSteps ( robot )
 walkAndrei( robot )
-
-# Alternate visualization tool
-from dynamic_graph.sot.core.utils.viewer_helper import addRobotViewer
-addRobotViewer(robot.device,small=True,small_extra=0,verbose=False)
-
 
 #-------------------------------------------------------------------------------
 #----- MAIN LOOP ---------------------------------------------------------------

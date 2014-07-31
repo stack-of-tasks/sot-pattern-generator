@@ -317,7 +317,7 @@ def walkAndrei(robot):
   robot.pg.parseCmd(":numberstepsbeforestop 4")
   robot.pg.parseCmd(":setfeetconstraint XY 0.02 0.02")
   robot.pg.parseCmd(":setVelReference 0.01 0.0 0.0")
-  robot.pg.parseCmd(":HerdtOnline 0.01 0.0 0.0")
+  robot.pg.parseCmd(":HerdtOnline")
   if robot.device.name == 'HRP2LAAS' or \
      robot.device.name == 'HRP2JRL':
     robot.pg.parseCmd(":setfeetconstraint XY 0.09 0.06")

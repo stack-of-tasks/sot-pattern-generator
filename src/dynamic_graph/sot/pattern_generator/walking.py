@@ -199,16 +199,16 @@ def initWaistCoMTasks(robot):
 
   waistReferenceVector.selec1(0,3)
   waistReferenceVector.selec2(0,3)
-  waistReference=PoseRollPitchYawToMatrixHomo('waistReference')
+  robot.pg.waistReference=PoseRollPitchYawToMatrixHomo('waistReference')
 
   # Controlling also the yaw.
   robot.waist.selec.value = '111100'
 
-  robot.addTrace(waistReference.name,'sout')
+  robot.addTrace(robot.pg.waistReference.name,'sout')
   robot.addTrace(robot.geom.name,'position')
   robot.addTrace(robot.pg.name,'initwaistposref')
-  plug(waistReferenceVector.sout,waistReference.sin)
-  plug(waistReference.sout,robot.waist.reference)
+  plug(waistReferenceVector.sout, robot.pg.waistReference.sin)
+  plug(robot.pg.waistReference.sout,robot.waist.reference)
 
   robot.tasks ['waist'].controlGain.value = 200
 

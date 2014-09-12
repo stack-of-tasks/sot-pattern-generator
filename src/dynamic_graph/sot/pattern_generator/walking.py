@@ -315,7 +315,6 @@ def walkAndrei(robot):
   robot.pg.parseCmd(":singlesupporttime 0.8")
   robot.pg.velocitydes.value=(0.01,0.0,0.0)
   robot.pg.parseCmd(":numberstepsbeforestop 4")
-  robot.pg.parseCmd(":setfeetconstraint XY 0.02 0.02")
   robot.pg.parseCmd(":setVelReference 0.01 0.0 0.0")
   robot.pg.parseCmd(":HerdtOnline")
   if robot.device.name == 'HRP2LAAS' or \
@@ -325,3 +324,5 @@ def walkAndrei(robot):
     robot.pg.parseCmd(":setfeetconstraint XY 0.07 0.06")
   elif robot.device.name == 'ROMEO':
     robot.pg.parseCmd(":setfeetconstraint XY 0.04 0.04")
+  else:
+    robot.pg.parseCmd(":setfeetconstraint XY 0.02 0.02")

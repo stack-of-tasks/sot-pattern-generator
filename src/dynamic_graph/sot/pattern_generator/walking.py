@@ -199,16 +199,16 @@ def initWaistCoMTasks(robot):
 
   waistReferenceVector.selec1(0,3)
   waistReferenceVector.selec2(0,3)
-  waistReference=PoseRollPitchYawToMatrixHomo('waistReference')
+  robot.pg.waistReference=PoseRollPitchYawToMatrixHomo('waistReference')
 
   # Controlling also the yaw.
   robot.waist.selec.value = '111100'
 
-  robot.addTrace(waistReference.name,'sout')
+  robot.addTrace(robot.pg.waistReference.name,'sout')
   robot.addTrace(robot.geom.name,'position')
   robot.addTrace(robot.pg.name,'initwaistposref')
-  plug(waistReferenceVector.sout,waistReference.sin)
-  plug(waistReference.sout,robot.waist.reference)
+  plug(waistReferenceVector.sout, robot.pg.waistReference.sin)
+  plug(robot.pg.waistReference.sout,robot.waist.reference)
 
   robot.tasks ['waist'].controlGain.value = 200
 
@@ -223,8 +223,8 @@ def initFeetTask(robot):
                               robot.pg.rightfootref])
 
   plug(robot.pg.inprocess,robot.selecFeet.selec)
-  robot.tasks['right-ankle'].controlGain.value = 180
-  robot.tasks['left-ankle'].controlGain.value = 180
+  robot.tasks['right-ankle'].controlGain.value = 200
+  robot.tasks['left-ankle'].controlGain.value = 200
 
   print "After Task for Right and Left Feet"
 
@@ -312,10 +312,9 @@ def walkAndrei(robot):
   robot.startTracer()
   robot.pg.parseCmd(":SetAlgoForZmpTrajectory Herdt")
   robot.pg.parseCmd(":doublesupporttime 0.1")
-  robot.pg.parseCmd(":singlesupporttime 0.8")
+  robot.pg.parseCmd(":singlesupporttime 0.7")
   robot.pg.velocitydes.value=(0.01,0.0,0.0)
   robot.pg.parseCmd(":numberstepsbeforestop 4")
-  robot.pg.parseCmd(":setfeetconstraint XY 0.02 0.02")
   robot.pg.parseCmd(":setVelReference 0.01 0.0 0.0")
   robot.pg.parseCmd(":HerdtOnline")
   if robot.device.name == 'HRP2LAAS' or \
@@ -325,3 +324,5 @@ def walkAndrei(robot):
     robot.pg.parseCmd(":setfeetconstraint XY 0.07 0.06")
   elif robot.device.name == 'ROMEO':
     robot.pg.parseCmd(":setfeetconstraint XY 0.04 0.04")
+  else:
+    robot.pg.parseCmd(":setfeetconstraint XY 0.02 0.02")

@@ -18,7 +18,7 @@
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 //#define VP_DEBUG
-#define VP_DEBUG_MODE 45
+//#define VP_DEBUG_MODE 45
 #include <sot/core/debug.hh>
 #ifdef VP_DEBUG
  class sotPG__INIT
@@ -33,7 +33,7 @@
 #include <jrl/dynamics/dynamicsfactory.hh>
 
 #ifdef WITH_HRP2DYNAMICS
-#  include <hrp2Dynamics/hrp2Opthumanoid-dynamic-robot.hh>
+#  include <hrp2-dynamics/hrp2OptHumanoidDynamicRobot.h>
 #endif
 
 #include <dynamic-graph/factory.h>
@@ -505,11 +505,12 @@ namespace dynamicgraph {
       dynamicsJRLJapan::ObjectFactory aRobotDynamicsObjectConstructor;
       CjrlHumanoidDynamicRobot * aHDR = 0;
 
-#ifndef WITH_HRP2DYNAMICS
+#ifndef WITH_HRP2DYNAMICS // WITH_HRP2DYNAMICS is not defined
       aHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
-#else
-      aHDR = new Chrp2OptHumanoidDynamicRobot(&aRobotDynamicsObjectConstructor);
-#endif
+#else // WITH_HRP2DYNAMICS is defined
+      Chrp2OptHumanoidDynamicRobot *aHRP2HDR = new Chrp2OptHumanoidDynamicRobot(&aRobotDynamicsObjectConstructor) ;
+      aHDR = aHRP2HDR ;
+#endif // end "if WITH_HRP2DYNAMICS defined"
 
       // Parsing the file.
       string RobotFileName = m_vrmlDirectory + m_vrmlMainFile;

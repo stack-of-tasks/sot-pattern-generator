@@ -386,6 +386,9 @@ namespace dynamicgraph {
        * working anymore/yet. */
       unsigned int m_dataInProcess;
 
+      /*! \brief Booleans used to indicate if feedback signals shoul be used or not */
+      bool m_feedBackControl;
+
       /*! \brief Booleans used to indicate feet contacts */
       bool m_rightFootContact, m_leftFootContact;
 
@@ -465,6 +468,9 @@ namespace dynamicgraph {
 
       /*! \brief Take the current CoM. */
       SignalPtr<ml::Vector,int> comSIN;
+
+      /*! \brief Take the current CoM state (pos, vel, acc). */
+      SignalPtr<ml::Vector,int> comStateSIN;
 
       /*! \brief Take the current desired velocity. */
       SignalPtr<ml::Vector,int> velocitydesSIN;
@@ -558,6 +564,7 @@ namespace dynamicgraph {
       void addOnLineStep( const double & x, const double & y, const double & th);
       void addStep( const double & x, const double & y, const double & th);
       void pgCommandLine( const std::string & cmdline );
+      void useFeedBackSignals( const bool & feedBack );
 
       void debug(void);
     };

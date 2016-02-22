@@ -1122,7 +1122,7 @@ namespace dynamicgraph {
           m_initForce=extForce;
         }
         extForce -= m_initForce;
-        unsigned int n=11;
+        unsigned int n=321;
         if(m_bufferForce.size()<n-1)
         {
           m_bufferForce.push_back(extForce);
@@ -1142,16 +1142,17 @@ namespace dynamicgraph {
           extForce(2) = ltmp3 ;
           m_bufferForce.pop_front();
         }
-        double threshold = 50.0;
+        double threshold = 20.0;
+        double thresholdy = 4.0;
         if(extForce(0)>threshold)
           extForce(0)=threshold;
         if(extForce(0)<-threshold)
           extForce(0)=-threshold;
 
-        if(extForce(1)>threshold)
-          extForce(1)=threshold;
-        if(extForce(1)<-threshold)
-          extForce(1)=-threshold;
+        if(extForce(1)>thresholdy)
+          extForce(1)=thresholdy;
+        if(extForce(1)<-thresholdy)
+          extForce(1)=-thresholdy;
 
         if(extForce(2)>threshold)
           extForce(2)=threshold;
@@ -1166,7 +1167,7 @@ namespace dynamicgraph {
         m_currentForces = extForce ;
         ostringstream oss ("");
         //oss << ":perturbationforce " << extForce(0) << " " << extForce(1) << " " << extForce(2);
-        oss << ":perturbationforce " << m_currentForces(1) << " " << -m_currentForces(0) << " " << m_currentForces(2);
+        oss << ":perturbationforce " << -m_currentForces(1) << " " << /*m_currentForces(0)*/0.0 << " " << m_currentForces(2);
         // cout << oss.str() << endl ;
         pgCommandLine(oss.str());
 

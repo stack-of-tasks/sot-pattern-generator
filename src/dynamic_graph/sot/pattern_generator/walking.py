@@ -161,36 +161,14 @@ def initWaistCoMTasks(robot):
 
   # Build the reference waist pos homo-matrix from PG.
 
-  # Build a left foot roll pitch yaw representation from left foot current pos.
-  curLeftPRPY = MatrixHomoToPoseRollPitchYaw('curLeftPRPY')
-  plug(robot.dynamic.signal('left-ankle'),curLeftPRPY.sin)
-  selecRPYfromCurLeftPRPY = Selec_of_vector('selecRPYfromCurLeftPRPY')
-  selecRPYfromCurLeftPRPY.selec(3,6);
-
-  plug(curLeftPRPY.sout,selecRPYfromCurLeftPRPY.sin)
-
-  curRightPRPY = MatrixHomoToPoseRollPitchYaw('curRightPRPY')
-  plug(robot.dynamic.signal('right-ankle'),curRightPRPY.sin)
-  selecRPYfromCurRightPRPY = Selec_of_vector('selecRPYfromCurRightPRPY')
-  selecRPYfromCurRightPRPY.selec(3,6);
-
-  plug(curRightPRPY.sout,selecRPYfromCurRightPRPY.sin)
-
-  addLeftRightRPY = Add_of_vector('addLeftRightRPY')
-  plug(selecRPYfromCurLeftPRPY.sout,addLeftRightRPY.sin1)
-  plug(selecRPYfromCurLeftPRPY.sout,addLeftRightRPY.sin2)
-  
-  mulLeftRightRPY = Multiply_double_vector('mulLeftRightRPY')
-  mulLeftRightRPY.sin1.value=0.5
-  plug(addLeftRightRPY.sout,mulLeftRightRPY.sin2)
-
+  # extract yaw
   YawFromLeftRightRPY = Multiply_matrix_vector('YawFromLeftRightRPY')
   YawFromLeftRightRPY.sin1.value=matrixToTuple(array([[ 0.,  0.,  0.], \
        [ 0.,  0.,  0.,  ],
        [ 0.,  0.,  1.,  ]]))
-  plug(mulLeftRightRPY.sout,YawFromLeftRightRPY.sin2)
+  plug(robot.pg.comattitude,YawFromLeftRightRPY.sin2)
 
-  # Build a reference vector from init waist pos and 
+  # Build a reference vector from init waist pos and
   # init left foot roll pitch representation
   waistReferenceVector = Stack_of_vector('waistReferenceVector')
   plug(robot.pg.initwaistposref,waistReferenceVector.sin1)
@@ -211,6 +189,7 @@ def initWaistCoMTasks(robot):
   plug(robot.pg.waistReference.sout,robot.waist.reference)
 
   robot.tasks ['waist'].controlGain.value = 200
+
 
 
 def initFeetTask(robot):

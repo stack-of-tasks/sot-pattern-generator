@@ -150,7 +150,7 @@ namespace dynamicgraph {
 			 "PatternGenerator("+name+")::output(vectorRPY)::waistattitude")
       ,waistattitudeabsoluteSOUT(boost::bind(&PatternGenerator::getWaistAttitudeAbsolute,this,_1,_2),
 				 OneStepOfControlS,
-                 "PatternGenerator("+name+")::output(vectorRPY)::waistattitudeabsolute")
+				 "PatternGenerator("+name+")::output(vectorRPY)::waistattitudeabsolute")
 
       ,waistpositionSOUT(boost::bind(&PatternGenerator::getWaistPosition,this,_1,_2),
 			 OneStepOfControlS,

@@ -95,11 +95,7 @@ namespace dynamicgraph {
 
       ,comSIN(NULL,"PatternGenerator("+name+")::input(vector)::com")
 
-      ,comStateSIN(NULL,"PatternGenerator("+name+")::input(vector)::comStateSIN")
-
-      ,zmpSIN(NULL,"PatternGenerator("+name+")::input(vector)::zmpSIN")
-
-      ,forceSIN(NULL,"PatternGenerator("+name+")::input(vector)::forceSIN")
+      ,comStateSIN(NULL,"PatternGenerator("+name+")::input(vector)::comState")
 
       ,velocitydesSIN(NULL,"PatternGenerator("+name+")::input(vector)::velocitydes")
 
@@ -255,8 +251,6 @@ namespace dynamicgraph {
       OneStepOfControlS.addDependency( motorControlJointPositionSIN );
       OneStepOfControlS.addDependency( comSIN );
       OneStepOfControlS.addDependency( comStateSIN );
-      OneStepOfControlS.addDependency( zmpSIN );
-      OneStepOfControlS.addDependency( forceSIN );
 
       // For debug, register OSOC (not relevant for normal use).
       signalRegistration( OneStepOfControlS );
@@ -307,7 +301,7 @@ namespace dynamicgraph {
 			  CoMRefSOUT <<
 			  dCoMRefSOUT);
 
-      signalRegistration( comStateSIN << zmpSIN << forceSIN );
+      signalRegistration( comStateSIN );
 
       signalRegistration(comSIN <<
 			 velocitydesSIN <<
@@ -343,24 +337,6 @@ namespace dynamicgraph {
 #endif
       initCommands();
 
-      // init filter for force signals "to be removed"
-      m_bufferForce.clear();
-      int n=10;
-      double sum=0,tmp=0;
-      m_filterWindow.resize(n+1);
-      for(int i=0;i<n+1;i++)
-        {
-          tmp =sin((M_PI*i)/n);
-          m_filterWindow[i]=tmp*tmp;
-        }
-
-      for(int i=0;i<n+1;i++)
-        sum+= m_filterWindow[i];
-
-      for(int i=0;i<n+1;i++)
-        m_filterWindow[i]/= sum;
-
-      m_initForce.resize(6,0.0);
       //dataInProcessSOUT.setReference( &m_dataInProcess );
 
       sotDEBUGOUT(5);
@@ -1067,94 +1043,23 @@ namespace dynamicgraph {
       try{
         if(m_feedBackControl)
         {
-          ml::Vector curCoMState (3) ;
-          ml::Vector curZMP (3) ;
-
+          ml::Vector curCoMState ;
           curCoMState = comStateSIN(time);
-          curZMP = zmpSIN(time);
+          for (unsigned i=0 ; i<3 ; ++i)
+            lCOMRefState.x[i] = curCoMState(i) ;
+          for (unsigned i=0 ; i<3 ; ++i)
+            lCOMRefState.y[i] = curCoMState(i+3) ;
+          for (unsigned i=0 ; i<3 ; ++i)
+            lCOMRefState.z[i] = curCoMState(i+6) ;
 
-          lCOMRefState.x[0] = curCoMState(0) ;
-          lCOMRefState.y[0] = curCoMState(1) ;
-          lCOMRefState.z[0] = curCoMState(2) ;
-          lCOMRefState.x[2] = (lCOMRefState.x[0]-curZMP(0))*9.81/lCOMRefState.z[0];
-          lCOMRefState.y[2] = (lCOMRefState.y[0]-curZMP(1))*9.81/lCOMRefState.z[0];
-          lCOMRefState.z[2] = 0.0 ;
-
-//          for (unsigned i=0 ; i<3 ; ++i)
-//            lCOMRefState.x[i] = curCoMState(i) ;
-//          for (unsigned i=0 ; i<3 ; ++i)
-//            lCOMRefState.y[i] = curCoMState(i+3) ;
-//          for (unsigned i=0 ; i<3 ; ++i)
-//            lCOMRefState.z[i] = curCoMState(i+6) ;
-
-//          ZMPTarget(0) = lCOMRefState.x[0]-lCOMRefState.x[2]*lCOMRefState.z[0]/9.81 ;
-//          ZMPTarget(1) = lCOMRefState.y[0]-lCOMRefState.y[2]*lCOMRefState.z[0]/9.81 ;
-//          ZMPTarget(2) = 0.0; //to be fixed considering the support foot
+          ZMPTarget(0) = lCOMRefState.x[0]-lCOMRefState.x[2]*lCOMRefState.z[0]/9.81 ;
+          ZMPTarget(1) = lCOMRefState.y[0]-lCOMRefState.y[2]*lCOMRefState.z[0]/9.81 ;
+          ZMPTarget(2) = 0.0; //to be fixed considering the support foot
         }
       }catch(...)
-      {
-        cout << "problems with signals reading" << endl;
-        useFeedBackSignals(false);
-      };
+      {};
 
-      try{
-        ml::Vector extForce (3);
-        extForce = forceSIN(time);
-        if(time<50*0.005)
-        {
-          m_initForce=extForce;
-        }
-        extForce -= m_initForce;
-        unsigned int n=11;
-        if(m_bufferForce.size()<n-1)
-        {
-          m_bufferForce.push_back(extForce);
-        }
-        else
-        {
-          m_bufferForce.push_back(extForce);
-          double ltmp1(0.0), ltmp2(0.0), ltmp3(0.0) ;
-          for(unsigned int k=0;k<m_filterWindow.size();k++)
-          {
-            ltmp1 += m_filterWindow[k]*m_bufferForce[n-1-k](0);
-            ltmp2 += m_filterWindow[k]*m_bufferForce[n-1-k](1);
-            ltmp3 += m_filterWindow[k]*m_bufferForce[n-1-k](2);
-          }
-          extForce(0) = ltmp1 ;
-          extForce(1) = ltmp2 ;
-          extForce(2) = ltmp3 ;
-          m_bufferForce.pop_front();
-        }
-        if(extForce(0)>100.0)
-          extForce(0)=100.0;
-        if(extForce(0)<-100.0)
-          extForce(0)=-100.0;
-
-        if(extForce(1)>100.0)
-          extForce(1)=100.0;
-        if(extForce(1)<-100.0)
-          extForce(1)=-100.0;
-
-        if(extForce(2)>100.0)
-          extForce(2)=100.0;
-        if(extForce(2)<-100.0)
-          extForce(2)=-100.0;
-
-        if((extForce(0)*extForce(0)+extForce(1)*extForce(1)) < 100)
-        {
-          extForce(0)=0.0;
-          extForce(1)=0.0;
-        }
-        ostringstream oss ("");
-        oss << ":perturbationforce " << extForce(0) << " " << extForce(1) << " " << extForce(2);
-        // cout << oss.str() << endl ;
-        pgCommandLine(oss.str());
-      }catch(...)
-      {
-        //cout << "problems with force signals reading" << endl;
-      };
-
-      // Test if the pattern value has some value to provide.
+	  // Test if the pattern value has some value to provide.
 	  if (m_PGI->RunOneStepOfTheControlLoop(CurrentConfiguration,
 						CurrentVelocity,
 						CurrentAcceleration,

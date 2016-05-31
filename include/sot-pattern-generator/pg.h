@@ -472,15 +472,6 @@ namespace dynamicgraph {
       /*! \brief Take the current CoM state (pos, vel, acc). */
       SignalPtr<ml::Vector,int> comStateSIN;
 
-      /*! \brief Take the current zmp (x, y, z). */
-      SignalPtr<ml::Vector,int> zmpSIN;
-
-      /*! \brief Take the current external force applied to the com (fx, fy, fz). */
-      SignalPtr<ml::Vector,int> forceSIN;
-      ml::Vector m_initForce;
-      std::deque<ml::Vector> m_bufferForce;
-      std::vector<double> m_filterWindow;
-
       /*! \brief Take the current desired velocity. */
       SignalPtr<ml::Vector,int> velocitydesSIN;
 

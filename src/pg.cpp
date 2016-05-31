@@ -502,15 +502,15 @@ namespace dynamicgraph {
     {
 
       // Creating the humanoid robot.
-      dynamicsJRLJapan::ObjectFactory aRobotDynamicsObjectConstructor ;
-      CjrlHumanoidDynamicRobot * aHDR = NULL;
+      dynamicsJRLJapan::ObjectFactory aRobotDynamicsObjectConstructor;
+      CjrlHumanoidDynamicRobot * aHDR = 0;
 
 #ifndef WITH_HRP2DYNAMICS // WITH_HRP2DYNAMICS is not defined
       aHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
 #else // WITH_HRP2DYNAMICS is defined
       Chrp2OptHumanoidDynamicRobot *aHRP2HDR = new Chrp2OptHumanoidDynamicRobot(&aRobotDynamicsObjectConstructor) ;
       aHDR = aHRP2HDR ;
-#endif // end "if not WITH_HRP2DYNAMICS defined"
+#endif // end "if WITH_HRP2DYNAMICS defined"
 
       // Parsing the file.
       string RobotFileName = m_vrmlDirectory + m_vrmlMainFile;
@@ -549,6 +549,7 @@ namespace dynamicgraph {
 					       "(PG creation process for object %s).",
 					       getName().c_str());
 	}
+
       m_init = true;
       return false;
     }
@@ -604,7 +605,6 @@ namespace dynamicgraph {
       					       getName().c_str());
       	}
       m_init = true;
-      cout << "init true" << endl ;
       return false;
     }
 

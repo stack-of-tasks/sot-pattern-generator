@@ -326,22 +326,3 @@ def walkAndrei(robot):
     robot.pg.parseCmd(":setfeetconstraint XY 0.04 0.04")
   else:
     robot.pg.parseCmd(":setfeetconstraint XY 0.02 0.02")
-
-def walkNaveau(robot):
-  robot.startTracer()
-  robot.pg.parseCmd(":SetAlgoForZmpTrajectory Naveau")
-  robot.pg.parseCmd(":doublesupporttime 0.1")
-  robot.pg.parseCmd(":singlesupporttime 0.7")
-  robot.pg.velocitydes.value=(0.01,0.0,0.0)
-  robot.pg.parseCmd(":numberstepsbeforestop 2")
-  robot.pg.parseCmd(":setVelReference 0.01 0.0 0.0")
-  robot.pg.parseCmd(":NaveauOnline")
-  if robot.device.name == 'HRP2LAAS' or \
-     robot.device.name == 'HRP2JRL':
-    robot.pg.parseCmd(":setfeetconstraint XY 0.09 0.06")
-  elif robot.device.name == 'HRP4LIRMM':
-    robot.pg.parseCmd(":setfeetconstraint XY 0.07 0.06")
-  elif robot.device.name == 'ROMEO':
-    robot.pg.parseCmd(":setfeetconstraint XY 0.04 0.04")
-  else:
-    robot.pg.parseCmd(":setfeetconstraint XY 0.02 0.02")

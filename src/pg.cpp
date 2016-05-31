@@ -30,16 +30,20 @@
 
 
 #include <jrl/mal/matrixabstractlayer.hh>
-#include "pinocchio/multibody/parser/urdf.hpp"
-#include "pinocchio/multibody/parser/srdf.hpp"
+#include <jrl/dynamics/dynamicsfactory.hh>
 
 #include <sot-pattern-generator/config_private.hh>
+
+#ifdef WITH_HRP2DYNAMICS
+  #include <hrp2-dynamics/hrp2OptHumanoidDynamicRobot.h>
+#endif
 
 #include <dynamic-graph/factory.h>
 #include <dynamic-graph/all-commands.h>
 #include <sot/core/matrix-homogeneous.hh>
 
 #include <sot-pattern-generator/pg.h>
+#include <jrl/dynamics/urdf/parser.hh>
 
 using namespace std;
 namespace dynamicgraph {
@@ -50,11 +54,14 @@ namespace dynamicgraph {
     PatternGenerator::
     PatternGenerator( const std::string & name )
       :Entity(name)
-      ,m_PGI(0)
+       //  ,m_PGI(NULL)
       ,m_PreviewControlParametersFile()
-      ,m_urdfFile("")
-      ,m_srdfFile("")
-      ,m_xmlRankFile("")
+      ,m_vrmlDirectory()
+      ,m_vrmlMainFile()
+      ,m_xmlSpecificitiesFile()
+      ,m_xmlRankFile()
+      ,m_urdfDirectory("")
+      ,m_urdfMainFile("")
       ,m_soleLength(0)
       ,m_soleWidth(0)
       ,m_init(false)
@@ -360,15 +367,12 @@ namespace dynamicgraph {
       m_initForce.resize(6,0.0);
       m_currentForces.resize(6,0.0);
       //dataInProcessSOUT.setReference( &m_dataInProcess );
-      m_wrml2urdfIndex.clear();
 
       sotDEBUGOUT(5);
     }
 
     bool PatternGenerator::InitState(void)
     {
-
-
       sotDEBUGIN(5);
       // TODO
       // Instead of (0) ie .access(0), it could be rather used:
@@ -391,7 +395,7 @@ namespace dynamicgraph {
 	  res.resize( pos.size()-6);
 
 	  for(unsigned i=0;i<res.size();i++)
-        res(m_wrml2urdfIndex[i]) = pos(i+6);
+	    res(i) = pos(i+6);
 
 	  ml::Vector lZMPPrevious = ZMPPreviousControllerSIN(m_LocalTime);
 	  for(unsigned int i=0;i<3;i++)
@@ -401,8 +405,6 @@ namespace dynamicgraph {
       else
 	{
 	  res = motorControlJointPositionSIN(m_LocalTime);
-      for(unsigned i=0;i<res.size();i++)
-        res(m_wrml2urdfIndex[i]) = res(i);
 	}
 
       ml::Vector com = comSIN(m_LocalTime);
@@ -532,107 +534,40 @@ namespace dynamicgraph {
       sotDEBUGOUT(5);
       return true;
     }
-
     bool PatternGenerator::buildModel( void )
     {
-      bool ok=true;
-      // Parsing the file.
-      m_robotModel = se3::urdf::buildModel(m_urdfFile, se3::JointModelFreeFlyer());
-      m_robotData = new se3::Data(m_robotModel) ;
+
       // Creating the humanoid robot.
-      m_PR = new pg::PinocchioRobot() ;
-      m_PR->initializeRobotModelAndData(&m_robotModel,m_robotData);
+      dynamicsJRLJapan::ObjectFactory aRobotDynamicsObjectConstructor ;
+      CjrlHumanoidDynamicRobot * aHDR = NULL;
 
-      // Read xml/srdf stream
-      std::ifstream srdf_stream(m_srdfFile.c_str());
-      using boost::property_tree::ptree;
-      ptree pt;
-      try{
-        read_xml(srdf_stream, pt);
-        // Initialize the Right Foot
-        pg::PRFoot aFoot ;
-        string path = "robot.specificities.feet.right.size" ;
-        BOOST_FOREACH(const ptree::value_type & v, pt.get_child(path.c_str()))
-        {
-          aFoot.soleHeight = v.second.get<double>("height");
-          aFoot.soleWidth  = v.second.get<double>("width");
-          aFoot.soleDepth  = v.second.get<double>("depth");
-        } // BOOST_FOREACH
-        path = "robot.specificities.feet.right.anklePosition" ;
-        BOOST_FOREACH(const ptree::value_type & v, pt.get_child(path.c_str()))
-        {
-          aFoot.anklePosition(0) = v.second.get<double>("x");
-          aFoot.anklePosition(1) = v.second.get<double>("y");
-          aFoot.anklePosition(2) = v.second.get<double>("z");
-        } // BOOST_FOREACH
-        aFoot.associatedAnkle = m_robotModel.getBodyId("r_ankle");
-        m_PR->initializeRightFoot(aFoot);
-        // Initialize the Left Foot
-        path = "robot.specificities.feet.left.size" ;
-        BOOST_FOREACH(const ptree::value_type & v, pt.get_child(path.c_str()))
-        {
-          aFoot.soleHeight = v.second.get<double>("height");
-          aFoot.soleWidth  = v.second.get<double>("width");
-          aFoot.soleDepth  = v.second.get<double>("depth");
-        } // BOOST_FOREACH
-        path = "robot.specificities.feet.left.anklePosition" ;
-        BOOST_FOREACH(const ptree::value_type & v, pt.get_child(path.c_str()))
-        {
-          aFoot.anklePosition(0) = v.second.get<double>("x");
-          aFoot.anklePosition(1) = v.second.get<double>("y");
-          aFoot.anklePosition(2) = v.second.get<double>("z");
-        } // BOOST_FOREACH
-        aFoot.associatedAnkle = m_robotModel.getBodyId("l_ankle");
-        m_PR->initializeLeftFoot(aFoot);
-      }catch(...)
-      {
-        cerr << "problem while reading the srdf file. File corrupted?" << endl;
-        ok=false;
-      }
+#ifndef WITH_HRP2DYNAMICS // WITH_HRP2DYNAMICS is not defined
+      aHDR = aRobotDynamicsObjectConstructor.createHumanoidDynamicRobot();
+#else // WITH_HRP2DYNAMICS is defined
+      Chrp2OptHumanoidDynamicRobot *aHRP2HDR = new Chrp2OptHumanoidDynamicRobot(&aRobotDynamicsObjectConstructor) ;
+      aHDR = aHRP2HDR ;
+#endif // end "if not WITH_HRP2DYNAMICS defined"
 
-      try{
-        m_wrml2urdfIndex.resize(m_robotModel.nv-6);
-        std::ifstream xmlRankPath_stream(m_xmlRankFile.c_str());
-        read_xml(xmlRankPath_stream, pt);
-        // Initialize the Right Foot
-        string path = "LinkJointNameAndRank" ;
-        BOOST_FOREACH(const ptree::value_type & v, pt.get_child(path.c_str()))
-        {
-          if(v.first=="Link")
-          {
-            istringstream data (v.second.data()) ;
-            string joint_name ; data >> joint_name ;
-            unsigned joint_rank ; data >> joint_rank ;
-            if(m_robotModel.existJointName(joint_name))
-            {
-              m_wrml2urdfIndex[joint_rank-6] = se3::idx_v(
-                  m_robotModel.joints[m_robotModel.getJointId(joint_name)] )
-                  - 6 ;
-            }
-          }
-        } // BOOST_FOREACH
+      // Parsing the file.
+      string RobotFileName = m_vrmlDirectory + m_vrmlMainFile;
+      dynamicsJRLJapan::parseOpenHRPVRMLFile(*aHDR,RobotFileName,m_xmlRankFile,m_xmlSpecificitiesFile);
+      bool ok=true;
 
-      }catch(...)
-      {
-        cerr << "problem while reading the xmlRank file. File corrupted?" << endl;
-        ok=false;
-      }
-
-      if (m_PR!=0)
-    {
-      pg::PRFoot * rightFoot = m_PR->rightFoot();
-      if (rightFoot!=0)
-        {
-          vector3d AnkleInFoot;
-          AnkleInFoot = rightFoot->anklePosition ;
-          m_AnkleSoilDistance = fabs(AnkleInFoot(2));
-        }
-      else ok=false;
-    }
+      if (aHDR!=0)
+	{
+	  CjrlFoot * rightFoot = aHDR->rightFoot();
+	  if (rightFoot!=0)
+	    {
+	      vector3d AnkleInFoot;
+	      rightFoot->getAnklePositionInLocalFrame(AnkleInFoot);
+	      m_AnkleSoilDistance = fabs(AnkleInFoot(2));
+	    }
+	  else ok=false;
+	}
       else ok=false;
       
       if (!ok)
-    {
+	{
 	  SOT_THROW ExceptionPatternGenerator( ExceptionPatternGenerator::PATTERN_GENERATOR_JRL,
 					       "Error while creating humanoid robot dynamical model.",
 					       "(PG creation process for object %s).",
@@ -640,7 +575,7 @@ namespace dynamicgraph {
 	}
       try
 	{
-      m_PGI = PatternGeneratorJRL::patternGeneratorInterfaceFactory(m_PR);
+	  m_PGI = PatternGeneratorJRL::patternGeneratorInterfaceFactory(aHDR);
 	}
 
       catch (...)
@@ -654,26 +589,73 @@ namespace dynamicgraph {
       return false;
     }
 
+    bool PatternGenerator::buildModelUrdf( void )
+    {
+      jrl::dynamics::urdf::Parser parser;
+
+      // Creating the humanoid robot.
+      dynamicsJRLJapan::ObjectFactory aRobotDynamicsObjectConstructor;
+      CjrlHumanoidDynamicRobot * aHDR = 0;
+
+      // Parsing the file.
+      string RobotFileName = m_urdfDirectory + m_urdfMainFile;
+
+      std::map<std::string, std::string>::const_iterator it = specialJoints_.begin();
+      for (;it!=specialJoints_.end();++it) {
+        parser.specifyREPName(it->first, it->second);
+      }
+      aHDR = parser.parse(RobotFileName);
+      bool ok=true;
+
+      if (aHDR!=0)
+      	{
+      	  CjrlFoot * rightFoot = aHDR->rightFoot();
+      	  if (rightFoot!=0)
+      	    {
+      	      vector3d AnkleInFoot;
+      	      rightFoot->getAnklePositionInLocalFrame(AnkleInFoot);
+	            m_AnkleSoilDistance = fabs(AnkleInFoot[2]);
+	            aHDR->leftFoot()->setSoleSize(m_soleLength, m_soleWidth);
+	            aHDR->rightFoot()->setSoleSize(m_soleLength, m_soleWidth);
+      	    }
+      	  else ok=false;
+      	}
+      else ok=false;
+      if (!ok)
+      	{
+      	  SOT_THROW ExceptionPatternGenerator( ExceptionPatternGenerator::PATTERN_GENERATOR_JRL,
+      					       "Error while creating humanoid robot dynamical model.",
+      					       "(PG creation process for object %s).",
+      					       getName().c_str());
+      	}
+      try
+      	{
+      	  m_PGI = PatternGeneratorJRL::patternGeneratorInterfaceFactory(aHDR);
+      	}
+      catch (...)
+      	{
+      	  SOT_THROW ExceptionPatternGenerator( ExceptionPatternGenerator::PATTERN_GENERATOR_JRL,
+      					       "Error while allocating the Pattern Generator.",
+      					       "(PG creation process for object %s).",
+      					       getName().c_str());
+      	}
+      m_init = true;
+      cout << "init true" << endl ;
+      return false;
+    }
+
     PatternGenerator::
     ~PatternGenerator( void )
     {
       sotDEBUGIN(25);
-      if( 0!=m_PR )
-    {
-      delete m_PR;
-      m_PR = 0;
-    }
       if( 0!=m_PGI )
-    {
-      delete m_PGI;
-      m_PGI = 0;
-    }
-      if( 0!=m_robotData )
 	{
-      delete m_robotData;
-      m_robotData = 0;
-    }
+	  delete m_PGI;
+	  m_PGI = 0;
+	}
+
       sotDEBUGOUT(25);
+
       return;
     }
 
@@ -683,25 +665,41 @@ namespace dynamicgraph {
     /* --- CONFIG --------------------------------------------------------------- */
     /* --- CONFIG --------------------------------------------------------------- */
     void PatternGenerator::
+    setVrmlDirectory( const std::string& filename )
+    {
+      m_vrmlDirectory = filename;
+    }
+    void PatternGenerator::
+    setVrmlMainFile( const std::string& filename )
+    {
+      m_vrmlMainFile = filename;
+    }
+    void PatternGenerator::
+    setXmlSpecificitiesFile( const std::string& filename )
+    {
+      m_xmlSpecificitiesFile = filename;
+    }
+    void PatternGenerator::
+    setXmlRankFile( const std::string& filename )
+    {
+      m_xmlRankFile = filename;
+    }
+
+    void PatternGenerator::
     setParamPreviewFile( const std::string& filename )
     {
       m_PreviewControlParametersFile = filename;
     }
 
     void PatternGenerator::
-    setURDFFile( const std::string& filename )
+    setUrdfDirectory( const std::string& filename )
     {
-      m_urdfFile = filename;
+      m_urdfDirectory = filename;
     }
     void PatternGenerator::
-    setSRDFFile( const std::string& filename )
+    setUrdfMainFile( const std::string& filename )
     {
-      m_srdfFile = filename;
-    }
-    void PatternGenerator::
-    setXmlRankFile( const std::string& filename )
-    {
-      m_xmlRankFile = filename;
+      m_urdfMainFile = filename;
     }
     void PatternGenerator::
     addJointMapping(const std::string &link, const std::string &repName)
@@ -1464,19 +1462,22 @@ namespace dynamicgraph {
     initCommands( void )
     {
       using namespace command;
-      addCommand("setURDFpath",
-         makeCommandVoid1(*this,&PatternGenerator::setURDFFile,
-                  docCommandVoid1("Set URDF directory+name.",
+      addCommand("setVrmlDir",
+		 makeCommandVoid1(*this,&PatternGenerator::setVrmlDirectory,
+				  docCommandVoid1("Set VRML directory.",
 						  "string (path name)")));
-      addCommand("setSRDFpath",
-         makeCommandVoid1(*this,&PatternGenerator::setSRDFFile,
-                  docCommandVoid1("Set SRDF directory+name.",
+      addCommand("setVrml",
+		 makeCommandVoid1(*this,&PatternGenerator::setVrmlMainFile,
+				  docCommandVoid1("Set VRML main file.",
 						  "string (file name)")));
-
-      addCommand("setXmlRank",
-         makeCommandVoid1(*this,&PatternGenerator::setXmlRankFile,
-                  docCommandVoid1("Set XML rank file directory+name.",
-                          "string (file name)")));
+      addCommand("setUrdfDir",
+		 makeCommandVoid1(*this,&PatternGenerator::setUrdfDirectory,
+				  docCommandVoid1("Set Urdf directory.",
+						  "string (path name)")));
+      addCommand("setUrdf",
+		 makeCommandVoid1(*this,&PatternGenerator::setUrdfMainFile,
+				  docCommandVoid1("Set Urdf main file.",
+						  "string (file name)")));
 
       std::string docstring = "    \n"
         "    Set foot parameters\n"
@@ -1494,7 +1495,14 @@ namespace dynamicgraph {
 				  docCommandVoid1("Map link names.",
 						  "string (link name)"
 						  "string (rep name)")));
-
+      addCommand("setXmlSpec",
+		 makeCommandVoid1(*this,&PatternGenerator::setXmlSpecificitiesFile,
+				  docCommandVoid1("Set Xml file for specicifities.",
+						  "string (path/filename)")));
+      addCommand("setXmlRank",
+		 makeCommandVoid1(*this,&PatternGenerator::setXmlRankFile,
+				  docCommandVoid1("Set XML rank file.",
+						  "string (path/filename)")));
       addCommand("setParamPreview",
 		 makeCommandVoid1(*this,&PatternGenerator::setParamPreviewFile,
 				  docCommandVoid1("Set [guess what!] file",
@@ -1504,6 +1512,10 @@ namespace dynamicgraph {
       addCommand("buildModel",
        		 makeCommandVoid0(*this,
 				  (void (PatternGenerator::*) (void))&PatternGenerator::buildModel,
+				  docCommandVoid0("From the files, parse and build.")));
+     addCommand("buildModelUrdf",
+       		 makeCommandVoid0(*this,
+				  (void (PatternGenerator::*) (void))&PatternGenerator::buildModelUrdf,
 				  docCommandVoid0("From the files, parse and build.")));
       addCommand("initState",
        		 makeCommandVoid0(*this,
@@ -1546,11 +1558,6 @@ namespace dynamicgraph {
                   docCommandVoid1("Enable or disable the use of the CoMfullState Signal inside the pg.",
                           "string (true or false)")));
 
-      addCommand("dynamicFilter",
-             makeCommandVoid1(*this,&PatternGenerator::useDynamicFilter,
-                  docCommandVoid1("Enable or disable the use of the CoMfullState Signal inside the pg.",
-                          "string (true or false)")));
-
       // Change next step : todo (deal with FootAbsolutePosition...).
 
      addCommand("debug",
@@ -1576,17 +1583,17 @@ namespace dynamicgraph {
 
     void PatternGenerator::addOnLineStep( const double & x, const double & y, const double & th)
     {
-      assert( m_PGI!=0 );
+      assert( m_PGI!=NULL );
       m_PGI->AddOnLineStep(x,y,th);
     }
     void PatternGenerator::addStep( const double & x, const double & y, const double & th)
     {
-      assert( m_PGI!=0 );
+      assert( m_PGI!=NULL );
       m_PGI->AddStepInStack(x,y,th);
     }
     void PatternGenerator::pgCommandLine( const std::string & cmdline )
     {
-      assert( m_PGI!=0 );
+      assert( m_PGI!=NULL );
       std::istringstream cmdArgs( cmdline );
       m_PGI->ParseCmd(cmdArgs);
     }
@@ -1595,17 +1602,8 @@ namespace dynamicgraph {
     {
       m_feedBackControl = feedBack ;
       string cmdBool = feedBack?"true":"false" ;
-      assert( m_PGI!=0 );
+      assert( m_PGI!=NULL );
       std::istringstream cmdArgs( ":feedBackControl " + cmdBool );
-      m_PGI->ParseCmd(cmdArgs);
-    }
-
-    void PatternGenerator::useDynamicFilter(const bool & dynamicFilter )
-    {
-      m_feedBackControl = dynamicFilter ;
-      string cmdBool = dynamicFilter?"true":"false" ;
-      assert( m_PGI!=0 );
-      std::istringstream cmdArgs( ":useDynamicFilter " + cmdBool );
       m_PGI->ParseCmd(cmdArgs);
     }
 

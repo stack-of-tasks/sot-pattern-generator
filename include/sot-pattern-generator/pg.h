@@ -44,7 +44,6 @@
 /* Pattern Generator */
 #include <jrl/mal/matrixabstractlayer.hh>
 #include <jrl/walkgen/patterngeneratorinterface.hh>
-#include <jrl/walkgen/pinocchiorobot.hh>
 namespace pg=PatternGeneratorJRL;
 
 /* --------------------------------------------------------------------- */
@@ -80,27 +79,25 @@ namespace dynamicgraph {
       :public Entity
     {
     public:
-      // overload the new[] eigen operator
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
       /*! \name Some constant to define the type
-    of frame reference.
-    @{
+	of frame reference.
+	@{
       */
       /*! \brief Specify that the frame is expressed  in
-    the world reference frame. */
+	the world reference frame. */
       static const int WORLD_FRAME=0;
 
       /*! \brief Specify that the frame is expressed in
-    the robot ego centered frame. */
+	the robot ego centered frame. */
       static const int EGOCENTERED_FRAME = 1;
 
       /*! \brief Specify that the frame is expressed in
-    the left foot centered frame. */
+	the left foot centered frame. */
       static const int LEFT_FOOT_CENTERED_FRAME = 2;
 
       /*! \brief Specify that the frame is expressed in
-    the waist centered frame. */
+	the waist centered frame. */
       static const int WAIST_CENTERED_FRAME = 3;
 
 
@@ -114,31 +111,32 @@ namespace dynamicgraph {
 
     protected:
 
-      /*! \brief The model of the robot. */
-      se3::Model m_robotModel ;
-      /*! \brief Pointer towards the robot model inside jrl-walkgen. */
-      pg::PinocchioRobot * m_PR ;
-      /*! \brief The pointor toward the robot data. */
-      se3::Data * m_robotData ;
       /*! \brief Pointer towards the interface of the pattern generator. */
-      pg::PatternGeneratorInterface * m_PGI ;
+      pg::PatternGeneratorInterface * m_PGI;
 
       /*! \name Fields to store name and positions of data files
-    @{
+	@{
       */
       /*! \brief Some information related to the preview control. */
       std::string m_PreviewControlParametersFile;
 
-      /*! \brief Directory+Name where the URDF file of the robot's model is located. */
-      std::string m_urdfFile;
+      /*! \brief Directory where the VRML file of the robot's model is located. */
+      std::string m_vrmlDirectory;
 
-      /*! \brief Directory+Name where the SRDF file of the robot's model is located. */
-      std::string m_srdfFile;
+      /*! \brief Name of the VRML file which containes the robot's model. */
+      std::string m_vrmlMainFile;
 
-      /*! \brief Directory+Name where the Rank of the joints are notified */
-      std::string m_xmlRankFile ;
+      /*! \brief Name of the XML file which contains humanoid specific informations. */
+      std::string m_xmlSpecificitiesFile;
 
-      std::vector<unsigned> m_wrml2urdfIndex ;
+      /*! \brief Name of the XML file which specificies the rank of the Joints in the state vector. */
+      std::string m_xmlRankFile;
+
+      /*! \brief Directory where the VRML file of the robot's model is located. */
+      std::string m_urdfDirectory;
+
+      /*! \brief Name of the VRML file which containes the robot's model. */
+      std::string m_urdfMainFile; 
 
       /*! \brief Lenght of the sole */
       double m_soleLength;
@@ -147,7 +145,7 @@ namespace dynamicgraph {
       double m_soleWidth;
 
       /* \brief Special joints map for the parser */
-      std::map<std::string, std::string> specialJoints_;
+      std::map<std::string, std::string> specialJoints_;     
 
      /*! @} */
 
@@ -155,7 +153,7 @@ namespace dynamicgraph {
       bool m_init;
 
       /*! \brief Boolean variable to initialize the position:
-    first through the real state of the robot, then through the motor command. */
+	first through the real state of the robot, then through the motor command. */
       bool m_InitPositionByRealState;
 
       /*! \brief Integer for the support foot. */
@@ -187,11 +185,14 @@ namespace dynamicgraph {
     public: /* --- MODEL CREATION --- */
 
       /*! \name Methods related to the data files.
-    @{
+	@{
       */
 
-      /*! \brief Build the pattern generator interface from a Urdf and SRDF file. */
+      /*! \brief Build the pattern generator interface. */
       bool buildModel( void );
+
+     /*! \brief Build the pattern generator interface from a Urdf file. */
+      bool buildModelUrdf( void );
 
       /*! \brief Initialize the state of the robot. */
       bool InitState( void );
@@ -199,32 +200,40 @@ namespace dynamicgraph {
       /*! \brief Set the directory which contains the parameters for the preview control. */
       void setPreviewControlParametersFile( const std::string& filename );
 
-      /*! \brief Set the path which contains the URDF files robot's model. */
-      void setURDFFile( const std::string& filename );
+      /*! \brief Set the directory which contains the VRML files robot's model. */
+      void setVrmlDirectory( const std::string& filename );
 
-      /*! \brief Set the path which contains the SRDF files robot's model.
-        More precisely this file describes which joints are the hands, feet.
-        For more information please see the documentation of walkGenJRL.
-      */
-      void setSRDFFile( const std::string& filename );
+      /*! \brief Set the name of the VRML file. */
+      void setVrmlMainFile( const std::string& filename );
 
-      /*! \brief Set the path which contains the Joint Rank model. */
+      /*! \brief Set the name of the file specifying a semantic to the joints.
+	More precisely this file describes which joints are the hands, feet.
+	For more information please see the documentation of walkGenJRL. */
+      void setXmlSpecificitiesFile( const std::string& filename );
+
+      /*! \brief Set the name of the file specifying the rank of the joints in the state vector. */
       void setXmlRankFile( const std::string& filename );
 
       /*! \brief Set the name of the file specifying the control parameters
-    of the preview control. */
+	of the preview control. */
       void setParamPreviewFile(const std::string &filename);
+
+      /*! \brief Set the directory which contains the urdf files robot's model. */
+      void setUrdfDirectory( const std::string& filename );
+      
+      /*! \brief Set the name of the urdf file. */
+      void setUrdfMainFile( const std::string& filename );
 
       /*! \brief Set the foot parameters */
       void setSoleParameters(const double& inSoleLength, const double& inSoleWidth);
-
+ 
       /*! \brief Set mapping between a link and actual robot name */
        void addJointMapping(const std::string& link, const std::string& repName);
-
+     
       /*! \brief Give access directly to the pattern generator...
-    You really have to know what your are doing. */
+	You really have to know what your are doing. */
       pg::PatternGeneratorInterface * GetPatternGeneratorInterface()
-    { return m_PGI;};
+	{ return m_PGI;};
 
       /*! @} */
 
@@ -233,7 +242,7 @@ namespace dynamicgraph {
       typedef int Dummy;
 
       /*! \name Internal signals.
-    @{
+	@{
       */
 
       /*! \brief Internal signal for initialization and one shot signals. */
@@ -247,7 +256,7 @@ namespace dynamicgraph {
     protected:
 
       /*! \name Internal methods to access reference trajectories.
-    @{
+	@{
       */
       /*! \brief Internal method to get the reference ZMP at a given time. */
       ml::Vector & getZMPRef(ml::Vector & res, int time);
@@ -311,11 +320,11 @@ namespace dynamicgraph {
       int & OneStepOfControl(int &dummy, int time);
 
       /*! \name Keep information computed once for each time.
-    @{
+	@{
       */
 
       /*! \brief Rigit motion between two waist positions
-    at the  beginning of the walking and at the end of the walking. */
+	at the  beginning of the walking and at the end of the walking. */
       MatrixHomogeneous m_k_Waist_kp1;
 
       /*! \brief Absolute Position for the left and right feet. */
@@ -337,11 +346,11 @@ namespace dynamicgraph {
       ml::Vector m_ZMPRefPos;
 
       /*! \brief Com Attitude: does not really exist apart from when the robot
-    is seen as an inverted pendulum*/
+	is seen as an inverted pendulum*/
       ml::Vector m_ComAttitude;
 
       /*! \brief Com Attitude: does not really exist apart when the robot
-    is seen as an inverted pendulum*/
+	is seen as an inverted pendulum*/
       ml::Vector m_dComAttitude;
 
       /*! \brief Absolute position of the reference CoM. */
@@ -389,28 +398,28 @@ namespace dynamicgraph {
       /*! @} */
 
       /*! Parsing a file of command by the walking pattern generator interface.
-    \par[in] The command line (optional option)
-    \par[in]
+	\par[in] The command line (optional option)
+	\par[in]
 
       */
       void ParseCmdFile(std::istringstream &cmdArg,
-            std::ostream &os);
+			std::ostream &os);
 
       /*! \brief Transfert from a current absolute foot position
-    to a dot homogeneous matrix. */
+	to a dot homogeneous matrix. */
       void FromAbsoluteFootPosToDotHomogeneous(pg::FootAbsolutePosition aFootPosition,
-                           MatrixHomogeneous &aFootMH,
-                           MatrixHomogeneous &adotFootMH);
+					       MatrixHomogeneous &aFootMH,
+					       MatrixHomogeneous &adotFootMH);
 
 
       /*! \brief Transfert from a current absolute foot position
-    to a homogeneous matrix. */
+	to a homogeneous matrix. */
       void FromAbsoluteFootPosToHomogeneous(pg::FootAbsolutePosition aFootPosition,
-                        MatrixHomogeneous &aFootMH);
+					    MatrixHomogeneous &aFootMH);
 
 
       /*! \brief Provide an homogeneous matrix from the current waist position
-    and attitude*/
+	and attitude*/
       void getAbsoluteWaistPosAttHomogeneousMatrix(MatrixHomogeneous &aWaistMH);
 
 
@@ -433,14 +442,14 @@ namespace dynamicgraph {
       MatrixHomogeneous & getInitRightFootRef(MatrixHomogeneous &res, int time);
 
       /*! \brief Internal method to get the information of contact or not on
-    the feet. */
+	the feet. */
       bool & getLeftFootContact(bool & res,int time);
       bool & getRightFootContact(bool & res,int time);
-
+      
     public:
 
       /*! \name External signals
-    @{
+	@{
       */
       /*! \brief Real state position values. */
       SignalPtr<ml::Vector,int> jointPositionSIN;
@@ -499,7 +508,7 @@ namespace dynamicgraph {
       SignalTimeDependent<MatrixHomogeneous,int> dotRightFootRefSOUT;
 
       /*! \brief Externalize the foot which is not considered as support foot,
-    the information are given in a relative referentiel. */
+	the information are given in a relative referentiel. */
       SignalTimeDependent<MatrixHomogeneous,int> FlyingFootRefSOUT;
 
       /*! \brief Externalize the support foot. */
@@ -553,7 +562,7 @@ namespace dynamicgraph {
       /*! @} */
 
       /*! \name Reimplement the interface of the plugin.
-    @{
+	@{
       */
 
       /*! @} */
@@ -570,7 +579,6 @@ namespace dynamicgraph {
       void addStep( const double & x, const double & y, const double & th);
       void pgCommandLine( const std::string & cmdline );
       void useFeedBackSignals( const bool & feedBack );
-      void useDynamicFilter( const bool & dynamicFilter );
 
       void debug(void);
     };

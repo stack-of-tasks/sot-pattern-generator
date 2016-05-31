@@ -1142,7 +1142,7 @@ namespace dynamicgraph {
           extForce(2) = ltmp3 ;
           m_bufferForce.pop_front();
         }
-        double threshold = 7.0;
+        double threshold = 20.0;
         double thresholdy = 4.0;
         if(extForce(0)>threshold)
           extForce(0)=threshold;
@@ -1171,24 +1171,24 @@ namespace dynamicgraph {
         // cout << oss.str() << endl ;
         pgCommandLine(oss.str());
 
-        ofstream aof;
-        string aFileName;
-        static int count_it = 0 ;
-        aFileName = "/tmp/dg_pg-external-forces.dat" ;
-        if ( count_it == 0 )
-        {
-          aof.open(aFileName.c_str(),ofstream::out);
-          aof.close();
-        }
-        aof.open(aFileName.c_str(),ofstream::app);
-        aof.precision(8);
-        aof.setf(ios::scientific, ios::floatfield);
-        aof << count_it*0.005 << " " ;    // 1
-        aof << m_currentForces(0) << " " ;       // 2
-        aof << m_currentForces(1) << " " ;       // 3
-        aof << m_currentForces(2) << " " ;       // 4
-        aof << endl;
-        ++count_it;
+//        ofstream aof;
+//        string aFileName;
+//        static int count_it = 0 ;
+//        aFileName = "/tmp/dg_pg-external-forces.dat" ;
+//        if ( count_it == 0 )
+//        {
+//          aof.open(aFileName.c_str(),ofstream::out);
+//          aof.close();
+//        }
+//        aof.open(aFileName.c_str(),ofstream::app);
+//        aof.precision(8);
+//        aof.setf(ios::scientific, ios::floatfield);
+//        aof << count_it*0.005 << " " ;    // 1
+//        aof << m_currentForces(0) << " " ;       // 2
+//        aof << m_currentForces(1) << " " ;       // 3
+//        aof << m_currentForces(2) << " " ;       // 4
+//        aof << endl;
+//        ++count_it;
       }catch(...)
       {
         //cout << "problems with force signals reading" << endl;

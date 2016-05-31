@@ -95,8 +95,6 @@ namespace dynamicgraph {
 
       ,comSIN(NULL,"PatternGenerator("+name+")::input(vector)::com")
 
-      ,comStateSIN(NULL,"PatternGenerator("+name+")::input(vector)::comState")
-
       ,velocitydesSIN(NULL,"PatternGenerator("+name+")::input(vector)::velocitydes")
 
       ,LeftFootCurrentPosSIN(NULL,"PatternGenerator("+name+")::input(homogeneousmatrix)::leftfootcurrentpos")
@@ -250,7 +248,6 @@ namespace dynamicgraph {
       OneStepOfControlS.addDependency( firstSINTERN );
       OneStepOfControlS.addDependency( motorControlJointPositionSIN );
       OneStepOfControlS.addDependency( comSIN );
-      OneStepOfControlS.addDependency( comStateSIN );
 
       // For debug, register OSOC (not relevant for normal use).
       signalRegistration( OneStepOfControlS );
@@ -300,8 +297,6 @@ namespace dynamicgraph {
 			  ZMPRefSOUT <<
 			  CoMRefSOUT <<
 			  dCoMRefSOUT);
-
-      signalRegistration( comStateSIN );
 
       signalRegistration(comSIN <<
 			 velocitydesSIN <<
@@ -1040,25 +1035,6 @@ namespace dynamicgraph {
 				      m_VelocityReference(1),
 				      m_VelocityReference(2));
 
-      try{
-        if(m_feedBackControl)
-        {
-          ml::Vector curCoMState ;
-          curCoMState = comStateSIN(time);
-          for (unsigned i=0 ; i<3 ; ++i)
-            lCOMRefState.x[i] = curCoMState(i) ;
-          for (unsigned i=0 ; i<3 ; ++i)
-            lCOMRefState.y[i] = curCoMState(i+3) ;
-          for (unsigned i=0 ; i<3 ; ++i)
-            lCOMRefState.z[i] = curCoMState(i+6) ;
-
-          ZMPTarget(0) = lCOMRefState.x[0]-lCOMRefState.x[2]*lCOMRefState.z[0]/9.81 ;
-          ZMPTarget(1) = lCOMRefState.y[0]-lCOMRefState.y[2]*lCOMRefState.z[0]/9.81 ;
-          ZMPTarget(2) = 0.0; //to be fixed considering the support foot
-        }
-      }catch(...)
-      {};
-
 	  // Test if the pattern value has some value to provide.
 	  if (m_PGI->RunOneStepOfTheControlLoop(CurrentConfiguration,
 						CurrentVelocity,
@@ -1417,12 +1393,6 @@ namespace dynamicgraph {
        		 makeCommandVoid1(*this,&PatternGenerator::pgCommandLine,
 				  docCommandVoid1("Send the command line to the internal pg object.",
 						  "string (command line)")));
-
-      addCommand("feedBackControl",
-             makeCommandVoid1(*this,&PatternGenerator::useFeedBackSignals,
-                  docCommandVoid1("Enable or disable the use of the CoMfullState Signal inside the pg.",
-                          "string (true or false)")));
-
       // Change next step : todo (deal with FootAbsolutePosition...).
 
      addCommand("debug",
@@ -1463,14 +1433,6 @@ namespace dynamicgraph {
       m_PGI->ParseCmd(cmdArgs);
     }
 
-    void PatternGenerator::useFeedBackSignals( const bool & feedBack )
-    {
-      m_feedBackControl = feedBack ;
-      string cmdBool = feedBack?"true":"false" ;
-      assert( m_PGI!=NULL );
-      std::istringstream cmdArgs( ":feedBackControl " + cmdBool );
-      m_PGI->ParseCmd(cmdArgs);
-    }
 
     int PatternGenerator::
     stringToReferenceEnum( const std::string & FrameReference )

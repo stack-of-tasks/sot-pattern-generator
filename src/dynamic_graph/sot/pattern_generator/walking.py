@@ -13,7 +13,7 @@ from dynamic_graph.sot.core.matrix_util import matrixToTuple
 # from dynamic_graph.sot.core import FeatureGeneric, FeaturePoint6d, Task, TaskPD
 from dynamic_graph.sot.core import FeaturePosture
 from dynamic_graph.ros import RosRobotModel
-
+import roslib
 
 from numpy import *
 def totuple( a ):
@@ -57,33 +57,38 @@ def initPg(robot):
   robot.pg.initState()
 
 def addPgToVRMLRobot(robot):
-  # Configure Pattern Generator
-  modelDir=robot.modelDir+'/'
-  robotName=robot.modelName
-  specificitiesPath=robot.specificitiesPath
-  jointRankPath=robot.jointRankPath
-  robot.pg = PatternGenerator('pg')
-  robot.pg.setVrmlDir(modelDir+'/')
-  robot.pg.setVrml(robotName)
-  robot.pg.setXmlSpec(specificitiesPath)
-  robot.pg.setXmlRank(jointRankPath)
-  # Build Pattern Generator
-  robot.pg.buildModel()
-  # Initialise Pattern Generator
-  initPg(robot)
+  print "This function does not implement anything anymore"
+  print "Use : \"addPgToUrdfRobot(robot)\" instead "
 
 def addPgToUrdfRobot(robot):
   # Configure Pattern Generator    
   robot.pg = PatternGenerator('pg')
-  robot.pg.setUrdfDir(robot.urdfDir)
-  robot.pg.setUrdf(robot.urdfName)
-  robot.pg.setSoleParameters(robot.ankleLength, robot.ankleWidth)
+  if robot.device.name == 'HRP2LAAS' or robot.device.name == 'HRP2JRL':
+    pkgLocation = str(roslib.packages.get_pkg_dir("hrp2_14_description"))
+    robot.urdfFile = str(pkgLocation+"/urdf/hrp2_14.urdf")
+    robot.srdfFile = str(pkgLocation+"/srdf/hrp2_14.srdf")
+  elif robot.device.name == 'HRP4LIRMM':
+    pkgLocation = roslib.packages.get_pkg_dir("hrp4_description")
+    robot.urdfFile = str(pkgLocation+"/urdf/hrp4.urdf")
+    robot.srdfFile = str(pkgLocation+"/srdf/hrp4.srdf")
+  elif robot.device.name == 'ROMEO':
+    pkgLocation = roslib.packages.get_pkg_dir("romeo_description")
+    robot.urdfFile = str(pkgLocation+"/urdf/romeo.urdf")
+    robot.srdfFile = str(pkgLocation+"/srdf/romeo.srdf")
+  else:
+    pkgLocation = roslib.packages.get_pkg_dir("error404notfound_description")
+    robot.urdfFile = "error 404 not found"
+    robot.srdfFile = "error 404 not found"
+
+  robot.pg.setURDFpath( robot.urdfFile )
+  robot.pg.setSRDFpath( robot.srdfFile )
+  robot.pg.setXmlRank(robot.jointRankPath)
   if(hasattr(robot, 'jointMap')):
       print "some joints need to be mapped"
       for i in robot.jointMap:
           robot.pg.addJointMapping(i, robot.jointMap[i])
   # Build Pattern Generator
-  robot.pg.buildModelUrdf()
+  robot.pg.buildModel()
   # Initialise Pattern Generator
   initPg(robot)
 
@@ -105,7 +110,7 @@ def addPgTaskToUrdfRobot(robot,solver):
   if(hasattr(robot, 'jointMap')):
       for i in robot.jointMap:
           robot.geom.addJointMapping(i, robot.jointMap[i])
-  robot.geom.loadUrdf(robot.urdfDir + robot.urdfName)
+  robot.geom.loadUrdf(robot.urdfFile)
 
 def initRobotGeom(robot):
   robot.geom.createOpPoint('rf2','right-ankle')
@@ -264,21 +269,9 @@ def createGraph(robot,solver):
   pushTasks(robot,solver)
 
 def CreateEverythingForPG(robot,solver):
-  if hasattr(robot, 'urdfName'):
-      CreateEverythingForPGwithUrdf(robot,solver)
-  else:
-      CreateEverythingForPGwithVRML(robot,solver)
-
-def CreateEverythingForPGwithVRML(robot,solver):
-  robot.initializeTracer()
-  addPgToVRMLRobot(robot)
-  addPgTaskToVRMLRobot(robot,solver)
-  createGraph(robot,solver)
-
-def CreateEverythingForPGwithUrdf(robot,solver):
   robot.initializeTracer()
   addPgToUrdfRobot(robot)
-  addPgTaskToUrdfRobot(robot,solver)
+  addPgTaskToVRMLRobot(robot,solver)
   createGraph(robot,solver)
 
 def walkFewSteps(robot):
@@ -296,15 +289,18 @@ def walkAndrei(robot):
   robot.pg.parseCmd(":numberstepsbeforestop 4")
   robot.pg.parseCmd(":setVelReference 0.01 0.0 0.0")
   robot.pg.parseCmd(":HerdtOnline")
-  if robot.device.name == 'HRP2LAAS' or \
-     robot.device.name == 'HRP2JRL':
+  if robot.device.name == 'HRP2LAAS' or robot.device.name == 'HRP2JRL':
     robot.pg.parseCmd(":setfeetconstraint XY 0.09 0.06")
+    robot.pg.parseCmd(":useDynamicFilter true")
   elif robot.device.name == 'HRP4LIRMM':
     robot.pg.parseCmd(":setfeetconstraint XY 0.07 0.06")
+    robot.pg.parseCmd(":useDynamicFilter false")
   elif robot.device.name == 'ROMEO':
     robot.pg.parseCmd(":setfeetconstraint XY 0.04 0.04")
+    robot.pg.parseCmd(":useDynamicFilter false")
   else:
     robot.pg.parseCmd(":setfeetconstraint XY 0.02 0.02")
+    robot.pg.parseCmd(":useDynamicFilter false")
 
 def walkNaveau(robot):
   robot.startTracer()
@@ -315,12 +311,15 @@ def walkNaveau(robot):
   robot.pg.parseCmd(":numberstepsbeforestop 2")
   robot.pg.parseCmd(":setVelReference 0.01 0.0 0.0")
   robot.pg.parseCmd(":NaveauOnline")
-  if robot.device.name == 'HRP2LAAS' or \
-     robot.device.name == 'HRP2JRL':
+  if robot.device.name == 'HRP2LAAS' or robot.device.name == 'HRP2JRL':
     robot.pg.parseCmd(":setfeetconstraint XY 0.09 0.06")
+    robot.pg.parseCmd(":useDynamicFilter true")
   elif robot.device.name == 'HRP4LIRMM':
     robot.pg.parseCmd(":setfeetconstraint XY 0.07 0.06")
+    robot.pg.parseCmd(":useDynamicFilter false")
   elif robot.device.name == 'ROMEO':
     robot.pg.parseCmd(":setfeetconstraint XY 0.04 0.04")
+    robot.pg.parseCmd(":useDynamicFilter false")
   else:
     robot.pg.parseCmd(":setfeetconstraint XY 0.02 0.02")
+    robot.pg.parseCmd(":useDynamicFilter false")

@@ -13,18 +13,6 @@
 # received a copy of the GNU Lesser General Public License along with
 # sot-pattern-generator. If not, see <http://www.gnu.org/licenses/>.
 
-IF(HRP2_DYNAMICS_FOUND)
-  MESSAGE(STATUS "hrp2-dynamics: found")
-ELSE(NOT HRP2_DYNAMICS_FOUND)
-  MESSAGE(STATUS "hrp2-dynamics: not found")
-ENDIF(HRP2_DYNAMICS_FOUND)
-
-SET(WITH_HRP2_DYNAMICS "" CACHE BOOL "Option to use HRP2-DYNAMICS robot in the PG" )
-SET(WITH_HRP2_DYNAMICS_BOOL 0)
-if (WITH_HRP2_DYNAMICS)
- SET(WITH_HRP2_DYNAMICS_BOOL 1)
-endif()
-
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include)
 
 ADD_DEFINITIONS(-DDEBUG=2)
@@ -90,7 +78,8 @@ SET(PYTHON_LOCAL_PATH sot/pattern_generator)
 FOREACH(LIBRARY_NAME ${plugins})
   ADD_LIBRARY(${LIBRARY_NAME}
     SHARED
-    ${LIBRARY_NAME}.cpp)
+    ${LIBRARY_NAME}.cpp
+    ../include/sot-pattern-generator/${LIBRARY_NAME}.h)
 
   SET_TARGET_PROPERTIES(${LIBRARY_NAME}
     PROPERTIES
@@ -113,16 +102,8 @@ FOREACH(LIBRARY_NAME ${plugins})
     PROPERTIES
     LINK_FLAGS "${${PROJECT_NAME}_src_LDFLAGS}")
 
-  PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} jrl-dynamics)
-  PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} jrl-dynamics-urdf)
   PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} jrl-walkgen)
-  PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} jrl-dynamics-urdf)
-
-  IF(HRP2_DYNAMICS_FOUND)
-    CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/private_cmake/config_private.hh.cmake ${CMAKE_BINARY_DIR}/include/${HEADER_DIR}/config_private.hh)
-    PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} hrp2-dynamics)
-  ENDIF(HRP2_DYNAMICS_FOUND)
-
+  PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} pinocchio)
   PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} sot-core)
 
   INSTALL(TARGETS ${LIBRARY_NAME} DESTINATION ${DYNAMIC_GRAPH_PLUGINDIR})

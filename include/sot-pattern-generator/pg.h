@@ -267,9 +267,6 @@ namespace dynamicgraph {
       /*! \brief Internal method to get the reference dCoM at a given time.*/
       ml::Vector & getdCoMRef(ml::Vector & res, int time);
 
-      /*! \brief Internal method to get the external forces at a given time.*/
-      ml::Vector & getExternalForces(ml::Vector & forces, int time);
-
       /*! \brief Internal method to get the position of the left foot. */
       MatrixHomogeneous & getLeftFootRef(MatrixHomogeneous &res, int time);
 
@@ -480,9 +477,7 @@ namespace dynamicgraph {
 
       /*! \brief Take the current external force applied to the com (fx, fy, fz). */
       SignalPtr<ml::Vector,int> forceSIN;
-      SignalTimeDependent<ml::Vector,int> forceSOUT;
       ml::Vector m_initForce;
-      ml::Vector m_currentForces;
       std::deque<ml::Vector> m_bufferForce;
       std::vector<double> m_filterWindow;
 

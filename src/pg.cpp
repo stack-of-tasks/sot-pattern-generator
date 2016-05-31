@@ -101,10 +101,6 @@ namespace dynamicgraph {
 
       ,forceSIN(NULL,"PatternGenerator("+name+")::input(vector)::forceSIN")
 
-      ,forceSOUT(boost::bind(&PatternGenerator::getExternalForces,this,_1,_2),
-                   OneStepOfControlS,
-                   "PatternGenerator("+name+")::output(matrix)::forceSOUT" )
-
       ,velocitydesSIN(NULL,"PatternGenerator("+name+")::input(vector)::velocitydes")
 
       ,LeftFootCurrentPosSIN(NULL,"PatternGenerator("+name+")::input(homogeneousmatrix)::leftfootcurrentpos")
@@ -311,7 +307,7 @@ namespace dynamicgraph {
 			  CoMRefSOUT <<
 			  dCoMRefSOUT);
 
-      signalRegistration( comStateSIN << zmpSIN << forceSIN << forceSOUT );
+      signalRegistration( comStateSIN << zmpSIN << forceSIN );
 
       signalRegistration(comSIN <<
 			 velocitydesSIN <<
@@ -365,7 +361,6 @@ namespace dynamicgraph {
         m_filterWindow[i]/= sum;
 
       m_initForce.resize(6,0.0);
-      m_currentForces.resize(6,0.0);
       //dataInProcessSOUT.setReference( &m_dataInProcess );
 
       sotDEBUGOUT(5);
@@ -756,18 +751,6 @@ namespace dynamicgraph {
     }
 
     ml::Vector & PatternGenerator::
-    getExternalForces(ml::Vector & forces, int time)
-    {
-      sotDEBUGIN(25);
-
-      OneStepOfControlS(time);
-      forces = m_currentForces;
-
-      sotDEBUGOUT(25);
-      return forces;
-    }
-
-    ml::Vector & PatternGenerator::
     getInitZMPRef(ml::Vector & InitZMPRefval, int /*time*/)
     {
       sotDEBUGIN(25);
@@ -1142,52 +1125,30 @@ namespace dynamicgraph {
           extForce(2) = ltmp3 ;
           m_bufferForce.pop_front();
         }
-        double threshold = 50.0;
-        if(extForce(0)>threshold)
-          extForce(0)=threshold;
-        if(extForce(0)<-threshold)
-          extForce(0)=-threshold;
+        if(extForce(0)>100.0)
+          extForce(0)=100.0;
+        if(extForce(0)<-100.0)
+          extForce(0)=-100.0;
 
-        if(extForce(1)>threshold)
-          extForce(1)=threshold;
-        if(extForce(1)<-threshold)
-          extForce(1)=-threshold;
+        if(extForce(1)>100.0)
+          extForce(1)=100.0;
+        if(extForce(1)<-100.0)
+          extForce(1)=-100.0;
 
-        if(extForce(2)>threshold)
-          extForce(2)=threshold;
-        if(extForce(2)<-threshold)
-          extForce(2)=-threshold;
+        if(extForce(2)>100.0)
+          extForce(2)=100.0;
+        if(extForce(2)<-100.0)
+          extForce(2)=-100.0;
 
         if((extForce(0)*extForce(0)+extForce(1)*extForce(1)) < 100)
         {
           extForce(0)=0.0;
           extForce(1)=0.0;
         }
-        m_currentForces = extForce ;
         ostringstream oss ("");
-        //oss << ":perturbationforce " << extForce(0) << " " << extForce(1) << " " << extForce(2);
-        oss << ":perturbationforce " << m_currentForces(1) << " " << -m_currentForces(0) << " " << m_currentForces(2);
+        oss << ":perturbationforce " << extForce(0) << " " << extForce(1) << " " << extForce(2);
         // cout << oss.str() << endl ;
         pgCommandLine(oss.str());
-
-//        ofstream aof;
-//        string aFileName;
-//        static int count_it = 0 ;
-//        aFileName = "/tmp/dg_pg-external-forces.dat" ;
-//        if ( count_it == 0 )
-//        {
-//          aof.open(aFileName.c_str(),ofstream::out);
-//          aof.close();
-//        }
-//        aof.open(aFileName.c_str(),ofstream::app);
-//        aof.precision(8);
-//        aof.setf(ios::scientific, ios::floatfield);
-//        aof << count_it*0.005 << " " ;    // 1
-//        aof << m_currentForces(0) << " " ;       // 2
-//        aof << m_currentForces(1) << " " ;       // 3
-//        aof << m_currentForces(2) << " " ;       // 4
-//        aof << endl;
-//        ++count_it;
       }catch(...)
       {
         //cout << "problems with force signals reading" << endl;

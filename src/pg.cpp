@@ -32,10 +32,8 @@
 #include <jrl/mal/matrixabstractlayer.hh>
 #include <jrl/dynamics/dynamicsfactory.hh>
 
-#include <sot-pattern-generator/config_private.hh>
-
 #ifdef WITH_HRP2DYNAMICS
-  #include <hrp2-dynamics/hrp2OptHumanoidDynamicRobot.h>
+#  include <hrp2-dynamics/hrp2OptHumanoidDynamicRobot.h>
 #endif
 
 #include <dynamic-graph/factory.h>

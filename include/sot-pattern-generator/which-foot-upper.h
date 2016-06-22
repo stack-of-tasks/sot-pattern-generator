@@ -34,9 +34,7 @@ namespace ml = maal::boost;
 #include <dynamic-graph/entity.h>
 #include <dynamic-graph/signal-ptr.h>
 #include <dynamic-graph/signal-time-dependent.h>
-#include <sot/core/matrix-homogeneous.hh>
-#include <sot/core/vector-roll-pitch-yaw.hh>
-#include <sot/core/matrix-rotation.hh>
+#include <sot/core/matrix-geometry.hh>
 
 /* STD */
 #include <string>
@@ -106,6 +104,9 @@ namespace dynamicgraph {
 			     const MatrixRotation& waistRsensor,
 			     const MatrixRotation& worldRsensor,
 			     MatrixHomogeneous& res );
+
+      MatrixRotation&
+	computeRotationMatrix(MatrixRotation& rotMat, int time );
 
       unsigned int & whichFoot( const MatrixHomogeneous& waistMlfoot,
 				const MatrixHomogeneous& waistMrfoot,

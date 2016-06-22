@@ -33,11 +33,11 @@
 #include "pinocchio/multibody/parser/urdf.hpp"
 #include "pinocchio/multibody/parser/srdf.hpp"
 
-#include <sot-pattern-generator/config_private.hh>
+//#include <sot-pattern-generator/config_private.hh>
 
 #include <dynamic-graph/factory.h>
 #include <dynamic-graph/all-commands.h>
-#include <sot/core/matrix-homogeneous.hh>
+#include <sot/core/matrix-geometry.hh>
 
 #include <sot-pattern-generator/pg.h>
 
@@ -219,11 +219,11 @@ namespace dynamicgraph {
       m_ComAttitude.resize(3);
       m_ComAttitude.fill(0);
       m_WaistPosition.resize(3);
-      m_WaistPosition.fill(0);
+      m_WaistPosition.setZero();
       m_WaistAttitudeAbsolute.resize(3);
       m_WaistAttitudeAbsolute.fill(0);
       m_WaistPositionAbsolute.resize(3);
-      m_WaistPositionAbsolute.fill(0);
+      m_WaistPositionAbsolute.setZero();
 
       m_k_Waist_kp1.setIdentity();
 
@@ -375,11 +375,11 @@ namespace dynamicgraph {
       // .accessCopy()
       // Instead of copy value (ml::Vector pos) it could be rather
       // used reference (const ml::Vector & post)
-      ml::Vector res;
+      Vector res;
 	  MAL_VECTOR_TYPE(double) lWaistPosition;
       if (m_InitPositionByRealState)
 	{
-	  const ml::Vector& pos = jointPositionSIN(m_LocalTime);
+	  const Vector& pos = jointPositionSIN(m_LocalTime);
 
       MAL_VECTOR_RESIZE(lWaistPosition, 6);
       for(unsigned int i = 0; i < 6; ++i)
@@ -393,7 +393,7 @@ namespace dynamicgraph {
 	  for(unsigned i=0;i<res.size();i++)
         res(m_wrml2urdfIndex[i]) = pos(i+6);
 
-	  ml::Vector lZMPPrevious = ZMPPreviousControllerSIN(m_LocalTime);
+	  Vector lZMPPrevious = ZMPPreviousControllerSIN(m_LocalTime);
 	  for(unsigned int i=0;i<3;i++)
 	    m_ZMPPrevious[i] = lZMPPrevious(i);
 
@@ -405,7 +405,7 @@ namespace dynamicgraph {
         res(m_wrml2urdfIndex[i]) = res(i);
 	}
 
-      ml::Vector com = comSIN(m_LocalTime);
+      Vector com = comSIN(m_LocalTime);
 
 
       m_JointErrorValuesForWalking.resize(res.size());
@@ -415,8 +415,9 @@ namespace dynamicgraph {
 
       try
 	{
-
-	  m_PGI->SetCurrentJointValues(res.accessToMotherLib());
+	  boost::numeric::ublas::vector<double> bres; bres.resize(res.size());
+	  for(int i=0;i<res.size();i++) bres(i) = res(i);
+	  m_PGI->SetCurrentJointValues(bres);
 	  //      m_ZMPPrevious[2] = -m_AnkleSoilDistance; // Changed the reference frame.
 
 
@@ -471,7 +472,7 @@ namespace dynamicgraph {
 	  FromAbsoluteFootPosToDotHomogeneous(InitLeftFootAbsPos,
 					      m_InitLeftFootPosition,
 					      m_dotLeftFootPosition);
-	  ml::Vector newtmp(4),oldtmp(4);
+	  Eigen::Matrix<double, 4,1> newtmp,oldtmp;
 	  oldtmp(0) =  m_InitCOMRefPos(0); oldtmp(1) =  m_InitCOMRefPos(1);
 	  oldtmp(2) =  m_InitCOMRefPos(2); oldtmp(3)=1.0;
 	  newtmp = m_MotionSinceInstanciationToThisSequence* oldtmp;
@@ -489,7 +490,7 @@ namespace dynamicgraph {
 	    {
 
 	      MatrixHomogeneous invInitLeftFootRef;
-	      m_InitLeftFootPosition.inverse(invInitLeftFootRef);
+	      invInitLeftFootRef = m_InitLeftFootPosition.inverse();
 
 	      m_k_Waist_kp1 = m_k_Waist_kp1 * invInitLeftFootRef;
 	      m_MotionSinceInstanciationToThisSequence =
@@ -715,8 +716,8 @@ namespace dynamicgraph {
 
 #include <jrl/mal/boostspecific.hh>
 
-    ml::Vector & PatternGenerator::
-    getZMPRef(ml::Vector & ZMPRefval, int time)
+    Vector & PatternGenerator::
+    getZMPRef(Vector & ZMPRefval, int time)
     {
       sotDEBUGIN(5);
 
@@ -733,8 +734,8 @@ namespace dynamicgraph {
       return ZMPRefval;
     }
 
-    ml::Vector & PatternGenerator::
-    getCoMRef(ml::Vector & CoMRefval, int time)
+    Vector & PatternGenerator::
+    getCoMRef(Vector & CoMRefval, int time)
     {
       sotDEBUGIN(25);
 
@@ -745,8 +746,8 @@ namespace dynamicgraph {
       return CoMRefval;
     }
 
-    ml::Vector & PatternGenerator::
-    getdCoMRef(ml::Vector & CoMRefval, int time)
+    Vector & PatternGenerator::
+    getdCoMRef(Vector & CoMRefval, int time)
     {
       sotDEBUGIN(25);
 
@@ -757,8 +758,8 @@ namespace dynamicgraph {
       return CoMRefval;
     }
 
-    ml::Vector & PatternGenerator::
-    getExternalForces(ml::Vector & forces, int time)
+    Vector & PatternGenerator::
+    getExternalForces(Vector & forces, int time)
     {
       sotDEBUGIN(25);
 
@@ -769,8 +770,8 @@ namespace dynamicgraph {
       return forces;
     }
 
-    ml::Vector & PatternGenerator::
-    getInitZMPRef(ml::Vector & InitZMPRefval, int /*time*/)
+    Vector & PatternGenerator::
+    getInitZMPRef(Vector & InitZMPRefval, int /*time*/)
     {
       sotDEBUGIN(25);
 
@@ -785,8 +786,8 @@ namespace dynamicgraph {
       return InitZMPRefval;
     }
 
-    ml::Vector & PatternGenerator::
-    getInitCoMRef(ml::Vector & InitCoMRefval, int /*time*/)
+    Vector & PatternGenerator::
+    getInitCoMRef(Vector & InitCoMRefval, int /*time*/)
     {
       sotDEBUGIN(25);
 
@@ -800,8 +801,8 @@ namespace dynamicgraph {
       return InitCoMRefval;
     }
 
-    ml::Vector & PatternGenerator::
-    getInitWaistPosRef(ml::Vector & InitWaistRefval, int /*time*/)
+    Vector & PatternGenerator::
+    getInitWaistPosRef(Vector & InitWaistRefval, int /*time*/)
     {
       sotDEBUGIN(25);
 
@@ -941,7 +942,7 @@ namespace dynamicgraph {
       const double cy = cos(m_WaistAttitudeAbsolute(2)); // YAW
       const double sy = sin(m_WaistAttitudeAbsolute(2));
 
-      aWaistMH.fill(0.0);
+      aWaistMH.matrix().setZero();
 
       aWaistMH(0,0) = cy*cp;
       aWaistMH(0,1) = cy*sp*sr-sy*cr;
@@ -978,7 +979,7 @@ namespace dynamicgraph {
       Twist(1,0)= aFootPosition.dtheta; Twist(1,1)= 0.0; Twist(1,2) = aFootPosition.domega2;
       Twist(2,0)= -aFootPosition.domega; Twist(2,1)= -aFootPosition.domega2; Twist(2,2) = 0.0;
 
-      Twist.multiply(Rot,dRot);
+      dRot = Twist * Rot;
 
       for(unsigned int i=0;i<3;i++)
 	for(unsigned int j=0;j<3;j++)
@@ -1058,7 +1059,7 @@ namespace dynamicgraph {
 	  // pointer of firstSINTERN has been earlier destroyed
 	  // by setconstant(0).
 	  firstSINTERN(time);
-	  ml::Vector CurrentState = motorControlJointPositionSIN(time);
+	  Vector CurrentState = motorControlJointPositionSIN(time);
 	  assert( CurrentState.size() == robotSize );
 
 	  /*! \brief Absolute Position for the left and right feet. */
@@ -1086,8 +1087,8 @@ namespace dynamicgraph {
       try{
         if(m_feedBackControl)
         {
-          ml::Vector curCoMState (3) ;
-          ml::Vector curZMP (3) ;
+          Vector curCoMState (3) ;
+          Vector curZMP (3) ;
 
           curCoMState = comStateSIN(time);
           curZMP = zmpSIN(time);
@@ -1117,7 +1118,7 @@ namespace dynamicgraph {
       };
 
       try{
-        ml::Vector extForce (3);
+        Vector extForce (3);
         extForce = forceSIN(time);
         if(time<50*0.005)
         {
@@ -1290,7 +1291,7 @@ namespace dynamicgraph {
 	      m_LeftFootPosition = m_MotionSinceInstanciationToThisSequence * m_LeftFootPosition;
 	      m_RightFootPosition = m_MotionSinceInstanciationToThisSequence * m_RightFootPosition;
 
-	      ml::Vector newRefPos(4), oldRefPos(4);
+	       Eigen::Matrix<double, 4,1> newRefPos, oldRefPos;
 	      oldRefPos(0) = m_COMRefPos(0); oldRefPos(1) = m_COMRefPos(1);
 	      oldRefPos(2) = m_COMRefPos(2); oldRefPos(3) = 1.0;
 	      newRefPos = m_MotionSinceInstanciationToThisSequence * oldRefPos;
@@ -1358,7 +1359,7 @@ namespace dynamicgraph {
 		    {
 		      PoseOrigin = WaistPoseAbsolute;
 		    }
-		  PoseOrigin.inverse(iPoseOrigin);
+		  iPoseOrigin = PoseOrigin.inverse();
 
 		  sotDEBUG(25) << "Old ComRef:  " << m_COMRefPos << endl;
 		  sotDEBUG(25) << "Old LeftFootRef:  " << m_LeftFootPosition << endl;
@@ -1366,8 +1367,8 @@ namespace dynamicgraph {
 		  sotDEBUG(25) << "Old PoseOrigin:  " << PoseOrigin << endl;
 
 
-		  ml::Vector lVZMPRefPos(4), lV2ZMPRefPos(4);
-		  ml::Vector lVCOMRefPos(4), lV2COMRefPos(4);
+		  Eigen::Matrix<double, 4,1> lVZMPRefPos, lV2ZMPRefPos;
+		  Eigen::Matrix<double, 4,1> lVCOMRefPos, lV2COMRefPos;
 
 		  for(unsigned int li=0;li<3;li++)
 		    {
@@ -1398,12 +1399,12 @@ namespace dynamicgraph {
 		  WaistPoseAbsolute = iPoseOrigin * WaistPoseAbsolute;
 
 		  MatrixRotation newWaistRot;
-		  WaistPoseAbsolute.extract(newWaistRot);
+		  newWaistRot = WaistPoseAbsolute.linear();
 		  VectorRollPitchYaw newWaistRPY;
-		  newWaistRPY.fromMatrix(newWaistRot);
+		  newWaistRPY = (newWaistRot.eulerAngles(2,1,0)).reverse();
 		  m_WaistAttitude = newWaistRPY;
 
-		  WaistPoseAbsolute.extract(m_WaistPosition);
+		  m_WaistPosition = WaistPoseAbsolute.translation();
 
 		  sotDEBUG(25) << "ComRef:  " << m_COMRefPos << endl;
 		  sotDEBUG(25) << "iPoseOrigin:  " << iPoseOrigin << endl;
@@ -1430,7 +1431,7 @@ namespace dynamicgraph {
 	      if (m_dataInProcess==1)
 		{
 		  MatrixHomogeneous invInitLeftFootRef,Diff;
-		  m_InitLeftFootPosition.inverse(invInitLeftFootRef);
+		  invInitLeftFootRef = m_InitLeftFootPosition.inverse();
 		  Diff = invInitLeftFootRef * m_LeftFootPosition;
 
 		  m_k_Waist_kp1 = m_k_Waist_kp1 * Diff;
@@ -1627,7 +1628,7 @@ namespace dynamicgraph {
       m_ReferenceFrame = stringToReferenceEnum( str );
     }
 
-    ml::Vector & PatternGenerator::getjointWalkingErrorPosition(ml::Vector &res,int time)
+    Vector & PatternGenerator::getjointWalkingErrorPosition(Vector &res,int time)
     {
       sotDEBUGIN(5);
 
@@ -1692,8 +1693,8 @@ namespace dynamicgraph {
       return res;
     }
 
-    ml::Vector & PatternGenerator::
-    getWaistPosition(ml::Vector &res, int time)
+    Vector & PatternGenerator::
+    getWaistPosition(Vector &res, int time)
     {
       sotDEBUGIN(5);
       OneStepOfControlS(time);
@@ -1702,8 +1703,8 @@ namespace dynamicgraph {
       sotDEBUGOUT(5);
       return res;
     }
-    ml::Vector & PatternGenerator::
-    getWaistPositionAbsolute(ml::Vector &res, int time)
+    Vector & PatternGenerator::
+    getWaistPositionAbsolute(Vector &res, int time)
     {
       sotDEBUGIN(5);
       OneStepOfControlS(time);

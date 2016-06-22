@@ -35,9 +35,7 @@ namespace dynamicgraph {
 
     const double WhichFootUpper::
     TRIGGER_THRESHOLD_DEFAULT = 5e-4;
-
-
-    typedef MatrixRotation& (MatrixHomogeneous::*ExtractMemberType) (MatrixRotation&) const;
+    typedef Eigen::Matrix<double,4,4>& (MatrixHomogeneous::*ExtractMemberType) (void) const;
 
     WhichFootUpper::
     WhichFootUpper( const std::string & name )
@@ -68,24 +66,21 @@ namespace dynamicgraph {
 		      "WhichFootUpper("+name+")::output(uint)::whichFoot" )
 
       ,waistMsensorSIN( NULL,"WhichFootUpper("+name+")::input(matrixRotation)::waistMsensor" )
-      ,waistRsensorSOUT( boost::bind( (ExtractMemberType)&MatrixHomogeneous::extract,
-				      SOT_CALL_SIG(waistMsensorSIN,MatrixHomogeneous),
-				      _1),
+      ,waistRsensorSOUT( boost::bind(&WhichFootUpper::computeRotationMatrix,this,_1,_2),
 			 waistMsensorSIN,
 			 "WhichFootUpper("+name+")::output(MatrixHomogeneous)::waistRsensorOUT" )
     {
       sotDEBUGIN(5);
-
       signalRegistration( whichFootSOUT      << waistRsensorSIN
 			  << worldRsensorSIN << waistMlfootSIN
 			  << waistMrfootSIN  << worldMlfootSOUT
 			  << worldMrfootSOUT
 			  << waistMsensorSIN << waistRsensorSOUT);
       waistRsensorSIN.plug( &waistRsensorSOUT );
-
-
       sotDEBUGOUT(5);
     }
+
+  
 
 
     WhichFootUpper::
@@ -98,6 +93,14 @@ namespace dynamicgraph {
     /* --- SIGNALS -------------------------------------------------------------- */
     /* --- SIGNALS -------------------------------------------------------------- */
     /* --- SIGNALS -------------------------------------------------------------- */
+    MatrixRotation& WhichFootUpper::
+    computeRotationMatrix(MatrixRotation& rotMat, int time) {
+      MatrixHomogeneous mh =  waistMsensorSIN(time);
+      sotDEBUGIN(15);
+      rotMat.resize(3,3);
+      rotMat = mh.linear();
+      return rotMat;
+    }
 
     MatrixHomogeneous & WhichFootUpper::
     computeFootPosition( const MatrixHomogeneous& waistMfoot,
@@ -108,12 +111,13 @@ namespace dynamicgraph {
       sotDEBUGIN(15);
 
       MatrixRotation worldRwaist;
-      worldRsensor.multiply( waistRsensor.transpose(),worldRwaist );
+      worldRwaist = worldRsensor * waistRsensor.transpose();
 
-      ml::Vector trans(3); trans.fill(0);
-      MatrixHomogeneous worldMwaist; worldMwaist.buildFrom(worldRwaist,trans);
+      MatrixHomogeneous worldMwaist; 
+      worldMwaist.translation().setZero();
+      worldMwaist.linear() = worldRwaist;
 
-      worldMwaist.multiply(waistMfoot,worldMfoot );
+      worldMfoot = worldMwaist * waistMfoot;
 
       sotDEBUGOUT(15);
       return worldMfoot;

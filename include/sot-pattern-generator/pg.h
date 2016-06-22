@@ -37,9 +37,7 @@
 #include <dynamic-graph/signal-ptr.h>
 #include <dynamic-graph/signal-time-dependent.h>
 #include <sot-pattern-generator/exception-pg.h>
-#include <sot/core/matrix-homogeneous.hh>
-#include <sot/core/vector-roll-pitch-yaw.hh>
-#include <sot/core/matrix-rotation.hh>
+#include <sot/core/matrix-geometry.hh>
 
 /* Pattern Generator */
 #include <jrl/mal/matrixabstractlayer.hh>
@@ -250,16 +248,16 @@ namespace dynamicgraph {
     @{
       */
       /*! \brief Internal method to get the reference ZMP at a given time. */
-      ml::Vector & getZMPRef(ml::Vector & res, int time);
+      dynamicgraph::Vector & getZMPRef(dynamicgraph::Vector & res, int time);
 
       /*! \brief Internal method to get the reference CoM at a given time.*/
-      ml::Vector & getCoMRef(ml::Vector & res, int time);
+      dynamicgraph::Vector & getCoMRef(dynamicgraph::Vector & res, int time);
 
       /*! \brief Internal method to get the reference dCoM at a given time.*/
-      ml::Vector & getdCoMRef(ml::Vector & res, int time);
+      dynamicgraph::Vector & getdCoMRef(dynamicgraph::Vector & res, int time);
 
       /*! \brief Internal method to get the external forces at a given time.*/
-      ml::Vector & getExternalForces(ml::Vector & forces, int time);
+      dynamicgraph::Vector & getExternalForces(dynamicgraph::Vector & forces, int time);
 
       /*! \brief Internal method to get the position of the left foot. */
       MatrixHomogeneous & getLeftFootRef(MatrixHomogeneous &res, int time);
@@ -277,7 +275,7 @@ namespace dynamicgraph {
       MatrixHomogeneous & getFlyingFootRef(MatrixHomogeneous &res, int time);
 
       /*! \brief Internal method to get the joint position for walking. */
-      ml::Vector & getjointWalkingErrorPosition(ml::Vector &res, int time);
+      dynamicgraph::Vector & getjointWalkingErrorPosition(dynamicgraph::Vector &res, int time);
 
       /*! \brief Internal method to get the derivative of the com attitude. */
       VectorRollPitchYaw & getdComAttitude(VectorRollPitchYaw &res, int time);
@@ -295,10 +293,10 @@ namespace dynamicgraph {
       unsigned & getDataInProcess(unsigned &res, int time);
 
       /*! \brief Internal method to get the position of the waist. */
-      ml::Vector & getWaistPosition(ml::Vector &res, int time);
+      dynamicgraph::Vector & getWaistPosition(dynamicgraph::Vector &res, int time);
 
       /*! \brief Internal method to get the absolute position of the waist. */
-      ml::Vector & getWaistPositionAbsolute(ml::Vector &res, int time);
+      dynamicgraph::Vector & getWaistPositionAbsolute(dynamicgraph::Vector &res, int time);
 
       /*! @} */
 
@@ -334,48 +332,48 @@ namespace dynamicgraph {
       MatrixHomogeneous m_FlyingFootPosition;
 
       /*! \brief Absolute position of the reference ZMP. */
-      ml::Vector m_ZMPRefPos;
+      dynamicgraph::Vector m_ZMPRefPos;
 
       /*! \brief Com Attitude: does not really exist apart from when the robot
     is seen as an inverted pendulum*/
-      ml::Vector m_ComAttitude;
+      dynamicgraph::Vector m_ComAttitude;
 
       /*! \brief Com Attitude: does not really exist apart when the robot
     is seen as an inverted pendulum*/
-      ml::Vector m_dComAttitude;
+      dynamicgraph::Vector m_dComAttitude;
 
       /*! \brief Absolute position of the reference CoM. */
-      ml::Vector m_COMRefPos;
+      dynamicgraph::Vector m_COMRefPos;
 
       /*! \brief Absolute position of the reference dCoM. */
-      ml::Vector m_dCOMRefPos;
+      dynamicgraph::Vector m_dCOMRefPos;
 
       /*! \brief Initial Absolute position of the reference ZMP. */
-      ml::Vector m_InitZMPRefPos;
+      dynamicgraph::Vector m_InitZMPRefPos;
 
       /*! \brief Initial Absolute position and attitude of the reference Waist. */
-      ml::Vector m_InitWaistRefPos, m_InitWaistRefAtt;
+      dynamicgraph::Vector m_InitWaistRefPos, m_InitWaistRefAtt;
 
       /*! \brief Initial Absolute position of the reference CoM. */
-      ml::Vector m_InitCOMRefPos;
+      dynamicgraph::Vector m_InitCOMRefPos;
 
       /*! \brief Waist position */
-      ml::Vector m_WaistPosition;
+      dynamicgraph::Vector m_WaistPosition;
 
       /*! \brief Waist position Absolute */
-      ml::Vector m_WaistPositionAbsolute;
+      dynamicgraph::Vector m_WaistPositionAbsolute;
 
       /*! \brief Waist Attitude */
-      ml::Vector m_WaistAttitude;
+      dynamicgraph::Vector m_WaistAttitude;
 
       /*! \brief Waist Attitude Absolute */
-      ml::Vector m_WaistAttitudeAbsolute;
+      dynamicgraph::Vector m_WaistAttitudeAbsolute;
 
       /*! \brief Joint values for walking. */
-      ml::Vector m_JointErrorValuesForWalking;
+      dynamicgraph::Vector m_JointErrorValuesForWalking;
 
       /*! \brief Velocity reference for Herdt's PG */
-      ml::Vector m_VelocityReference;
+      dynamicgraph::Vector m_VelocityReference;
       /*! \brief true iff the pattern if dealing with data, false if pg is not
        * working anymore/yet. */
       unsigned int m_dataInProcess;
@@ -415,13 +413,13 @@ namespace dynamicgraph {
 
 
       /*! \brief Internal method to get the initial reference ZMP at a given time. */
-      ml::Vector & getInitZMPRef(ml::Vector & res, int time);
+      dynamicgraph::Vector & getInitZMPRef(dynamicgraph::Vector & res, int time);
 
       /*! \brief Internal method to get the initial reference CoM at a given time.*/
-      ml::Vector & getInitCoMRef(ml::Vector & res, int time);
+      dynamicgraph::Vector & getInitCoMRef(dynamicgraph::Vector & res, int time);
 
       /*! \brief Internal method to get the initial reference CoM at a given time.*/
-      ml::Vector & getInitWaistPosRef(ml::Vector & res, int time);
+      dynamicgraph::Vector & getInitWaistPosRef(dynamicgraph::Vector & res, int time);
 
       /*! \brief Internal method to get the initial reference CoM at a given time.*/
       VectorRollPitchYaw & getInitWaistAttRef(VectorRollPitchYaw & res, int time);
@@ -443,42 +441,42 @@ namespace dynamicgraph {
     @{
       */
       /*! \brief Real state position values. */
-      SignalPtr<ml::Vector,int> jointPositionSIN;
+      SignalPtr<dynamicgraph::Vector,int> jointPositionSIN;
 
       /*! \brief Motor control joint position values. */
-      SignalPtr<ml::Vector,int> motorControlJointPositionSIN;
+      SignalPtr<dynamicgraph::Vector,int> motorControlJointPositionSIN;
 
       /*! \brief Previous ZMP value (ZMP send by the preceding controller). */
-      SignalPtr<ml::Vector,int> ZMPPreviousControllerSIN;
+      SignalPtr<dynamicgraph::Vector,int> ZMPPreviousControllerSIN;
 
       /*! \brief Externalize the ZMP reference . */
-      SignalTimeDependent<ml::Vector,int> ZMPRefSOUT;
+      SignalTimeDependent<dynamicgraph::Vector,int> ZMPRefSOUT;
 
       /*! \brief Externalize the CoM reference. */
-      SignalTimeDependent<ml::Vector,int> CoMRefSOUT;
+      SignalTimeDependent<dynamicgraph::Vector,int> CoMRefSOUT;
 
       /*! \brief Externalize the CoM reference. */
-      SignalTimeDependent<ml::Vector,int> dCoMRefSOUT;
+      SignalTimeDependent<dynamicgraph::Vector,int> dCoMRefSOUT;
 
       /*! \brief Take the current CoM. */
-      SignalPtr<ml::Vector,int> comSIN;
+      SignalPtr<dynamicgraph::Vector,int> comSIN;
 
       /*! \brief Take the current CoM state (pos, vel, acc). */
-      SignalPtr<ml::Vector,int> comStateSIN;
+      SignalPtr<dynamicgraph::Vector,int> comStateSIN;
 
       /*! \brief Take the current zmp (x, y, z). */
-      SignalPtr<ml::Vector,int> zmpSIN;
+      SignalPtr<dynamicgraph::Vector,int> zmpSIN;
 
       /*! \brief Take the current external force applied to the com (fx, fy, fz). */
-      SignalPtr<ml::Vector,int> forceSIN;
-      SignalTimeDependent<ml::Vector,int> forceSOUT;
-      ml::Vector m_initForce;
-      ml::Vector m_currentForces;
-      std::deque<ml::Vector> m_bufferForce;
+      SignalPtr<dynamicgraph::Vector,int> forceSIN;
+      SignalTimeDependent<dynamicgraph::Vector,int> forceSOUT;
+      dynamicgraph::Vector m_initForce;
+      dynamicgraph::Vector m_currentForces;
+      std::deque<dynamicgraph::Vector> m_bufferForce;
       std::vector<double> m_filterWindow;
 
       /*! \brief Take the current desired velocity. */
-      SignalPtr<ml::Vector,int> velocitydesSIN;
+      SignalPtr<dynamicgraph::Vector,int> velocitydesSIN;
 
       /*! \brief Take the current left foot homogeneous position. */
       SignalPtr<MatrixHomogeneous,int> LeftFootCurrentPosSIN;
@@ -506,7 +504,7 @@ namespace dynamicgraph {
       SignalTimeDependent<unsigned int,int> SupportFootSOUT;
 
       /*! \brief Externalize the joint values for walking. */
-      SignalTimeDependent<ml::Vector,int> jointWalkingErrorPositionSOUT;
+      SignalTimeDependent<dynamicgraph::Vector,int> jointWalkingErrorPositionSOUT;
 
       /*! \brief Externalize the com attitude. */
       SignalTimeDependent<VectorRollPitchYaw,int> comattitudeSOUT;
@@ -521,22 +519,22 @@ namespace dynamicgraph {
       SignalTimeDependent<VectorRollPitchYaw,int> waistattitudeabsoluteSOUT;
 
       /*! \brief Externalize the waist position. */
-      SignalTimeDependent<ml::Vector,int> waistpositionSOUT;
+      SignalTimeDependent<dynamicgraph::Vector,int> waistpositionSOUT;
 
       /*! \brief Externalize the absolute waist position. */
-      SignalTimeDependent<ml::Vector,int> waistpositionabsoluteSOUT;
+      SignalTimeDependent<dynamicgraph::Vector,int> waistpositionabsoluteSOUT;
 
       /*! \brief true iff PG is processing. Use it for synchronize. */
       SignalTimeDependent<unsigned int,int> dataInProcessSOUT;
 
       /*! \brief Externalize the initial ZMP reference . */
-      SignalTimeDependent<ml::Vector,int> InitZMPRefSOUT;
+      SignalTimeDependent<dynamicgraph::Vector,int> InitZMPRefSOUT;
 
       /*! \brief Externalize the initial CoM reference. */
-      SignalTimeDependent<ml::Vector,int> InitCoMRefSOUT;
+      SignalTimeDependent<dynamicgraph::Vector,int> InitCoMRefSOUT;
 
       /*! \brief Externalize the initial Waist reference. */
-      SignalTimeDependent<ml::Vector,int> InitWaistPosRefSOUT;
+      SignalTimeDependent<dynamicgraph::Vector,int> InitWaistPosRefSOUT;
 
       /*! \brief Externalize the initial Waist reference. */
       SignalTimeDependent<VectorRollPitchYaw,int> InitWaistAttRefSOUT;

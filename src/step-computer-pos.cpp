@@ -98,50 +98,50 @@ namespace dynamicgraph {
 	{
 	  ffMref = referencePositionRightSIN.access( timeCurr );
 	  ffMref0 = rfMref0;
-	  MatrixHomogeneous sfMw; wMlf.inverse(sfMw); sfMw.multiply(wMrf, sfMff);
+	  MatrixHomogeneous sfMw; sfMw = wMlf.inverse(); sfMff = sfMw*wMrf;
 	}
       else // -- right foot support ---
 	{
 	  ffMref = referencePositionLeftSIN.access( timeCurr );
 	  ffMref0 = lfMref0;
-	  MatrixHomogeneous sfMw; wMrf.inverse(sfMw); sfMw.multiply(wMlf, sfMff);
+	  MatrixHomogeneous sfMw; sfMw = wMrf.inverse(); sfMff = sfMw*wMlf;
 	}
 
       // homogeneous transform from ref position of ref frame to
       // actual position of ref frame.
 
-      MatrixHomogeneous ref0Mff; ffMref0.inverse(ref0Mff);
-      MatrixHomogeneous ref0Mref; ref0Mff.multiply(ffMref, ref0Mref);
+      MatrixHomogeneous ref0Mff; ref0Mff = ffMref0.inverse();
+      MatrixHomogeneous ref0Mref; ref0Mref = ref0Mff*ffMref;
 
       // extract the translation part and express it in the support
       // foot frame.
 
-      MatrixHomogeneous sfMref0; sfMff.multiply(ffMref0, sfMref0);
-      ml::Vector t_ref0(3); ref0Mref.extract(t_ref0);
-      MatrixRotation sfRref0; sfMref0.extract(sfRref0);
-      ml::Vector t_sf = sfRref0.multiply(t_ref0);
+      MatrixHomogeneous sfMref0; sfMref0 = sfMff*ffMref0;
+      Vector t_ref0(3); t_ref0 = ref0Mref.translation();
+      MatrixRotation sfRref0; sfRref0 = sfMref0.linear();
+      Vector t_sf = sfRref0 * t_ref0;
 
       // add it to the position of the fly foot in support foot to
       // get the new position of fly foot in support foot.
 
-      ml::Vector pff_sf(3); sfMff.extract(pff_sf);
+      Vector pff_sf(3); pff_sf = sfMff.translation();
       t_sf += pff_sf;
 
       // compute the rotation that transforms ref0 into ref,
       // express it in the support foot frame. Then get the
       // associated yaw (rot around z).
 
-      MatrixRotation ref0Rsf; sfRref0.transpose(ref0Rsf);
-      MatrixRotation ref0Rref; ref0Mref.extract(ref0Rref);
-      MatrixRotation tmp; ref0Rref.multiply(ref0Rsf, tmp);
-      MatrixRotation Rref; sfRref0.multiply(tmp, Rref);
-      VectorRollPitchYaw rpy; rpy.fromMatrix(Rref);
+      MatrixRotation ref0Rsf; ref0Rsf = sfRref0.transpose();
+      MatrixRotation ref0Rref; ref0Rref = ref0Mref.linear();
+      MatrixRotation tmp; tmp = ref0Rref * ref0Rsf;
+      MatrixRotation Rref; Rref = sfRref0 * tmp;
+      VectorRollPitchYaw rpy; rpy = (Rref.eulerAngles(2,1,0)).reverse();
 
       // get the yaw of the current orientation of the ff wrt sf.
       // Add it to the previously computed rpy.
 
-      MatrixRotation sfRff; sfMff.extract(sfRff);
-      VectorRollPitchYaw rpy_ff; rpy_ff.fromMatrix(sfRff);
+      MatrixRotation sfRff; sfRff = sfMff.linear();
+      VectorRollPitchYaw rpy_ff; rpy_ff = (sfRff.eulerAngles(2,1,0)).reverse();
       rpy += rpy_ff;
 
       // The clipping function expects the x-y coordinates of the

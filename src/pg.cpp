@@ -30,8 +30,8 @@
 
 
 #include <jrl/mal/matrixabstractlayer.hh>
-#include "pinocchio/multibody/parser/urdf.hpp"
-#include "pinocchio/multibody/parser/srdf.hpp"
+#include "pinocchio/parsers/urdf.hpp"
+#include "pinocchio/parsers/srdf.hpp"
 
 //#include <sot-pattern-generator/config_private.hh>
 
@@ -229,9 +229,9 @@ namespace dynamicgraph {
 
       m_SupportFoot = 1; // Means that we do not know which support foot it is.
       m_ReferenceFrame = WORLD_FRAME;
-
+      
       sotDEBUGIN(5);
-
+      
       firstSINTERN.setDependencyType(TimeDependency<int>::BOOL_DEPENDENT);
       // TODO: here, the 'setConstant' destroy the pointer toward
       // function initOneStepOfControl. By calling firstSINTERN(t), whatever t,
@@ -259,14 +259,14 @@ namespace dynamicgraph {
       signalRegistration( OneStepOfControlS );
 
 #if 0
-
-     signalRegistration( jointPositionSIN <<
+      
+      signalRegistration( jointPositionSIN <<
 			  motorControlJointPositionSIN <<
 			  ZMPPreviousControllerSIN <<
 			  ZMPRefSOUT <<
 			  CoMRefSOUT <<
 			  dCoMRefSOUT);
-
+      
       signalRegistration( dataInProcessSOUT <<
 			  LeftFootCurrentPosSIN <<
 			  RightFootCurrentPosSIN <<
@@ -350,25 +350,23 @@ namespace dynamicgraph {
           tmp =sin((M_PI*i)/n);
           m_filterWindow[i]=tmp*tmp;
         }
-
+      
       for(int i=0;i<n+1;i++)
         sum+= m_filterWindow[i];
-
+      
       for(int i=0;i<n+1;i++)
         m_filterWindow[i]/= sum;
-
-      m_initForce.resize(6,0.0);
-      m_currentForces.resize(6,0.0);
+      
+      m_initForce.resize(6);
+      m_currentForces.resize(6);
       //dataInProcessSOUT.setReference( &m_dataInProcess );
-      m_wrml2urdfIndex.clear();
-
+      //m_wrml2urdfIndex.clear();
+      
       sotDEBUGOUT(5);
     }
-
+    
     bool PatternGenerator::InitState(void)
     {
-
-
       sotDEBUGIN(5);
       // TODO
       // Instead of (0) ie .access(0), it could be rather used:
@@ -391,25 +389,25 @@ namespace dynamicgraph {
 	  res.resize( pos.size()-6);
 
 	  for(unsigned i=0;i<res.size();i++)
-        res(m_wrml2urdfIndex[i]) = pos(i+6);
+	    res(i) = pos(i+6);
 
 	  Vector lZMPPrevious = ZMPPreviousControllerSIN(m_LocalTime);
 	  for(unsigned int i=0;i<3;i++)
 	    m_ZMPPrevious[i] = lZMPPrevious(i);
-
+	  
 	}
       else
 	{
 	  res = motorControlJointPositionSIN(m_LocalTime);
-      for(unsigned i=0;i<res.size();i++)
-        res(m_wrml2urdfIndex[i]) = res(i);
+	  //for(unsigned i=0;i<res.size();i++)
+	  //res(m_wrml2urdfIndex[i]) = res(i);
 	}
-
+      
       Vector com = comSIN(m_LocalTime);
-
-
+      
+      
       m_JointErrorValuesForWalking.resize(res.size());
-
+      
       sotDEBUG(5) << "m_LocalTime:" << m_LocalTime << endl;
       sotDEBUG(5) << "Joint Values:" << res << endl;
 
@@ -427,22 +425,22 @@ namespace dynamicgraph {
 	  MAL_S3_VECTOR_TYPE(double) lStartingZMPPosition;
 	  PatternGeneratorJRL::FootAbsolutePosition InitLeftFootAbsPos;
 	  PatternGeneratorJRL::FootAbsolutePosition InitRightFootAbsPos;
-
+	  
 	  m_PGI->EvaluateStartingState(lStartingCOMState,
 				       lStartingZMPPosition,
 				       lWaistPosition,
 				       InitLeftFootAbsPos,
 				       InitRightFootAbsPos);
-
+	  
 	  // Put inside sotHomogeneous representation
 	  m_InitCOMRefPos(0) = lStartingCOMState.x[0];
 	  m_InitCOMRefPos(1) = lStartingCOMState.y[0];
 	  m_InitCOMRefPos(2) = lStartingCOMState.z[0];
-
+	  
 	  m_InitZMPRefPos(0) = lStartingCOMState.x[0];
 	  m_InitZMPRefPos(1) = lStartingCOMState.y[0];
 	  m_InitZMPRefPos(2) = 0;
-
+	  
 	  if (m_InitPositionByRealState)
 	    {
 	      m_ZMPPrevious[0] = lStartingCOMState.x[0];
@@ -450,7 +448,7 @@ namespace dynamicgraph {
 	      m_ZMPPrevious[2] = 0;
 	    }
 	  sotDEBUG(5) << "InitZMPRefPos :" <<m_InitZMPRefPos<< endl;
-
+	  
 	  m_InitWaistRefPos(0) =
 	    m_WaistPositionAbsolute(0) = lWaistPosition(0);
 	  m_InitWaistRefPos(1) =
@@ -491,7 +489,6 @@ namespace dynamicgraph {
 
 	      MatrixHomogeneous invInitLeftFootRef;
 	      invInitLeftFootRef = m_InitLeftFootPosition.inverse();
-
 	      m_k_Waist_kp1 = m_k_Waist_kp1 * invInitLeftFootRef;
 	      m_MotionSinceInstanciationToThisSequence =
 		m_MotionSinceInstanciationToThisSequence * m_k_Waist_kp1;
@@ -539,11 +536,12 @@ namespace dynamicgraph {
       bool ok=true;
       // Parsing the file.
       m_robotModel = se3::urdf::buildModel(m_urdfFile, se3::JointModelFreeFlyer());
+
+
       m_robotData = new se3::Data(m_robotModel) ;
       // Creating the humanoid robot.
       m_PR = new pg::PinocchioRobot() ;
       m_PR->initializeRobotModelAndData(&m_robotModel,m_robotData);
-
       // Read xml/srdf stream
       std::ifstream srdf_stream(m_srdfFile.c_str());
       using boost::property_tree::ptree;
@@ -566,7 +564,7 @@ namespace dynamicgraph {
           aFoot.anklePosition(1) = v.second.get<double>("y");
           aFoot.anklePosition(2) = v.second.get<double>("z");
         } // BOOST_FOREACH
-        aFoot.associatedAnkle = m_robotModel.getBodyId("r_ankle");
+        aFoot.associatedAnkle = m_robotModel.getFrameParent("r_ankle");
         m_PR->initializeRightFoot(aFoot);
         // Initialize the Left Foot
         path = "robot.specificities.feet.left.size" ;
@@ -583,15 +581,14 @@ namespace dynamicgraph {
           aFoot.anklePosition(1) = v.second.get<double>("y");
           aFoot.anklePosition(2) = v.second.get<double>("z");
         } // BOOST_FOREACH
-        aFoot.associatedAnkle = m_robotModel.getBodyId("l_ankle");
+        aFoot.associatedAnkle = m_robotModel.getFrameParent("l_ankle");
         m_PR->initializeLeftFoot(aFoot);
       }catch(...)
       {
         cerr << "problem while reading the srdf file. File corrupted?" << endl;
         ok=false;
-      }
-
-      try{
+	}
+      /*try{
         m_wrml2urdfIndex.resize(m_robotModel.nv-6);
         std::ifstream xmlRankPath_stream(m_xmlRankFile.c_str());
         read_xml(xmlRankPath_stream, pt);
@@ -617,7 +614,7 @@ namespace dynamicgraph {
       {
         cerr << "problem while reading the xmlRank file. File corrupted?" << endl;
         ok=false;
-      }
+	}*/
 
       if (m_PR!=0)
     {
@@ -1659,11 +1656,12 @@ namespace dynamicgraph {
       return res;
     }
 
-    VectorRollPitchYaw & PatternGenerator::
-    getdComAttitude( VectorRollPitchYaw&res, int time)
+    dynamicgraph::Vector & PatternGenerator::
+    getdComAttitude( dynamicgraph::Vector& res, int time)
     {
       sotDEBUGIN(5);
       OneStepOfControlS(time);
+      res.resize(3);
       for( unsigned int i=0;i<3;++i ) { res(i) = m_dComAttitude(i); }
       sotDEBUG(5) << "ComAttitude: " << m_dComAttitude << endl;
       sotDEBUGOUT(5);
@@ -1671,11 +1669,12 @@ namespace dynamicgraph {
     }
 
 
-    VectorRollPitchYaw & PatternGenerator::
-    getComAttitude( VectorRollPitchYaw&res, int time)
+    dynamicgraph::Vector& PatternGenerator::
+    getComAttitude( dynamicgraph::Vector& res, int time)
     {
       sotDEBUGIN(5);
       OneStepOfControlS(time);
+      res.resize(3);
       for( unsigned int i=0;i<3;++i ) { res(i) = m_ComAttitude(i); }
       sotDEBUG(5) << "ComAttitude: " << m_ComAttitude << endl;
       sotDEBUGOUT(5);

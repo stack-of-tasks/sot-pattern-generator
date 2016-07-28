@@ -12,8 +12,8 @@ from dynamic_graph.sot.pattern_generator import PatternGenerator,Selector
 from dynamic_graph.sot.core.matrix_util import matrixToTuple
 # from dynamic_graph.sot.core import FeatureGeneric, FeaturePoint6d, Task, TaskPD
 from dynamic_graph.sot.core import FeaturePosture
-from dynamic_graph.ros import RosRobotModel
-import roslib
+#from dynamic_graph.ros import RosRobotModel
+#import roslib
 
 from numpy import *
 def totuple( a ):
@@ -48,8 +48,8 @@ def initPg(robot):
 
   plug(robot.dynamic.position,robot.pg.position)
   plug(robot.com, robot.pg.com)
-  plug(robot.dynamic.signal('left-ankle'), robot.pg.leftfootcurrentpos)
-  plug(robot.dynamic.signal('right-ankle'), robot.pg.rightfootcurrentpos)
+  plug(robot.dynamic.signal(robot.OperationalPointsMap['left-ankle']), robot.pg.leftfootcurrentpos)
+  plug(robot.dynamic.signal(robot.OperationalPointsMap['right-ankle']), robot.pg.rightfootcurrentpos)
   robotDim = len(robot.dynamic.velocity.value)
   robot.pg.motorcontrol.value = robotDim*(0,)
   robot.pg.zmppreviouscontroller.value = (0,0,0)
@@ -82,7 +82,6 @@ def addPgToUrdfRobot(robot):
 
   robot.pg.setURDFpath( robot.urdfFile )
   robot.pg.setSRDFpath( robot.srdfFile )
-  robot.pg.setXmlRank(robot.jointRankPath)
   if(hasattr(robot, 'jointMap')):
       print "some joints need to be mapped"
       for i in robot.jointMap:
@@ -99,7 +98,7 @@ def addPgTaskToVRMLRobot(robot,solver):
   print("modelDir: ",robot.modelDir)
   print("modelName:",robot.modelName)
   print("specificitiesPath:",robot.specificitiesPath)
-  print("jointRankPath:",robot.jointRankPath)
+  #print("jointRankPath:",robot.jointRankPath)
 
   robot.geom.setFiles(robot.modelDir, robot.modelName,robot.specificitiesPath,robot.jointRankPath)
   robot.geom.parse()
@@ -113,8 +112,8 @@ def addPgTaskToUrdfRobot(robot,solver):
   robot.geom.loadUrdf(robot.urdfFile)
 
 def initRobotGeom(robot):
-  robot.geom.createOpPoint('rf2','right-ankle')
-  robot.geom.createOpPoint('lf2','left-ankle')
+  robot.geom.createOpPoint('rf2',robot.OperationalPointsMap['right-ankle'])
+  robot.geom.createOpPoint('lf2',robot.OperationalPointsMap['left-ankle'])
   plug(robot.dynamic.position,robot.geom.position)
   robot.geom.ffposition.value = 6*(0,)
   robotDim = len(robot.dynamic.velocity.value)
@@ -129,7 +128,7 @@ def initZMPRef(robot):
 
   selecSupportFoot = Selector('selecSupportFoot' \
        ,['matrixHomo','pg_H_sf',robot.pg.rightfootref,robot.pg.leftfootref] \
-       ,['matrixHomo','wa_H_sf',robot.geom.rf2,robot.geom.lf2])
+       ,['matrixHomo','wa_H_sf',robot.dynamic.rf2,robot.dynamic.lf2])
 
   robot.addTrace(robot.pg.name,'rightfootref')
   robot.addTrace(robot.pg.name,'leftfootref')
@@ -171,7 +170,7 @@ def initWaistCoMTasks(robot):
   YawFromLeftRightRPY.sin1.value=matrixToTuple(array([[ 0.,  0.,  0.], \
        [ 0.,  0.,  0.,  ],
        [ 0.,  0.,  1.,  ]]))
-  plug(robot.pg.comattitude,YawFromLeftRightRPY.sin2)
+  plug(robot.pg.signal('comattitude'),YawFromLeftRightRPY.sin2)
 
   # Build a reference vector from init waist pos and
   # init left foot roll pitch representation
@@ -188,7 +187,6 @@ def initWaistCoMTasks(robot):
   robot.waist.selec.value = '111100'
 
   robot.addTrace(robot.pg.waistReference.name,'sout')
-  robot.addTrace(robot.geom.name,'position')
   robot.addTrace(robot.pg.name,'initwaistposref')
   plug(waistReferenceVector.sout, robot.pg.waistReference.sin)
   plug(robot.pg.waistReference.sout,robot.waist.reference)
@@ -200,17 +198,15 @@ def initWaistCoMTasks(robot):
 def initFeetTask(robot):
   robot.selecFeet = Selector('selecFeet',
                              ['matrixHomo','leftfootref', \
-                               robot.dynamic.signal('left-ankle'),\
+                               robot.dynamic.signal(robot.OperationalPointsMap['left-ankle']),\
                                robot.pg.leftfootref], \
                              ['matrixHomo','rightfootref', \
-                              robot.dynamic.signal('right-ankle'), \
+                              robot.dynamic.signal(robot.OperationalPointsMap['right-ankle']), \
                               robot.pg.rightfootref])
 
   plug(robot.pg.inprocess,robot.selecFeet.selec)
   robot.tasks['right-ankle'].controlGain.value = 200
   robot.tasks['left-ankle'].controlGain.value = 200
-
-  print "After Task for Right and Left Feet"
 
 def removeDofUsed(jacobian, target):
   for i in range(0,len(jacobian)):
@@ -229,9 +225,9 @@ def initPostureTask(robot):
 
   # Remove the dofs of the feet.
   postureTaskDofs = [True] * (len(robot.dynamic.position.value) - 6)
-  jla = robot.dynamic.signal('Jleft-ankle').value
+  jla = robot.dynamic.signal('J'+robot.OperationalPointsMap['left-ankle']).value
   postureTaskDofs = removeDofUsed(jla, postureTaskDofs)
-  jra = robot.dynamic.signal('Jright-ankle').value
+  jra = robot.dynamic.signal('J'+robot.OperationalPointsMap['right-ankle']).value
   postureTaskDofs = removeDofUsed(jra, postureTaskDofs)
 
   for dof,isEnabled in enumerate(postureTaskDofs):
@@ -271,7 +267,7 @@ def createGraph(robot,solver):
 def CreateEverythingForPG(robot,solver):
   robot.initializeTracer()
   addPgToUrdfRobot(robot)
-  addPgTaskToVRMLRobot(robot,solver)
+  addPgTaskToUrdfRobot(robot,solver)
   createGraph(robot,solver)
 
 def walkFewSteps(robot):

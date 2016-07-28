@@ -278,10 +278,10 @@ namespace dynamicgraph {
       dynamicgraph::Vector & getjointWalkingErrorPosition(dynamicgraph::Vector &res, int time);
 
       /*! \brief Internal method to get the derivative of the com attitude. */
-      VectorRollPitchYaw & getdComAttitude(VectorRollPitchYaw &res, int time);
+      dynamicgraph::Vector & getdComAttitude(dynamicgraph::Vector &res, int time);
 
       /*! \brief Internal method to get the attitude of the com. */
-      VectorRollPitchYaw & getComAttitude(VectorRollPitchYaw &res, int time);
+      dynamicgraph::Vector & getComAttitude(dynamicgraph::Vector &res, int time);
 
       /*! \brief Internal method to get the attitude of the waist. */
       VectorRollPitchYaw & getWaistAttitude(VectorRollPitchYaw &res, int time);
@@ -507,10 +507,10 @@ namespace dynamicgraph {
       SignalTimeDependent<dynamicgraph::Vector,int> jointWalkingErrorPositionSOUT;
 
       /*! \brief Externalize the com attitude. */
-      SignalTimeDependent<VectorRollPitchYaw,int> comattitudeSOUT;
+      SignalTimeDependent<dynamicgraph::Vector,int> comattitudeSOUT;
 
       /*! \brief Externalize the dcom attitude. */
-      SignalTimeDependent<VectorRollPitchYaw,int> dcomattitudeSOUT;
+      SignalTimeDependent<dynamicgraph::Vector,int> dcomattitudeSOUT;
 
       /*! \brief Externalize the waist attitude. */
       SignalTimeDependent<VectorRollPitchYaw,int> waistattitudeSOUT;

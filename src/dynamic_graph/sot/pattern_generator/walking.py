@@ -14,6 +14,7 @@ from dynamic_graph.sot.core.matrix_util import matrixToTuple
 from dynamic_graph.sot.core import FeaturePosture
 #from dynamic_graph.ros import RosRobotModel
 #import roslib
+import pinocchio as se3
 
 from numpy import *
 def totuple( a ):
@@ -62,6 +63,7 @@ def addPgToVRMLRobot(robot):
 
 def addPgToUrdfRobot(robot):
   # Configure Pattern Generator    
+  import roslib
   robot.pg = PatternGenerator('pg')
   if robot.device.name == 'HRP2LAAS' or robot.device.name == 'HRP2JRL':
     pkgLocation = str(roslib.packages.get_pkg_dir("hrp2_14_description"))
@@ -76,9 +78,9 @@ def addPgToUrdfRobot(robot):
     robot.urdfFile = str(pkgLocation+"/urdf/romeo.urdf")
     robot.srdfFile = str(pkgLocation+"/srdf/romeo.srdf")
   else:
-    pkgLocation = roslib.packages.get_pkg_dir("error404notfound_description")
-    robot.urdfFile = "error 404 not found"
-    robot.srdfFile = "error 404 not found"
+    pkgLocation = str(roslib.packages.get_pkg_dir("hrp2_14_description"))
+    robot.urdfFile = str(pkgLocation+"/urdf/hrp2_14.urdf")
+    robot.srdfFile = str(pkgLocation+"/srdf/hrp2_14.srdf")
 
   robot.pg.setURDFpath( robot.urdfFile )
   robot.pg.setSRDFpath( robot.srdfFile )
@@ -102,14 +104,17 @@ def addPgTaskToVRMLRobot(robot,solver):
 
   robot.geom.setFiles(robot.modelDir, robot.modelName,robot.specificitiesPath,robot.jointRankPath)
   robot.geom.parse()
-
+  
 def addPgTaskToUrdfRobot(robot,solver):
-  # --- ROBOT.PG INIT FRAMES ---
-  robot.geom = RosRobotModel("geom")
-  if(hasattr(robot, 'jointMap')):
-      for i in robot.jointMap:
-          robot.geom.addJointMapping(i, robot.jointMap[i])
-  robot.geom.loadUrdf(robot.urdfFile)
+    # --- ROBOT.PG INIT FRAMES ---
+    robot.geom = Dynamic("geom")
+    if(hasattr(robot, 'jointMap')):
+        for i in robot.jointMap:
+            robot.geom.addJointMapping(i, robot.jointMap[i])
+    pinocchioModel = se3.buildModelFromUrdf(robot.urdfFile)
+    pinocchioData = pinocchioModel.createData()
+    robot.geom.setModel(pinocchioModel)
+    robot.geom.setData(pinocchioData)
 
 def initRobotGeom(robot):
   robot.geom.createOpPoint('rf2',robot.OperationalPointsMap['right-ankle'])
@@ -128,7 +133,7 @@ def initZMPRef(robot):
 
   selecSupportFoot = Selector('selecSupportFoot' \
        ,['matrixHomo','pg_H_sf',robot.pg.rightfootref,robot.pg.leftfootref] \
-       ,['matrixHomo','wa_H_sf',robot.dynamic.rf2,robot.dynamic.lf2])
+       ,['matrixHomo','wa_H_sf',robot.geom.rf2,robot.geom.lf2])
 
   robot.addTrace(robot.pg.name,'rightfootref')
   robot.addTrace(robot.pg.name,'leftfootref')
@@ -187,6 +192,7 @@ def initWaistCoMTasks(robot):
   robot.waist.selec.value = '111100'
 
   robot.addTrace(robot.pg.waistReference.name,'sout')
+  robot.addTrace(robot.geom.name,'position')
   robot.addTrace(robot.pg.name,'initwaistposref')
   plug(waistReferenceVector.sout, robot.pg.waistReference.sin)
   plug(robot.pg.waistReference.sout,robot.waist.reference)

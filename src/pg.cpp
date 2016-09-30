@@ -30,10 +30,8 @@
 
 
 #include <jrl/mal/matrixabstractlayer.hh>
-#include "pinocchio/multibody/parser/urdf.hpp"
-#include "pinocchio/multibody/parser/srdf.hpp"
-
-#include <sot-pattern-generator/config_private.hh>
+#include "pinocchio/parsers/urdf.hpp"
+#include "pinocchio/parsers/srdf.hpp"
 
 #include <dynamic-graph/factory.h>
 #include <dynamic-graph/all-commands.h>
@@ -537,7 +535,7 @@ namespace dynamicgraph {
     {
       bool ok=true;
       // Parsing the file.
-      m_robotModel = se3::urdf::buildModel(m_urdfFile, se3::JointModelFreeFlyer());
+      se3::urdf::buildModel(m_urdfFile, se3::JointModelFreeFlyer(),m_robotModel);
       m_robotData = new se3::Data(m_robotModel) ;
       // Creating the humanoid robot.
       m_PR = new pg::PinocchioRobot() ;
@@ -565,7 +563,8 @@ namespace dynamicgraph {
           aFoot.anklePosition(1) = v.second.get<double>("y");
           aFoot.anklePosition(2) = v.second.get<double>("z");
         } // BOOST_FOREACH
-        aFoot.associatedAnkle = m_robotModel.getBodyId("r_ankle");
+        se3::FrameIndex ra = m_robotModel.getFrameId("r_ankle");
+        aFoot.associatedAnkle = m_robotModel.frames[ra].parent ;
         m_PR->initializeRightFoot(aFoot);
         // Initialize the Left Foot
         path = "robot.specificities.feet.left.size" ;
@@ -582,7 +581,8 @@ namespace dynamicgraph {
           aFoot.anklePosition(1) = v.second.get<double>("y");
           aFoot.anklePosition(2) = v.second.get<double>("z");
         } // BOOST_FOREACH
-        aFoot.associatedAnkle = m_robotModel.getBodyId("l_ankle");
+        se3::FrameIndex la = m_robotModel.getFrameId("l_ankle");
+        aFoot.associatedAnkle = m_robotModel.frames[la].parent ;
         m_PR->initializeLeftFoot(aFoot);
       }catch(...)
       {

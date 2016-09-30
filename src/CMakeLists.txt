@@ -15,6 +15,10 @@
 
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include)
 
+# Make the config_private.hh file available
+#CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/private_cmake/config_private.hh.cmake
+#               ${CMAKE_BINARY_DIR}/include/${HEADER_DIR}/config_private.hh)
+
 ADD_DEFINITIONS(-DDEBUG=2)
 
 SET(LIBRARY_NAME ${PROJECT_NAME})

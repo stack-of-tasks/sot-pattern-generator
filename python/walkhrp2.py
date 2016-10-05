@@ -1,33 +1,34 @@
 # ______________________________________________________________________________
 # ******************************************************************************
-# A simple Herdt walking pattern generator for ROMEO.
+# A simple Herdt walking pattern generator for HRP2.
 # ______________________________________________________________________________
 # ******************************************************************************
 
 
 #----------------CUSTOM-------------------------------#
-#------SET THESE VALUES FOR YOUR ROBOT----------------#
 dt=5e-3
-_urdfPath = "~/git/sot/pinocchio/models/romeo.urdf"
-_srdfPath = "~/git/laas/romeo/romeo_description/srdf/romeo.srdf"
-_urdfDir = ["~/git/sot/pinocchio/models"]
-_robotName = 'ROMEO'
-_OperationalPointsMap = {'left-wrist'  : 'LWristPitch',
-                         'right-wrist' : 'RWristPitch',
-                         'left-ankle'  : 'LAnkleRoll',
-                         'right-ankle' : 'RAnkleRoll',
-                         'gaze'        : 'HeadRoll',
+_urdfPath = "/local/rbudhira/git/trac/hrp2/hrp2_14_description/urdf/hrp2_14.urdf"
+_srdfPath = "/local/rbudhira/git/trac/hrp2/hrp2_14_description/srdf/hrp2_14.srdf"
+_urdfDir = ["/local/rbudhira/git/trac/hrp2"]
+_robotName = 'HRP2LAAS'
+_OperationalPointsMap = {'left-wrist'  : 'LARM_JOINT5',
+                         'right-wrist' : 'RARM_JOINT5',
+                         'left-ankle'  : 'LLEG_JOINT5',
+                         'right-ankle' : 'RLEG_JOINT5',
+                         'gaze'        : 'HEAD_JOINT1',
                          'waist'       : 'root_joint',
-                         'chest'       : 'TrunkYaw'}
+                         'chest'       : 'CHEST_JOINT1'}
+_initialConfig = (0., 0., 0.648702, 0., 0. , 0.,                  # Free flyer
+                  0., 0., 0., 0.,                                 # Chest and head
+                  0.261799, 0.17453, 0., -0.523599, 0., 0., 0.1, # Left Arm
+                  #0.,0.,0.,0.,0.,                                # Left hand
+                  0.261799, -0.17453,  0., -0.523599, 0., 0., 0.1, # Right Arm
+                  #0.,0.,0.,0.,0.,                                # Right Hand
+                  0., 0., -0.453786, 0.872665, -0.418879, 0.,     # Left Leg
+                  0., 0., -0.453786, 0.872665, -0.418879, 0.      # Right Leg
+              )
 
-_initialConfig = (0, 0, .840252, 0, 0, 0,                                 # FF
-                 0,  0,  -0.3490658,  0.6981317,  -0.3490658,   0,       # LLEG
-                 0,  0,  -0.3490658,  0.6981317,  -0.3490658,   0,       # RLEG
-                 0,                                                      # TRUNK
-                 1.5,  0.6,  -0.5, -1.05, -0.4, -0.3, -0.2,              # LARM
-                 0, 0, 0, 0,                                             # HEAD
-                 1.5, -0.6,   0.5,  1.05, -0.4, -0.3, -0.2,              # RARM
-                 )
+
 
 #----------------PINOCCHIO----------------------------#
 import pinocchio as se3
@@ -35,8 +36,6 @@ from pinocchio.robot_wrapper import RobotWrapper
 
 pinocchioRobot = RobotWrapper(_urdfPath, _urdfDir, se3.JointModelFreeFlyer())
 pinocchioRobot.initDisplay(loadModel=True)
-
-
 
 #----------------ROBOT - DEVICE AND DYNAMICS----------#
 from dynamic_graph.sot.dynamics.humanoid_robot import HumanoidRobot
@@ -51,32 +50,15 @@ solver = initialize( robot )
 
 
 #----------------PG--------------------------------#
-from dynamic_graph.sot.pattern_generator import PatternGenerator,Selector
-from dynamic_graph.sot.pattern_generator.walking import initPg, initZMPRef, initWaistCoMTasks, initFeetTask, initPostureTask, pushTasks, walkNaveau
+#from dynamic_graph.sot.pattern_generator.walking import initPg, initZMPRef, initWaistCoMTasks, initFeetTask, initPostureTask, pushTasks
+from dynamic_graph.sot.pattern_generator.walking import walkNaveau, CreateEverythingForPG, walkFewSteps, walkAndrei
 
-#CreateEverythingForPG ( robot , sot , dyn )
-robot.initializeTracer()
-robot.pg = PatternGenerator('pg')
-robot.pg.setURDFpath( _urdfPath )
-robot.pg.setSRDFpath( _srdfPath )
-
-robot.pg.buildModel()
-initPg(robot)
-
-#createGraph(robot,solver
-robot.dynamic.createOpPoint('rf2',robot.OperationalPointsMap['right-ankle'])
-robot.dynamic.createOpPoint('lf2',robot.OperationalPointsMap['left-ankle'])
-
-initZMPRef(robot)
-initWaistCoMTasks(robot)
-initFeetTask(robot)
-initPostureTask(robot)
-
-pushTasks(robot, solver)
+CreateEverythingForPG (robot, solver)
 
 #------------------------------------------------#
-# walkFewSteps ( robot )
+#walkFewSteps ( robot )
 walkNaveau( robot )
+#walkAndrei( robot )
 robot.pg.velocitydes.value =(0.1,0.0,0.0)
 #-------------------------------------------------------------------------------
 #----- MAIN LOOP ---------------------------------------------------------------

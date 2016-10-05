@@ -535,7 +535,7 @@ namespace dynamicgraph {
     {
       bool ok=true;
       // Parsing the file.
-      m_robotModel = se3::urdf::buildModel(m_urdfFile, se3::JointModelFreeFlyer());
+      se3::urdf::buildModel(m_urdfFile, se3::JointModelFreeFlyer(), m_robotModel);
 
 
       m_robotData = new se3::Data(m_robotModel) ;
@@ -564,7 +564,7 @@ namespace dynamicgraph {
           aFoot.anklePosition(1) = v.second.get<double>("y");
           aFoot.anklePosition(2) = v.second.get<double>("z");
         } // BOOST_FOREACH
-        aFoot.associatedAnkle = m_robotModel.getFrameParent("r_ankle");
+        aFoot.associatedAnkle = m_robotModel.frames.at(m_robotModel.getFrameId("r_ankle")).parent;
         m_PR->initializeRightFoot(aFoot);
         // Initialize the Left Foot
         path = "robot.specificities.feet.left.size" ;
@@ -581,7 +581,7 @@ namespace dynamicgraph {
           aFoot.anklePosition(1) = v.second.get<double>("y");
           aFoot.anklePosition(2) = v.second.get<double>("z");
         } // BOOST_FOREACH
-        aFoot.associatedAnkle = m_robotModel.getFrameParent("l_ankle");
+        aFoot.associatedAnkle = m_robotModel.frames.at(m_robotModel.getFrameId("l_ankle")).parent;
         m_PR->initializeLeftFoot(aFoot);
       }catch(...)
       {

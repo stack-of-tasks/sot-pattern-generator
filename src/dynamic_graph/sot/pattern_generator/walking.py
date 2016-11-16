@@ -30,13 +30,13 @@ def initPg(robot):
   robot.pg.parseCmd(":walkmode 0")
   robot.pg.parseCmd(":omega 0.0")
   robot.pg.parseCmd(":stepheight 0.05")
-  robot.pg.parseCmd(":singlesupporttime 0.780")
-  robot.pg.parseCmd(":doublesupporttime 0.020")
+  robot.pg.parseCmd(":singlesupporttime 0.78")
+  robot.pg.parseCmd(":doublesupporttime 0.02")
   robot.pg.parseCmd(":armparameters 0.5")
   robot.pg.parseCmd(":LimitsFeasibility 0.0")
   robot.pg.parseCmd(":ZMPShiftParameters 0.015 0.015 0.015 0.015")
   robot.pg.parseCmd(":TimeDistributeParameters 2.0 3.5 1.0 3.0")
-  robot.pg.parseCmd(":UpperBodyMotionParameters 0.0 -0.5 0.0")
+  robot.pg.parseCmd(":UpperBodyMotionParameters -0.1 -1.0 0.0")
   if robot.device.name == 'HRP2LAAS' or \
      robot.device.name == 'HRP2JRL':
     robot.pg.parseCmd(":comheight 0.814")
@@ -307,19 +307,16 @@ def walkNaveau(robot):
   robot.pg.parseCmd(":SetAlgoForZmpTrajectory Naveau")
   robot.pg.parseCmd(":doublesupporttime 0.1")
   robot.pg.parseCmd(":singlesupporttime 0.7")
+  robot.pg.parseCmd(":NaveauOnline")
   robot.pg.velocitydes.value=(0.01,0.0,0.0)
   robot.pg.parseCmd(":numberstepsbeforestop 2")
   robot.pg.parseCmd(":setVelReference 0.01 0.0 0.0")
-  robot.pg.parseCmd(":NaveauOnline")
-  if robot.device.name == 'HRP2LAAS' or robot.device.name == 'HRP2JRL':
-    robot.pg.parseCmd(":setfeetconstraint XY 0.09 0.06")
-    robot.pg.parseCmd(":useDynamicFilter true")
-  elif robot.device.name == 'HRP4LIRMM':
-    robot.pg.parseCmd(":setfeetconstraint XY 0.07 0.06")
-    robot.pg.parseCmd(":useDynamicFilter false")
-  elif robot.device.name == 'ROMEO':
-    robot.pg.parseCmd(":setfeetconstraint XY 0.04 0.04")
-    robot.pg.parseCmd(":useDynamicFilter false")
-  else:
-    robot.pg.parseCmd(":setfeetconstraint XY 0.02 0.02")
-    robot.pg.parseCmd(":useDynamicFilter false")
+  robot.pg.parseCmd(":setfeetconstraint XY 0.095 0.055")
+
+  robot.pg.parseCmd(":feedBackControl false")
+  robot.pg.parseCmd(":useDynamicFilter true")
+
+  robot.pg.parseCmd(":stepheight 0.05")
+  robot.pg.parseCmd(":deleteallobstacles")
+
+

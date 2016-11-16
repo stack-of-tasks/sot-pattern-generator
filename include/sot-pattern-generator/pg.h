@@ -383,6 +383,9 @@ namespace dynamicgraph {
       /*! \brief Booleans used to indicate if feedback signals shoul be used or not */
       bool m_feedBackControl;
 
+      /*! \brief Booleans used to indicate if force feedback signals shoul be used or not */
+      bool m_forceFeedBack;
+
       /*! \brief Booleans used to indicate feet contacts */
       bool m_rightFootContact, m_leftFootContact;
 

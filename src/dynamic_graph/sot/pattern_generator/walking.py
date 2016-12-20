@@ -40,7 +40,7 @@ def initPg(robot):
   robot.pg.parseCmd(":UpperBodyMotionParameters -0.1 -1.0 0.0")
   if robot.device.name == 'HRP2LAAS' or \
      robot.device.name == 'HRP2JRL':
-    robot.pg.parseCmd(":comheight 0.814")
+      robot.pg.parseCmd(":comheight 0.814")
   elif robot.device.name == 'HRP4LIRMM':
     robot.pg.parseCmd(":comheight 0.747")
   else: #default value
@@ -314,14 +314,14 @@ def walkNaveau(robot):
   robot.pg.parseCmd(":setVelReference 0.01 0.0 0.0")
   robot.pg.parseCmd(":NaveauOnline")
   if robot.device.name == 'HRP2LAAS' or robot.device.name == 'HRP2JRL':
-    robot.pg.parseCmd(":setfeetconstraint XY 0.09 0.06")
-  robot.pg.parseCmd(":useDynamicFilter true")
+      robot.pg.parseCmd(":setfeetconstraint XY 0.09 0.06")
+      robot.pg.parseCmd(":useDynamicFilter true")
   elif robot.device.name == 'HRP4LIRMM':
-    robot.pg.parseCmd(":setfeetconstraint XY 0.07 0.06")
-    robot.pg.parseCmd(":useDynamicFilter false")
+      robot.pg.parseCmd(":setfeetconstraint XY 0.07 0.06")
+      robot.pg.parseCmd(":useDynamicFilter false")
   elif robot.device.name == 'ROMEO':
-    robot.pg.parseCmd(":setfeetconstraint XY 0.04 0.04")
-    robot.pg.parseCmd(":useDynamicFilter false")
+      robot.pg.parseCmd(":setfeetconstraint XY 0.04 0.04")
+      robot.pg.parseCmd(":useDynamicFilter false")
   else:
-    robot.pg.parseCmd(":setfeetconstraint XY 0.02 0.02")
-    robot.pg.parseCmd(":useDynamicFilter false")
+      robot.pg.parseCmd(":setfeetconstraint XY 0.02 0.02")
+      robot.pg.parseCmd(":useDynamicFilter false")

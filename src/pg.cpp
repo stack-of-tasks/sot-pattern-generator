@@ -21,19 +21,17 @@
 //#define VP_DEBUG_MODE 45
 #include <sot/core/debug.hh>
 #ifdef VP_DEBUG
- class sotPG__INIT
- {
- public:sotPG__INIT( void ) { dynamicgraph::sot::DebugTrace::openFile(); }
- };
- sotPG__INIT sotPG_initiator;
+class sotPG__INIT
+{
+  public:sotPG__INIT( void ) { dynamicgraph::sot::DebugTrace::openFile(); }
+};
+sotPG__INIT sotPG_initiator;
 #endif //#ifdef VP_DEBUG
 
 
 #include <jrl/mal/matrixabstractlayer.hh>
 #include "pinocchio/parsers/urdf.hpp"
 #include "pinocchio/parsers/srdf.hpp"
-
-//#include <sot-pattern-generator/config_private.hh>
 
 #include <dynamic-graph/factory.h>
 #include <dynamic-graph/all-commands.h>
@@ -60,10 +58,10 @@ namespace dynamicgraph {
       ,m_init(false)
       ,m_InitPositionByRealState(true)
       ,firstSINTERN( boost::bind(&PatternGenerator::InitOneStepOfControl,this,_1,_2),
-		     sotNOSIGNAL,"PatternGenerator("+name+")::intern(dummy)::init" )
+                     sotNOSIGNAL,"PatternGenerator("+name+")::intern(dummy)::init" )
 
       ,OneStepOfControlS( boost::bind(&PatternGenerator::OneStepOfControl,this,_1,_2),
-			  firstSINTERN << jointPositionSIN ,"PatternGenerator("+name+")::onestepofcontrol" )
+                          firstSINTERN << jointPositionSIN ,"PatternGenerator("+name+")::onestepofcontrol" )
 
       ,m_dataInProcess(0)
       ,m_rightFootContact(true) // It is assumed that the robot is standing.
@@ -75,16 +73,16 @@ namespace dynamicgraph {
       ,ZMPPreviousControllerSIN(NULL,"PatternGenerator("+name+")::input(vector)::zmppreviouscontroller")
 
       ,ZMPRefSOUT( boost::bind(&PatternGenerator::getZMPRef,this,_1,_2),
-		   OneStepOfControlS,
-		   "PatternGenerator("+name+")::output(vector)::zmpref" )
+                   OneStepOfControlS,
+                   "PatternGenerator("+name+")::output(vector)::zmpref" )
 
       ,CoMRefSOUT( boost::bind(&PatternGenerator::getCoMRef,this,_1,_2),
-		   OneStepOfControlS,
-		   "PatternGenerator("+name+")::output(matrix)::comref" )
+                   OneStepOfControlS,
+                   "PatternGenerator("+name+")::output(matrix)::comref" )
 
       ,dCoMRefSOUT( boost::bind(&PatternGenerator::getdCoMRef,this,_1,_2),
-		    OneStepOfControlS,
-		    "PatternGenerator("+name+")::output(matrix)::dcomref" )
+                    OneStepOfControlS,
+                    "PatternGenerator("+name+")::output(matrix)::dcomref" )
 
       ,comSIN(NULL,"PatternGenerator("+name+")::input(vector)::com")
 
@@ -95,8 +93,8 @@ namespace dynamicgraph {
       ,forceSIN(NULL,"PatternGenerator("+name+")::input(vector)::forceSIN")
 
       ,forceSOUT(boost::bind(&PatternGenerator::getExternalForces,this,_1,_2),
-                   OneStepOfControlS,
-                   "PatternGenerator("+name+")::output(matrix)::forceSOUT" )
+                 OneStepOfControlS,
+                 "PatternGenerator("+name+")::output(matrix)::forceSOUT" )
 
       ,velocitydesSIN(NULL,"PatternGenerator("+name+")::input(vector)::velocitydes")
 
@@ -105,85 +103,85 @@ namespace dynamicgraph {
       ,RightFootCurrentPosSIN(NULL,"PatternGenerator("+name+")::input(homogeneousmatrix)::rightfootcurrentpos")
 
       ,LeftFootRefSOUT( boost::bind(&PatternGenerator::getLeftFootRef,this,_1,_2),
-			OneStepOfControlS,
-			"PatternGenerator("+name+")::output(homogeneousmatrix)::leftfootref" )
+                        OneStepOfControlS,
+                        "PatternGenerator("+name+")::output(homogeneousmatrix)::leftfootref" )
 
       ,RightFootRefSOUT( boost::bind(&PatternGenerator::getRightFootRef,this,_1,_2),
-			 OneStepOfControlS,
-			 "PatternGenerator("+name+")::output(homogeneousmatrix)::rightfootref" )
+                         OneStepOfControlS,
+                         "PatternGenerator("+name+")::output(homogeneousmatrix)::rightfootref" )
       ,dotLeftFootRefSOUT( boost::bind(&PatternGenerator::getdotLeftFootRef,this,_1,_2),
-			   OneStepOfControlS,
-			   "PatternGenerator("+name+")::output(homogeneousmatrix)::dotleftfootref" )
+                           OneStepOfControlS,
+                           "PatternGenerator("+name+")::output(homogeneousmatrix)::dotleftfootref" )
 
       ,dotRightFootRefSOUT( boost::bind(&PatternGenerator::getdotRightFootRef,this,_1,_2),
-			    OneStepOfControlS,
-			    "PatternGenerator("+name+")::output(homogeneousmatrix)::dotrightfootref" )
+                            OneStepOfControlS,
+                            "PatternGenerator("+name+")::output(homogeneousmatrix)::dotrightfootref" )
 
       ,FlyingFootRefSOUT( boost::bind(&PatternGenerator::getFlyingFootRef,this,_1,_2),
-			  OneStepOfControlS,
-			  "PatternGenerator("+name+")::output(homogeneousmatrix)::flyingfootref" )
+                          OneStepOfControlS,
+                          "PatternGenerator("+name+")::output(homogeneousmatrix)::flyingfootref" )
 
 
       ,SupportFootSOUT( boost::bind(&PatternGenerator::getSupportFoot,this,_1,_2),
-			OneStepOfControlS,
-			"PatternGenerator("+name+")::output(uint)::SupportFoot" )
+                        OneStepOfControlS,
+                        "PatternGenerator("+name+")::output(uint)::SupportFoot" )
       ,jointWalkingErrorPositionSOUT(boost::bind(&PatternGenerator::getjointWalkingErrorPosition,this,_1,_2),
-				     OneStepOfControlS,
-				     "PatternGenerator("+name+")::output(vector)::walkingerrorposition")
+                                     OneStepOfControlS,
+                                     "PatternGenerator("+name+")::output(vector)::walkingerrorposition")
 
       ,comattitudeSOUT(boost::bind(&PatternGenerator::getComAttitude,this,_1,_2),
-		       OneStepOfControlS,
-		       "sotPatternGenerator("+name+")::output(vectorRPY)::comattitude")
+                       OneStepOfControlS,
+                       "sotPatternGenerator("+name+")::output(vectorRPY)::comattitude")
       ,dcomattitudeSOUT(boost::bind(&PatternGenerator::getdComAttitude,this,_1,_2),
-			OneStepOfControlS,
-			"sotPatternGenerator("+name+")::output(vectorRPY)::dcomattitude")
+                        OneStepOfControlS,
+                        "sotPatternGenerator("+name+")::output(vectorRPY)::dcomattitude")
 
       ,waistattitudeSOUT(boost::bind(&PatternGenerator::getWaistAttitude,this,_1,_2),
-			 OneStepOfControlS,
-			 "PatternGenerator("+name+")::output(vectorRPY)::waistattitude")
+                         OneStepOfControlS,
+                         "PatternGenerator("+name+")::output(vectorRPY)::waistattitude")
       ,waistattitudeabsoluteSOUT(boost::bind(&PatternGenerator::getWaistAttitudeAbsolute,this,_1,_2),
-				 OneStepOfControlS,
-                 "PatternGenerator("+name+")::output(vectorRPY)::waistattitudeabsolute")
+                                 OneStepOfControlS,
+                                 "PatternGenerator("+name+")::output(vectorRPY)::waistattitudeabsolute")
 
       ,waistpositionSOUT(boost::bind(&PatternGenerator::getWaistPosition,this,_1,_2),
-			 OneStepOfControlS,
-			 "PatternGenerator("+name+")::output(vector)::waistposition")
+                         OneStepOfControlS,
+                         "PatternGenerator("+name+")::output(vector)::waistposition")
       ,waistpositionabsoluteSOUT(boost::bind(&PatternGenerator::getWaistPositionAbsolute,this,_1,_2),
-				 OneStepOfControlS,
-				 "PatternGenerator("+name+")::output(vector)::waistpositionabsolute")
+                                 OneStepOfControlS,
+                                 "PatternGenerator("+name+")::output(vector)::waistpositionabsolute")
 
       ,dataInProcessSOUT(boost::bind(&PatternGenerator::getDataInProcess, this, _1, _2),
-			 OneStepOfControlS,
-			 "PatternGenerator("+name+")::output(bool)::inprocess")
+                         OneStepOfControlS,
+                         "PatternGenerator("+name+")::output(bool)::inprocess")
       ,InitZMPRefSOUT( boost::bind(&PatternGenerator::getInitZMPRef,this,_1,_2),
-		       OneStepOfControlS,
-		       "PatternGenerator("+name+")::output(vector)::initzmpref" )
+                       OneStepOfControlS,
+                       "PatternGenerator("+name+")::output(vector)::initzmpref" )
 
       ,InitCoMRefSOUT( boost::bind(&PatternGenerator::getInitCoMRef,this,_1,_2),
-		       OneStepOfControlS,
-		       "PatternGenerator("+name+")::output(matrix)::initcomref" )
+                       OneStepOfControlS,
+                       "PatternGenerator("+name+")::output(matrix)::initcomref" )
 
       ,InitWaistPosRefSOUT( boost::bind(&PatternGenerator::getInitWaistPosRef,this,_1,_2),
-			    OneStepOfControlS,
-			    "PatternGenerator("+name+")::output(vector)::initwaistposref" )
+                            OneStepOfControlS,
+                            "PatternGenerator("+name+")::output(vector)::initwaistposref" )
 
       ,InitWaistAttRefSOUT( boost::bind(&PatternGenerator::getInitWaistAttRef,this,_1,_2),
-			    OneStepOfControlS,
-			    "PatternGenerator("+name+")::output(vectorRPY)::initwaistattref" )
+                            OneStepOfControlS,
+                            "PatternGenerator("+name+")::output(vectorRPY)::initwaistattref" )
 
       ,InitLeftFootRefSOUT( boost::bind(&PatternGenerator::getInitLeftFootRef,this,_1,_2),
-			    OneStepOfControlS,
-			    "PatternGenerator("+name+")::output(homogeneousmatrix)::initleftfootref" )
+                            OneStepOfControlS,
+                            "PatternGenerator("+name+")::output(homogeneousmatrix)::initleftfootref" )
 
       ,InitRightFootRefSOUT( boost::bind(&PatternGenerator::getInitRightFootRef,this,_1,_2),
-			     OneStepOfControlS,
-			     "PatternGenerator("+name+")::output(homogeneousmatrix)::initrightfootref" )
+                             OneStepOfControlS,
+                             "PatternGenerator("+name+")::output(homogeneousmatrix)::initrightfootref" )
       ,leftFootContactSOUT( boost::bind(&PatternGenerator::getLeftFootContact,this,_1,_2),
-			     OneStepOfControlS,
-			    "PatternGenerator("+name+")::output(bool)::leftfootcontact" )
+                            OneStepOfControlS,
+                            "PatternGenerator("+name+")::output(bool)::leftfootcontact" )
       ,rightFootContactSOUT( boost::bind(&PatternGenerator::getRightFootContact,this,_1,_2),
-			     OneStepOfControlS,
-			     "PatternGenerator("+name+")::output(bool)::rightfootcontact")
+                             OneStepOfControlS,
+                             "PatternGenerator("+name+")::output(bool)::rightfootcontact")
 
 
     {
@@ -192,6 +190,8 @@ namespace dynamicgraph {
       m_LocalTime = 0;
       m_TimeStep = 0.005;
       m_DoubleSupportPhaseState = false;
+      m_forceFeedBack = false ;
+      m_feedBackControl = false ;
 
       m_ZMPRefPos.resize(4);
       m_ZMPRefPos.fill(0.0);
@@ -219,19 +219,19 @@ namespace dynamicgraph {
       m_ComAttitude.resize(3);
       m_ComAttitude.fill(0);
       m_WaistPosition.resize(3);
-      m_WaistPosition.setZero();
+      m_WaistPosition.fill(0);
       m_WaistAttitudeAbsolute.resize(3);
       m_WaistAttitudeAbsolute.fill(0);
       m_WaistPositionAbsolute.resize(3);
-      m_WaistPositionAbsolute.setZero();
+      m_WaistPositionAbsolute.fill(0);
 
       m_k_Waist_kp1.setIdentity();
 
       m_SupportFoot = 1; // Means that we do not know which support foot it is.
       m_ReferenceFrame = WORLD_FRAME;
-      
+
       sotDEBUGIN(5);
-      
+
       firstSINTERN.setDependencyType(TimeDependency<int>::BOOL_DEPENDENT);
       // TODO: here, the 'setConstant' destroy the pointer toward
       // function initOneStepOfControl. By calling firstSINTERN(t), whatever t,
@@ -259,83 +259,82 @@ namespace dynamicgraph {
       signalRegistration( OneStepOfControlS );
 
 #if 0
-      
+
       signalRegistration( jointPositionSIN <<
-			  motorControlJointPositionSIN <<
-			  ZMPPreviousControllerSIN <<
-			  ZMPRefSOUT <<
-			  CoMRefSOUT <<
-			  dCoMRefSOUT);
-      
+                          motorControlJointPositionSIN <<
+                          ZMPPreviousControllerSIN <<
+                          ZMPRefSOUT <<
+                          CoMRefSOUT <<
+                          dCoMRefSOUT);
       signalRegistration( dataInProcessSOUT <<
-			  LeftFootCurrentPosSIN <<
-			  RightFootCurrentPosSIN <<
-			  LeftFootRefSOUT <<
-			  RightFootRefSOUT);
+                          LeftFootCurrentPosSIN <<
+                          RightFootCurrentPosSIN <<
+                          LeftFootRefSOUT <<
+                          RightFootRefSOUT);
 
       signalRegistration( SupportFootSOUT <<
-			  jointWalkingErrorPositionSOUT <<
-			  waistattitudeSOUT <<
-			  waistpositionSOUT <<
-			  waistattitudeabsoluteSOUT <<
-			  waistpositionabsoluteSOUT);
+                          jointWalkingErrorPositionSOUT <<
+                          waistattitudeSOUT <<
+                          waistpositionSOUT <<
+                          waistattitudeabsoluteSOUT <<
+                          waistpositionabsoluteSOUT);
 
       signalRegistration( comattitudeSOUT <<
-			  dcomattitudeSOUT );
+                          dcomattitudeSOUT );
 
       signalRegistration( dotLeftFootRefSOUT <<
-			  dotRightFootRefSOUT);
+                          dotRightFootRefSOUT);
 
       signalRegistration( InitZMPRefSOUT <<
-			  InitCoMRefSOUT <<
-			  InitWaistPosRefSOUT <<
-			  InitWaistAttRefSOUT <<
-			  InitLeftFootRefSOUT <<
-			  InitRightFootRefSOUT <<
-			  comSIN <<
-			  velocitydesSIN);
+                          InitCoMRefSOUT <<
+                          InitWaistPosRefSOUT <<
+                          InitWaistAttRefSOUT <<
+                          InitLeftFootRefSOUT <<
+                          InitRightFootRefSOUT <<
+                          comSIN <<
+                          velocitydesSIN);
 #else
       signalRegistration( dataInProcessSOUT );
 
       signalRegistration( jointPositionSIN <<
-			  motorControlJointPositionSIN <<
-			  ZMPPreviousControllerSIN <<
-			  ZMPRefSOUT <<
-			  CoMRefSOUT <<
-			  dCoMRefSOUT);
+                          motorControlJointPositionSIN <<
+                          ZMPPreviousControllerSIN <<
+                          ZMPRefSOUT <<
+                          CoMRefSOUT <<
+                          dCoMRefSOUT);
 
       signalRegistration( comStateSIN << zmpSIN << forceSIN << forceSOUT );
 
       signalRegistration(comSIN <<
-			 velocitydesSIN <<
-			  LeftFootCurrentPosSIN <<
-			  RightFootCurrentPosSIN <<
-			  LeftFootRefSOUT <<
-			  RightFootRefSOUT);
+                         velocitydesSIN <<
+                         LeftFootCurrentPosSIN <<
+                         RightFootCurrentPosSIN <<
+                         LeftFootRefSOUT <<
+                         RightFootRefSOUT);
 
       signalRegistration( SupportFootSOUT <<
-			  jointWalkingErrorPositionSOUT <<
-			  comattitudeSOUT <<
-			  dcomattitudeSOUT <<
-			  waistattitudeSOUT );
+                          jointWalkingErrorPositionSOUT <<
+                          comattitudeSOUT <<
+                          dcomattitudeSOUT <<
+                          waistattitudeSOUT );
 
       signalRegistration( waistpositionSOUT <<
-			  waistattitudeabsoluteSOUT <<
-			  waistpositionabsoluteSOUT);
+                          waistattitudeabsoluteSOUT <<
+                          waistpositionabsoluteSOUT);
 
 
       signalRegistration( dotLeftFootRefSOUT <<
-			  dotRightFootRefSOUT);
+                          dotRightFootRefSOUT);
 
       signalRegistration( InitZMPRefSOUT <<
-			  InitCoMRefSOUT <<
-			  InitWaistPosRefSOUT <<
-			  InitWaistAttRefSOUT <<
-			  InitLeftFootRefSOUT <<
-			  InitRightFootRefSOUT );
+                          InitCoMRefSOUT <<
+                          InitWaistPosRefSOUT <<
+                          InitWaistAttRefSOUT <<
+                          InitLeftFootRefSOUT <<
+                          InitRightFootRefSOUT );
 
       signalRegistration( leftFootContactSOUT <<
-			  rightFootContactSOUT);
+                          rightFootContactSOUT);
 
 #endif
       initCommands();
@@ -346,14 +345,14 @@ namespace dynamicgraph {
       double sum=0,tmp=0;
       m_filterWindow.resize(n+1);
       for(int i=0;i<n+1;i++)
-        {
-          tmp =sin((M_PI*i)/n);
-          m_filterWindow[i]=tmp*tmp;
-        }
-      
+      {
+        tmp =sin((M_PI*i)/n);
+        m_filterWindow[i]=tmp*tmp;
+      }
+
       for(int i=0;i<n+1;i++)
         sum+= m_filterWindow[i];
-      
+
       for(int i=0;i<n+1;i++)
         m_filterWindow[i]/= sum;
       
@@ -364,9 +363,11 @@ namespace dynamicgraph {
       
       sotDEBUGOUT(5);
     }
-    
+
     bool PatternGenerator::InitState(void)
     {
+
+
       sotDEBUGIN(5);
       // TODO
       // Instead of (0) ie .access(0), it could be rather used:
@@ -394,7 +395,6 @@ namespace dynamicgraph {
 	  Vector lZMPPrevious = ZMPPreviousControllerSIN(m_LocalTime);
 	  for(unsigned int i=0;i<3;i++)
 	    m_ZMPPrevious[i] = lZMPPrevious(i);
-	  
 	}
       else
 	{
@@ -407,7 +407,7 @@ namespace dynamicgraph {
       
       
       m_JointErrorValuesForWalking.resize(res.size());
-      
+
       sotDEBUG(5) << "m_LocalTime:" << m_LocalTime << endl;
       sotDEBUG(5) << "Joint Values:" << res << endl;
 
@@ -425,22 +425,22 @@ namespace dynamicgraph {
 	  MAL_S3_VECTOR_TYPE(double) lStartingZMPPosition;
 	  PatternGeneratorJRL::FootAbsolutePosition InitLeftFootAbsPos;
 	  PatternGeneratorJRL::FootAbsolutePosition InitRightFootAbsPos;
-	  
+
 	  m_PGI->EvaluateStartingState(lStartingCOMState,
 				       lStartingZMPPosition,
 				       lWaistPosition,
 				       InitLeftFootAbsPos,
 				       InitRightFootAbsPos);
-	  
+
 	  // Put inside sotHomogeneous representation
 	  m_InitCOMRefPos(0) = lStartingCOMState.x[0];
 	  m_InitCOMRefPos(1) = lStartingCOMState.y[0];
 	  m_InitCOMRefPos(2) = lStartingCOMState.z[0];
-	  
+
 	  m_InitZMPRefPos(0) = lStartingCOMState.x[0];
 	  m_InitZMPRefPos(1) = lStartingCOMState.y[0];
 	  m_InitZMPRefPos(2) = 0;
-	  
+
 	  if (m_InitPositionByRealState)
 	    {
 	      m_ZMPPrevious[0] = lStartingCOMState.x[0];
@@ -448,7 +448,7 @@ namespace dynamicgraph {
 	      m_ZMPPrevious[2] = 0;
 	    }
 	  sotDEBUG(5) << "InitZMPRefPos :" <<m_InitZMPRefPos<< endl;
-	  
+
 	  m_InitWaistRefPos(0) =
 	    m_WaistPositionAbsolute(0) = lWaistPosition(0);
 	  m_InitWaistRefPos(1) =
@@ -564,7 +564,8 @@ namespace dynamicgraph {
           aFoot.anklePosition(1) = v.second.get<double>("y");
           aFoot.anklePosition(2) = v.second.get<double>("z");
         } // BOOST_FOREACH
-        aFoot.associatedAnkle = m_robotModel.frames.at(m_robotModel.getFrameId("r_ankle")).parent;
+        se3::FrameIndex ra = m_robotModel.getFrameId("r_ankle");
+        aFoot.associatedAnkle = m_robotModel.frames.at(ra).parent ;
         m_PR->initializeRightFoot(aFoot);
         // Initialize the Left Foot
         path = "robot.specificities.feet.left.size" ;
@@ -581,40 +582,14 @@ namespace dynamicgraph {
           aFoot.anklePosition(1) = v.second.get<double>("y");
           aFoot.anklePosition(2) = v.second.get<double>("z");
         } // BOOST_FOREACH
-        aFoot.associatedAnkle = m_robotModel.frames.at(m_robotModel.getFrameId("l_ankle")).parent;
+        se3::FrameIndex la = m_robotModel.getFrameId("l_ankle");
+        aFoot.associatedAnkle = m_robotModel.frames.at(la).parent ;
         m_PR->initializeLeftFoot(aFoot);
       }catch(...)
       {
         cerr << "problem while reading the srdf file. File corrupted?" << endl;
         ok=false;
-	}
-      /*try{
-        m_wrml2urdfIndex.resize(m_robotModel.nv-6);
-        std::ifstream xmlRankPath_stream(m_xmlRankFile.c_str());
-        read_xml(xmlRankPath_stream, pt);
-        // Initialize the Right Foot
-        string path = "LinkJointNameAndRank" ;
-        BOOST_FOREACH(const ptree::value_type & v, pt.get_child(path.c_str()))
-        {
-          if(v.first=="Link")
-          {
-            istringstream data (v.second.data()) ;
-            string joint_name ; data >> joint_name ;
-            unsigned joint_rank ; data >> joint_rank ;
-            if(m_robotModel.existJointName(joint_name))
-            {
-              m_wrml2urdfIndex[joint_rank-6] = se3::idx_v(
-                  m_robotModel.joints[m_robotModel.getJointId(joint_name)] )
-                  - 6 ;
-            }
-          }
-        } // BOOST_FOREACH
-
-      }catch(...)
-      {
-        cerr << "problem while reading the xmlRank file. File corrupted?" << endl;
-        ok=false;
-	}*/
+      }
 
       if (m_PR!=0)
     {
@@ -1115,6 +1090,8 @@ namespace dynamicgraph {
       };
 
       try{
+          if(m_forceFeedBack)
+          {
         Vector extForce (3);
         extForce = forceSIN(time);
         if(time<50*0.005)
@@ -1170,25 +1147,7 @@ namespace dynamicgraph {
         oss << ":perturbationforce " << -m_currentForces(1) << " " << /*m_currentForces(0)*/0.0 << " " << m_currentForces(2);
         // cout << oss.str() << endl ;
         pgCommandLine(oss.str());
-
-        ofstream aof;
-        string aFileName;
-        static int count_it = 0 ;
-        aFileName = "/tmp/dg_pg-external-forces.dat" ;
-        if ( count_it == 0 )
-        {
-          aof.open(aFileName.c_str(),ofstream::out);
-          aof.close();
-        }
-        aof.open(aFileName.c_str(),ofstream::app);
-        aof.precision(8);
-        aof.setf(ios::scientific, ios::floatfield);
-        aof << count_it*0.005 << " " ;    // 1
-        aof << m_currentForces(0) << " " ;       // 2
-        aof << m_currentForces(1) << " " ;       // 3
-        aof << m_currentForces(2) << " " ;       // 4
-        aof << endl;
-        ++count_it;
+          }
       }catch(...)
       {
         //cout << "problems with force signals reading" << endl;

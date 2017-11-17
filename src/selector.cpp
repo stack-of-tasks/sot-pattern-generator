@@ -225,8 +225,8 @@ namespace dynamicgraph {
       /* *** Enter here the type list *** --------------------------------------- */
       /* ------------------------------------------------------------------------ */
 
-      SOT_SELECTOR_CREATE_TYPE( ml::Vector,"vector" );
-      SOT_SELECTOR_CREATE_TYPE( ml::Matrix,"matrix" );
+      SOT_SELECTOR_CREATE_TYPE( Vector,"vector" );
+      SOT_SELECTOR_CREATE_TYPE( Matrix,"matrix" );
       SOT_SELECTOR_CREATE_TYPE( MatrixHomogeneous,"matrixHomo" );
 
       /* ------------------------------------------------------------------------ */

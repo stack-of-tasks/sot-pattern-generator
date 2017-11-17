@@ -12,8 +12,9 @@ from dynamic_graph.sot.pattern_generator import PatternGenerator,Selector
 from dynamic_graph.sot.core.matrix_util import matrixToTuple
 # from dynamic_graph.sot.core import FeatureGeneric, FeaturePoint6d, Task, TaskPD
 from dynamic_graph.sot.core import FeaturePosture
-from dynamic_graph.ros import RosRobotModel
-import roslib
+#from dynamic_graph.ros import RosRobotModel
+#import roslib
+import pinocchio as se3
 
 from numpy import *
 def totuple( a ):
@@ -39,7 +40,7 @@ def initPg(robot):
   robot.pg.parseCmd(":UpperBodyMotionParameters -0.1 -1.0 0.0")
   if robot.device.name == 'HRP2LAAS' or \
      robot.device.name == 'HRP2JRL':
-    robot.pg.parseCmd(":comheight 0.814")
+      robot.pg.parseCmd(":comheight 0.814")
   elif robot.device.name == 'HRP4LIRMM':
     robot.pg.parseCmd(":comheight 0.747")
   else: #default value
@@ -48,8 +49,8 @@ def initPg(robot):
 
   plug(robot.dynamic.position,robot.pg.position)
   plug(robot.com, robot.pg.com)
-  plug(robot.dynamic.signal('left-ankle'), robot.pg.leftfootcurrentpos)
-  plug(robot.dynamic.signal('right-ankle'), robot.pg.rightfootcurrentpos)
+  plug(robot.dynamic.signal(robot.OperationalPointsMap['left-ankle']), robot.pg.leftfootcurrentpos)
+  plug(robot.dynamic.signal(robot.OperationalPointsMap['right-ankle']), robot.pg.rightfootcurrentpos)
   robotDim = len(robot.dynamic.velocity.value)
   robot.pg.motorcontrol.value = robotDim*(0,)
   robot.pg.zmppreviouscontroller.value = (0,0,0)
@@ -62,6 +63,7 @@ def addPgToVRMLRobot(robot):
 
 def addPgToUrdfRobot(robot):
   # Configure Pattern Generator    
+  import roslib
   robot.pg = PatternGenerator('pg')
   if robot.device.name == 'HRP2LAAS' or robot.device.name == 'HRP2JRL':
     pkgLocation = str(roslib.packages.get_pkg_dir("hrp2_14_description"))
@@ -76,13 +78,12 @@ def addPgToUrdfRobot(robot):
     robot.urdfFile = str(pkgLocation+"/urdf/romeo.urdf")
     robot.srdfFile = str(pkgLocation+"/srdf/romeo.srdf")
   else:
-    pkgLocation = roslib.packages.get_pkg_dir("error404notfound_description")
-    robot.urdfFile = "error 404 not found"
-    robot.srdfFile = "error 404 not found"
+    pkgLocation = str(roslib.packages.get_pkg_dir("hrp2_14_description"))
+    robot.urdfFile = str(pkgLocation+"/urdf/hrp2_14.urdf")
+    robot.srdfFile = str(pkgLocation+"/srdf/hrp2_14.srdf")
 
   robot.pg.setURDFpath( robot.urdfFile )
   robot.pg.setSRDFpath( robot.srdfFile )
-  robot.pg.setXmlRank(robot.jointRankPath)
   if(hasattr(robot, 'jointMap')):
       print "some joints need to be mapped"
       for i in robot.jointMap:
@@ -99,22 +100,25 @@ def addPgTaskToVRMLRobot(robot,solver):
   print("modelDir: ",robot.modelDir)
   print("modelName:",robot.modelName)
   print("specificitiesPath:",robot.specificitiesPath)
-  print("jointRankPath:",robot.jointRankPath)
+  #print("jointRankPath:",robot.jointRankPath)
 
   robot.geom.setFiles(robot.modelDir, robot.modelName,robot.specificitiesPath,robot.jointRankPath)
   robot.geom.parse()
-
+  
 def addPgTaskToUrdfRobot(robot,solver):
-  # --- ROBOT.PG INIT FRAMES ---
-  robot.geom = RosRobotModel("geom")
-  if(hasattr(robot, 'jointMap')):
-      for i in robot.jointMap:
-          robot.geom.addJointMapping(i, robot.jointMap[i])
-  robot.geom.loadUrdf(robot.urdfFile)
+    # --- ROBOT.PG INIT FRAMES ---
+    robot.geom = Dynamic("geom")
+    if(hasattr(robot, 'jointMap')):
+        for i in robot.jointMap:
+            robot.geom.addJointMapping(i, robot.jointMap[i])
+    pinocchioModel = se3.buildModelFromUrdf(robot.urdfFile)
+    pinocchioData = pinocchioModel.createData()
+    robot.geom.setModel(pinocchioModel)
+    robot.geom.setData(pinocchioData)
 
 def initRobotGeom(robot):
-  robot.geom.createOpPoint('rf2','right-ankle')
-  robot.geom.createOpPoint('lf2','left-ankle')
+  robot.geom.createOpPoint('rf2',robot.OperationalPointsMap['right-ankle'])
+  robot.geom.createOpPoint('lf2',robot.OperationalPointsMap['left-ankle'])
   plug(robot.dynamic.position,robot.geom.position)
   robot.geom.ffposition.value = 6*(0,)
   robotDim = len(robot.dynamic.velocity.value)
@@ -171,7 +175,7 @@ def initWaistCoMTasks(robot):
   YawFromLeftRightRPY.sin1.value=matrixToTuple(array([[ 0.,  0.,  0.], \
        [ 0.,  0.,  0.,  ],
        [ 0.,  0.,  1.,  ]]))
-  plug(robot.pg.comattitude,YawFromLeftRightRPY.sin2)
+  plug(robot.pg.signal('comattitude'),YawFromLeftRightRPY.sin2)
 
   # Build a reference vector from init waist pos and
   # init left foot roll pitch representation
@@ -200,17 +204,15 @@ def initWaistCoMTasks(robot):
 def initFeetTask(robot):
   robot.selecFeet = Selector('selecFeet',
                              ['matrixHomo','leftfootref', \
-                               robot.dynamic.signal('left-ankle'),\
+                               robot.dynamic.signal(robot.OperationalPointsMap['left-ankle']),\
                                robot.pg.leftfootref], \
                              ['matrixHomo','rightfootref', \
-                              robot.dynamic.signal('right-ankle'), \
+                              robot.dynamic.signal(robot.OperationalPointsMap['right-ankle']), \
                               robot.pg.rightfootref])
 
   plug(robot.pg.inprocess,robot.selecFeet.selec)
   robot.tasks['right-ankle'].controlGain.value = 200
   robot.tasks['left-ankle'].controlGain.value = 200
-
-  print "After Task for Right and Left Feet"
 
 def removeDofUsed(jacobian, target):
   for i in range(0,len(jacobian)):
@@ -229,9 +231,9 @@ def initPostureTask(robot):
 
   # Remove the dofs of the feet.
   postureTaskDofs = [True] * (len(robot.dynamic.position.value) - 6)
-  jla = robot.dynamic.signal('Jleft-ankle').value
+  jla = robot.dynamic.signal('J'+robot.OperationalPointsMap['left-ankle']).value
   postureTaskDofs = removeDofUsed(jla, postureTaskDofs)
-  jra = robot.dynamic.signal('Jright-ankle').value
+  jra = robot.dynamic.signal('J'+robot.OperationalPointsMap['right-ankle']).value
   postureTaskDofs = removeDofUsed(jra, postureTaskDofs)
 
   for dof,isEnabled in enumerate(postureTaskDofs):
@@ -271,7 +273,7 @@ def createGraph(robot,solver):
 def CreateEverythingForPG(robot,solver):
   robot.initializeTracer()
   addPgToUrdfRobot(robot)
-  addPgTaskToVRMLRobot(robot,solver)
+  addPgTaskToUrdfRobot(robot,solver)
   createGraph(robot,solver)
 
 def walkFewSteps(robot):
@@ -307,16 +309,19 @@ def walkNaveau(robot):
   robot.pg.parseCmd(":SetAlgoForZmpTrajectory Naveau")
   robot.pg.parseCmd(":doublesupporttime 0.1")
   robot.pg.parseCmd(":singlesupporttime 0.7")
-  robot.pg.parseCmd(":NaveauOnline")
   robot.pg.velocitydes.value=(0.01,0.0,0.0)
   robot.pg.parseCmd(":numberstepsbeforestop 2")
   robot.pg.parseCmd(":setVelReference 0.01 0.0 0.0")
-  robot.pg.parseCmd(":setfeetconstraint XY 0.095 0.055")
-
-  robot.pg.parseCmd(":feedBackControl false")
-  robot.pg.parseCmd(":useDynamicFilter true")
-
-  robot.pg.parseCmd(":stepheight 0.05")
-  robot.pg.parseCmd(":deleteallobstacles")
-
-
+  robot.pg.parseCmd(":NaveauOnline")
+  if robot.device.name == 'HRP2LAAS' or robot.device.name == 'HRP2JRL':
+      robot.pg.parseCmd(":setfeetconstraint XY 0.09 0.06")
+      robot.pg.parseCmd(":useDynamicFilter true")
+  elif robot.device.name == 'HRP4LIRMM':
+      robot.pg.parseCmd(":setfeetconstraint XY 0.07 0.06")
+      robot.pg.parseCmd(":useDynamicFilter false")
+  elif robot.device.name == 'ROMEO':
+      robot.pg.parseCmd(":setfeetconstraint XY 0.04 0.04")
+      robot.pg.parseCmd(":useDynamicFilter false")
+  else:
+      robot.pg.parseCmd(":setfeetconstraint XY 0.02 0.02")
+      robot.pg.parseCmd(":useDynamicFilter false")

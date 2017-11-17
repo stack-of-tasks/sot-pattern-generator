@@ -36,7 +36,7 @@
 #include <sot-pattern-generator/step-checker.h>
 #include <dynamic-graph/factory.h>
 #include <dynamic-graph/pool.h>
-#include <sot/core/matrix-twist.hh>
+#include <sot/core/matrix-geometry.hh>
 
 namespace dynamicgraph {
   namespace sot {
@@ -97,36 +97,36 @@ namespace dynamicgraph {
       }
     }
 
-    ml::Vector& StepComputerForce::computeDisplacement( ml::Vector& res,int timeCurr )
+    Vector& StepComputerForce::computeDisplacement( Vector& res,int timeCurr )
     {
       if(!twoHandObserver) {
 	std::cerr << "Observer not set" << std::endl;
 	res.resize(3);
-	res.fill(0.);
+	res.setZero();
 	return res;
       }
 
       // transformation from ref0 to ref.
 
       const MatrixHomogeneous& waMref = referencePositionWaistSIN.access( timeCurr );
-      MatrixHomogeneous ref0Mwa; waMref0.inverse(ref0Mwa);
-      MatrixHomogeneous ref0Mref; ref0Mwa.multiply(waMref, ref0Mref);
+      MatrixHomogeneous ref0Mwa; ref0Mwa = waMref0.inverse();
+      MatrixHomogeneous ref0Mref; ref0Mref = ref0Mwa * waMref;
 
       // extract the translation part and express it in the waist frame.
 
-      ml::Vector t_ref0(3); ref0Mref.extract(t_ref0);
-      MatrixRotation waRref0; waMref0.extract(waRref0);
-      ml::Vector t_wa = waRref0.multiply(t_ref0);
+      Vector t_ref0(3); t_ref0 = ref0Mref.translation();
+      MatrixRotation waRref0; waRref0 = waMref0.linear();
+      Vector t_wa = waRref0 * t_ref0;
 
       // compute the rotation that transforms ref0 into ref,
       // express it in the waist frame. Then get the associated
       // yaw (rot around z).
 
-      MatrixRotation ref0Rwa; waRref0.transpose(ref0Rwa);
-      MatrixRotation ref0Rref; ref0Mref.extract(ref0Rref);
-      MatrixRotation tmp; ref0Rref.multiply(ref0Rwa, tmp);
-      MatrixRotation Rref; waRref0.multiply(tmp, Rref);
-      VectorRollPitchYaw rpy; rpy.fromMatrix(Rref);
+      MatrixRotation ref0Rwa; ref0Rwa = waRref0.transpose();
+      MatrixRotation ref0Rref; ref0Rref = ref0Mref.linear();
+      MatrixRotation tmp; tmp = ref0Rref * ref0Rwa;
+      MatrixRotation Rref; Rref = waRref0 * tmp;
+      VectorRollPitchYaw rpy; rpy = (Rref.eulerAngles(2,1,0)).reverse();
 
       // store the result.
 
@@ -137,27 +137,27 @@ namespace dynamicgraph {
       return res;
     }
 
-    ml::Vector& StepComputerForce::computeForce( ml::Vector& res,int timeCurr )
+    Vector& StepComputerForce::computeForce( Vector& res,int timeCurr )
     {
-      const ml::Vector& dx = displacementSOUT.access( timeCurr );
-      const ml::Vector& K = stiffnessSIN.access( timeCurr );
+      const Vector& dx = displacementSOUT.access( timeCurr );
+      const Vector& K = stiffnessSIN.access( timeCurr );
 
       if((dx.size() != 3) || (K.size() != 3) || (dx.size() != K.size())) {
 	res.resize(3);
-	res.fill(0.);
+	res.setZero();
       }
       else {
-	res = K.multiply(dx);
+	res = K * dx;
       }
 
       return res;
     }
 
-    ml::Vector&
-    StepComputerForce::computeHandForce( ml::Vector& res,
+    Vector&
+    StepComputerForce::computeHandForce( Vector& res,
 					 const MatrixHomogeneous& waMh,
 					 const MatrixHomogeneous& waMref,
-					 const ml::Vector& F )
+					 const Vector& F )
     {
       if(F.size() != 3) {
 	res.resize(6);
@@ -165,18 +165,18 @@ namespace dynamicgraph {
 	return res;
       }
 
-      ml::Vector pref(3); waMref.extract(pref);
-      ml::Vector ph(3); waMh.extract(ph);
+      Vector pref(3); pref = waMref.translation();
+      Vector ph(3); ph = waMh.translation();
 
-      ml::Vector OA(3);
+      Eigen::Vector3d OA;
       OA(0) = ph(0) - pref(0);
       OA(1) = ph(1) - pref(1);
       OA(2) = 0;
 
-      ml::Vector tau(3); tau.fill(0.);
+      Eigen::Vector3d tau; tau.setZero();
       tau(2) = -F(2);
 
-      ml::Vector tauOA = tau.crossProduct(OA);
+      Eigen::Vector3d tauOA; tauOA = tau.cross(OA);
       double ntauOA = tauOA.norm();
       double nOA = OA.norm();
       double L = 2 * ntauOA * nOA;
@@ -185,43 +185,42 @@ namespace dynamicgraph {
 	tauOA.fill(0);
       }
       else {
-	tauOA = tauOA.multiply(1./L);
+	tauOA = tauOA * (1./L);
       }
 
-      ml::Vector tmp(6); tmp.fill(0.);
-      tmp.resize(6); tmp.fill(0.);
+      Vector tmp(6); tmp.setZero();
       tmp(0) = tauOA(0) - F(0);
       tmp(1) = tauOA(1) - F(1);
 
-      MatrixHomogeneous H; waMh.inverse(H);
+      MatrixHomogeneous H; H = waMh.inverse();
       for(int i = 0; i < 3; ++i){ H(i,3) = 0; }
-      MatrixTwist V; V.buildFrom(H);
-      V.multiply(tmp, res);
+      MatrixTwist V; buildFrom(H, V);
+      res = V * tmp;
 
       return res;
     }
 
-    ml::Vector& StepComputerForce::computeForceL( ml::Vector& res,int timeCurr )
+    Vector& StepComputerForce::computeForceL( Vector& res,int timeCurr )
     {
       const MatrixHomogeneous& waMlh = waistMlhandSIN.access( timeCurr );
       const MatrixHomogeneous& waMref = referencePositionWaistSIN.access( timeCurr );
-      const ml::Vector& F = forceSOUT.access( timeCurr );
+      const Vector& F = forceSOUT.access( timeCurr );
 
       return computeHandForce( res,waMlh,waMref,F );
     }
 
-    ml::Vector& StepComputerForce::computeForceR( ml::Vector& res,int timeCurr )
+    Vector& StepComputerForce::computeForceR( Vector& res,int timeCurr )
     {
       const MatrixHomogeneous& waMrh = waistMrhandSIN.access( timeCurr );
       const MatrixHomogeneous& waMref = referencePositionWaistSIN.access( timeCurr );
-      const ml::Vector& F = forceSOUT.access( timeCurr );
+      const Vector& F = forceSOUT.access( timeCurr );
 
       return computeHandForce( res,waMrh,waMref,F );
     }
 
     void StepComputerForce::changeFirstStep( StepQueue& queue, int timeCurr )
     {
-      const ml::Vector& v = velocitySIN.access( timeCurr );
+      const Vector& v = velocitySIN.access( timeCurr );
       unsigned sfoot = contactFootSIN.access( timeCurr );
 
       double y_default = 0;

@@ -1,8 +1,7 @@
 #include <cmath>
 
 #include <sot-pattern-generator/step-observer.h>
-#include <sot/core/vector-roll-pitch-yaw.hh>
-#include <sot/core/matrix-rotation.hh>
+#include <sot/core/matrix-geometry.hh>
 #include <dynamic-graph/factory.h>
 #include <sot/core/debug.hh>
 
@@ -68,35 +67,36 @@ namespace dynamicgraph {
 #if RIGHT_HAND_REFERENCE
 
       const MatrixHomogeneous& wMrh = rightHandPositionSIN( timeCurr );
-      MatrixHomogeneous refMw; wMref.inverse(refMw);
-      refMw.multiply(wMrh, res);
+      MatrixHomogeneous refMw; refMw = wMref.inverse();
+      res = refMw*wMrh;
 
 #else
 
       const MatrixHomogeneous& wMlh = leftHandPositionSIN( timeCurr );
       const MatrixHomogeneous& wMrh = rightHandPositionSIN( timeCurr );
 
-      MatrixHomogeneous refMw; wMref.inverse(refMw);
-      MatrixHomogeneous sfMlh; refMw.multiply(wMlh, sfMlh);
-      MatrixHomogeneous sfMrh; refMw.multiply(wMrh, sfMrh);
+      MatrixHomogeneous refMw; refMw = wMref.inverse();
+      MatrixHomogeneous sfMlh; sfMlh = refMw * wMlh;
+      MatrixHomogeneous sfMrh; sfMrh  = refMw * wMrh;
 
-      MatrixRotation R;
       VectorRollPitchYaw rpy;
 
-      ml::Vector prh(3); sfMrh.extract(prh);
-      sfMrh.extract(R);
-      VectorRollPitchYaw rpy_rh; rpy_rh.fromMatrix(R);
+      Vector prh(3); prh = sfMrh.translation();
 
-      ml::Vector plh(3); sfMlh.extract(plh);
-      sfMlh.extract(R);
-      VectorRollPitchYaw rpy_lh; rpy_lh.fromMatrix(R);
+      Vector plh(3); plh = sfMlh.translation();
 
-      rpy.fill(0.);
+      rpy.setZero();
       rpy(2) = std::atan2(prh(0) - plh(0), plh(1) - prh(1));
-      ml::Vector p = .5 * (plh + prh);
+      Vector p(3); p = .5 * (plh + prh);
 
-      rpy.toMatrix(R);
-      res.buildFrom(R, p);
+      MatrixRotation R;
+
+      R = (Eigen::AngleAxisd(rpy(2),Eigen::Vector3d::UnitZ())*
+	   Eigen::AngleAxisd(rpy(1),Eigen::Vector3d::UnitY())*
+	   Eigen::AngleAxisd(rpy(0),Eigen::Vector3d::UnitX())).toRotationMatrix();
+
+      res.translation() = p;
+      res.linear() = R;
 
 #endif
 

@@ -1,7 +1,7 @@
 from dynamic_graph.sot.core import *
 from dynamic_graph import plug
 from dynamic_graph.sot.pattern_generator import PatternGenerator,Selector
-from dynamic_graph.sot.dynamics import *
+from dynamic_graph.sot.dynamics_pinocchio import *
 
 class MetaPG:
     def __init__(self,dyn):

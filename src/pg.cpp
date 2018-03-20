@@ -19,6 +19,9 @@
 
 //#define VP_DEBUG
 //#define VP_DEBUG_MODE 45
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+
 #include <sot/core/debug.hh>
 #ifdef VP_DEBUG
 class sotPG__INIT
@@ -993,7 +996,8 @@ namespace dynamicgraph {
       int lSupportFoot; // Local support foot.
       // Default value
       m_JointErrorValuesForWalking.fill(0.0);
-      const int robotSize = m_JointErrorValuesForWalking.size()+6;
+      const dynamicgraph::Vector::Index
+	robotSize = m_JointErrorValuesForWalking.size()+6;
 
       try
 	{
@@ -1202,9 +1206,9 @@ namespace dynamicgraph {
 
 	      // In this setting we assume that there is a proper mapping between
 	      // CurrentState and CurrentConfiguration.
-	      unsigned int SizeCurrentState = CurrentState.size();
-	      unsigned int SizeCurrentConfiguration = CurrentConfiguration.size()-6;
-	      unsigned int MinSize = std::min(SizeCurrentState,SizeCurrentConfiguration);
+	      Vector::Index SizeCurrentState = CurrentState.size();
+	      Vector::Index SizeCurrentConfiguration = CurrentConfiguration.size()-6;
+	      Vector::Index MinSize = std::min(SizeCurrentState,SizeCurrentConfiguration);
 
 	      if (m_JointErrorValuesForWalking.size()>=MinSize)
 		{
@@ -1353,7 +1357,6 @@ namespace dynamicgraph {
 		      m_COMRefPos(i) = lV2COMRefPos(i);
 		    }
 
-		  MatrixHomogeneous lWaistPoseAbsoluste = WaistPoseAbsolute;
 		  WaistPoseAbsolute = iPoseOrigin * WaistPoseAbsolute;
 
 		  MatrixRotation newWaistRot;

@@ -1,12 +1,12 @@
 # --- PG ---------------------------------------------------------
 from dynamic_graph import plug
 from dynamic_graph.sot.core.math_small_entities import Derivator_of_Matrix, Inverse_of_matrixHomo, Multiply_of_matrixHomo, Stack_of_vector, PoseRollPitchYawToMatrixHomo, MatrixHomoToPoseRollPitchYaw, Multiply_matrixHomo_vector
-from dynamic_graph.sot.dynamics import Dynamic
+from dynamic_graph.sot.dynamics_pinocchio import DynamicPinocchio
 import dynamic_graph.script_shortcuts
 from dynamic_graph.script_shortcuts import optionalparentheses
 from dynamic_graph.matlab import matlab
 from dynamic_graph.sot.core import *
-from dynamic_graph.sot.dynamics import *
+from dynamic_graph.sot.dynamics_pinocchio import *
 from dynamic_graph.sot.core.meta_task_6d import MetaTask6d,toFlags
 from dynamic_graph.sot.pattern_generator import PatternGenerator,Selector
 from dynamic_graph.sot.core.matrix_util import matrixToTuple
@@ -96,7 +96,7 @@ def addPgToUrdfRobot(robot):
 
 def addPgTaskToVRMLRobot(robot,solver):
   # --- ROBOT.PG INIT FRAMES ---
-  robot.geom = Dynamic("geom")
+  robot.geom = DynamicPinocchio("geom")
   print("modelDir: ",robot.modelDir)
   print("modelName:",robot.modelName)
   print("specificitiesPath:",robot.specificitiesPath)
@@ -107,7 +107,7 @@ def addPgTaskToVRMLRobot(robot,solver):
   
 def addPgTaskToUrdfRobot(robot,solver):
     # --- ROBOT.PG INIT FRAMES ---
-    robot.geom = Dynamic("geom")
+    robot.geom = DynamicPinocchio("geom")
     if(hasattr(robot, 'jointMap')):
         for i in robot.jointMap:
             robot.geom.addJointMapping(i, robot.jointMap[i])

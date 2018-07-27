@@ -8,33 +8,33 @@ cache:
   paths:
     - ccache
 
-.robotpkg-sot-pattern-generator: &robotpkg-sot-pattern-generator
+.robotpkg-sot-pattern-generator-v3: &robotpkg-sot-pattern-generator-v3
   except:
     - gh-pages
   script:
     - mkdir -p ccache
-    - cd /root/robotpkg/motion/sot-pattern-generator
+    - cd /root/robotpkg/wip/sot-pattern-generator-v3
     - git pull
     - make checkout MASTER_REPOSITORY="dir ${CI_PROJECT_DIR}"
     - make install
     - cd work.$(hostname)/$(make show-var VARNAME=DISTNAME)
     - make test
 
-robotpkg-sot-pattern-generator-14.04-release:
-  <<: *robotpkg-sot-pattern-generator
-  image: eur0c.laas.fr:5000/stack-of-tasks/sot-pattern-generator/sot-pattern-generator:14.04
+robotpkg-sot-pattern-generator-v3-14.04-release:
+  <<: *robotpkg-sot-pattern-generator-v3
+  image: eur0c.laas.fr:5000/stack-of-tasks/sot-pattern-generator/sot-pattern-generator-v3:14.04
 
-robotpkg-sot-pattern-generator-16.04-release:
-  <<: *robotpkg-sot-pattern-generator
-  image: eur0c.laas.fr:5000/stack-of-tasks/sot-pattern-generator/sot-pattern-generator:16.04
+robotpkg-sot-pattern-generator-v3-16.04-release:
+  <<: *robotpkg-sot-pattern-generator-v3
+  image: eur0c.laas.fr:5000/stack-of-tasks/sot-pattern-generator/sot-pattern-generator-v3:16.04
 
 doc-coverage:
-  <<: *robotpkg-sot-pattern-generator
-  image: eur0c.laas.fr:5000/stack-of-tasks/sot-pattern-generator/sot-pattern-generator:16.04
+  <<: *robotpkg-sot-pattern-generator-v3
+  image: eur0c.laas.fr:5000/stack-of-tasks/sot-pattern-generator/sot-pattern-generator-v3:16.04
   before_script:
     - echo -e 'CXXFLAGS+= --coverage\nLDFLAGS+= --coverage\nPKG_DEFAULT_OPTIONS= debug' >> /opt/openrobots/etc/robotpkg.conf
   after_script:
-    - cd /root/robotpkg/motion/sot-pattern-generator
+    - cd /root/robotpkg/wip/sot-pattern-generator-v3
     - cd work.$(hostname)/$(make show-var VARNAME=DISTNAME)
     - make doc
     - mv doc/doxygen-html ${CI_PROJECT_DIR}

@@ -155,19 +155,5 @@ namespace dynamicgraph {
 	os << "step " << i << ": " << fp.contact << ", (" << fp.x << " " << fp.y << " " << fp.theta << ")" << std::endl;
       }
     }
-
-
-    void StepQueue::commandLine( const std::string& cmdLine,
-				 std::istringstream& cmdArgs,
-				 std::ostream& os )
-    {
-      if( cmdLine == "help" )
-	{
-	  os << "StepQueue: " << std::endl
-	     << std::endl;
-	}
-      else { Entity::commandLine( cmdLine,cmdArgs,os); }
-    }
-
   } // namespace dg
 } // namespace sot

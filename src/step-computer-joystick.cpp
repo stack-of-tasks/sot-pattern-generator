@@ -141,27 +141,6 @@ namespace dynamicgraph {
       os << "StepComputer <" << getName() <<">:" << std::endl;
     }
 
-
-    void StepComputerJoystick::commandLine( const std::string& cmdLine,
-					    std::istringstream& cmdArgs,
-					    std::ostream& os )
-    {
-      if( cmdLine == "help" )
-	{
-	  os << "NextStep: " << std::endl
-	     << " - verbose [OFF]" << std::endl
-	     << " - state [{start|stop}] \t get/set the stepper state. " << std::endl
-	     << " - yZeroStep [<value>] \t get/set the Y default position." << std::endl
-	     << std::endl;
-	}
-      else   if( cmdLine == "thisIsZero" )
-	{
-
-	  os << "Not supported" << std::endl;
-	}
-      else { Entity::commandLine( cmdLine,cmdArgs,os); }
-    }
-
     ml::Vector & StepComputerJoystick::getlaststep(ml::Vector& res, int time)
     {
       if (res.size()!=4)

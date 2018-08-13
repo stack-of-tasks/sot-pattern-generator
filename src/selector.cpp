@@ -275,43 +275,5 @@ namespace dynamicgraph {
     {
       os << getTypeList();
     }
-
-    void Selector::
-    commandLine( const std::string& cmdLine,
-		 std::istringstream& cmdArgs,
-		 std::ostream& os )
-    {
-      if( cmdLine == "help" )
-	{
-	  os << "Selector: " << std::endl
-	     << "  - typeList: display the available types. " << std::endl
-	     << "  - reset <nbEntries> <nbSig>: reset the signal lists. " << std::endl
-	     << "  - create <sigtype> <signame> <sigid>: create a new set of signals" << std::endl;
-	}
-      else if( cmdLine == "typeList" ) { displayOrCreate( *this,false,os ); }
-      else if( cmdLine == "create" )
-	{
-	  std::string type,name; int sigId;
-	  cmdArgs >> type >> name >>std::ws;
-	  if( cmdArgs.good() ) cmdArgs >> sigId; else sigId=-1;
-	  displayOrCreate( *this,true,os,name,type,sigId );
-
-	}
-      else if( cmdLine == "reset" )
-	{
-	  cmdArgs >> std::ws;
-	  if( cmdArgs.good() )
-	    {
-	      unsigned int nbSig,nbEntries; cmdArgs>>nbSig>> std::ws;
-	      if( cmdArgs.good() ) cmdArgs>>nbEntries;
-	      else
-		{os << "Error: usage is: reset <nbEntries> <nbSig>." << std::endl; return;}
-	      resetSignals(nbSig,nbEntries);
-	    }
-	  else {os << "Error: usage is: reset <nbEntries> <nbSig>." << std::endl; return;}
-	}
-      else { Entity::commandLine( cmdLine,cmdArgs,os); }
-    }
-
   } // namespace dg
 } // namespace sot

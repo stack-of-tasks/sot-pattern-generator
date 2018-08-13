@@ -112,13 +112,6 @@ namespace dynamicgraph {
 				const MatrixHomogeneous& waistMrfoot,
 				unsigned int& res );
 
-
-    public: /* --- PARAMS --- */
-      virtual void commandLine( const std::string& cmdLine,
-				std::istringstream& cmdArgs,
-				std::ostream& os );
-
-
     };
 
   } // namespace sot

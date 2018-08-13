@@ -155,7 +155,7 @@ namespace dynamicgraph {
       MatrixRotation ref0Rref; ref0Rref = ref0Mref.linear();
       MatrixRotation tmp = ref0Rref * ref0Rsf;
       MatrixRotation Rref = sfRref0*tmp;
-	
+
       VectorRollPitchYaw rpy; rpy = (Rref.eulerAngles(2,1,0)).reverse();
 
       // get the yaw of the current orientation of the ff wrt sf.
@@ -368,77 +368,6 @@ namespace dynamicgraph {
 	}
     }
 
-
-    void NextStep::
-    commandLine( const std::string& cmdLine,
-		 std::istringstream& cmdArgs,
-		 std::ostream& os )
-    {
-
-
-      if( cmdLine == "help" )
-	{
-	  os << "NextStep: " << std::endl
-	     << " - verbose [OFF]" << std::endl
-	     << " - state [{start|stop}] \t get/set the stepper state. " << std::endl
-	     << " - yZeroStep [<value>] \t get/set the Y default position." << std::endl
-	     << " - thisIsZero {record|disp}" << std::endl
-	     << std::endl;
-	}
-      else if( cmdLine == "state" )
-	{
-	  cmdArgs >> std::ws;
-	  if( cmdArgs.good() )
-	    {
-	      std::string statearg; cmdArgs >> statearg;
-	      if( statearg == "start" ) { state = STATE_STARTING; }
-	      else if( statearg == "stop" ) { state = STATE_STOPING; }
-	    }
-	  else
-	    {
-	      os <<"state = ";
-	      switch( state )
-		{
-		case STATE_STARTING: os << "starting"; break;
-		case STATE_STOPING: os << "stoping"; break;
-		case STATE_STARTED: os << "started"; break;
-		case STATE_STOPED: os << "stoped"; break;
-		default: os <<"error"; break;
-		}
-	      os << std::endl;
-	    }
-	}
-      else if( cmdLine == "yZeroStep" )
-	{
-	  cmdArgs >> std::ws; if( cmdArgs.good() )
-				{ cmdArgs >> zeroStepPosition; }
-	  else { os << "yzero = " << zeroStepPosition; }
-	}
-      else if( cmdLine == "thisIsZero" )
-	{
-	  std::string arg; cmdArgs >> arg;
-	  if( arg == "disp_left" ) { os << "zero_left = " << lfMref0; }
-	  else if( arg == "disp_right" ) { os << "zero_right = " << rfMref0; }
-	  else if( arg == "record" ) { thisIsZero(); }
-	}
-      else if( cmdLine == "verbose" )
-	{
-	  cmdArgs >> std::ws; std::string offarg;
-	  if( (cmdArgs.good())&&(cmdArgs>>offarg,offarg=="OFF") ) { verbose =  NULL; }
-	  else { verbose = &os; }
-	}
-      else if( cmdLine == "mode1d" )
-	{
-	  mode = MODE_1D;
-	}
-      else if( cmdLine == "mode3d" )
-	{
-	  mode = MODE_3D;
-	}
-      else { Entity::commandLine( cmdLine,cmdArgs,os); }
-    }
-
-
     /* --- TWO HAND -------------------------------------------------------------- */
     /* --- TWO HAND -------------------------------------------------------------- */
     /* --- TWO HAND -------------------------------------------------------------- */
@@ -541,7 +470,7 @@ namespace dynamicgraph {
 	   Eigen::AngleAxisd(rpy(0),Eigen::Vector3d::UnitX())).toRotationMatrix();
       res.linear() = R;
       res.translation() = p;
-      
+
 #endif
 
       sotDEBUGOUT(15);

@@ -63,7 +63,7 @@ namespace dynamicgraph {
       :public NextStep
     {
     public:
-      DYNAMIC_GRAPH_ENTITY_DECL();      
+      DYNAMIC_GRAPH_ENTITY_DECL();
       static const unsigned int ADDING_STEP=0;
       static const unsigned int CHANGING_STEP=1;
 
@@ -96,10 +96,6 @@ namespace dynamicgraph {
       virtual void introductionCallBack( const int & timeCurr );
 
     public: /* --- ENTITY INHERITANCE --- */
-      virtual void commandLine( const std::string& cmdLine,
-				std::istringstream& cmdArgs,
-				std::ostream& os );
-
     };
 
 

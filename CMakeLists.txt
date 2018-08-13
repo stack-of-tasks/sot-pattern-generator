@@ -22,7 +22,7 @@ INCLUDE(cmake/cpack.cmake)
 
 SET(PROJECT_NAME sot-pattern-generator)
 SET(PROJECT_DESCRIPTION "jrl-walkgen bindings for dynamic-graph.")
-SET(PROJECT_URL "https://github.com/jrl-umi3218/sot-pattern-generator")
+SET(PROJECT_URL "https://github.com/stack-of-tasks/sot-pattern-generator")
 
 SET(CUSTOM_HEADER_DIR "${PROJECT_NAME}")
 

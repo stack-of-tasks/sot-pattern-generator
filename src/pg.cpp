@@ -28,6 +28,8 @@ class sotPG__INIT
 sotPG__INIT sotPG_initiator;
 #endif //#ifdef VP_DEBUG
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 
 #include <jrl/mal/matrixabstractlayer.hh>
 #include "pinocchio/parsers/urdf.hpp"
@@ -355,12 +357,12 @@ namespace dynamicgraph {
 
       for(int i=0;i<n+1;i++)
         m_filterWindow[i]/= sum;
-      
+
       m_initForce.resize(6);
       m_currentForces.resize(6);
       //dataInProcessSOUT.setReference( &m_dataInProcess );
       //m_wrml2urdfIndex.clear();
-      
+
       sotDEBUGOUT(5);
     }
 
@@ -402,10 +404,10 @@ namespace dynamicgraph {
 	  //for(unsigned i=0;i<res.size();i++)
 	  //res(m_wrml2urdfIndex[i]) = res(i);
 	}
-      
+
       Vector com = comSIN(m_LocalTime);
-      
-      
+
+
       m_JointErrorValuesForWalking.resize(res.size());
 
       sotDEBUG(5) << "m_LocalTime:" << m_LocalTime << endl;
@@ -603,7 +605,7 @@ namespace dynamicgraph {
       else ok=false;
     }
       else ok=false;
-      
+
       if (!ok)
     {
 	  SOT_THROW ExceptionPatternGenerator( ExceptionPatternGenerator::PATTERN_GENERATOR_JRL,
@@ -877,7 +879,7 @@ namespace dynamicgraph {
       res = m_leftFootContact;
       sotDEBUGOUT(25);
       return res;
-      
+
     }
 
     bool & PatternGenerator ::
@@ -888,7 +890,7 @@ namespace dynamicgraph {
       res = m_rightFootContact;
       sotDEBUGOUT(25);
       return res;
-      
+
     }
 
     int &PatternGenerator::
@@ -1197,7 +1199,7 @@ namespace dynamicgraph {
 	      sotDEBUG(2) << "CurrentConfiguration.size()"<< CurrentConfiguration.size()<<endl;
 	      sotDEBUG(2) << "m_JointErrorValuesForWalking.size(): "<< m_JointErrorValuesForWalking.size() <<endl;
 
-	
+
 	      // In this setting we assume that there is a proper mapping between
 	      // CurrentState and CurrentConfiguration.
 	      unsigned int SizeCurrentState = CurrentState.size();
@@ -1234,7 +1236,7 @@ namespace dynamicgraph {
 			   << lCOMRefState.x[0] << " "
 			   << lCOMRefState.y[0] << " "
 			   << lCOMRefState.z[0] <<  endl;
-	
+
 	      /* Fill in the homogeneous matrix using the world reference frame*/
 	      FromAbsoluteFootPosToDotHomogeneous(lLeftFootPosition,
 						  m_LeftFootPosition,
@@ -1373,7 +1375,7 @@ namespace dynamicgraph {
 	      sotDEBUG(25) << "ZMPRefPos:  " << m_ZMPRefPos << endl;
 	      sotDEBUG(25) << "m_MotionSinceInstanciationToThisSequence" <<
 		m_MotionSinceInstanciationToThisSequence<< std::endl;
-	
+
 	      for(unsigned int i=0;i<3;i++)
 		m_ZMPPrevious[i] = m_ZMPRefPos(i);
 
@@ -1442,7 +1444,7 @@ namespace dynamicgraph {
         "        - a floating point number: the sole width,\n"
         "    \n";
       addCommand("setSoleParameters",
-		 makeCommandVoid2(*this,&PatternGenerator::setSoleParameters, 
+		 makeCommandVoid2(*this,&PatternGenerator::setSoleParameters,
                         docstring));
 
 

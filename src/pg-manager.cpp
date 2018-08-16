@@ -54,8 +54,6 @@ namespace dynamicgraph {
 
       std::istringstream cmdArg( cmdstd.str() );
       std::istringstream emptyArg;
-      pgEntity->commandLine( "initState", emptyArg, os );
-      pgEntity->commandLine( "parsecmd", cmdArg, os );
 
       sotDEBUG(15) << "Cmd: " << cmdstd.str() << std::endl;
     }
@@ -71,7 +69,6 @@ namespace dynamicgraph {
       std::ostringstream cmdstd; cmdstd << ":StopOnLineStepSequencing";
       std::ostringstream os;
       std::istringstream cmdArg( cmdstd.str() );
-      pgEntity->commandLine( "parsecmd", cmdArg, os );
     }
 
 
@@ -88,7 +85,6 @@ namespace dynamicgraph {
       std::ostringstream cmdArgIn, os;
       cmdArgIn << lastStep.x << " " << lastStep.y << " " << lastStep.theta;
       std::istringstream cmdArg( cmdArgIn.str() );
-      pgEntity->commandLine(cmdLine,cmdArg,os);
     }
 
 
@@ -116,41 +112,5 @@ namespace dynamicgraph {
     {
       os << "PGManager <" << getName() << ">:" << std::endl;
     }
-
-
-    void PGManager::commandLine( const std::string& cmdLine,
-				 std::istringstream& cmdArgs,
-				 std::ostream& os )
-    {
-      if( cmdLine == "help" )
-	{
-	  os << "StepTimeLine: " << std::endl
-	     << std::endl;
-	}
-      else if( "initPg" == cmdLine )
-	{
-	  std::string name = "pg";
-	  cmdArgs >> std::ws;
-	  if( cmdArgs.good()){ cmdArgs >> name; }
-	  pgEntity = &(PoolStorage::getInstance()->getEntity( name ));
-	  PatternGenerator* spg = dynamic_cast<PatternGenerator*>(pgEntity);
-	  if (spg){ pgi = spg->GetPatternGeneratorInterface(); }
-	}
-      else if( "savesteps" == cmdLine )
-	{
-	  std::ofstream os("/tmp/steps.dat");
-	  for(size_t i = 0; i < stepbuf.size(); ++i)
-	    {
-	      os << stepbuf[i].contact << " "
-		 << stepbuf[i].x << " "
-		 << stepbuf[i].y << " "
-		 << stepbuf[i].theta << "\n";
-	    }
-	  os << std::endl;
-	  stepbuf.clear();
-	}
-      else { Entity::commandLine( cmdLine,cmdArgs,os); }
-    }
-
   } // namespace dg
 } // namespace sot

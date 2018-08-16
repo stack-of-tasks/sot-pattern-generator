@@ -135,8 +135,6 @@ namespace dynamicgraph {
 	  }
 	std::istringstream cmdArg( cmdstd.str() );
 	std::istringstream emptyArg;
-	pgEntity->commandLine( "initState", emptyArg, os );
-	pgEntity->commandLine( "parsecmd", cmdArg, os );
 	sotDEBUG(15) << "Cmd: " << cmdstd.str() << std::endl;
       } else { sotERROR <<"PG not set" << std::endl; }
 
@@ -155,7 +153,6 @@ namespace dynamicgraph {
 	std::ostringstream cmdstd; std::ostringstream os;
 	cmdstd << ":StopOnLineStepSequencing";
 	std::istringstream cmdArg( cmdstd.str() );
-	pgEntity->commandLine( "parsecmd", cmdArg, os );
       } else { sotERROR <<"PG not set" << std::endl; }
 
       m_NbOfFirstSteps = 0;
@@ -182,7 +179,6 @@ namespace dynamicgraph {
 		  std::ostringstream cmdArgIn; std::ostringstream os;
 		  cmdArgIn << lastStep.x << " " << lastStep.y << " " << lastStep.theta;
 		  std::istringstream cmdArg( cmdArgIn.str() );
-		  pgEntity->commandLine(cmdLine,cmdArg,os);
 		}
 	      else if (m_StepModificationMode == NextStepPgSot::CHANGING_STEP)
 		{
@@ -299,66 +295,5 @@ namespace dynamicgraph {
       return;
 
     }
-
-
-
-    void NextStepPgSot::
-    commandLine( const std::string& cmdLine,
-		 std::istringstream& cmdArgs,
-		 std::ostream& os )
-    {
-      if( "help"==cmdLine )
-	{
-	  os << "NextStepPgSot: " << std::endl
-	     << " - initPg [<pg_name>]" << std::endl
-	     << " - stepmodificationmode [add|change]" <<std::endl;
-	  NextStep::commandLine(cmdLine, cmdArgs, os);
-	}
-      else if( "initPg" == cmdLine )
-	{
-	  std::string name = "pg";
-	  cmdArgs >> std::ws; if( cmdArgs.good()) cmdArgs >> name;
-	  pgEntity = &(PoolStorage::getInstance()->getEntity( name ));
-	  m_sPG = dynamic_cast<PatternGenerator *>(pgEntity);
-	  if (m_sPG!=0)
-	    m_PGI = m_sPG->GetPatternGeneratorInterface();
-	}
-      else if( "stepmodificationmode" == cmdLine)
-	{
-	  std::string stgmode;
-	  cmdArgs >> std::ws;
-	  if( cmdArgs.good())
-	    {
-	      cmdArgs >> stgmode;
-	      if (stgmode=="add")
-		m_StepModificationMode=NextStepPgSot::ADDING_STEP;
-	      else if (stgmode=="change")
-		m_StepModificationMode=NextStepPgSot::CHANGING_STEP;
-	    }
-	  else
-	    {
-	      if (m_StepModificationMode==NextStepPgSot::ADDING_STEP)
-		os << "add";
-	      else if (m_StepModificationMode==NextStepPgSot::CHANGING_STEP)
-		os << "change";
-	    }
-	}
-      else if( "savesteps" == cmdLine )
-	{
-	  std::ofstream os("/tmp/steps.dat");
-	  for(size_t i = 0; i < stepbuf.size(); ++i)
-	    {
-	      os << stepbuf[i].first << " "
-		 << stepbuf[i].second.x << " "
-		 << stepbuf[i].second.y << " "
-		 << stepbuf[i].second.z << "\n";
-	    }
-	  os << std::endl;
-	  stepbuf.clear();
-	}
-      else { NextStep::commandLine( cmdLine,cmdArgs,os ); }
-
-    }
-
   } // namespace dg
 } // namespace sot

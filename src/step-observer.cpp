@@ -148,19 +148,5 @@ namespace dynamicgraph {
     {
       os << "StepObserver <" << getName() <<">:" << std::endl;
     }
-
-
-    void StepObserver::commandLine( const std::string& cmdLine,
-				    std::istringstream& cmdArgs,
-				    std::ostream& os )
-    {
-      if( cmdLine == "help" )
-	{
-	  os << "StepObserver: " << std::endl
-	     << std::endl;
-	}
-      else { Entity::commandLine( cmdLine,cmdArgs,os); }
-    }
-
   } // namespace dg
 } // namespace sot

@@ -80,7 +80,7 @@ namespace dynamicgraph {
       sotDEBUGOUT(5);
     }
 
-  
+
 
 
     WhichFootUpper::
@@ -113,7 +113,7 @@ namespace dynamicgraph {
       MatrixRotation worldRwaist;
       worldRwaist = worldRsensor * waistRsensor.transpose();
 
-      MatrixHomogeneous worldMwaist; 
+      MatrixHomogeneous worldMwaist;
       worldMwaist.translation().setZero();
       worldMwaist.linear() = worldRwaist;
 
@@ -147,50 +147,5 @@ namespace dynamicgraph {
       sotDEBUGOUT(15);
       return res;
     }
-
-    /* --- PARAMS --------------------------------------------------------------- */
-    /* --- PARAMS --------------------------------------------------------------- */
-    /* --- PARAMS --------------------------------------------------------------- */
-
-    void WhichFootUpper::
-    commandLine( const std::string& cmdLine,
-		 std::istringstream& cmdArgs,
-		 std::ostream& os )
-    {
-
-
-      if( cmdLine == "help" )
-	{
-	  os << "WhichFootUpper: " << std::endl
-	     << " - index {left|right} [<value>]: get/set the foot indeces." << std::endl
-	     << " - trigger [<value>]: get/set the trigger threshold. " << std::endl;
-	}
-      else if( cmdLine == "index" )
-	{
-	  std::string foot; cmdArgs >> foot >> std::ws;
-	  unsigned int * classIndex = NULL;
-	  if( foot=="left" )
-	    { classIndex = & indexLeftFoot;  }
-	  else if( foot=="right" )
-	    { classIndex = & indexRightFoot; }
-	  else
-	    {
-	      os << "Error. Usage is: index {left|right} [<value>]" << std::endl;
-	      return;
-	    }
-
-	  if( cmdArgs.good() )
-	    { cmdArgs >> (*classIndex);}
-	  else { os << "index = " << (*classIndex) << std::endl; }
-
-	}
-      else if( cmdLine == "trigger" )
-	{
-	  cmdArgs >> std::ws; if( cmdArgs.good() ) { cmdArgs >> triggerThreshold; }
-	  else { os  << "trigger = " << triggerThreshold << std::endl; }
-	}
-      else { Entity::commandLine( cmdLine,cmdArgs,os); }
-    }
-
   } // namespace dg
 } // namespace sot

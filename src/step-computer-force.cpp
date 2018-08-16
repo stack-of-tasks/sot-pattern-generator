@@ -294,35 +294,5 @@ namespace dynamicgraph {
     {
       os << "StepComputerForce <" << getName() <<">:" << std::endl;
     }
-
-
-    void StepComputerForce::commandLine( const std::string& cmdLine,
-					 std::istringstream& cmdArgs,
-					 std::ostream& os )
-    {
-      if( cmdLine == "help" )
-	{
-	  os << "NextStep: " << std::endl
-	     << " - setObserver" << std::endl
-	     << " - thisIsZero {record|disp}" << std::endl
-	     << std::endl;
-	}
-      else if( cmdLine == "thisIsZero" )
-	{
-	  std::string arg; cmdArgs >> arg;
-	  if( arg == "disp" ) { os << "zero = " << waMref0; }
-	  else if( arg == "record" ) { thisIsZero(); }
-	}
-      else if( cmdLine == "setObserver" )
-	{
-	  std::string name = "stepobs";
-	  cmdArgs >> std::ws;
-	  if( cmdArgs.good()){ cmdArgs >> name; }
-	  Entity* entity = &(PoolStorage::getInstance()->getEntity( name ));
-	  twoHandObserver = dynamic_cast<StepObserver*>(entity);
-	}
-      else { Entity::commandLine( cmdLine,cmdArgs,os); }
-    }
-
   } // namespace dg
 } // namespace sot

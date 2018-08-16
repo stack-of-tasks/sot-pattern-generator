@@ -103,9 +103,6 @@ namespace dynamicgraph {
 
     public: /* --- PARAMS --- */
       void initCommands( void );
-      virtual void commandLine( const std::string& cmdLine,
-				std::istringstream& cmdArgs,
-				std::ostream& os );
       void create( const std::string& name,const std::string& type,const int & sigId );
       std::string getTypeList( void );
       void getTypeList( std::ostream& os );

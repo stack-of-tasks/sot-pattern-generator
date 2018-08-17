@@ -74,10 +74,6 @@ SET (step-computer-joystick_plugins_dependencies ${step-computer_plugins_depende
 SET (pg-manager_plugins_dependencies step-queue pg)
 SET (step-time-line_plugins_dependencies step-queue pg-manager)
 
-# --- PY ---
-INCLUDE(../cmake/python.cmake)
-SET(PYTHON_LOCAL_PATH sot/pattern_generator)
-
 # --- PLUGIN COMPILATION/INSTALLATION
 FOREACH(LIBRARY_NAME ${plugins})
   ADD_LIBRARY(${LIBRARY_NAME}
@@ -113,24 +109,26 @@ FOREACH(LIBRARY_NAME ${plugins})
   INSTALL(TARGETS ${LIBRARY_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/plugin)
 
   # --- PY ---
-  STRING(REPLACE - _ PYTHON_LIBRARY_NAME ${LIBRARY_NAME})
+  IF(BUILD_PYTHON_INTERFACE)
+    STRING(REPLACE - _ PYTHON_LIBRARY_NAME ${LIBRARY_NAME})
 
-  DYNAMIC_GRAPH_PYTHON_MODULE("${PYTHON_LOCAL_PATH}/${PYTHON_LIBRARY_NAME}"
-    ${LIBRARY_NAME} sot-pattern_generator-${PYTHON_LIBRARY_NAME}-wrap)
+    DYNAMIC_GRAPH_PYTHON_MODULE("${PYTHON_LOCAL_PATH}/${PYTHON_LIBRARY_NAME}"
+      ${LIBRARY_NAME} sot-pattern_generator-${PYTHON_LIBRARY_NAME}-wrap)
+  ENDIF(BUILD_PYTHON_INTERFACE)
 
 ENDFOREACH(LIBRARY_NAME)
 
 # --- PY ---
-# Install lonely files
-SET(PYTHON_MODULE dynamic_graph/sot/pattern_generator)
-SET(LOCAL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_graph/${PYTHON_LOCAL_PATH})
-SET(PYFILES 
-__init__.py 
-meta_selector.py
-meta_pg.py
-walking.py)
+IF(BUILD_PYTHON_INTERFACE)
+  # Install lonely files
+  SET(PYFILES
+    __init__.py
+    meta_selector.py
+    meta_pg.py
+    walking.py)
 
-FOREACH(PYFILE ${PYFILES})
-  PYTHON_INSTALL_ON_SITE("${PYTHON_MODULE}" "${PYFILE}" )
-ENDFOREACH()
+  FOREACH(PYFILE ${PYFILES})
+    PYTHON_INSTALL_ON_SITE("${PYTHON_MODULE}" "${PYFILE}" )
+  ENDFOREACH()
 
+ENDIF(BUILD_PYTHON_INTERFACE)

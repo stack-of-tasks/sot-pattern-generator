@@ -1,8 +1,6 @@
-INCLUDE(../cmake/python.cmake)
-FINDPYTHON()
-
-INSTALL(
-  FILES walkromeo.py
-  DESTINATION ${PYTHON_SITELIB}/dynamic_graph/tutorial
-)
-
+IF(BUILD_PYTHON_INTERFACE)
+  INSTALL(
+    FILES walkromeo.py
+    DESTINATION ${PYTHON_SITELIB}/dynamic_graph/tutorial
+    )
+ENDIF(BUILD_PYTHON_INTERFACE)

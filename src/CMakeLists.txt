@@ -120,15 +120,11 @@ ENDFOREACH(LIBRARY_NAME)
 
 # --- PY ---
 IF(BUILD_PYTHON_INTERFACE)
-  # Install lonely files
-  SET(PYFILES
-    __init__.py
-    meta_selector.py
-    meta_pg.py
-    walking.py)
-
-  FOREACH(PYFILE ${PYFILES})
-    PYTHON_INSTALL_ON_SITE("${PYTHON_MODULE}" "${PYFILE}" )
-  ENDFOREACH()
-
+  INSTALL(FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_graph/sot/pattern_generator/__init__.py
+    ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_graph/sot/pattern_generator/meta_selector.py
+    ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_graph/sot/pattern_generator/meta_pg.py
+    ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_graph/sot/pattern_generator/walking.py
+    DESTINATION ${PYTHON_SITELIB}/dynamic_graph/sot/pattern_generator/
+    )
 ENDIF(BUILD_PYTHON_INTERFACE)

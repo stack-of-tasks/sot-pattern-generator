@@ -48,6 +48,7 @@ ADD_REQUIRED_DEPENDENCY("pinocchio >= 1.2.0")
 ADD_REQUIRED_DEPENDENCY("dynamic-graph >= 3.0.0")
 ADD_REQUIRED_DEPENDENCY("dynamic-graph-python >= 3.0.0")
 ADD_REQUIRED_DEPENDENCY("sot-core >= 3.0")
+ADD_OPTIONAL_DEPENDENCY("hrp2_14_description >= 1.0.5")
 
 OPTION(BUILD_PYTHON_INTERFACE "Build the python bindings" ON)
 IF(BUILD_PYTHON_INTERFACE)

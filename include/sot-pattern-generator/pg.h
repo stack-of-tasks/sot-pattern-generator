@@ -40,7 +40,6 @@
 #include <sot/core/matrix-geometry.hh>
 
 /* Pattern Generator */
-#include <jrl/mal/matrixabstractlayer.hh>
 #include <jrl/walkgen/patterngeneratorinterface.hh>
 #include <jrl/walkgen/pinocchiorobot.hh>
 namespace pg=PatternGeneratorJRL;
@@ -81,24 +80,24 @@ namespace dynamicgraph {
       // overload the new[] eigen operator
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-      /*! \name Some constant to define the type
-    of frame reference.
-    @{
-      */
-      /*! \brief Specify that the frame is expressed  in
-    the world reference frame. */
-      static const int WORLD_FRAME=0;
+        /*! \name Some constant to define the type
+          of frame reference.
+          @{
+        */
+        /*! \brief Specify that the frame is expressed  in
+          the world reference frame. */
+        static const int WORLD_FRAME=0;
 
       /*! \brief Specify that the frame is expressed in
-    the robot ego centered frame. */
+        the robot ego centered frame. */
       static const int EGOCENTERED_FRAME = 1;
 
       /*! \brief Specify that the frame is expressed in
-    the left foot centered frame. */
+        the left foot centered frame. */
       static const int LEFT_FOOT_CENTERED_FRAME = 2;
 
       /*! \brief Specify that the frame is expressed in
-    the waist centered frame. */
+        the waist centered frame. */
       static const int WAIST_CENTERED_FRAME = 3;
 
 
@@ -113,27 +112,30 @@ namespace dynamicgraph {
     protected:
 
       /*! \brief The model of the robot. */
-      se3::Model m_robotModel ;
+      pinocchio::Model m_robotModel ;
       /*! \brief Pointer towards the robot model inside jrl-walkgen. */
       pg::PinocchioRobot * m_PR ;
       /*! \brief The pointor toward the robot data. */
-      se3::Data * m_robotData ;
+      pinocchio::Data * m_robotData ;
       /*! \brief Pointer towards the interface of the pattern generator. */
       pg::PatternGeneratorInterface * m_PGI ;
 
       /*! \name Fields to store name and positions of data files
-    @{
+        @{
       */
       /*! \brief Some information related to the preview control. */
       std::string m_PreviewControlParametersFile;
 
-      /*! \brief Directory+Name where the URDF file of the robot's model is located. */
+      /*! \brief Directory+Name where the URDF file of
+        the robot's model is located. */
       std::string m_urdfFile;
 
-      /*! \brief Directory+Name where the SRDF file of the robot's model is located. */
+      /*! \brief Directory+Name where the SRDF file of
+        the robot's model is located. */
       std::string m_srdfFile;
 
-      /*! \brief Directory+Name where the Rank of the joints are notified */
+      /*! \brief Directory+Name where the Rank of
+        the joints are notified */
       std::string m_xmlRankFile ;
 
       std::vector<unsigned> m_wrml2urdfIndex ;
@@ -147,13 +149,15 @@ namespace dynamicgraph {
       /* \brief Special joints map for the parser */
       std::map<std::string, std::string> specialJoints_;
 
-     /*! @} */
+      /*! @} */
 
-      /*! \brief Boolean variable to initialize the object by loading an object. */
+      /*! \brief Boolean variable to initialize the object
+        by loading an object. */
       bool m_init;
 
       /*! \brief Boolean variable to initialize the position:
-    first through the real state of the robot, then through the motor command. */
+        first through the real state of the robot,
+        then through the motor command. */
       bool m_InitPositionByRealState;
 
       /*! \brief Integer for the support foot. */
@@ -185,16 +189,18 @@ namespace dynamicgraph {
     public: /* --- MODEL CREATION --- */
 
       /*! \name Methods related to the data files.
-    @{
+        @{
       */
 
-      /*! \brief Build the pattern generator interface from a Urdf and SRDF file. */
+      /*! \brief Build the pattern generator interface from a Urdf
+        and SRDF file. */
       bool buildModel( void );
 
       /*! \brief Initialize the state of the robot. */
       bool InitState( void );
 
-      /*! \brief Set the directory which contains the parameters for the preview control. */
+      /*! \brief Set the directory which contains the parameters
+        for the preview control. */
       void setPreviewControlParametersFile( const std::string& filename );
 
       /*! \brief Set the path which contains the URDF files robot's model. */
@@ -210,19 +216,21 @@ namespace dynamicgraph {
       void setXmlRankFile( const std::string& filename );
 
       /*! \brief Set the name of the file specifying the control parameters
-    of the preview control. */
+        of the preview control. */
       void setParamPreviewFile(const std::string &filename);
 
       /*! \brief Set the foot parameters */
-      void setSoleParameters(const double& inSoleLength, const double& inSoleWidth);
+      void setSoleParameters(const double& inSoleLength,
+                             const double& inSoleWidth);
 
       /*! \brief Set mapping between a link and actual robot name */
-       void addJointMapping(const std::string& link, const std::string& repName);
+      void addJointMapping(const std::string& link,
+                           const std::string& repName);
 
       /*! \brief Give access directly to the pattern generator...
-    You really have to know what your are doing. */
+        You really have to know what your are doing. */
       pg::PatternGeneratorInterface * GetPatternGeneratorInterface()
-    { return m_PGI;};
+      { return m_PGI;};
 
       /*! @} */
 
@@ -231,7 +239,7 @@ namespace dynamicgraph {
       typedef int Dummy;
 
       /*! \name Internal signals.
-    @{
+        @{
       */
 
       /*! \brief Internal signal for initialization and one shot signals. */
@@ -245,7 +253,7 @@ namespace dynamicgraph {
     protected:
 
       /*! \name Internal methods to access reference trajectories.
-    @{
+        @{
       */
       /*! \brief Internal method to get the reference ZMP at a given time. */
       dynamicgraph::Vector & getZMPRef(dynamicgraph::Vector & res, int time);
@@ -257,7 +265,8 @@ namespace dynamicgraph {
       dynamicgraph::Vector & getdCoMRef(dynamicgraph::Vector & res, int time);
 
       /*! \brief Internal method to get the external forces at a given time.*/
-      dynamicgraph::Vector & getExternalForces(dynamicgraph::Vector & forces, int time);
+      dynamicgraph::Vector & getExternalForces
+        (dynamicgraph::Vector & forces, int time);
 
       /*! \brief Internal method to get the position of the left foot. */
       MatrixHomogeneous & getLeftFootRef(MatrixHomogeneous &res, int time);
@@ -275,28 +284,35 @@ namespace dynamicgraph {
       MatrixHomogeneous & getFlyingFootRef(MatrixHomogeneous &res, int time);
 
       /*! \brief Internal method to get the joint position for walking. */
-      dynamicgraph::Vector & getjointWalkingErrorPosition(dynamicgraph::Vector &res, int time);
+      dynamicgraph::Vector & getjointWalkingErrorPosition
+        (dynamicgraph::Vector &res, int time);
 
       /*! \brief Internal method to get the derivative of the com attitude. */
-      dynamicgraph::Vector & getdComAttitude(dynamicgraph::Vector &res, int time);
+      dynamicgraph::Vector & getdComAttitude
+        (dynamicgraph::Vector &res, int time);
 
       /*! \brief Internal method to get the attitude of the com. */
-      dynamicgraph::Vector & getComAttitude(dynamicgraph::Vector &res, int time);
+      dynamicgraph::Vector & getComAttitude
+        (dynamicgraph::Vector &res, int time);
 
       /*! \brief Internal method to get the attitude of the waist. */
-      VectorRollPitchYaw & getWaistAttitude(VectorRollPitchYaw &res, int time);
+      VectorRollPitchYaw & getWaistAttitude
+        (VectorRollPitchYaw &res, int time);
 
       /*! \brief Internal method to get the absolute attitude of the waist. */
-      VectorRollPitchYaw & getWaistAttitudeAbsolute(VectorRollPitchYaw &res, int time);
+      VectorRollPitchYaw & getWaistAttitudeAbsolute
+        (VectorRollPitchYaw &res, int time);
 
       /*! \brief Internal method to get the dataInPorcess flag */
       unsigned & getDataInProcess(unsigned &res, int time);
 
       /*! \brief Internal method to get the position of the waist. */
-      dynamicgraph::Vector & getWaistPosition(dynamicgraph::Vector &res, int time);
+      dynamicgraph::Vector & getWaistPosition
+        (dynamicgraph::Vector &res, int time);
 
       /*! \brief Internal method to get the absolute position of the waist. */
-      dynamicgraph::Vector & getWaistPositionAbsolute(dynamicgraph::Vector &res, int time);
+      dynamicgraph::Vector & getWaistPositionAbsolute
+        (dynamicgraph::Vector &res, int time);
 
       /*! @} */
 
@@ -309,11 +325,11 @@ namespace dynamicgraph {
       int & OneStepOfControl(int &dummy, int time);
 
       /*! \name Keep information computed once for each time.
-    @{
+        @{
       */
 
       /*! \brief Rigit motion between two waist positions
-    at the  beginning of the walking and at the end of the walking. */
+        at the  beginning of the walking and at the end of the walking. */
       MatrixHomogeneous m_k_Waist_kp1;
 
       /*! \brief Absolute Position for the left and right feet. */
@@ -322,7 +338,8 @@ namespace dynamicgraph {
       /*! \brief Absolute Derivate for the left and right feet. */
       MatrixHomogeneous m_dotLeftFootPosition,m_dotRightFootPosition;
 
-      /*! \brief Initial Absolute Starting Position for the left and right feet. */
+      /*! \brief Initial Absolute Starting Position
+        for the left and right feet. */
       MatrixHomogeneous m_InitLeftFootPosition,m_InitRightFootPosition;
 
       /*! \brief Keep track of the motion between sequence of motions. */
@@ -334,12 +351,13 @@ namespace dynamicgraph {
       /*! \brief Absolute position of the reference ZMP. */
       dynamicgraph::Vector m_ZMPRefPos;
 
-      /*! \brief Com Attitude: does not really exist apart from when the robot
-    is seen as an inverted pendulum*/
+      /*! \brief Com Attitude: does not really exist apart
+        from when the robot
+        is seen as an inverted pendulum*/
       dynamicgraph::Vector m_ComAttitude;
 
       /*! \brief Com Attitude: does not really exist apart when the robot
-    is seen as an inverted pendulum*/
+        is seen as an inverted pendulum*/
       dynamicgraph::Vector m_dComAttitude;
 
       /*! \brief Absolute position of the reference CoM. */
@@ -351,7 +369,8 @@ namespace dynamicgraph {
       /*! \brief Initial Absolute position of the reference ZMP. */
       dynamicgraph::Vector m_InitZMPRefPos;
 
-      /*! \brief Initial Absolute position and attitude of the reference Waist. */
+      /*! \brief Initial Absolute position and
+        attitude of the reference Waist. */
       dynamicgraph::Vector m_InitWaistRefPos, m_InitWaistRefAtt;
 
       /*! \brief Initial Absolute position of the reference CoM. */
@@ -374,14 +393,18 @@ namespace dynamicgraph {
 
       /*! \brief Velocity reference for Herdt's PG */
       dynamicgraph::Vector m_VelocityReference;
-      /*! \brief true iff the pattern if dealing with data, false if pg is not
-       * working anymore/yet. */
+
+      /*! \brief true iff the pattern if dealing with data,
+        false if pg is not
+        * working anymore/yet. */
       unsigned int m_dataInProcess;
 
-      /*! \brief Booleans used to indicate if feedback signals shoul be used or not */
+      /*! \brief Booleans used to indicate if feedback
+        signals shoul be used or not */
       bool m_feedBackControl;
 
-      /*! \brief Booleans used to indicate if force feedback signals shoul be used or not */
+      /*! \brief Booleans used to indicate if force
+        feedback signals shoul be used or not */
       bool m_forceFeedBack;
 
       /*! \brief Booleans used to indicate feet contacts */
@@ -389,60 +412,71 @@ namespace dynamicgraph {
 
       /*! @} */
 
-      /*! Parsing a file of command by the walking pattern generator interface.
-    \par[in] The command line (optional option)
-    \par[in]
-
-      */
+      /*! Parsing a file of command by the walking
+        pattern generator interface.
+        \par[in] The command line (optional option)
+        \par[in] */
       void ParseCmdFile(std::istringstream &cmdArg,
-            std::ostream &os);
+                        std::ostream &os);
 
       /*! \brief Transfert from a current absolute foot position
-    to a dot homogeneous matrix. */
-      void FromAbsoluteFootPosToDotHomogeneous(pg::FootAbsolutePosition aFootPosition,
-                           MatrixHomogeneous &aFootMH,
-                           MatrixHomogeneous &adotFootMH);
+        to a dot homogeneous matrix. */
+      void FromAbsoluteFootPosToDotHomogeneous
+        (pg::FootAbsolutePosition aFootPosition,
+         MatrixHomogeneous &aFootMH,
+         MatrixHomogeneous &adotFootMH);
 
 
       /*! \brief Transfert from a current absolute foot position
-    to a homogeneous matrix. */
-      void FromAbsoluteFootPosToHomogeneous(pg::FootAbsolutePosition aFootPosition,
-                        MatrixHomogeneous &aFootMH);
+        to a homogeneous matrix. */
+      void FromAbsoluteFootPosToHomogeneous
+        (pg::FootAbsolutePosition aFootPosition,
+         MatrixHomogeneous &aFootMH);
 
 
-      /*! \brief Provide an homogeneous matrix from the current waist position
-    and attitude*/
-      void getAbsoluteWaistPosAttHomogeneousMatrix(MatrixHomogeneous &aWaistMH);
+      /*! \brief Provide an homogeneous matrix
+        from the current waist position and attitude*/
+      void getAbsoluteWaistPosAttHomogeneousMatrix
+        (MatrixHomogeneous &aWaistMH);
 
 
-      /*! \brief Internal method to get the initial reference ZMP at a given time. */
-      dynamicgraph::Vector & getInitZMPRef(dynamicgraph::Vector & res, int time);
+      /*! \brief Internal method to get the initial
+        reference ZMP at a given time. */
+      dynamicgraph::Vector & getInitZMPRef
+        (dynamicgraph::Vector & res, int time);
 
-      /*! \brief Internal method to get the initial reference CoM at a given time.*/
-      dynamicgraph::Vector & getInitCoMRef(dynamicgraph::Vector & res, int time);
+      /*! \brief Internal method to get the
+        initial reference CoM at a given time.*/
+      dynamicgraph::Vector & getInitCoMRef
+        (dynamicgraph::Vector & res, int time);
 
-      /*! \brief Internal method to get the initial reference CoM at a given time.*/
-      dynamicgraph::Vector & getInitWaistPosRef(dynamicgraph::Vector & res, int time);
+      /*! \brief Internal method to get the initial
+        reference CoM at a given time.*/
+      dynamicgraph::Vector & getInitWaistPosRef
+        (dynamicgraph::Vector & res, int time);
 
-      /*! \brief Internal method to get the initial reference CoM at a given time.*/
-      VectorRollPitchYaw & getInitWaistAttRef(VectorRollPitchYaw & res, int time);
+      /*! \brief Internal method to get the initial
+        reference CoM at a given time.*/
+      VectorRollPitchYaw & getInitWaistAttRef
+        (VectorRollPitchYaw & res, int time);
 
       /*! \brief Internal method to get the position of the left foot. */
-      MatrixHomogeneous & getInitLeftFootRef(MatrixHomogeneous &res, int time);
+      MatrixHomogeneous & getInitLeftFootRef
+        (MatrixHomogeneous &res, int time);
 
       /*! \brief Internal method to get the position of the right foot. */
-      MatrixHomogeneous & getInitRightFootRef(MatrixHomogeneous &res, int time);
+      MatrixHomogeneous & getInitRightFootRef
+        (MatrixHomogeneous &res, int time);
 
       /*! \brief Internal method to get the information of contact or not on
-    the feet. */
+        the feet. */
       bool & getLeftFootContact(bool & res,int time);
       bool & getRightFootContact(bool & res,int time);
 
     public:
 
       /*! \name External signals
-    @{
-      */
+        @{ */
       /*! \brief Real state position values. */
       SignalPtr<dynamicgraph::Vector,int> jointPositionSIN;
 
@@ -470,7 +504,8 @@ namespace dynamicgraph {
       /*! \brief Take the current zmp (x, y, z). */
       SignalPtr<dynamicgraph::Vector,int> zmpSIN;
 
-      /*! \brief Take the current external force applied to the com (fx, fy, fz). */
+      /*! \brief Take the current external force applied
+        to the com (fx, fy, fz). */
       SignalPtr<dynamicgraph::Vector,int> forceSIN;
       SignalTimeDependent<dynamicgraph::Vector,int> forceSOUT;
       dynamicgraph::Vector m_initForce;
@@ -500,14 +535,15 @@ namespace dynamicgraph {
       SignalTimeDependent<MatrixHomogeneous,int> dotRightFootRefSOUT;
 
       /*! \brief Externalize the foot which is not considered as support foot,
-    the information are given in a relative referentiel. */
+        the information are given in a relative referentiel. */
       SignalTimeDependent<MatrixHomogeneous,int> FlyingFootRefSOUT;
 
       /*! \brief Externalize the support foot. */
       SignalTimeDependent<unsigned int,int> SupportFootSOUT;
 
       /*! \brief Externalize the joint values for walking. */
-      SignalTimeDependent<dynamicgraph::Vector,int> jointWalkingErrorPositionSOUT;
+      SignalTimeDependent<dynamicgraph::Vector,int>
+        jointWalkingErrorPositionSOUT;
 
       /*! \brief Externalize the com attitude. */
       SignalTimeDependent<dynamicgraph::Vector,int> comattitudeSOUT;
@@ -516,16 +552,20 @@ namespace dynamicgraph {
       SignalTimeDependent<dynamicgraph::Vector,int> dcomattitudeSOUT;
 
       /*! \brief Externalize the waist attitude. */
-      SignalTimeDependent<VectorRollPitchYaw,int> waistattitudeSOUT;
+      SignalTimeDependent<VectorRollPitchYaw,int>
+        waistattitudeSOUT;
 
       /*! \brief Externalize the absolute waist attitude. */
-      SignalTimeDependent<VectorRollPitchYaw,int> waistattitudeabsoluteSOUT;
+      SignalTimeDependent<VectorRollPitchYaw,int>
+        waistattitudeabsoluteSOUT;
 
       /*! \brief Externalize the waist position. */
-      SignalTimeDependent<dynamicgraph::Vector,int> waistpositionSOUT;
+      SignalTimeDependent<dynamicgraph::Vector,int>
+        waistpositionSOUT;
 
       /*! \brief Externalize the absolute waist position. */
-      SignalTimeDependent<dynamicgraph::Vector,int> waistpositionabsoluteSOUT;
+      SignalTimeDependent<dynamicgraph::Vector,int>
+        waistpositionabsoluteSOUT;
 
       /*! \brief true iff PG is processing. Use it for synchronize. */
       SignalTimeDependent<unsigned int,int> dataInProcessSOUT;
@@ -554,20 +594,21 @@ namespace dynamicgraph {
       /*! @} */
 
       /*! \name Reimplement the interface of the plugin.
-    @{
-      */
+        @{ */
 
       /*! @} */
     protected:
 
       /*! Storing the previous ZMP value. */
-      MAL_VECTOR(m_ZMPPrevious,double);
+      Eigen::VectorXd m_ZMPPrevious;
 
     public: /* --- PARAMS --- */
       void initCommands( void );
       int stringToReferenceEnum( const std::string & FrameReference );
       void setReferenceFromString( const std::string & str );
-      void addOnLineStep( const double & x, const double & y, const double & th);
+      void addOnLineStep( const double & x,
+                          const double & y,
+                          const double & th);
       void addStep( const double & x, const double & y, const double & th);
       void pgCommandLine( const std::string & cmdline );
       void useFeedBackSignals( const bool & feedBack );
@@ -582,4 +623,3 @@ namespace dynamicgraph {
 } // namespace dynamicgraph
 
 #endif // #ifndef __SOT_PATTERN_GENERATOR_H__
-

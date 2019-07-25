@@ -22,6 +22,7 @@
 #include <time.h>
 #ifndef WIN32
 # include <sys/time.h>
+# include <iostream>
 #else
 # include <jrl/mal/boost.hh>
 # include <sot/core/utils-windows.hh>
@@ -44,9 +45,12 @@ namespace dynamicgraph {
 
     StepComputerPos:: StepComputerPos( const std::string & name )
       : Entity(name)
-      , referencePositionLeftSIN( NULL,"StepComputerPos("+name+")::input(vector)::posrefleft" )
-      , referencePositionRightSIN( NULL,"StepComputerPos("+name+")::input(vector)::posrefright" )
-      , contactFootSIN( NULL,"StepComputerPos("+name+")::input(uint)::contactfoot" )
+      , referencePositionLeftSIN
+        ( NULL,"StepComputerPos("+name+")::input(vector)::posrefleft" )
+      , referencePositionRightSIN
+        ( NULL,"StepComputerPos("+name+")::input(vector)::posrefright" )
+      , contactFootSIN
+        ( NULL,"StepComputerPos("+name+")::input(uint)::contactfoot" )
       , rfMref0()
       , lfMref0()
       , twoHandObserver( 0x0 )
@@ -56,7 +60,8 @@ namespace dynamicgraph {
     {
       sotDEBUGIN(5);
 
-      signalRegistration( referencePositionLeftSIN<<referencePositionRightSIN<<contactFootSIN );
+      signalRegistration
+        ( referencePositionLeftSIN<<referencePositionRightSIN<<contactFootSIN );
 
       sotDEBUGOUT(5);
     }
@@ -65,29 +70,31 @@ namespace dynamicgraph {
     {
       // Introduce new step at the end of the preview window.
       if( queue.getLastStep().contact == CONTACT_LEFT_FOOT ) {
-	queue.pushStep(0., -queue.getZeroStepPosition(), 0.);
-	logPreview << timeCurr << " " << 0 << " "
-		   << -queue.getZeroStepPosition() << " " << 0
-		   << std::endl;
+        queue.pushStep(0., -queue.getZeroStepPosition(), 0.);
+        logPreview << timeCurr << " " << 0 << " "
+                   << -queue.getZeroStepPosition() << " " << 0
+                   << std::endl;
       }
       else {
-	queue.pushStep(0., queue.getZeroStepPosition(), 0.);
-	logPreview << timeCurr << " " << 0 << " "
-		   << queue.getZeroStepPosition() << " " << 0
-		   << std::endl;
+        queue.pushStep(0., queue.getZeroStepPosition(), 0.);
+        logPreview << timeCurr << " " << 0 << " "
+                   << queue.getZeroStepPosition() << " " << 0
+                   << std::endl;
       }
     }
 
     void StepComputerPos::changeFirstStep( StepQueue& queue, int timeCurr )
     {
       if(!twoHandObserver) {
-	std::cerr << "Observer not set" << std::endl;
-	return;
+        std::cerr << "Observer not set" << std::endl;
+        return;
       }
 
       const unsigned& sfoot = contactFootSIN( timeCurr );
-      const MatrixHomogeneous& wMlf = twoHandObserver->leftFootPositionSIN.access( timeCurr );
-      const MatrixHomogeneous& wMrf = twoHandObserver->rightFootPositionSIN.access( timeCurr );
+      const MatrixHomogeneous& wMlf =
+        twoHandObserver->leftFootPositionSIN.access( timeCurr );
+      const MatrixHomogeneous& wMrf =
+        twoHandObserver->rightFootPositionSIN.access( timeCurr );
 
       // actual and reference position of reference frame in fly foot,
       // position of fly foot in support foot.
@@ -95,17 +102,17 @@ namespace dynamicgraph {
       MatrixHomogeneous ffMref, ffMref0;
       MatrixHomogeneous sfMff;
       if( sfoot != 1 ) // --- left foot support ---
-	{
-	  ffMref = referencePositionRightSIN.access( timeCurr );
-	  ffMref0 = rfMref0;
-	  MatrixHomogeneous sfMw; sfMw = wMlf.inverse(); sfMff = sfMw*wMrf;
-	}
+        {
+          ffMref = referencePositionRightSIN.access( timeCurr );
+          ffMref0 = rfMref0;
+          MatrixHomogeneous sfMw; sfMw = wMlf.inverse(); sfMff = sfMw*wMrf;
+        }
       else // -- right foot support ---
-	{
-	  ffMref = referencePositionLeftSIN.access( timeCurr );
-	  ffMref0 = lfMref0;
-	  MatrixHomogeneous sfMw; sfMw = wMrf.inverse(); sfMff = sfMw*wMlf;
-	}
+        {
+          ffMref = referencePositionLeftSIN.access( timeCurr );
+          ffMref0 = lfMref0;
+          MatrixHomogeneous sfMw; sfMw = wMrf.inverse(); sfMff = sfMw*wMlf;
+        }
 
       // homogeneous transform from ref position of ref frame to
       // actual position of ref frame.
@@ -156,17 +163,18 @@ namespace dynamicgraph {
 
       double nx = 0, ny = 0;
       if(sfoot != 1) { // left foot support phase
-	if(y > 0){ y = -0.001; }
+        if(y > 0){ y = -0.001; }
       }
       else {
-	if(y < 0){ y = 0.001; }
+        if(y < 0){ y = 0.001; }
       }
 
       checker.clipStep(x, y, nx, ny);
 
       // Log x-y values before and after clipping
 
-      logChanges << timeCurr << " " << x << " " << y << " " << nx << " " << ny << " ";
+      logChanges << timeCurr << " " << x << " "
+                 << y << " " << nx << " " << ny << " ";
 
       // The coordinates must be expressed in the destination foot frame.
       // See the technical report of Olivier Stasse for more details,
@@ -202,5 +210,35 @@ namespace dynamicgraph {
     {
       os << "StepComputerPos <" << getName() <<">:" << std::endl;
     }
+
+    void StepComputerPos::commandLine( const std::string& cmdLine,
+                                       std::istringstream& cmdArgs,
+                                       std::ostream& os )
+    {
+      if( cmdLine == "help" )
+        {
+          os << "NextStep: " << std::endl
+             << " - setObserver" << std::endl
+             << " - thisIsZero {record|disp}" << std::endl
+             << std::endl;
+        }
+      else if( cmdLine == "thisIsZero" )
+        {
+          std::string arg; cmdArgs >> arg;
+          if( arg == "disp_left" ) { os << "zero_left = " << lfMref0; }
+          else if( arg == "disp_right" ) { os << "zero_right = " << rfMref0; }
+          else if( arg == "record" ) { thisIsZero(); }
+        }
+      else if( cmdLine == "setObserver" )
+        {
+          std::string name = "stepobs";
+          cmdArgs >> std::ws;
+          if( cmdArgs.good()){ cmdArgs >> name; }
+          Entity* entity = &(PoolStorage::getInstance()->getEntity( name ));
+          twoHandObserver = dynamic_cast<StepObserver*>(entity);
+        }
+      else {  }
+    }
+
   } // namespace dg
 } // namespace sot

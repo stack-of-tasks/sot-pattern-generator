@@ -30,18 +30,20 @@ namespace dynamicgraph {
 
 
     FootPrint::FootPrint()
-  : x(0.), y(0.), theta(0.), contact(CONTACT_RIGHT_FOOT)
+      : x(0.), y(0.), theta(0.), contact(CONTACT_RIGHT_FOOT)
     {
     }
 
-    FootPrint::FootPrint(double nx, double ny, double ntheta, ContactName ncontact)
-  : x(nx), y(ny), theta(ntheta), contact(ncontact)
+    FootPrint::FootPrint(double nx, double ny,
+                         double ntheta, ContactName ncontact)
+      : x(nx), y(ny), theta(ntheta), contact(ncontact)
     {
     }
 
     const unsigned int StepQueue::QUEUE_SIZE = 4;
     const double StepQueue::ZERO_STEP_POSITION = 0.19;
-    const FootPrint StepQueue::START_FOOT_PRINT(0.0, -ZERO_STEP_POSITION/2., 0.0, CONTACT_RIGHT_FOOT);
+    const FootPrint StepQueue::
+    START_FOOT_PRINT(0.0, -ZERO_STEP_POSITION/2., 0.0, CONTACT_RIGHT_FOOT);
 
 
     StepQueue::StepQueue( const std::string& name )
@@ -57,9 +59,12 @@ namespace dynamicgraph {
     {
       footPrintList.clear();
       footPrintList.push_back( START_FOOT_PRINT );
-      footPrintList.push_back( FootPrint(0., ZERO_STEP_POSITION, 0., CONTACT_LEFT_FOOT) );
-      footPrintList.push_back( FootPrint(0., -ZERO_STEP_POSITION, 0., CONTACT_RIGHT_FOOT) );
-      footPrintList.push_back( FootPrint(0., ZERO_STEP_POSITION, 0., CONTACT_LEFT_FOOT) );
+      footPrintList.push_back( FootPrint(0., ZERO_STEP_POSITION, 0.,
+                                         CONTACT_LEFT_FOOT) );
+      footPrintList.push_back( FootPrint(0., -ZERO_STEP_POSITION, 0.,
+                                         CONTACT_RIGHT_FOOT) );
+      footPrintList.push_back( FootPrint(0., ZERO_STEP_POSITION, 0.,
+                                         CONTACT_LEFT_FOOT) );
 
       firstStepChanged = false;
     }
@@ -75,10 +80,10 @@ namespace dynamicgraph {
       const FootPrint& last = footPrintList.back();
 
       if(last.contact == CONTACT_LEFT_FOOT) {
-	footprint.contact = CONTACT_RIGHT_FOOT;
+        footprint.contact = CONTACT_RIGHT_FOOT;
       }
       else {
-	footprint.contact = CONTACT_LEFT_FOOT;
+        footprint.contact = CONTACT_LEFT_FOOT;
       }
 
       footPrintList.push_back(footprint);
@@ -151,9 +156,25 @@ namespace dynamicgraph {
       os << "StepQueue <" << getName() << ">:" << std::endl;
 
       for(size_t i = 0; i < footPrintList.size(); ++i) {
-	const FootPrint& fp = footPrintList[i];
-	os << "step " << i << ": " << fp.contact << ", (" << fp.x << " " << fp.y << " " << fp.theta << ")" << std::endl;
+        const FootPrint& fp = footPrintList[i];
+        os << "step " << i << ": " << fp.contact
+           << ", (" << fp.x << " " << fp.y << " "
+           << fp.theta << ")" << std::endl;
       }
     }
+
+
+    void StepQueue::commandLine( const std::string& cmdLine,
+                                 std::istringstream& cmdArgs,
+                                 std::ostream& os )
+    {
+      if( cmdLine == "help" )
+        {
+          os << "StepQueue: " << std::endl
+             << std::endl;
+        }
+      else {  }
+    }
+
   } // namespace dg
 } // namespace sot

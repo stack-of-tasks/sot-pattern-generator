@@ -22,8 +22,8 @@
 #include <time.h>
 #ifndef WIN32
 # include <sys/time.h>
+# include <iostream>
 #else
-# include <jrl/mal/boost.hh>
 # include <sot/core/utils-windows.hh>
 # include <Winsock2.h>
 #endif /*WIN32*/
@@ -40,16 +40,19 @@
 namespace dynamicgraph {
   namespace sot {
 
-    DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(StepComputerJoystick,"StepComputerJoystick");
+    DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN
+    (StepComputerJoystick,"StepComputerJoystick");
 
 
     StepComputerJoystick::StepComputerJoystick( const std::string & name )
       : Entity(name)
-      , joystickSIN( NULL,"StepComputerJoystick("+name+")::input(vector)::joystickin" )
-      , contactFootSIN( NULL,"StepComputerJoystick("+name+")::input(uint)::contactfoot" )
+      , joystickSIN( NULL,"StepComputerJoystick("+name+
+                     ")::input(vector)::joystickin" )
+      , contactFootSIN( NULL,"StepComputerJoystick("+name+
+                        ")::input(uint)::contactfoot" )
       , laststepSOUT(boost::bind(&StepComputerJoystick::getlaststep,this,_1,_2),
-		     joystickSIN,
-		     "StepComputerJoystick("+name+")::output(vector)::laststep")
+                     joystickSIN,
+                     "StepComputerJoystick("+name+")::output(vector)::laststep")
       , checker()
       , logChanges("/tmp/stepcomp_changes.dat")
       , logPreview("/tmp/stepcomp_preview.dat")
@@ -66,16 +69,16 @@ namespace dynamicgraph {
     {
       // Introduce new step at the end of the preview window.
       if( queue.getLastStep().contact == CONTACT_LEFT_FOOT ) {
-	queue.pushStep(0., -queue.getZeroStepPosition(), 0.);
-	logPreview << timeCurr << " " << 0 << " "
-		   << -queue.getZeroStepPosition() << " " << 0
-		   << std::endl;
+        queue.pushStep(0., -queue.getZeroStepPosition(), 0.);
+        logPreview << timeCurr << " " << 0 << " "
+                   << -queue.getZeroStepPosition() << " " << 0
+                   << std::endl;
       }
       else {
-	queue.pushStep(0., queue.getZeroStepPosition(), 0.);
-	logPreview << timeCurr << " " << 0 << " "
-		   << queue.getZeroStepPosition() << " " << 0
-		   << std::endl;
+        queue.pushStep(0., queue.getZeroStepPosition(), 0.);
+        logPreview << timeCurr << " " << 0 << " "
+                   << queue.getZeroStepPosition() << " " << 0
+                   << std::endl;
       }
     }
 
@@ -85,26 +88,26 @@ namespace dynamicgraph {
 
       const FootPrint& step = queue.getFirstStep();
 
-      ml::Vector joyin;
+      Vector joyin;
       joyin.resize(3);
       try
-	{
-	  joyin= joystickSIN(timeCurr);
+        {
+          joyin= joystickSIN(timeCurr);
 
-	}
+        }
       catch(...)
-	{
-	  joyin(0) = 0;
-	  joyin(1) = 0;
-	  joyin(2) = 0;
-	  std::cerr  << "No joystick input stay on the spot" << std::endl;
-	}
+        {
+          joyin(0) = 0;
+          joyin(1) = 0;
+          joyin(2) = 0;
+          std::cerr  << "No joystick input stay on the spot" << std::endl;
+        }
 
       double x = step.x+joyin(0), y = step.y+joyin(1);
       double theta = step.theta+joyin(2);
 
       std::cout << "stopStepComputedJoystick::changeFirstStep: " <<
-	x << " " << y << " " << theta << std::endl;
+        x << " " << y << " " << theta << std::endl;
       const double THETA_MAX = 9.;
       if(theta < -THETA_MAX){ theta = -THETA_MAX; }
       if(theta > THETA_MAX){ theta = THETA_MAX; }
@@ -115,7 +118,8 @@ namespace dynamicgraph {
 
       // Log x-y values before and after clipping
 
-      //  logChanges << timeCurr << " " << x << " " << y << " " << nx << " " << ny << " ";
+      //  logChanges << timeCurr << " " << x << " " << y
+      // << " " << nx << " " << ny << " ";
 
       // The coordinates must be expressed in the destination foot frame.
       // See the technical report of Olivier Stasse for more details,
@@ -141,10 +145,33 @@ namespace dynamicgraph {
       os << "StepComputer <" << getName() <<">:" << std::endl;
     }
 
-    ml::Vector & StepComputerJoystick::getlaststep(ml::Vector& res, int time)
+
+    void StepComputerJoystick::commandLine( const std::string& cmdLine,
+                                            std::istringstream& cmdArgs,
+                                            std::ostream& os )
+    {
+      if( cmdLine == "help" )
+        {
+          os << "NextStep: " << std::endl
+             << " - verbose [OFF]" << std::endl
+             << " - state [{start|stop}] \t get/set the stepper state. "
+             << std::endl
+             << " - yZeroStep [<value>] \t get/set the Y default position."
+             << std::endl
+             << std::endl;
+        }
+      else   if( cmdLine == "thisIsZero" )
+        {
+
+          os << "Not supported" << std::endl;
+        }
+      else {  }
+    }
+
+    Vector & StepComputerJoystick::getlaststep(Vector& res, int time)
     {
       if (res.size()!=4)
-	res.resize(4);
+        res.resize(4);
 
       res(0) = m_laststep[0];
       res(1) = m_laststep[1];

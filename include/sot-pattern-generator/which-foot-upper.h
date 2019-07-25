@@ -26,9 +26,6 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-/* Matrix */
-#include <jrl/mal/boost.hh>
-namespace ml = maal::boost;
 
 /* SOT */
 #include <dynamic-graph/entity.h>
@@ -100,17 +97,24 @@ namespace dynamicgraph {
     public: /* --- FUNCTIONS --- */
 
       static MatrixHomogeneous &
-	computeFootPosition( const MatrixHomogeneous& waistMfoot,
-			     const MatrixRotation& waistRsensor,
-			     const MatrixRotation& worldRsensor,
-			     MatrixHomogeneous& res );
+        computeFootPosition( const MatrixHomogeneous& waistMfoot,
+                             const MatrixRotation& waistRsensor,
+                             const MatrixRotation& worldRsensor,
+                             MatrixHomogeneous& res );
 
       MatrixRotation&
-	computeRotationMatrix(MatrixRotation& rotMat, int time );
+        computeRotationMatrix(MatrixRotation& rotMat, int time );
 
       unsigned int & whichFoot( const MatrixHomogeneous& waistMlfoot,
-				const MatrixHomogeneous& waistMrfoot,
-				unsigned int& res );
+                                const MatrixHomogeneous& waistMrfoot,
+                                unsigned int& res );
+
+
+    public: /* --- PARAMS --- */
+      virtual void commandLine( const std::string& cmdLine,
+                                std::istringstream& cmdArgs,
+                                std::ostream& os );
+
 
     };
 

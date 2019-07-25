@@ -32,14 +32,14 @@ namespace dynamicgraph {
 
     ExceptionPatternGenerator::
     ExceptionPatternGenerator ( const ExceptionPatternGenerator::ErrorCodeEnum& errcode,
-				const std::string & msg )
+                                const std::string & msg )
       :ExceptionAbstract(errcode,msg)
     {
     }
 
     ExceptionPatternGenerator::
     ExceptionPatternGenerator ( const ExceptionPatternGenerator::ErrorCodeEnum& errcode,
-				const std::string & msg,const char* format, ... )
+                                const std::string & msg,const char* format, ... )
       :ExceptionAbstract(errcode,msg)
     {
       va_list args;

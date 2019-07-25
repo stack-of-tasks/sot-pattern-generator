@@ -77,15 +77,16 @@ namespace dynamicgraph {
     /// - stopping: playing a final step sequence (cleanup),
     /// - stopped: doing nothing (not sending steps).
     ///
-    /// \note{This entity class can not be instantiated in a shell since it does not
-    /// register any factory. This behavior is intended.}
+    /// \note{This entity class can not be instantiated in a shell since it does
+    /// not register any factory. This behavior is intended.}
     class StepTimeLine_EXPORT StepTimeLine
       : public Entity
     {
     public: // Entity name
 
       static const std::string CLASS_NAME;
-      virtual const std::string& getClassName( void ) const { return CLASS_NAME; }
+      virtual const std::string& getClassName( void )
+        const { return CLASS_NAME; }
 
     private:
 
@@ -114,15 +115,19 @@ namespace dynamicgraph {
 
       enum SteppingState
       {
-	STATE_STARTING,   ///< Introducing 4 steps then switches to STATE_STARTED.
-	STATE_STOPPING,   ///< Running but stop requested: introduce a last step and stop.
-	STATE_STARTED,    ///< Running, simply introduce steps.
-	STATE_STOPPED     ///< Nothing to do, cannot introduce steps in the FIFO
+        STATE_STARTING, ///< Introducing 4 steps then switches to STATE_STARTED.
+        STATE_STOPPING, ///< Running but stop requested: introduce a last step
+                        /// and stop.
+        STATE_STARTED,  ///< Running, simply introduce steps.
+        STATE_STOPPED   ///< Nothing to do, cannot introduce steps in the FIFO
       };
 
     public: // Entity
 
       virtual void display( std::ostream& os ) const;
+      virtual void commandLine( const std::string& cmdLine,
+                                std::istringstream& cmdArgs,
+                                std::ostream& os );
 
     private:
 

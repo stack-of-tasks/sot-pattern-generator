@@ -22,6 +22,7 @@
 #include <time.h>
 #ifndef WIN32
 # include <sys/time.h>
+# include <iostream>
 #else
 # include <jrl/mal/boost.hh>
 # include <sot/core/utils-windows.hh>
@@ -45,24 +46,46 @@ namespace dynamicgraph {
 
     StepComputerForce:: StepComputerForce( const std::string & name )
       : Entity(name)
-      , waistMlhandSIN( NULL,"StepComputerForce("+name+")::input(vector)::waistMlhand" )
-      , waistMrhandSIN( NULL,"StepComputerForce("+name+")::input(vector)::waistMrhand" )
-      , referencePositionWaistSIN( NULL,"StepComputerForce("+name+")::input(vector)::posrefwaist" )
-      , stiffnessSIN( NULL,"StepComputerForce("+name+")::input(vector)::stiffness" )
-      , velocitySIN( NULL,"StepComputerForce("+name+")::input(vector)::velocity" )
-      , contactFootSIN( NULL,"StepComputerForce("+name+")::input(uint)::contactfoot" )
-      , displacementSOUT( boost::bind(&StepComputerForce::computeDisplacement,this,_1,_2),
-			  referencePositionWaistSIN,
-			  "StepComputerForce("+name+")::output(vector)::displacement" )
-      , forceSOUT( boost::bind(&StepComputerForce::computeForce,this,_1,_2),
-		   displacementSOUT,
-		   "StepComputerForce("+name+")::output(vector)::force" )
-      , forceLhandSOUT( boost::bind(&StepComputerForce::computeForceL,this,_1,_2),
-			waistMlhandSIN<<referencePositionWaistSIN<<forceSOUT,
-			"StepComputerForce("+name+")::output(vector)::forceL" )
-      , forceRhandSOUT( boost::bind(&StepComputerForce::computeForceR,this,_1,_2),
-			waistMrhandSIN<<referencePositionWaistSIN<<forceSOUT,
-			"StepComputerForce("+name+")::output(vector)::forceR" )
+      , waistMlhandSIN
+        (NULL,
+                      "StepComputerForce("+name+
+                       ")::input(vector)::waistMlhand" )
+        
+      , waistMrhandSIN
+        ( NULL,"StepComputerForce("+name+
+                        ")::input(vector)::waistMrhand" )
+      , referencePositionWaistSIN
+        ( NULL,"StepComputerForce("+name+
+          ")::input(vector)::posrefwaist" )
+        
+      , stiffnessSIN
+        ( NULL,"StepComputerForce("+name+")::input(vector)::stiffness" )
+        
+      , velocitySIN
+        ( NULL,"StepComputerForce("+name+")::input(vector)::velocity" )
+        
+      , contactFootSIN
+        ( NULL,"StepComputerForce("+name+")::input(uint)::contactfoot" )
+        
+      , displacementSOUT
+        ( boost::bind(&StepComputerForce::computeDisplacement,this,_1,_2),
+          referencePositionWaistSIN,
+          "StepComputerForce("+name+")::output(vector)::displacement" )
+        
+      , forceSOUT
+        ( boost::bind(&StepComputerForce::computeForce,this,_1,_2),
+          displacementSOUT,
+          "StepComputerForce("+name+")::output(vector)::force" )
+        
+      , forceLhandSOUT
+        ( boost::bind(&StepComputerForce::computeForceL,this,_1,_2),
+          waistMlhandSIN<<referencePositionWaistSIN<<forceSOUT,
+          "StepComputerForce("+name+")::output(vector)::forceL" )
+        
+      , forceRhandSOUT
+        ( boost::bind(&StepComputerForce::computeForceR,this,_1,_2),
+          waistMrhandSIN<<referencePositionWaistSIN<<forceSOUT,
+          "StepComputerForce("+name+")::output(vector)::forceR" )
       , waMref0()
       , twoHandObserver( 0x0 )
       , checker()
@@ -72,10 +95,10 @@ namespace dynamicgraph {
       sotDEBUGIN(5);
 
       signalRegistration( referencePositionWaistSIN<<contactFootSIN <<
-			  waistMlhandSIN << waistMrhandSIN <<
-			  stiffnessSIN << velocitySIN <<
-			  displacementSOUT << forceSOUT <<
-			  forceLhandSOUT << forceRhandSOUT );
+                          waistMlhandSIN << waistMrhandSIN <<
+                          stiffnessSIN << velocitySIN <<
+                          displacementSOUT << forceSOUT <<
+                          forceLhandSOUT << forceRhandSOUT );
 
       sotDEBUGOUT(5);
     }
@@ -84,31 +107,32 @@ namespace dynamicgraph {
     {
       // Introduce new step at the end of the preview window.
       if( queue.getLastStep().contact == CONTACT_LEFT_FOOT ) {
-	queue.pushStep(0., -queue.getZeroStepPosition(), 0.);
-	logPreview << timeCurr << " " << 0 << " "
-		   << -queue.getZeroStepPosition() << " " << 0
-		   << std::endl;
+        queue.pushStep(0., -queue.getZeroStepPosition(), 0.);
+        logPreview << timeCurr << " " << 0 << " "
+                   << -queue.getZeroStepPosition() << " " << 0
+                   << std::endl;
       }
       else {
-	queue.pushStep(0., queue.getZeroStepPosition(), 0.);
-	logPreview << timeCurr << " " << 0 << " "
-		   << queue.getZeroStepPosition() << " " << 0
-		   << std::endl;
+        queue.pushStep(0., queue.getZeroStepPosition(), 0.);
+        logPreview << timeCurr << " " << 0 << " "
+                   << queue.getZeroStepPosition() << " " << 0
+                   << std::endl;
       }
     }
 
     Vector& StepComputerForce::computeDisplacement( Vector& res,int timeCurr )
     {
       if(!twoHandObserver) {
-	std::cerr << "Observer not set" << std::endl;
-	res.resize(3);
-	res.setZero();
-	return res;
+        std::cerr << "Observer not set" << std::endl;
+        res.resize(3);
+        res.setZero();
+        return res;
       }
 
       // transformation from ref0 to ref.
 
-      const MatrixHomogeneous& waMref = referencePositionWaistSIN.access( timeCurr );
+      const MatrixHomogeneous& waMref =
+        referencePositionWaistSIN.access( timeCurr );
       MatrixHomogeneous ref0Mwa; ref0Mwa = waMref0.inverse();
       MatrixHomogeneous ref0Mref; ref0Mref = ref0Mwa * waMref;
 
@@ -143,11 +167,11 @@ namespace dynamicgraph {
       const Vector& K = stiffnessSIN.access( timeCurr );
 
       if((dx.size() != 3) || (K.size() != 3) || (dx.size() != K.size())) {
-	res.resize(3);
-	res.setZero();
+        res.resize(3);
+        res.setZero();
       }
       else {
-	res = K * dx;
+        res = K * dx;
       }
 
       return res;
@@ -155,14 +179,14 @@ namespace dynamicgraph {
 
     Vector&
     StepComputerForce::computeHandForce( Vector& res,
-					 const MatrixHomogeneous& waMh,
-					 const MatrixHomogeneous& waMref,
-					 const Vector& F )
+                                         const MatrixHomogeneous& waMh,
+                                         const MatrixHomogeneous& waMref,
+                                         const Vector& F )
     {
       if(F.size() != 3) {
-	res.resize(6);
-	res.fill(0.);
-	return res;
+        res.resize(6);
+        res.fill(0.);
+        return res;
       }
 
       Vector pref(3); pref = waMref.translation();
@@ -182,10 +206,10 @@ namespace dynamicgraph {
       double L = 2 * ntauOA * nOA;
 
       if(L < 1e-12) {
-	tauOA.fill(0);
+        tauOA.fill(0);
       }
       else {
-	tauOA = tauOA * (1./L);
+        tauOA = tauOA * (1./L);
       }
 
       Vector tmp(6); tmp.setZero();
@@ -203,7 +227,8 @@ namespace dynamicgraph {
     Vector& StepComputerForce::computeForceL( Vector& res,int timeCurr )
     {
       const MatrixHomogeneous& waMlh = waistMlhandSIN.access( timeCurr );
-      const MatrixHomogeneous& waMref = referencePositionWaistSIN.access( timeCurr );
+      const MatrixHomogeneous& waMref =
+        referencePositionWaistSIN.access( timeCurr );
       const Vector& F = forceSOUT.access( timeCurr );
 
       return computeHandForce( res,waMlh,waMref,F );
@@ -212,7 +237,8 @@ namespace dynamicgraph {
     Vector& StepComputerForce::computeForceR( Vector& res,int timeCurr )
     {
       const MatrixHomogeneous& waMrh = waistMrhandSIN.access( timeCurr );
-      const MatrixHomogeneous& waMref = referencePositionWaistSIN.access( timeCurr );
+      const MatrixHomogeneous& waMref =
+        referencePositionWaistSIN.access( timeCurr );
       const Vector& F = forceSOUT.access( timeCurr );
 
       return computeHandForce( res,waMrh,waMref,F );
@@ -225,10 +251,10 @@ namespace dynamicgraph {
 
       double y_default = 0;
       if( sfoot != 1 ) { // --- left foot support ---
-	y_default = -0.19;
+        y_default = -0.19;
       }
       else { // -- right foot support ---
-	y_default = 0.19;
+        y_default = 0.19;
       }
 
       // The clipping function expects the x-y coordinates of the
@@ -249,17 +275,18 @@ namespace dynamicgraph {
 
       double nx = 0, ny = 0;
       if(sfoot != 1) { // left foot support phase
-	if(y > 0){ y = -0.001; }
+        if(y > 0){ y = -0.001; }
       }
       else {
-	if(y < 0){ y = 0.001; }
+        if(y < 0){ y = 0.001; }
       }
 
       checker.clipStep(x, y, nx, ny);
 
       // Log x-y values before and after clipping
 
-      logChanges << timeCurr << " " << x << " " << y << " " << nx << " " << ny << " ";
+      logChanges << timeCurr << " " << x << " "
+                 << y << " " << nx << " " << ny << " ";
 
       // The coordinates must be expressed in the destination foot frame.
       // See the technical report of Olivier Stasse for more details,
@@ -294,5 +321,35 @@ namespace dynamicgraph {
     {
       os << "StepComputerForce <" << getName() <<">:" << std::endl;
     }
+
+
+    void StepComputerForce::commandLine( const std::string& cmdLine,
+                                         std::istringstream& cmdArgs,
+                                         std::ostream& os )
+    {
+      if( cmdLine == "help" )
+        {
+          os << "NextStep: " << std::endl
+             << " - setObserver" << std::endl
+             << " - thisIsZero {record|disp}" << std::endl
+             << std::endl;
+        }
+      else if( cmdLine == "thisIsZero" )
+        {
+          std::string arg; cmdArgs >> arg;
+          if( arg == "disp" ) { os << "zero = " << waMref0; }
+          else if( arg == "record" ) { thisIsZero(); }
+        }
+      else if( cmdLine == "setObserver" )
+        {
+          std::string name = "stepobs";
+          cmdArgs >> std::ws;
+          if( cmdArgs.good()){ cmdArgs >> name; }
+          Entity* entity = &(PoolStorage::getInstance()->getEntity( name ));
+          twoHandObserver = dynamic_cast<StepObserver*>(entity);
+        }
+      else {  }
+    }
+
   } // namespace dg
 } // namespace sot

@@ -1,7 +1,7 @@
 from selector import Selector
 from dynamic_graph import plug
 
-print "With meta selector"
+print("With meta selector")
 
 # Define a new constructor for the selector entity. The basic Selector(name)
 # constructor is still valid.

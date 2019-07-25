@@ -26,10 +26,6 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-/* Matrix */
-#include <jrl/mal/boost.hh>
-namespace ml = maal::boost;
-
 /* SOT */
 #include <dynamic-graph/entity.h>
 #include <dynamic-graph/signal-ptr.h>
@@ -90,20 +86,26 @@ namespace dynamicgraph {
     public: /* --- FUNCTIONS --- */
 
       template< class T >
-	static T& computeSelection( const unsigned int & sigNum,
-				    std::vector< SignalBase<int>* >& entriesSIN,
-				    T& res,const int& time );
+        static T& computeSelection( const unsigned int & sigNum,
+                                    std::vector< SignalBase<int>* >& entriesSIN,
+                                    T& res,const int& time );
 
       template< class T >
-	unsigned int createSignal( const std::string& shortname,
-				   const int & sigId=-1 );
+        unsigned int createSignal( const std::string& shortname,
+                                   const int & sigId=-1 );
 
 
-      void resetSignals( const unsigned int & nbEntries,const unsigned int & nbSignals );
+      void resetSignals( const unsigned int & nbEntries,
+                         const unsigned int & nbSignals );
 
     public: /* --- PARAMS --- */
       void initCommands( void );
-      void create( const std::string& name,const std::string& type,const int & sigId );
+      virtual void commandLine( const std::string& cmdLine,
+                                std::istringstream& cmdArgs,
+                                std::ostream& os );
+
+      void create( const std::string& name,const std::string& type,
+                   const int & sigId );
       std::string getTypeList( void );
       void getTypeList( std::ostream& os );
 

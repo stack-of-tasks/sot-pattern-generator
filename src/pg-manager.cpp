@@ -39,21 +39,22 @@ namespace dynamicgraph {
 
     void PGManager::startSequence( const StepQueue& seq )
     {
-      if(!pgEntity) {
-	sotERROR <<"PG not set" << std::endl;
-	return;
+      if(!spg_) {
+        sotERROR <<"PG not set" << std::endl;
+        return;
       }
 
       std::ostringstream cmdstd; cmdstd << ":StartOnLineStepSequencing ";
-      std::ostringstream os;
 
       for( unsigned int i = 0; i < seq.size(); ++i ) {
-	const FootPrint& fp = seq.getStep(i);
-	cmdstd << fp.x << " " << fp.y << " " << fp.theta << " ";
+        const FootPrint& fp = seq.getStep(i);
+        cmdstd << fp.x << " " << fp.y << " " << fp.theta << " ";
       }
 
       std::istringstream cmdArg( cmdstd.str() );
       std::istringstream emptyArg;
+      spg_->InitState();
+      spg_->pgCommandLine( cmdArg.str());
 
       sotDEBUG(15) << "Cmd: " << cmdstd.str() << std::endl;
     }
@@ -61,30 +62,31 @@ namespace dynamicgraph {
 
     void PGManager::stopSequence( const StepQueue& seq )
     {
-      if(!pgEntity) {
-	sotERROR <<"PG not set" << std::endl;
-	return;
+      if(!spg_) {
+        sotERROR <<"PG not set" << std::endl;
+        return;
       }
 
       std::ostringstream cmdstd; cmdstd << ":StopOnLineStepSequencing";
-      std::ostringstream os;
       std::istringstream cmdArg( cmdstd.str() );
+      spg_->pgCommandLine( cmdArg.str());
     }
 
 
     void PGManager::introduceStep( StepQueue& queue )
     {
-      if(!pgEntity) {
-	sotERROR << "Walk plugin not found. " << std::endl;
-	return;
+      if(!spg_) {
+        sotERROR << "Walk plugin not found. " << std::endl;
+        return;
       }
 
       const FootPrint& lastStep = queue.getLastStep();
 
       std::string cmdLine = "addStep";
-      std::ostringstream cmdArgIn, os;
+      std::ostringstream cmdArgIn;
       cmdArgIn << lastStep.x << " " << lastStep.y << " " << lastStep.theta;
       std::istringstream cmdArg( cmdArgIn.str() );
+      spg_->pgCommandLine(cmdArg.str());
     }
 
 
@@ -93,15 +95,15 @@ namespace dynamicgraph {
       double stepTime = -1.;
 
       const FootPrint& step = queue.getFirstStep();
-      stepbuf.push_back(step);
+      stepbuf_.push_back(step);
 
       if(queue.isFirstStepChanged()) {
-	PatternGeneratorJRL::FootAbsolutePosition aFAP;
-	const FootPrint& change = queue.getFirstStepChange();
-	aFAP.x = change.x - step.x;
-	aFAP.y = change.y - step.y;
-	aFAP.theta = change.theta - step.theta;
-	pgi->ChangeOnLineStep(0.805, aFAP, stepTime);
+        PatternGeneratorJRL::FootAbsolutePosition aFAP;
+        const FootPrint& change = queue.getFirstStepChange();
+        aFAP.x = change.x - step.x;
+        aFAP.y = change.y - step.y;
+        aFAP.theta = change.theta - step.theta;
+        pgi_->ChangeOnLineStep(0.805, aFAP, stepTime);
       }
 
       return stepTime;
@@ -112,5 +114,41 @@ namespace dynamicgraph {
     {
       os << "PGManager <" << getName() << ">:" << std::endl;
     }
+
+
+    void PGManager::commandLine( const std::string& cmdLine,
+                                 std::istringstream& cmdArgs,
+                                 std::ostream& os )
+    {
+      if( cmdLine == "help" )
+        {
+          os << "StepTimeLine: " << std::endl
+             << std::endl;
+        }
+      else if( "initPg" == cmdLine )
+        {
+          std::string name = "pg";
+          cmdArgs >> std::ws;
+          if( cmdArgs.good()){ cmdArgs >> name; }
+          Entity * pgEntity = &(PoolStorage::getInstance()->getEntity( name ));
+          spg_ = dynamic_cast<PatternGenerator*>(pgEntity);
+          pgi_ = spg_->GetPatternGeneratorInterface();
+        }
+      else if( "savesteps" == cmdLine )
+        {
+          std::ofstream os("/tmp/steps.dat");
+          for(size_t i = 0; i < stepbuf_.size(); ++i)
+            {
+              os << stepbuf_[i].contact << " "
+                 << stepbuf_[i].x << " "
+                 << stepbuf_[i].y << " "
+                 << stepbuf_[i].theta << "\n";
+            }
+          os << std::endl;
+          stepbuf_.clear();
+        }
+      else {  }
+    }
+
   } // namespace dg
 } // namespace sot

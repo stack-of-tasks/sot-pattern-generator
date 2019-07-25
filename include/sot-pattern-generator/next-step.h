@@ -25,10 +25,6 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-/* Matrix */
-#include <jrl/mal/boost.hh>
-namespace ml = maal::boost;
-
 /* SOT */
 #include <dynamic-graph/entity.h>
 #include <dynamic-graph/signal-ptr.h>
@@ -74,35 +70,41 @@ namespace dynamicgraph {
     public:
 
       SignalPtr< MatrixHomogeneous,int > referencePositionLeftSIN;
-      SignalPtr< ml::Vector,int > referenceVelocityLeftSIN;
-      SignalPtr< ml::Vector,int > referenceAccelerationLeftSIN;
+      SignalPtr< Vector,int > referenceVelocityLeftSIN;
+      SignalPtr< Vector,int > referenceAccelerationLeftSIN;
       SignalPtr< MatrixHomogeneous,int > leftFootPositionSIN;
 
       SignalPtr< MatrixHomogeneous,int > referencePositionRightSIN;
-      SignalPtr< ml::Vector,int > referenceVelocityRightSIN;
-      SignalPtr< ml::Vector,int > referenceAccelerationRightSIN;
+      SignalPtr< Vector,int > referenceVelocityRightSIN;
+      SignalPtr< Vector,int > referenceAccelerationRightSIN;
       SignalPtr< MatrixHomogeneous,int > rightFootPositionSIN;
 
       SignalTimeDependent< MatrixHomogeneous,int > referencePositionLeftSOUT;
       SignalTimeDependent< MatrixHomogeneous,int > referencePositionRightSOUT;
-      SignalTimeDependent< ml::Vector,int > referenceVelocitySOUT;
-      SignalTimeDependent< ml::Vector,int > referenceAccelerationSOUT;
+      SignalTimeDependent< Vector,int > referenceVelocitySOUT;
+      SignalTimeDependent< Vector,int > referenceAccelerationSOUT;
 
     public:
 
       NextStepTwoHandObserver( const std::string & name );
 
-      MatrixHomogeneous& computeReferencePositionLeft( MatrixHomogeneous& res,int timeCurr );
-      MatrixHomogeneous& computeReferencePositionRight( MatrixHomogeneous& res,int timeCurr );
-      ml::Vector& computeReferenceVelocity( const ml::Vector& right,const ml::Vector& left,ml::Vector& res );
-      ml::Vector& computeReferenceAcceleration( const ml::Vector& right,const ml::Vector& left,ml::Vector& res );
+      MatrixHomogeneous& computeReferencePositionLeft
+        ( MatrixHomogeneous& res,int timeCurr );
+      MatrixHomogeneous& computeReferencePositionRight
+        ( MatrixHomogeneous& res,int timeCurr );
+      Vector& computeReferenceVelocity
+        ( const Vector& right,const Vector& left,Vector& res );
+      Vector& computeReferenceAcceleration( const Vector& right,
+                                            const Vector& left,
+                                            Vector& res );
 
       SignalArray<int> getSignals( void );
       operator SignalArray<int> ();
 
     private:
 
-      MatrixHomogeneous& computeRefPos( MatrixHomogeneous& res,int timeCurr,const MatrixHomogeneous& wMsf );
+      MatrixHomogeneous& computeRefPos
+        ( MatrixHomogeneous& res,int timeCurr,const MatrixHomogeneous& wMsf );
     };
 
 
@@ -126,15 +128,15 @@ namespace dynamicgraph {
 
       enum ContactName
       {
-	CONTACT_LEFT_FOOT
-	,CONTACT_RIGHT_FOOT
+        CONTACT_LEFT_FOOT
+        ,CONTACT_RIGHT_FOOT
       };
       class FootPrint
       {
       public:
-	double x,y,theta;
-	ContactName contact;
-	int introductionTime;
+        double x,y,theta;
+        ContactName contact;
+        int introductionTime;
       };
       std::deque< FootPrint > footPrintList;
 
@@ -148,16 +150,17 @@ namespace dynamicgraph {
 
       enum SteppingMode
       {
-	MODE_1D
-	,MODE_3D
+        MODE_1D
+        ,MODE_3D
       };
       SteppingMode mode;
       enum SteppingState
       {
-	STATE_STARTING   //! Introducing 4 steps then switches to STATE_STARTED.
-	,STATE_STOPING   //! Running but stop requested: introduce a last step and stop.
-	,STATE_STARTED   //! Running, simply introduce steps.
-	,STATE_STOPED    //! Nothing to do, cannot introduce steps in the FIFO
+        STATE_STARTING   //! Introducing 4 steps then switches to STATE_STARTED.
+        ,STATE_STOPING   //! Running but stop requested: introduce a last step
+                         // and stop.
+        ,STATE_STARTED   //! Running, simply introduce steps.
+        ,STATE_STOPED    //! Nothing to do, cannot introduce steps in the FIFO
       };
       SteppingState state;
 
@@ -198,13 +201,16 @@ namespace dynamicgraph {
       virtual void starter( const int & timeCurr );
       virtual void stoper( const int & timeCurr );
 
-      virtual void introductionCallBack( const int & timeCurr ) {};
+      virtual void introductionCallBack( const int &  ) {};
 
       int& triggerCall( int& dummy,int timeCurr );
 
     public: /* --- PARAMS --- */
 
       virtual void display( std::ostream& os ) const;
+      virtual void commandLine( const std::string& cmdLine,
+                                std::istringstream& cmdArgs,
+                                std::ostream& os );
     };
 
 

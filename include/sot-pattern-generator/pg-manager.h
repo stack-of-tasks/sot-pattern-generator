@@ -27,8 +27,7 @@
 /* --------------------------------------------------------------------- */
 
 /* Matrix */
-#include <jrl/mal/boost.hh>
-namespace ml = maal::boost;
+#include <Eigen/Dense>
 
 /* SOT */
 #include <dynamic-graph/entity.h>
@@ -82,12 +81,15 @@ namespace dynamicgraph {
     public: // Entity
 
       virtual void display( std::ostream& os ) const;
+      virtual void commandLine( const std::string& cmdLine,
+                                std::istringstream& cmdArgs,
+                                std::ostream& os );
 
     private:
 
-      std::vector<FootPrint> stepbuf;
-      Entity* pgEntity;
-      pg::PatternGeneratorInterface* pgi;
+      std::vector<FootPrint> stepbuf_;
+      PatternGenerator * spg_;
+      PatternGeneratorJRL::PatternGeneratorInterface * pgi_;
     };
 
   } // namespace sot

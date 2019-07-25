@@ -59,10 +59,10 @@ namespace dynamicgraph {
 
     /// Support foot identifier.
     enum ContactName
-    {
-      CONTACT_LEFT_FOOT,
-      CONTACT_RIGHT_FOOT
-    };
+      {
+        CONTACT_LEFT_FOOT,
+        CONTACT_RIGHT_FOOT
+      };
 
 
     class StepQueue_EXPORT FootPrint
@@ -145,6 +145,9 @@ namespace dynamicgraph {
     public: // Entity
 
       virtual void display( std::ostream& os ) const;
+      virtual void commandLine( const std::string& cmdLine,
+                                std::istringstream& cmdArgs,
+                                std::ostream& os );
 
     private:
 

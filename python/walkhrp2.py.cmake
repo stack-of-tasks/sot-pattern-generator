@@ -7,9 +7,9 @@
 
 #----------------CUSTOM-------------------------------#
 dt=5e-3
-_urdfPath = "/local/rbudhira/git/trac/hrp2/hrp2_14_description/urdf/hrp2_14.urdf"
-_srdfPath = "/local/rbudhira/git/trac/hrp2/hrp2_14_description/srdf/hrp2_14.srdf"
-_urdfDir = ["/local/rbudhira/git/trac/hrp2"]
+_urdfPath = "@HRP2_14_DESCRIPTION_DATAROOTDIR@/hrp2_14_description/urdf/hrp2_14.urdf"
+_srdfPath = "@HRP2_14_DESCRIPTION_DATAROOTDIR@/hrp2_14_description/srdf/hrp2_14.srdf"
+_urdfDir = ["@HRP2_14_DESCRIPTION_DATAROOTDIR@/hrp2_14_description/"]
 _robotName = 'HRP2LAAS'
 _OperationalPointsMap = {'left-wrist'  : 'LARM_JOINT5',
                          'right-wrist' : 'RARM_JOINT5',
@@ -38,7 +38,7 @@ pinocchioRobot = RobotWrapper(_urdfPath, _urdfDir, se3.JointModelFreeFlyer())
 pinocchioRobot.initDisplay(loadModel=True)
 
 #----------------ROBOT - DEVICE AND DYNAMICS----------#
-from dynamic_graph.sot.dynamics.humanoid_robot import HumanoidRobot
+from dynamic_graph.sot.dynamics_pinocchio.humanoid_robot import HumanoidRobot
 robot = HumanoidRobot(_robotName, pinocchioRobot.model,
                       pinocchioRobot.data, _initialConfig, _OperationalPointsMap)
 #-----------------------------------------------------#

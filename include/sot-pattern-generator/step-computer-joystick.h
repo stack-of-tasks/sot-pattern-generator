@@ -25,9 +25,6 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-/* Matrix */
-#include <jrl/mal/boost.hh>
-namespace ml = maal::boost;
 
 /* SOT */
 #include <dynamic-graph/entity.h>
@@ -76,7 +73,8 @@ namespace dynamicgraph {
     public:
 
       static const std::string CLASS_NAME;
-      virtual const std::string& getClassName( void ) const { return CLASS_NAME; }
+      virtual const std::string& getClassName( void )
+        const { return CLASS_NAME; }
 
     public: // Construction
 
@@ -90,18 +88,21 @@ namespace dynamicgraph {
     public: // Signals
 
       /*! \brief Entry of the joystick (x,y,theta)*/
-      SignalPtr< ml::Vector,int > joystickSIN;
+      SignalPtr< Vector,int > joystickSIN;
       /*! \brief Getting the support foot */
       SignalPtr< unsigned,int > contactFootSIN;
       /*! \brief Externalize the last step . */
-      SignalTimeDependent<ml::Vector,int> laststepSOUT;
+      SignalTimeDependent<Vector,int> laststepSOUT;
 
     protected:
-      ml::Vector& getlaststep(ml::Vector &res, int time);
+      Vector& getlaststep(Vector &res, int time);
 
     public: // Entity
 
       virtual void display( std::ostream& os ) const;
+      virtual void commandLine( const std::string& cmdLine,
+                                std::istringstream& cmdArgs,
+                                std::ostream& os );
 
     private: // Reference frame
 

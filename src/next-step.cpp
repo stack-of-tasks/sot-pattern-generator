@@ -30,7 +30,6 @@
 #include <Winsock2.h>
 #endif /*WIN32*/
 
-#include <jrl/mal/boost.hh>
 #include <dynamic-graph/factory.h>
 #include <sot/core/macros-signal.hh>
 
@@ -39,9 +38,9 @@ namespace dynamicgraph {
 
     DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(NextStep,"NextStep");
 
-    /* --- CONSTRUCT ------------------------------------------------------------- */
-    /* --- CONSTRUCT ------------------------------------------------------------- */
-    /* --- CONSTRUCT ------------------------------------------------------------- */
+    /* --- CONSTRUCT -------------------------------------------------------- */
+    /* --- CONSTRUCT -------------------------------------------------------- */
+    /* --- CONSTRUCT -------------------------------------------------------- */
 
     const unsigned int NextStep::PERIOD_DEFAULT = 160; // 160iter=800ms
     const double NextStep::ZERO_STEP_POSITION_DEFAULT = 0.19;
@@ -65,8 +64,10 @@ namespace dynamicgraph {
 
       ,verbose(0x0)
 
-      ,referencePositionLeftSIN( NULL,"NextStep("+name+")::input(vector)::posrefleft" )
-      ,referencePositionRightSIN( NULL,"NextStep("+name+")::input(vector)::posrefright" )
+      ,referencePositionLeftSIN( NULL,"NextStep("+name+
+                                 ")::input(vector)::posrefleft" )
+      ,referencePositionRightSIN
+       ( NULL,"NextStep("+name+")::input(vector)::posrefright" )
 
       ,contactFootSIN( NULL,"NextStep("+name+")::input(uint)::contactfoot" )
       ,triggerSOUT( "NextStep("+name+")::input(dummy)::trigger" )
@@ -76,11 +77,13 @@ namespace dynamicgraph {
       triggerSOUT.setFunction( boost::bind(&NextStep::triggerCall,this,_1,_2) );
 
       signalRegistration( referencePositionLeftSIN<<referencePositionRightSIN
-			  <<contactFootSIN<<triggerSOUT );
+                          <<contactFootSIN<<triggerSOUT );
       signalRegistration( twoHandObserver.getSignals() );
 
-      referencePositionLeftSIN.plug( &twoHandObserver.referencePositionLeftSOUT );
-      referencePositionRightSIN.plug( &twoHandObserver.referencePositionRightSOUT );
+      referencePositionLeftSIN.plug
+        ( &twoHandObserver.referencePositionLeftSOUT );
+      referencePositionRightSIN.plug
+        ( &twoHandObserver.referencePositionRightSOUT );
 
       sotDEBUGOUT(5);
     }
@@ -96,9 +99,9 @@ namespace dynamicgraph {
     }
 
 
-    /* --- FUNCTIONS ------------------------------------------------------------ */
-    /* --- FUNCTIONS ------------------------------------------------------------ */
-    /* --- FUNCTIONS ------------------------------------------------------------ */
+    /* --- FUNCTIONS ------------------------------------------------------- */
+    /* --- FUNCTIONS ------------------------------------------------------- */
+    /* --- FUNCTIONS ------------------------------------------------------- */
 
     void NextStep::
     nextStep( const int & timeCurr )
@@ -106,8 +109,10 @@ namespace dynamicgraph {
       sotDEBUGIN(15);
 
       const unsigned& sfoot = contactFootSIN( timeCurr );
-      const MatrixHomogeneous& wMlf = twoHandObserver.leftFootPositionSIN.access( timeCurr );
-      const MatrixHomogeneous& wMrf = twoHandObserver.rightFootPositionSIN.access( timeCurr );
+      const MatrixHomogeneous& wMlf =
+        twoHandObserver.leftFootPositionSIN.access( timeCurr );
+      const MatrixHomogeneous& wMrf =
+        twoHandObserver.rightFootPositionSIN.access( timeCurr );
 
       // actual and reference position of reference frame in fly foot,
       // position of fly foot in support foot.
@@ -115,17 +120,17 @@ namespace dynamicgraph {
       MatrixHomogeneous ffMref, ffMref0;
       MatrixHomogeneous sfMff;
       if( sfoot != 1 ) // --- left foot support ---
-	{
-	  ffMref = referencePositionRightSIN.access( timeCurr );
-	  ffMref0 = rfMref0;
-	  MatrixHomogeneous sfMw; sfMw = wMlf.inverse(); sfMff = sfMw*wMrf;
-	}
+        {
+          ffMref = referencePositionRightSIN.access( timeCurr );
+          ffMref0 = rfMref0;
+          MatrixHomogeneous sfMw; sfMw = wMlf.inverse(); sfMff = sfMw*wMrf;
+        }
       else // -- right foot support ---
-	{
-	  ffMref = referencePositionLeftSIN.access( timeCurr );
-	  ffMref0 = lfMref0;
-	  MatrixHomogeneous sfMw; sfMw = wMrf.inverse(); sfMff = sfMw*wMlf;
-	}
+        {
+          ffMref = referencePositionLeftSIN.access( timeCurr );
+          ffMref0 = lfMref0;
+          MatrixHomogeneous sfMw; sfMw = wMrf.inverse(); sfMff = sfMw*wMlf;
+        }
 
       // homogeneous transform from ref position of ref frame to
       // actual position of ref frame.
@@ -155,7 +160,6 @@ namespace dynamicgraph {
       MatrixRotation ref0Rref; ref0Rref = ref0Mref.linear();
       MatrixRotation tmp = ref0Rref * ref0Rsf;
       MatrixRotation Rref = sfRref0*tmp;
-
       VectorRollPitchYaw rpy; rpy = (Rref.eulerAngles(2,1,0)).reverse();
 
       // get the yaw of the current orientation of the ff wrt sf.
@@ -173,7 +177,8 @@ namespace dynamicgraph {
       // [dX;dY] = A^t [X;Y]
       //
       // where A is the planar rotation matrix of angle theta, [X;Y]
-      // is the planar column-vector joining the support foot to the new fly foot,
+      // is the planar column-vector joining the support foot
+      // to the new fly foot,
       // expressed in the support foot frame, and [dX;dY] is this same planar
       // column-vector expressed in the coordinates frame of the new fly foot.
       //
@@ -182,29 +187,29 @@ namespace dynamicgraph {
 
       double ns_x = 0, ns_y = 0, ns_theta = 0;
       if(mode != MODE_1D) {
-	ns_theta = rpy(2) * 180 / 3.14159265;
-	if(fabs(ns_theta) < 10) {
-	  ns_theta = 0;
-	  rpy(2) = 0;
-	}
+        ns_theta = rpy(2) * 180 / 3.14159265;
+        if(fabs(ns_theta) < 10) {
+          ns_theta = 0;
+          rpy(2) = 0;
+        }
 
-	double x = t_sf(0);
-	double y = t_sf(1);
+        double x = t_sf(0);
+        double y = t_sf(1);
 
-	double ctheta = cos(rpy(2));
-	double stheta = sin(rpy(2));
+        double ctheta = cos(rpy(2));
+        double stheta = sin(rpy(2));
 
-	ns_x = x * ctheta + y * stheta;
-	ns_y = -x * stheta + y * ctheta;
+        ns_x = x * ctheta + y * stheta;
+        ns_y = -x * stheta + y * ctheta;
 
-	ns_theta = rpy(2) * 180 / 3.14159265;
-	if(fabs(ns_theta) < 10){ ns_theta = 0; }
+        ns_theta = rpy(2) * 180 / 3.14159265;
+        if(fabs(ns_theta) < 10){ ns_theta = 0; }
       }
       else {
-	ns_x = t_sf(0);
-	if(sfoot != 1){ ns_y = -ZERO_STEP_POSITION_DEFAULT; }
-	else{ ns_y = ZERO_STEP_POSITION_DEFAULT; }
-	ns_theta = 0.;
+        ns_x = t_sf(0);
+        if(sfoot != 1){ ns_y = -ZERO_STEP_POSITION_DEFAULT; }
+        else{ ns_y = ZERO_STEP_POSITION_DEFAULT; }
+        ns_theta = 0.;
       }
 
       FootPrint newStep;
@@ -284,7 +289,7 @@ namespace dynamicgraph {
     }
 
     void NextStep::
-    stoper( const int & timeCurr )
+    stoper( const int &  )
     {
       sotDEBUGIN(15);
 
@@ -293,9 +298,9 @@ namespace dynamicgraph {
     }
 
 
-    /* --- SIGNALS -------------------------------------------------------------- */
-    /* --- SIGNALS -------------------------------------------------------------- */
-    /* --- SIGNALS -------------------------------------------------------------- */
+    /* --- SIGNALS ---------------------------------------------------------- */
+    /* --- SIGNALS ---------------------------------------------------------- */
+    /* --- SIGNALS ---------------------------------------------------------- */
 
     int& NextStep::
     triggerCall( int& dummy,int timeCurrent )
@@ -304,42 +309,43 @@ namespace dynamicgraph {
       sotDEBUGIN(45);
 
       switch( state )
-	{
-	case STATE_STOPED: break;
-	case STATE_STARTED:
-	  {
-	    int nextIntoductionTime = timeLastIntroduction+period;
-	    if( nextIntoductionTime<=timeCurrent )
-	      {
-		nextStep( timeCurrent );
-		if( NULL!=verbose )
-		  {
-		    FootPrint & lastStep =  footPrintList.back();
-		    (*verbose) << "<T=" << timeCurrent << "> Introduced a new step: ";
-		    switch( lastStep.contact )
-		      {
-		      case CONTACT_LEFT_FOOT: (*verbose) << "LF " ; break;
-		      case CONTACT_RIGHT_FOOT: (*verbose) << "RF " ; break;
-		      }
-		    (*verbose) << lastStep.x << "," << lastStep.y << ","
-			       << lastStep.theta << std::endl;
-		  }
-		introductionCallBack( timeCurrent );
-		timeLastIntroduction=timeCurrent;
-	      }
-	    break;
-	  }
-	case STATE_STARTING:
-	  {
-	    starter( timeCurrent );
-	    break;
-	  }
-	case STATE_STOPING:
-	  {
-	    stoper( timeCurrent );
-	    break;
-	  }
-	};
+        {
+        case STATE_STOPED: break;
+        case STATE_STARTED:
+          {
+            int nextIntoductionTime = timeLastIntroduction+period;
+            if( nextIntoductionTime<=timeCurrent )
+              {
+                nextStep( timeCurrent );
+                if( NULL!=verbose )
+                  {
+                    FootPrint & lastStep =  footPrintList.back();
+                    (*verbose) << "<T=" << timeCurrent
+                               << "> Introduced a new step: ";
+                    switch( lastStep.contact )
+                      {
+                      case CONTACT_LEFT_FOOT: (*verbose) << "LF " ; break;
+                      case CONTACT_RIGHT_FOOT: (*verbose) << "RF " ; break;
+                      }
+                    (*verbose) << lastStep.x << "," << lastStep.y << ","
+                               << lastStep.theta << std::endl;
+                  }
+                introductionCallBack( timeCurrent );
+                timeLastIntroduction=timeCurrent;
+              }
+            break;
+          }
+        case STATE_STARTING:
+          {
+            starter( timeCurrent );
+            break;
+          }
+        case STATE_STOPING:
+          {
+            stoper( timeCurrent );
+            break;
+          }
+        };
 
       sotDEBUGOUT(45);
 
@@ -347,72 +353,173 @@ namespace dynamicgraph {
     }
 
 
-    /* --- PARAMS --------------------------------------------------------------- */
-    /* --- PARAMS --------------------------------------------------------------- */
-    /* --- PARAMS --------------------------------------------------------------- */
+    /* --- PARAMS ---------------------------------------------------------- */
+    /* --- PARAMS ---------------------------------------------------------- */
+    /* --- PARAMS ---------------------------------------------------------- */
 
     void NextStep::
     display( std::ostream& os ) const
     {
       os << "NextStep <" << getName() <<">:" << std::endl;
       for( std::deque< FootPrint >::const_iterator iter = footPrintList.begin();
-	   iter!=footPrintList.end();++iter )
-	{
-	  os << "<time=" << iter->introductionTime << "> " ;
-	  switch( iter->contact )
-	    {
-	    case CONTACT_LEFT_FOOT: os << "LF " ; break;
-	    case CONTACT_RIGHT_FOOT: os << "RF " ; break;
-	    }
-	  os << "(" << iter->x << "," << iter->y << "," << iter->theta << ")" << std::endl;
-	}
+           iter!=footPrintList.end();++iter )
+        {
+          os << "<time=" << iter->introductionTime << "> " ;
+          switch( iter->contact )
+            {
+            case CONTACT_LEFT_FOOT: os << "LF " ; break;
+            case CONTACT_RIGHT_FOOT: os << "RF " ; break;
+            }
+          os << "(" << iter->x << "," << iter->y << ","
+             << iter->theta << ")" << std::endl;
+        }
     }
 
-    /* --- TWO HAND -------------------------------------------------------------- */
-    /* --- TWO HAND -------------------------------------------------------------- */
-    /* --- TWO HAND -------------------------------------------------------------- */
+
+    void NextStep::
+    commandLine( const std::string& cmdLine,
+                 std::istringstream& cmdArgs,
+                 std::ostream& os )
+    {
+
+
+      if( cmdLine == "help" )
+        {
+          os << "NextStep: " << std::endl
+             << " - verbose [OFF]" << std::endl
+             << " - state [{start|stop}] \t get/set the stepper state. "
+             << std::endl
+             << " - yZeroStep [<value>] \t get/set the Y default position."
+             << std::endl
+             << " - thisIsZero {record|disp}" << std::endl
+             << std::endl;
+        }
+      else if( cmdLine == "state" )
+        {
+          cmdArgs >> std::ws;
+          if( cmdArgs.good() )
+            {
+              std::string statearg; cmdArgs >> statearg;
+              if( statearg == "start" ) { state = STATE_STARTING; }
+              else if( statearg == "stop" ) { state = STATE_STOPING; }
+            }
+          else
+            {
+              os <<"state = ";
+              switch( state )
+                {
+                case STATE_STARTING: os << "starting"; break;
+                case STATE_STOPING: os << "stoping"; break;
+                case STATE_STARTED: os << "started"; break;
+                case STATE_STOPED: os << "stoped"; break;
+                default: os <<"error"; break;
+                }
+              os << std::endl;
+            }
+        }
+      else if( cmdLine == "yZeroStep" )
+        {
+          cmdArgs >> std::ws; if( cmdArgs.good() )
+                                { cmdArgs >> zeroStepPosition; }
+          else { os << "yzero = " << zeroStepPosition; }
+        }
+      else if( cmdLine == "thisIsZero" )
+        {
+          std::string arg; cmdArgs >> arg;
+          if( arg == "disp_left" ) { os << "zero_left = " << lfMref0; }
+          else if( arg == "disp_right" ) { os << "zero_right = " << rfMref0; }
+          else if( arg == "record" ) { thisIsZero(); }
+        }
+      else if( cmdLine == "verbose" )
+        {
+          cmdArgs >> std::ws; std::string offarg;
+          if( (cmdArgs.good())&&(cmdArgs>>offarg,offarg=="OFF") )
+            { verbose =  NULL; }
+          else { verbose = &os; }
+        }
+      else if( cmdLine == "mode1d" )
+        {
+          mode = MODE_1D;
+        }
+      else if( cmdLine == "mode3d" )
+        {
+          mode = MODE_3D;
+        }
+      else {  }
+    }
+
+
+    /* --- TWO HAND -------------------------------------------------------- */
+    /* --- TWO HAND -------------------------------------------------------- */
+    /* --- TWO HAND -------------------------------------------------------- */
 
     NextStepTwoHandObserver::
     NextStepTwoHandObserver( const std::string & name )
-      :referencePositionLeftSIN( NULL,"NextStepTwoHandObserver("+name+")::input(vector)::positionLeft" )
-      ,referenceVelocityLeftSIN( NULL,"NextStepTwoHandObserver("+name+")::input(vector)::velocityLeft" )
-      ,referenceAccelerationLeftSIN( NULL,"NextStepTwoHandObserver("+name+")::input(vector)::accelerationLeft" )
-      ,leftFootPositionSIN( NULL,"NextStepTwoHandObserver("+name+")::input(matrixhomo)::leftfoot" )
+      :referencePositionLeftSIN( NULL,"NextStepTwoHandObserver("
+                                 +name+")::input(vector)::positionLeft" )
+      ,referenceVelocityLeftSIN( NULL,"NextStepTwoHandObserver("
+                                 +name+")::input(vector)::velocityLeft" )
+      ,referenceAccelerationLeftSIN( NULL,"NextStepTwoHandObserver("
+                                     +name+
+                                     ")::input(vector)::accelerationLeft" )
+      ,leftFootPositionSIN( NULL,"NextStepTwoHandObserver("+name+
+                            ")::input(matrixhomo)::leftfoot" )
 
-      ,referencePositionRightSIN( NULL,"NextStepTwoHandObserver("+name+")::input(vector)::positionRight" )
-      ,referenceVelocityRightSIN( NULL,"NextStepTwoHandObserver("+name+")::input(vector)::velocityRight" )
-      ,referenceAccelerationRightSIN( NULL,"NextStepTwoHandObserver("+name+")::input(vector)::accelerationRight" )
-      ,rightFootPositionSIN( NULL,"NextStepTwoHandObserver("+name+")::input(matrixhomo)::rightfoot" )
+      ,referencePositionRightSIN( NULL,"NextStepTwoHandObserver("+name+
+                                  ")::input(vector)::positionRight" )
+      ,referenceVelocityRightSIN( NULL,"NextStepTwoHandObserver("+name+
+                                  ")::input(vector)::velocityRight" )
+      ,referenceAccelerationRightSIN( NULL,"NextStepTwoHandObserver("+name+
+                                      ")::input(vector)::accelerationRight" )
+      ,rightFootPositionSIN( NULL,"NextStepTwoHandObserver("+name+
+                             ")::input(matrixhomo)::rightfoot" )
 
-      ,referencePositionLeftSOUT( boost::bind(&NextStepTwoHandObserver::computeReferencePositionLeft,this,_1,_2),
-				  leftFootPositionSIN<<referencePositionLeftSIN<<referencePositionRightSIN,
-				  "NextStepTwoHandObserver("+name+")::output(vector)::position2handLeft" )
-      ,referencePositionRightSOUT( boost::bind(&NextStepTwoHandObserver::computeReferencePositionRight,this,_1,_2),
-				   rightFootPositionSIN<<referencePositionLeftSIN<<referencePositionRightSIN,
-				   "NextStepTwoHandObserver("+name+")::output(vector)::position2handRight" )
+      ,referencePositionLeftSOUT( boost::bind
+                                  (&NextStepTwoHandObserver::
+                                   computeReferencePositionLeft,this,_1,_2),
+                                  leftFootPositionSIN<<referencePositionLeftSIN
+                                  <<referencePositionRightSIN,
+                                  "NextStepTwoHandObserver("+name+
+                                  ")::output(vector)::position2handLeft" )
+      ,referencePositionRightSOUT( boost::bind
+                                   (&NextStepTwoHandObserver::
+                                    computeReferencePositionRight,this,_1,_2),
+                                   rightFootPositionSIN<<
+                                   referencePositionLeftSIN<<
+                                   referencePositionRightSIN,
+                                   "NextStepTwoHandObserver("+name+
+                                   ")::output(vector)::position2handRight" )
 
-      ,referenceVelocitySOUT( SOT_MEMBER_SIGNAL_2( NextStepTwoHandObserver::computeReferenceVelocity,
-						   referenceVelocityLeftSIN,ml::Vector,
-						   referenceVelocityRightSIN,ml::Vector),
-			      "NextStepTwoHandObserver("+name+")::output(vector)::velocity2Hand" )
-      ,referenceAccelerationSOUT( SOT_MEMBER_SIGNAL_2( NextStepTwoHandObserver::computeReferenceAcceleration,
-						       referenceAccelerationLeftSIN,ml::Vector,
-						       referenceAccelerationRightSIN,ml::Vector),
-				  "NextStepTwoHandObserver("+name+")::output(vector)::acceleration2Hand" )
-    { sotDEBUGINOUT(25); }
+      ,referenceVelocitySOUT( SOT_MEMBER_SIGNAL_2( NextStepTwoHandObserver::
+                                                   computeReferenceVelocity,
+                                                   referenceVelocityLeftSIN,
+                                                   Vector,
+                                                   referenceVelocityRightSIN,
+                                                   Vector),
+                              "NextStepTwoHandObserver("+name+
+                              ")::output(vector)::velocity2Hand" )
+      ,referenceAccelerationSOUT
+                            ( SOT_MEMBER_SIGNAL_2
+                              ( NextStepTwoHandObserver::
+                                computeReferenceAcceleration,
+                                referenceAccelerationLeftSIN,Vector,
+                                referenceAccelerationRightSIN,Vector),
+                              "NextStepTwoHandObserver("+name+
+                              ")::output(vector)::acceleration2Hand" )
+{ sotDEBUGINOUT(25); }
 
 
     SignalArray<int> NextStepTwoHandObserver::
     getSignals( void )
     {
       return (referencePositionLeftSIN << referenceVelocityLeftSIN
-	      << referenceAccelerationLeftSIN
-	      << leftFootPositionSIN
-	      << referencePositionRightSIN << referenceVelocityRightSIN
-	      << referenceAccelerationRightSIN
-	      << rightFootPositionSIN
-	      << referencePositionLeftSOUT << referencePositionRightSOUT
-	      << referenceVelocitySOUT << referenceAccelerationSOUT);
+              << referenceAccelerationLeftSIN
+              << leftFootPositionSIN
+              << referencePositionRightSIN << referenceVelocityRightSIN
+              << referenceAccelerationRightSIN
+              << rightFootPositionSIN
+              << referencePositionLeftSOUT << referencePositionRightSOUT
+              << referenceVelocitySOUT << referenceAccelerationSOUT);
 
 
     }
@@ -421,17 +528,18 @@ namespace dynamicgraph {
     {
 
       return (referencePositionLeftSIN << referenceVelocityLeftSIN
-	      << referenceAccelerationLeftSIN
-	      << leftFootPositionSIN
-	      << referencePositionRightSIN << referenceVelocityRightSIN
-	      << referenceAccelerationRightSIN
-	      << rightFootPositionSIN
-	      << referencePositionLeftSOUT << referencePositionRightSOUT
-	      << referenceVelocitySOUT << referenceAccelerationSOUT);
+              << referenceAccelerationLeftSIN
+              << leftFootPositionSIN
+              << referencePositionRightSIN << referenceVelocityRightSIN
+              << referenceAccelerationRightSIN
+              << rightFootPositionSIN
+              << referencePositionLeftSOUT << referencePositionRightSOUT
+              << referenceVelocitySOUT << referenceAccelerationSOUT);
     }
 
     MatrixHomogeneous& NextStepTwoHandObserver::
-    computeRefPos( MatrixHomogeneous& res,int timeCurr,const MatrixHomogeneous& wMsf )
+    computeRefPos( MatrixHomogeneous& res,int timeCurr,
+                   const MatrixHomogeneous& wMsf )
     {
       sotDEBUGIN(15);
 
@@ -466,8 +574,9 @@ namespace dynamicgraph {
       rpy = 0.5 * (rpy_rh + rpy_lh);
 
       R = (Eigen::AngleAxisd(rpy(2),Eigen::Vector3d::UnitZ())*
-	   Eigen::AngleAxisd(rpy(1),Eigen::Vector3d::UnitY())*
-	   Eigen::AngleAxisd(rpy(0),Eigen::Vector3d::UnitX())).toRotationMatrix();
+           Eigen::AngleAxisd(rpy(1),Eigen::Vector3d::UnitY())*
+           Eigen::AngleAxisd(rpy(0),Eigen::Vector3d::UnitX())).
+        toRotationMatrix();
       res.linear() = R;
       res.translation() = p;
 
@@ -503,10 +612,10 @@ namespace dynamicgraph {
     }
 
 
-    ml::Vector& NextStepTwoHandObserver::
-    computeReferenceVelocity( const ml::Vector& right,
-			      const ml::Vector& left,
-			      ml::Vector& res )
+    Vector& NextStepTwoHandObserver::
+    computeReferenceVelocity( const Vector& ,
+                              const Vector& ,
+                              Vector&  res)
     {
       sotDEBUGIN(15);
 
@@ -517,10 +626,10 @@ namespace dynamicgraph {
     }
 
 
-    ml::Vector& NextStepTwoHandObserver::
-    computeReferenceAcceleration( const ml::Vector& right,
-				  const ml::Vector& left,
-				  ml::Vector& res )
+    Vector& NextStepTwoHandObserver::
+    computeReferenceAcceleration( const Vector& ,
+                                  const Vector& ,
+                                  Vector& res)
     {
       sotDEBUGIN(15);
 

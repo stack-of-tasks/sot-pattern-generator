@@ -13,27 +13,39 @@ namespace dynamicgraph {
     StepObserver::StepObserver( const std::string & name )
       :Entity(name)
 
-      ,leftHandPositionSIN( NULL,"StepObserver("+name+")::input(vector)::lefthand" )
-      ,rightHandPositionSIN( NULL,"StepObserver("+name+")::input(vector)::righthand" )
+      ,leftHandPositionSIN(NULL,"StepObserver("+name+
+                           ")::input(vector)::lefthand" )
+       
+      ,rightHandPositionSIN( NULL,"StepObserver("+name+
+                             ")::input(vector)::righthand" )
 
-      ,leftFootPositionSIN( NULL,"StepObserver("+name+")::input(matrixhomo)::leftfoot" )
-      ,rightFootPositionSIN( NULL,"StepObserver("+name+")::input(matrixhomo)::rightfoot" )
-      ,waistPositionSIN( NULL,"StepObserver("+name+")::input(matrixhomo)::waist" )
+      ,leftFootPositionSIN( NULL,"StepObserver("+name+
+                            ")::input(matrixhomo)::leftfoot" )
+       
+      ,rightFootPositionSIN( NULL,"StepObserver("+name+
+                             ")::input(matrixhomo)::rightfoot" )
+       
+      ,waistPositionSIN( NULL,"StepObserver("+name+
+                         ")::input(matrixhomo)::waist" )
 
-      ,referencePositionLeftSOUT( boost::bind(&StepObserver::computeReferencePositionLeft,this,_1,_2),
-				  leftFootPositionSIN<<leftHandPositionSIN<<rightHandPositionSIN,
-				  "StepObserver("+name+")::output(vector)::position2handLeft" )
-      ,referencePositionRightSOUT( boost::bind(&StepObserver::computeReferencePositionRight,this,_1,_2),
-				   rightFootPositionSIN<<rightHandPositionSIN<<leftHandPositionSIN,
-				   "StepObserver("+name+")::output(vector)::position2handRight" )
-      ,referencePositionWaistSOUT( boost::bind(&StepObserver::computeReferencePositionWaist,this,_1,_2),
-				   waistPositionSIN<<rightHandPositionSIN<<leftHandPositionSIN,
-				   "StepObserver("+name+")::output(vector)::position2handWaist" )
+      ,referencePositionLeftSOUT
+       ( boost::bind(&StepObserver::computeReferencePositionLeft,this,_1,_2),
+         leftFootPositionSIN << leftHandPositionSIN
+         <<rightHandPositionSIN,
+         "StepObserver("+name+")::output(vector)::position2handLeft" )
+       
+      ,referencePositionRightSOUT
+       ( boost::bind(&StepObserver::computeReferencePositionRight,this,_1,_2),
+         rightFootPositionSIN<<rightHandPositionSIN<<leftHandPositionSIN,
+         "StepObserver("+name+")::output(vector)::position2handRight" )
+       
+      ,referencePositionWaistSOUT
+       ( boost::bind(&StepObserver::computeReferencePositionWaist,this,_1,_2),
+         waistPositionSIN<<rightHandPositionSIN<<leftHandPositionSIN,
+         "StepObserver("+name+")::output(vector)::position2handWaist" )
     {
       sotDEBUGIN(25);
-
       signalRegistration(getSignals());
-
       sotDEBUGOUT(25);
     }
 
@@ -41,9 +53,9 @@ namespace dynamicgraph {
     SignalArray<int> StepObserver::getSignals( void )
     {
       return (leftHandPositionSIN << leftFootPositionSIN << waistPositionSIN
-	      << rightHandPositionSIN << rightFootPositionSIN
-	      << referencePositionLeftSOUT << referencePositionRightSOUT
-	      << referencePositionWaistSOUT );
+              << rightHandPositionSIN << rightFootPositionSIN
+              << referencePositionLeftSOUT << referencePositionRightSOUT
+              << referencePositionWaistSOUT );
     }
 
 
@@ -55,8 +67,8 @@ namespace dynamicgraph {
 
     MatrixHomogeneous&
     StepObserver::computeRefPos( MatrixHomogeneous& res,
-				 int timeCurr,
-				 const MatrixHomogeneous& wMref )
+                                 int timeCurr,
+                                 const MatrixHomogeneous& wMref )
     {
       sotDEBUGIN(15);
 
@@ -92,8 +104,9 @@ namespace dynamicgraph {
       MatrixRotation R;
 
       R = (Eigen::AngleAxisd(rpy(2),Eigen::Vector3d::UnitZ())*
-	   Eigen::AngleAxisd(rpy(1),Eigen::Vector3d::UnitY())*
-	   Eigen::AngleAxisd(rpy(0),Eigen::Vector3d::UnitX())).toRotationMatrix();
+           Eigen::AngleAxisd(rpy(1),Eigen::Vector3d::UnitY())*
+           Eigen::AngleAxisd(rpy(0),Eigen::Vector3d::UnitX()))
+        .toRotationMatrix();
 
       res.translation() = p;
       res.linear() = R;
@@ -107,7 +120,7 @@ namespace dynamicgraph {
 
     MatrixHomogeneous&
     StepObserver::computeReferencePositionLeft( MatrixHomogeneous& res,
-						int timeCurr )
+                                                int timeCurr )
     {
       sotDEBUGIN(15);
 
@@ -120,7 +133,7 @@ namespace dynamicgraph {
 
     MatrixHomogeneous&
     StepObserver::computeReferencePositionRight( MatrixHomogeneous& res,
-						 int timeCurr )
+                                                 int timeCurr )
     {
       sotDEBUGIN(15);
 
@@ -133,7 +146,7 @@ namespace dynamicgraph {
 
     MatrixHomogeneous&
     StepObserver::computeReferencePositionWaist( MatrixHomogeneous& res,
-						 int timeCurr )
+                                                 int timeCurr )
     {
       sotDEBUGIN(15);
 
@@ -148,5 +161,18 @@ namespace dynamicgraph {
     {
       os << "StepObserver <" << getName() <<">:" << std::endl;
     }
+    
+    void StepObserver::commandLine( const std::string& cmdLine,
+                                    std::istringstream& cmdArgs,
+                                    std::ostream& os )
+    {
+      if( cmdLine == "help" )
+        {
+          os << "StepObserver: " << std::endl
+             << std::endl;
+        }
+      else {  }
+    }
+
   } // namespace dg
 } // namespace sot

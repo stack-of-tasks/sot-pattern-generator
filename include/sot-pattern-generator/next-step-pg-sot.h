@@ -26,10 +26,6 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-/* Matrix */
-#include <jrl/mal/boost.hh>
-namespace ml = maal::boost;
-
 /* SOT */
 #include <sot-pattern-generator/next-step.h>
 #include <sot-pattern-generator/pg.h>
@@ -70,7 +66,8 @@ namespace dynamicgraph {
 
     protected:
 
-      typedef std::pair<unsigned int, PatternGeneratorJRL::FootAbsolutePosition> FootPrint_t;
+      typedef std::pair<unsigned int,
+                        PatternGeneratorJRL::FootAbsolutePosition> FootPrint_t;
       std::vector<FootPrint_t> stepbuf;
 
       Entity * pgEntity;
@@ -81,7 +78,8 @@ namespace dynamicgraph {
       /*! \brief Pointer towards the interface of the pattern generator. */
       pg::PatternGeneratorInterface * m_PGI;
 
-      /*! \brief Pointer towards the entity which handle the pattern generator. */
+      /*! \brief Pointer towards the entity 
+        which handle the pattern generator. */
       PatternGenerator * m_sPG;
 
     public: /* --- CONSTRUCTION --- */
@@ -96,6 +94,10 @@ namespace dynamicgraph {
       virtual void introductionCallBack( const int & timeCurr );
 
     public: /* --- ENTITY INHERITANCE --- */
+      virtual void commandLine( const std::string& cmdLine,
+                                std::istringstream& cmdArgs,
+                                std::ostream& os );
+
     };
 
 

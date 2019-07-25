@@ -63,7 +63,8 @@ namespace dynamicgraph {
     public:
 
       static const std::string CLASS_NAME;
-      virtual const std::string& getClassName( void ) const { return CLASS_NAME; }
+      virtual const std::string& getClassName( void )
+        const { return CLASS_NAME; }
 
     public:
 
@@ -92,17 +93,24 @@ namespace dynamicgraph {
 
     public: // signal callbacks
 
-      MatrixHomogeneous& computeReferencePositionLeft( MatrixHomogeneous& res,int timeCurr );
-      MatrixHomogeneous& computeReferencePositionRight( MatrixHomogeneous& res,int timeCurr );
-      MatrixHomogeneous& computeReferencePositionWaist( MatrixHomogeneous& res,int timeCurr );
+      MatrixHomogeneous& computeReferencePositionLeft
+        ( MatrixHomogeneous& res,int timeCurr );
+      MatrixHomogeneous& computeReferencePositionRight
+        ( MatrixHomogeneous& res,int timeCurr );
+      MatrixHomogeneous& computeReferencePositionWaist
+        ( MatrixHomogeneous& res,int timeCurr );
 
     public: // Entity
 
       virtual void display( std::ostream& os ) const;
+      virtual void commandLine( const std::string& cmdLine,
+                                std::istringstream& cmdArgs,
+                                std::ostream& os );
 
     private: // helpers
 
-      MatrixHomogeneous& computeRefPos( MatrixHomogeneous& res,int timeCurr,const MatrixHomogeneous& wMref );
+      MatrixHomogeneous& computeRefPos
+        ( MatrixHomogeneous& res,int timeCurr,const MatrixHomogeneous& wMref );
     };
 
 

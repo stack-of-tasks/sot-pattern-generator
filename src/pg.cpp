@@ -64,7 +64,6 @@ namespace dynamicgraph {
       ,m_urdfFile("")
       ,m_srdfFile("")
       ,m_xmlRankFile("")
-      ,m_soleLength(0)
       ,m_soleWidth(0)
       ,m_init(false)
       ,m_InitPositionByRealState(true)
@@ -102,6 +101,10 @@ namespace dynamicgraph {
       ,dCoMRefSOUT( boost::bind(&PatternGenerator::getdCoMRef,this,_1,_2),
                     OneStepOfControlS,
                     "PatternGenerator("+name+")::output(matrix)::dcomref" )
+
+      ,ddCoMRefSOUT( boost::bind(&PatternGenerator::getddCoMRef,this,_1,_2),
+                    OneStepOfControlS,
+                    "PatternGenerator("+name+")::output(matrix)::ddcomref" )
 
       ,comSIN(NULL,"PatternGenerator("+name+")::input(vector)::com")
 
@@ -178,6 +181,11 @@ namespace dynamicgraph {
        (boost::bind(&PatternGenerator::getdComAttitude,this,_1,_2),
         OneStepOfControlS,
         "sotPatternGenerator("+name+")::output(vectorRPY)::dcomattitude")
+
+      ,ddcomattitudeSOUT
+       (boost::bind(&PatternGenerator::getddComAttitude,this,_1,_2),
+        OneStepOfControlS,
+        "sotPatternGenerator("+name+")::output(vectorRPY)::ddcomattitude")
 
       ,waistattitudeSOUT
        (boost::bind(&PatternGenerator::getWaistAttitude,this,_1,_2),
@@ -797,6 +805,18 @@ namespace dynamicgraph {
     }
 
     Vector & PatternGenerator::
+    getddCoMRef(Vector & CoMRefval, int time)
+    {
+      sotDEBUGIN(25);
+
+      OneStepOfControlS(time);
+      CoMRefval = m_ddCOMRefPos;
+
+      sotDEBUGOUT(25);
+      return CoMRefval;
+    }
+
+    Vector & PatternGenerator::
     getExternalForces(Vector & forces, int time)
     {
       sotDEBUGIN(25);
@@ -1279,6 +1299,11 @@ namespace dynamicgraph {
               m_dCOMRefPos(0) = lCOMRefState.x[1];
               m_dCOMRefPos(1) = lCOMRefState.y[1];
               m_dCOMRefPos(2) = lCOMRefState.z[1];
+              
+              m_ddCOMRefPos(0) = lCOMRefState.x[2];
+              m_ddCOMRefPos(1) = lCOMRefState.y[2];
+              m_ddCOMRefPos(2) = lCOMRefState.z[2];
+              // HERE -------------------------------
 
               m_ComAttitude(0) = lCOMRefState.roll[0];
               m_ComAttitude(1) = lCOMRefState.pitch[0];
@@ -1287,6 +1312,10 @@ namespace dynamicgraph {
               m_dComAttitude(0) = lCOMRefState.roll[1];
               m_dComAttitude(1) = lCOMRefState.pitch[1];
               m_dComAttitude(2) = lCOMRefState.yaw[1];
+
+              m_ddComAttitude(0) = lCOMRefState.roll[2];
+              m_ddComAttitude(1) = lCOMRefState.pitch[2];
+              m_ddComAttitude(2) = lCOMRefState.yaw[2];              
 
               sotDEBUG(2) << "dCOMRefPos returned by the PG: "
                           << m_dCOMRefPos <<endl;
@@ -1807,6 +1836,17 @@ namespace dynamicgraph {
       return res;
     }
 
+    dynamicgraph::Vector & PatternGenerator::
+    getddComAttitude( dynamicgraph::Vector& res, int time)
+    {
+      sotDEBUGIN(5);
+      OneStepOfControlS(time);
+      res.resize(3);
+      for( unsigned int i=0;i<3;++i ) { res(i) = m_ddComAttitude(i); }
+      sotDEBUG(5) << "ComAttitude: " << m_ddComAttitude << endl;
+      sotDEBUGOUT(5);
+      return res;
+    }
 
     dynamicgraph::Vector& PatternGenerator::
     getComAttitude( dynamicgraph::Vector& res, int time)

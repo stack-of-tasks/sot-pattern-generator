@@ -96,15 +96,15 @@ namespace dynamicgraph {
 
       ,CoMRefSOUT( boost::bind(&PatternGenerator::getCoMRef,this,_1,_2),
                    OneStepOfControlS,
-                   "PatternGenerator("+name+")::output(matrix)::comref" )
+                   "PatternGenerator("+name+")::output(vector)::comref" )
 
       ,dCoMRefSOUT( boost::bind(&PatternGenerator::getdCoMRef,this,_1,_2),
                     OneStepOfControlS,
-                    "PatternGenerator("+name+")::output(matrix)::dcomref" )
+                    "PatternGenerator("+name+")::output(vector)::dcomref" )
 
       ,ddCoMRefSOUT( boost::bind(&PatternGenerator::getddCoMRef,this,_1,_2),
                     OneStepOfControlS,
-                    "PatternGenerator("+name+")::output(matrix)::ddcomref" )
+                    "PatternGenerator("+name+")::output(vector)::ddcomref" )
 
       ,comSIN(NULL,"PatternGenerator("+name+")::input(vector)::com")
 
@@ -118,7 +118,7 @@ namespace dynamicgraph {
       ,forceSOUT
        (boost::bind(&PatternGenerator::getExternalForces,this,_1,_2),
         OneStepOfControlS,
-        "PatternGenerator("+name+")::output(matrix)::forceSOUT" )
+        "PatternGenerator("+name+")::output(vector)::forceSOUT" )
 
       ,velocitydesSIN
        (NULL,
@@ -273,6 +273,8 @@ namespace dynamicgraph {
       m_ZMPPrevious(3) = 1.0;
       m_dCOMRefPos.resize(3);
       m_dCOMRefPos.fill(0.0);
+      m_ddCOMRefPos.resize(3);
+      m_ddCOMRefPos.fill(0.0);      
       m_InitZMPRefPos.resize(3);
       m_InitZMPRefPos.fill(0);
       m_InitCOMRefPos.resize(3);
@@ -283,6 +285,8 @@ namespace dynamicgraph {
       m_InitWaistRefAtt.fill(0);
       m_dComAttitude.resize(3);
       m_dComAttitude.fill(0);
+      m_ddComAttitude.resize(3);
+      m_ddComAttitude.fill(0);      
       m_VelocityReference.resize(3);
       m_VelocityReference.fill(0.0);
       m_WaistAttitude.resize(3);
@@ -372,7 +376,8 @@ namespace dynamicgraph {
                           ZMPPreviousControllerSIN <<
                           ZMPRefSOUT <<
                           CoMRefSOUT <<
-                          dCoMRefSOUT);
+                          dCoMRefSOUT <<
+                          ddCoMRefSOUT);
 
       signalRegistration( comStateSIN << zmpSIN << forceSIN << forceSOUT );
 
@@ -387,6 +392,7 @@ namespace dynamicgraph {
                           jointWalkingErrorPositionSOUT <<
                           comattitudeSOUT <<
                           dcomattitudeSOUT <<
+                          ddcomattitudeSOUT <<
                           waistattitudeSOUT );
 
       signalRegistration( waistpositionSOUT <<

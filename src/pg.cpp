@@ -197,6 +197,11 @@ namespace dynamicgraph {
         OneStepOfControlS,
         "PatternGenerator("+name+")::output(vectorRPY)::waistattitudeabsolute")
 
+      ,waistattitudematrixSOUT
+       (boost::bind(&PatternGenerator::getWaistAttitudeMatrix,this,_1,_2),
+        OneStepOfControlS,
+        "PatternGenerator("+name+")::output(homogeneousmatrix)::waistattitudematrix")
+
       ,waistpositionSOUT
        (boost::bind(&PatternGenerator::getWaistPosition,this,_1,_2),
         OneStepOfControlS,
@@ -300,6 +305,17 @@ namespace dynamicgraph {
       m_WaistPositionAbsolute.resize(3);
       m_WaistPositionAbsolute.fill(0);
 
+      m_WaistAttitudeMatrix.setIdentity();
+      m_LeftFootPosition.setIdentity();
+      m_RightFootPosition.setIdentity();
+
+      m_dotLeftFootPosition.setIdentity();
+      m_dotRightFootPosition.setIdentity();
+
+      m_InitLeftFootPosition.setIdentity();
+      m_InitRightFootPosition.setIdentity();
+      m_FlyingFootPosition.setIdentity();
+
       m_k_Waist_kp1.setIdentity();
 
       m_SupportFoot = 1; // Means that we do not know which support foot it is.
@@ -393,7 +409,8 @@ namespace dynamicgraph {
                           comattitudeSOUT <<
                           dcomattitudeSOUT <<
                           ddcomattitudeSOUT <<
-                          waistattitudeSOUT );
+                          waistattitudeSOUT <<
+                          waistattitudematrixSOUT);
 
       signalRegistration( waistpositionSOUT <<
                           waistattitudeabsoluteSOUT <<
@@ -887,8 +904,6 @@ namespace dynamicgraph {
       return InitWaistRefval;
     }
 
-
-
     MatrixHomogeneous & PatternGenerator::
     getLeftFootRef(MatrixHomogeneous & LeftFootRefVal, int time)
     {
@@ -899,6 +914,7 @@ namespace dynamicgraph {
       sotDEBUGOUT(25) ;
       return LeftFootRefVal;
     }
+
     MatrixHomogeneous & PatternGenerator::
     getRightFootRef(MatrixHomogeneous & RightFootRefval, int time)
     {
@@ -1519,6 +1535,8 @@ namespace dynamicgraph {
 
                   m_WaistPosition = WaistPoseAbsolute.translation();
 
+                  m_WaistAttitudeMatrix = WaistPoseAbsolute;
+
                   sotDEBUG(25) << "ComRef:  " << m_COMRefPos << endl;
                   sotDEBUG(25) << "iPoseOrigin:  " << iPoseOrigin << endl;
                 }
@@ -1879,6 +1897,16 @@ namespace dynamicgraph {
       sotDEBUGOUT(5);
       return res;
     }
+
+    MatrixHomogeneous & PatternGenerator::
+    getWaistAttitudeMatrix(MatrixHomogeneous &res, int time)
+    {
+      sotDEBUGIN(5);
+      OneStepOfControlS(time);
+      res = m_WaistAttitudeMatrix;
+      sotDEBUGOUT(5);
+      return res;
+    }    
 
     Vector & PatternGenerator::
     getWaistPosition(Vector &res, int time)

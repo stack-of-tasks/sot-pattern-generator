@@ -264,6 +264,9 @@ namespace dynamicgraph {
       /*! \brief Internal method to get the reference dCoM at a given time.*/
       dynamicgraph::Vector & getdCoMRef(dynamicgraph::Vector & res, int time);
 
+      /*! \brief Internal method to get the reference ddCoM at a given time.*/
+      dynamicgraph::Vector & getddCoMRef(dynamicgraph::Vector & res, int time);
+
       /*! \brief Internal method to get the external forces at a given time.*/
       dynamicgraph::Vector & getExternalForces
         (dynamicgraph::Vector & forces, int time);
@@ -291,6 +294,10 @@ namespace dynamicgraph {
       dynamicgraph::Vector & getdComAttitude
         (dynamicgraph::Vector &res, int time);
 
+      /*! \brief Internal method to get the second derivative of the com attitude. */
+      dynamicgraph::Vector & getddComAttitude
+        (dynamicgraph::Vector &res, int time);
+
       /*! \brief Internal method to get the attitude of the com. */
       dynamicgraph::Vector & getComAttitude
         (dynamicgraph::Vector &res, int time);
@@ -302,6 +309,11 @@ namespace dynamicgraph {
       /*! \brief Internal method to get the absolute attitude of the waist. */
       VectorRollPitchYaw & getWaistAttitudeAbsolute
         (VectorRollPitchYaw &res, int time);
+
+      /*! \brief Internal method to get the absolute attitude of the waist into 
+        an homogeneous matrix. */
+      MatrixHomogeneous & getWaistAttitudeMatrix
+        (MatrixHomogeneous &res, int time);        
 
       /*! \brief Internal method to get the dataInPorcess flag */
       unsigned & getDataInProcess(unsigned &res, int time);
@@ -356,15 +368,22 @@ namespace dynamicgraph {
         is seen as an inverted pendulum*/
       dynamicgraph::Vector m_ComAttitude;
 
-      /*! \brief Com Attitude: does not really exist apart when the robot
+      /*! \brief dCom Attitude: does not really exist apart when the robot
         is seen as an inverted pendulum*/
       dynamicgraph::Vector m_dComAttitude;
+
+      /*! \brief ddCom Attitude: does not really exist apart when the robot
+        is seen as an inverted pendulum*/
+      dynamicgraph::Vector m_ddComAttitude;      
 
       /*! \brief Absolute position of the reference CoM. */
       dynamicgraph::Vector m_COMRefPos;
 
       /*! \brief Absolute position of the reference dCoM. */
       dynamicgraph::Vector m_dCOMRefPos;
+
+      /*! \brief Absolute position of the reference ddCoM. */
+      dynamicgraph::Vector m_ddCOMRefPos;
 
       /*! \brief Initial Absolute position of the reference ZMP. */
       dynamicgraph::Vector m_InitZMPRefPos;
@@ -388,11 +407,17 @@ namespace dynamicgraph {
       /*! \brief Waist Attitude Absolute */
       dynamicgraph::Vector m_WaistAttitudeAbsolute;
 
+      /*! \brief Waist Attitude Homogeneous Matrix */
+      MatrixHomogeneous m_WaistAttitudeMatrix;
+
       /*! \brief Joint values for walking. */
       dynamicgraph::Vector m_JointErrorValuesForWalking;
 
       /*! \brief Velocity reference for Herdt's PG */
       dynamicgraph::Vector m_VelocityReference;
+
+      /*! \brief trigger to start walking */
+      bool m_trigger;
 
       /*! \brief true iff the pattern if dealing with data,
         false if pg is not
@@ -495,6 +520,7 @@ namespace dynamicgraph {
       /*! \brief Externalize the CoM reference. */
       SignalTimeDependent<dynamicgraph::Vector,int> dCoMRefSOUT;
 
+      SignalTimeDependent<dynamicgraph::Vector,int> ddCoMRefSOUT;
       /*! \brief Take the current CoM. */
       SignalPtr<dynamicgraph::Vector,int> comSIN;
 
@@ -515,6 +541,9 @@ namespace dynamicgraph {
 
       /*! \brief Take the current desired velocity. */
       SignalPtr<dynamicgraph::Vector,int> velocitydesSIN;
+
+      /*! \brief Take the current trigger to start OneStepOfControl. */
+      SignalPtr<bool,int> triggerSIN;     
 
       /*! \brief Take the current left foot homogeneous position. */
       SignalPtr<MatrixHomogeneous,int> LeftFootCurrentPosSIN;
@@ -551,6 +580,9 @@ namespace dynamicgraph {
       /*! \brief Externalize the dcom attitude. */
       SignalTimeDependent<dynamicgraph::Vector,int> dcomattitudeSOUT;
 
+      /*! \brief Externalize the ddcom attitude. */
+      SignalTimeDependent<dynamicgraph::Vector,int> ddcomattitudeSOUT;
+
       /*! \brief Externalize the waist attitude. */
       SignalTimeDependent<VectorRollPitchYaw,int>
         waistattitudeSOUT;
@@ -558,6 +590,10 @@ namespace dynamicgraph {
       /*! \brief Externalize the absolute waist attitude. */
       SignalTimeDependent<VectorRollPitchYaw,int>
         waistattitudeabsoluteSOUT;
+
+      /*! \brief Externalize the absolute waist attitude into a homogeneous matrix. */
+      SignalTimeDependent<MatrixHomogeneous,int>
+        waistattitudematrixSOUT;
 
       /*! \brief Externalize the waist position. */
       SignalTimeDependent<dynamicgraph::Vector,int>

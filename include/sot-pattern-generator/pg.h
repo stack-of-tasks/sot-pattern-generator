@@ -179,6 +179,9 @@ namespace dynamicgraph {
       /*! \brief iteration time. */
       unsigned int m_LocalTime;
 
+      /*! \brief count for subsampling. */
+      unsigned int m_count;      
+
     public: /* --- CONSTRUCTION --- */
 
       /*! \brief Default constructor. */
@@ -345,7 +348,10 @@ namespace dynamicgraph {
       MatrixHomogeneous m_k_Waist_kp1;
 
       /*! \brief Absolute Position for the left and right feet. */
-      MatrixHomogeneous m_LeftFootPosition,m_RightFootPosition;
+      MatrixHomogeneous m_LeftFootPosition,m_RightFootPosition; 
+      PatternGeneratorJRL::FootAbsolutePosition m_PrevSamplingRightFootAbsPos, m_PrevSamplingLeftFootAbsPos;    
+      PatternGeneratorJRL::FootAbsolutePosition m_NextSamplingRightFootAbsPos, m_NextSamplingLeftFootAbsPos;
+      PatternGeneratorJRL::FootAbsolutePosition m_InitRightFootAbsPos, m_InitLeftFootAbsPos;    
 
       /*! \brief Absolute Derivate for the left and right feet. */
       MatrixHomogeneous m_dotLeftFootPosition,m_dotRightFootPosition;
@@ -378,12 +384,18 @@ namespace dynamicgraph {
 
       /*! \brief Absolute position of the reference CoM. */
       dynamicgraph::Vector m_COMRefPos;
-
+      dynamicgraph::Vector m_PrevSamplingCOMRefPos;
+      dynamicgraph::Vector m_NextSamplingCOMRefPos; 
+           
       /*! \brief Absolute position of the reference dCoM. */
       dynamicgraph::Vector m_dCOMRefPos;
+      dynamicgraph::Vector m_PrevSamplingdCOMRefPos;
+      dynamicgraph::Vector m_NextSamplingdCOMRefPos; 
 
       /*! \brief Absolute position of the reference ddCoM. */
       dynamicgraph::Vector m_ddCOMRefPos;
+      dynamicgraph::Vector m_PrevSamplingddCOMRefPos;
+      dynamicgraph::Vector m_NextSamplingddCOMRefPos; 
 
       /*! \brief Initial Absolute position of the reference ZMP. */
       dynamicgraph::Vector m_InitZMPRefPos;
@@ -406,9 +418,11 @@ namespace dynamicgraph {
 
       /*! \brief Waist Attitude Absolute */
       dynamicgraph::Vector m_WaistAttitudeAbsolute;
+      dynamicgraph::Vector m_PrevSamplingWaistAttAbs;
+      dynamicgraph::Vector m_NextSamplingWaistAttAbs;
 
       /*! \brief Waist Attitude Homogeneous Matrix */
-      MatrixHomogeneous m_WaistAttitudeMatrix;
+      MatrixHomogeneous m_WaistAttitudeMatrix;     
 
       /*! \brief Joint values for walking. */
       dynamicgraph::Vector m_JointErrorValuesForWalking;
@@ -464,6 +478,16 @@ namespace dynamicgraph {
       void getAbsoluteWaistPosAttHomogeneousMatrix
         (MatrixHomogeneous &aWaistMH);
 
+      void SubsamplingFootPos(pg::FootAbsolutePosition &PrevFootPosition,
+      pg::FootAbsolutePosition &NextFootPosition, MatrixHomogeneous &FootPositionOut,
+      MatrixHomogeneous &dotFootPositionOut, unsigned int &count);  
+
+      void SubsamplingVector(dynamicgraph::Vector &PrevPosition, 
+        dynamicgraph::Vector &NextPosition, dynamicgraph::Vector &PositionOut, 
+        unsigned int &count);          
+
+      void CopyFootPosition(pg::FootAbsolutePosition &FootPositionIn,
+        pg::FootAbsolutePosition &FootPositionOut);
 
       /*! \brief Internal method to get the initial
         reference ZMP at a given time. */

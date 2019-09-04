@@ -268,6 +268,7 @@ namespace dynamicgraph {
       m_MotionSinceInstanciationToThisSequence.setIdentity();
 
       m_LocalTime = 0;
+      m_count = 1;
       m_TimeStep = 0.005;
       m_DoubleSupportPhaseState = false;
       m_forceFeedBack = false ;
@@ -278,12 +279,24 @@ namespace dynamicgraph {
       m_ZMPRefPos(3) = 1.0;
       m_COMRefPos.resize(3);
       m_COMRefPos.fill(0.0);
+      m_PrevSamplingCOMRefPos.resize(3);
+      m_PrevSamplingCOMRefPos.fill(0.0);
+      m_NextSamplingCOMRefPos.resize(3);
+      m_NextSamplingCOMRefPos.fill(0.0);
       m_ZMPPrevious.resize(4);
       m_ZMPPrevious(3) = 1.0;
       m_dCOMRefPos.resize(3);
       m_dCOMRefPos.fill(0.0);
+      m_PrevSamplingdCOMRefPos.resize(3);
+      m_PrevSamplingdCOMRefPos.fill(0.0);
+      m_NextSamplingdCOMRefPos.resize(3);
+      m_NextSamplingdCOMRefPos.fill(0.0);
       m_ddCOMRefPos.resize(3);
-      m_ddCOMRefPos.fill(0.0);      
+      m_ddCOMRefPos.fill(0.0);  
+      m_PrevSamplingddCOMRefPos.resize(3);
+      m_PrevSamplingddCOMRefPos.fill(0.0);
+      m_NextSamplingddCOMRefPos.resize(3);
+      m_NextSamplingddCOMRefPos.fill(0.0);     
       m_InitZMPRefPos.resize(3);
       m_InitZMPRefPos.fill(0);
       m_InitCOMRefPos.resize(3);
@@ -307,6 +320,10 @@ namespace dynamicgraph {
       m_WaistPosition.fill(0);
       m_WaistAttitudeAbsolute.resize(3);
       m_WaistAttitudeAbsolute.fill(0);
+      m_PrevSamplingWaistAttAbs.resize(3);
+      m_PrevSamplingWaistAttAbs.fill(0); 
+      m_NextSamplingWaistAttAbs.resize(3);
+      m_NextSamplingWaistAttAbs.fill(0);            
       m_WaistPositionAbsolute.resize(3);
       m_WaistPositionAbsolute.fill(0);
 
@@ -523,14 +540,12 @@ namespace dynamicgraph {
           // according to the state of the robot.
           PatternGeneratorJRL::COMState lStartingCOMState;
           Eigen::Vector3d lStartingZMPPosition;
-          PatternGeneratorJRL::FootAbsolutePosition InitLeftFootAbsPos;
-          PatternGeneratorJRL::FootAbsolutePosition InitRightFootAbsPos;
 
           m_PGI->EvaluateStartingState(lStartingCOMState,
                                        lStartingZMPPosition,
                                        lWaistPosition,
-                                       InitLeftFootAbsPos,
-                                       InitRightFootAbsPos);
+                                       m_InitLeftFootAbsPos,
+                                       m_InitRightFootAbsPos);
 
           // Put inside sotHomogeneous representation
           m_InitCOMRefPos(0) = lStartingCOMState.x[0];
@@ -564,10 +579,10 @@ namespace dynamicgraph {
             m_WaistAttitudeAbsolute(2) = lWaistPosition(5);
 
 
-          FromAbsoluteFootPosToDotHomogeneous(InitRightFootAbsPos,
+          FromAbsoluteFootPosToDotHomogeneous(m_InitRightFootAbsPos,
                                               m_InitRightFootPosition,
                                               m_dotRightFootPosition);
-          FromAbsoluteFootPosToDotHomogeneous(InitLeftFootAbsPos,
+          FromAbsoluteFootPosToDotHomogeneous(m_InitLeftFootAbsPos,
                                               m_InitLeftFootPosition,
                                               m_dotLeftFootPosition);
           Eigen::Matrix<double, 4,1> newtmp,oldtmp;
@@ -1107,6 +1122,52 @@ namespace dynamicgraph {
       aFootMH(3,3) = 1.0;
     }
 
+    void PatternGenerator::SubsamplingFootPos(pg::FootAbsolutePosition &PrevFootPosition,
+      pg::FootAbsolutePosition &NextFootPosition, MatrixHomogeneous &FootPositionOut,
+      MatrixHomogeneous &dotFootPositionOut, unsigned int &count)
+    {
+      pg::FootAbsolutePosition lFootPosition;
+
+      lFootPosition.x = PrevFootPosition.x + (NextFootPosition.x-PrevFootPosition.x) 
+        * (count%5) / 5;
+      lFootPosition.y = PrevFootPosition.y + (NextFootPosition.y-PrevFootPosition.y) 
+        * (count%5) / 5;
+      lFootPosition.z = PrevFootPosition.z + (NextFootPosition.z-PrevFootPosition.z) 
+        * (count%5) / 5;
+      lFootPosition.theta = PrevFootPosition.theta + (NextFootPosition.theta
+        -PrevFootPosition.theta) * (count%5) / 5;
+      lFootPosition.omega = PrevFootPosition.omega + (NextFootPosition.omega 
+        -PrevFootPosition.omega)* (count%5) / 5;
+      lFootPosition.omega2 = PrevFootPosition.omega2 + (NextFootPosition.omega2 
+        -PrevFootPosition.omega2)* (count%5) / 5;
+
+      /* Fill in the homogeneous matrix using the world reference frame*/
+      FromAbsoluteFootPosToDotHomogeneous(lFootPosition,
+                                          FootPositionOut,
+                                          dotFootPositionOut);
+    }
+
+    void PatternGenerator::SubsamplingVector(dynamicgraph::Vector &PrevPosition, 
+      dynamicgraph::Vector &NextPosition, dynamicgraph::Vector &PositionOut, 
+      unsigned int &count)
+    {
+      for(unsigned int i=0;i<3;i++)
+      {
+        PositionOut(i) = PrevPosition(i) + (NextPosition(i)-PrevPosition(i)) * (count%5) / 5;
+      }
+    } 
+
+    void PatternGenerator::CopyFootPosition(pg::FootAbsolutePosition &FootPositionIn,
+      pg::FootAbsolutePosition &FootPositionOut)
+    {
+      FootPositionOut.x = FootPositionIn.x;
+      FootPositionOut.y = FootPositionIn.y;    
+      FootPositionOut.z = FootPositionIn.z; 
+      FootPositionOut.theta = FootPositionIn.theta;
+      FootPositionOut.omega = FootPositionIn.omega;    
+      FootPositionOut.omega2 = FootPositionIn.omega2; 
+    }
+
     int &PatternGenerator::
     OneStepOfControl(int &dummy, int time)
     {
@@ -1176,6 +1237,8 @@ namespace dynamicgraph {
           lRightFootPosition.x=0.0;lRightFootPosition.y=0.0;
           lRightFootPosition.z=0.0;
           /*! \brief Absolute position of the reference CoM. */
+
+
           pg::COMState lCOMRefState;
           sotDEBUG(45) << "mc = " << CurrentState << std::endl;
 
@@ -1303,14 +1366,38 @@ namespace dynamicgraph {
               //cout << "problems with force signals reading" << endl;
             };
 
-          // Test if the pattern value has some value to provide.
-          if (m_PGI->RunOneStepOfTheControlLoop(CurrentConfiguration,
-                                                CurrentVelocity,
-                                                CurrentAcceleration,
-                                                ZMPTarget,
-                                                lCOMRefState,
-                                                lLeftFootPosition,
-                                                lRightFootPosition))
+          if(m_count%5 == 0)
+          {
+            if(m_count > 1)
+            {
+              for(unsigned int i=0;i<3;i++)
+              {
+                m_PrevSamplingCOMRefPos(i) = m_NextSamplingCOMRefPos(i);
+                m_PrevSamplingdCOMRefPos(i) = m_NextSamplingdCOMRefPos(i);                  
+                m_PrevSamplingddCOMRefPos(i) = m_NextSamplingddCOMRefPos(i);
+                m_PrevSamplingWaistAttAbs(i) = m_NextSamplingWaistAttAbs(i);
+              }
+              CopyFootPosition(m_NextSamplingLeftFootAbsPos,m_PrevSamplingLeftFootAbsPos);
+              CopyFootPosition(m_NextSamplingRightFootAbsPos,m_PrevSamplingRightFootAbsPos);
+            } else {
+              for(unsigned int i=0;i<3;i++)
+              {
+                m_PrevSamplingCOMRefPos(i) = m_InitCOMRefPos(i);
+                m_PrevSamplingdCOMRefPos(i) = 0.0;                  
+                m_PrevSamplingddCOMRefPos(i) = 0.0;
+                m_PrevSamplingWaistAttAbs(i) = m_InitWaistRefAtt(i);  
+              }
+              CopyFootPosition(m_InitLeftFootAbsPos,m_PrevSamplingLeftFootAbsPos);
+              CopyFootPosition(m_InitRightFootAbsPos,m_PrevSamplingRightFootAbsPos);              
+            }
+            // Test if the pattern value has some value to provide.
+            if (m_PGI->RunOneStepOfTheControlLoop(CurrentConfiguration,
+                                                  CurrentVelocity,
+                                                  CurrentAcceleration,
+                                                  ZMPTarget,
+                                                  lCOMRefState,
+                                                  lLeftFootPosition,
+                                                  lRightFootPosition))
             {
               sotDEBUG(25) << "After One Step of control " << endl
                            << "CurrentState:" << CurrentState << endl
@@ -1324,15 +1411,16 @@ namespace dynamicgraph {
               sotDEBUG(2) << "ZMPTarget returned by the PG: "
                           << m_ZMPRefPos <<endl;
               for(int i=0;i<3;i++)
-                {
-                  m_WaistPositionAbsolute(i) = CurrentConfiguration(i);
-                  m_WaistAttitudeAbsolute(i) = CurrentConfiguration(i+3);
-                }
+              {
+                m_WaistPositionAbsolute(i) = CurrentConfiguration(i);
+                m_WaistAttitudeAbsolute(i) = CurrentConfiguration(i+3);
+              }
               m_COMRefPos(0) = lCOMRefState.x[0];
               m_COMRefPos(1) = lCOMRefState.y[0];
               m_COMRefPos(2) = lCOMRefState.z[0];
               sotDEBUG(2) << "COMRefPos returned by the PG: "
                           << m_COMRefPos <<endl;
+
               m_dCOMRefPos(0) = lCOMRefState.x[1];
               m_dCOMRefPos(1) = lCOMRefState.y[1];
               m_dCOMRefPos(2) = lCOMRefState.z[1];
@@ -1340,7 +1428,6 @@ namespace dynamicgraph {
               m_ddCOMRefPos(0) = lCOMRefState.x[2];
               m_ddCOMRefPos(1) = lCOMRefState.y[2];
               m_ddCOMRefPos(2) = lCOMRefState.z[2];
-              // HERE -------------------------------
 
               m_ComAttitude(0) = lCOMRefState.roll[0];
               m_ComAttitude(1) = lCOMRefState.pitch[0];
@@ -1400,6 +1487,7 @@ namespace dynamicgraph {
                           << lLeftFootPosition.y << " "
                           << lLeftFootPosition.z << " "
                           << lLeftFootPosition.theta << endl;
+
               sotDEBUG(1) << "lRightFootPosition : "
                           << lRightFootPosition.x << " "
                           << lRightFootPosition.y << " "
@@ -1411,165 +1499,19 @@ namespace dynamicgraph {
                            << lCOMRefState.y[0] << " "
                            << lCOMRefState.z[0] <<  endl;
 
-              /* Fill in the homogeneous matrix using the
-                 world reference frame*/
-              FromAbsoluteFootPosToDotHomogeneous(lLeftFootPosition,
-                                                  m_LeftFootPosition,
-                                                  m_dotLeftFootPosition);
-              FromAbsoluteFootPosToDotHomogeneous(lRightFootPosition,
-                                                  m_RightFootPosition,
-                                                  m_dotRightFootPosition);
-
-              /* We assume that the left foot is always the origin
-                 of the new frame. */
-              m_LeftFootPosition = m_MotionSinceInstanciationToThisSequence
-                * m_LeftFootPosition;
-              m_RightFootPosition = m_MotionSinceInstanciationToThisSequence
-                * m_RightFootPosition;
-
-              Eigen::Matrix<double, 4,1> newRefPos, oldRefPos;
-              oldRefPos(0) = m_COMRefPos(0); oldRefPos(1) = m_COMRefPos(1);
-              oldRefPos(2) = m_COMRefPos(2); oldRefPos(3) = 1.0;
-              newRefPos = m_MotionSinceInstanciationToThisSequence * oldRefPos;
-              m_COMRefPos(0) = newRefPos(0);
-              m_COMRefPos(1) = newRefPos(1);
-              m_COMRefPos(2) = newRefPos(2);
-
-              oldRefPos(0) = m_ZMPRefPos(0); oldRefPos(1) = m_ZMPRefPos(1);
-              oldRefPos(2) = m_ZMPRefPos(2); oldRefPos(3) = 1.0;
-              newRefPos = m_MotionSinceInstanciationToThisSequence * oldRefPos;
-              m_ZMPRefPos(0) = newRefPos(0);
-              m_ZMPRefPos(1) = newRefPos(1);
-              m_ZMPRefPos(2) = newRefPos(2);
-
-              sotDEBUG(25) << "lLeftFootPosition.stepType: "
-                           << lLeftFootPosition.stepType
-                           << " lRightFootPosition.stepType: "
-                           << lRightFootPosition.stepType <<endl;
-              // Find the support foot feet.
-              m_leftFootContact = true;
-              m_rightFootContact = true;
-              if (lLeftFootPosition.stepType==-1)
-                {
-                  lSupportFoot=1; m_leftFootContact = true;
-                  if (lRightFootPosition.stepType!=-1)
-                    m_rightFootContact = false;
-                  m_DoubleSupportPhaseState = 0;
-                }
-              else if (lRightFootPosition.stepType==-1)
-                {
-                  lSupportFoot=0; m_rightFootContact = true;
-                  if (lLeftFootPosition.stepType!=-1)
-                    m_leftFootContact = false;
-                  m_DoubleSupportPhaseState = 0;
-                }
-              else
-                /* m_LeftFootPosition.z ==m_RightFootPosition.z
-                   We keep the previous support foot half the time
-                   of the double support phase..
-                   */
-                {
-                  lSupportFoot=m_SupportFoot;
-                }
-
-              /* Update the class related member. */
-              m_SupportFoot = lSupportFoot;
-
-              if ((m_ReferenceFrame==EGOCENTERED_FRAME) ||
-                  (m_ReferenceFrame==LEFT_FOOT_CENTERED_FRAME) ||
-                  (m_ReferenceFrame==WAIST_CENTERED_FRAME))
-                {
-                  sotDEBUG(25) << "Inside egocentered frame " <<endl;
-                  MatrixHomogeneous PoseOrigin,iPoseOrigin, WaistPoseAbsolute;
-
-                  getAbsoluteWaistPosAttHomogeneousMatrix(WaistPoseAbsolute);
-
-                  if (m_ReferenceFrame==EGOCENTERED_FRAME)
-                    {
-                      if (m_SupportFoot==1)
-                        PoseOrigin = m_LeftFootPosition;
-                      else
-                        PoseOrigin = m_RightFootPosition;
-                    }
-                  else if (m_ReferenceFrame==LEFT_FOOT_CENTERED_FRAME)
-                    {
-                      PoseOrigin = m_LeftFootPosition;
-                    }
-                  else if (m_ReferenceFrame==WAIST_CENTERED_FRAME)
-                    {
-                      PoseOrigin = WaistPoseAbsolute;
-                    }
-                  iPoseOrigin = PoseOrigin.inverse();
-
-                  sotDEBUG(25) << "Old ComRef:  " << m_COMRefPos << endl;
-                  sotDEBUG(25) << "Old LeftFootRef:  "
-                               << m_LeftFootPosition << endl;
-                  sotDEBUG(25) << "Old RightFootRef:  "
-                               << m_RightFootPosition << endl;
-                  sotDEBUG(25) << "Old PoseOrigin:  "
-                               << PoseOrigin << endl;
-
-
-                  Eigen::Matrix<double, 4,1> lVZMPRefPos, lV2ZMPRefPos;
-                  Eigen::Matrix<double, 4,1> lVCOMRefPos, lV2COMRefPos;
-
-                  for(unsigned int li=0;li<3;li++)
-                    {
-                      lVZMPRefPos(li) = m_ZMPRefPos(li);
-                      lVCOMRefPos(li) = m_COMRefPos(li);
-                    }
-                  lVZMPRefPos(3) = lVCOMRefPos(3) = 1.0;
-
-                  // We do not touch to ZMP.
-                  lV2ZMPRefPos = iPoseOrigin *
-                    (WaistPoseAbsolute * lVZMPRefPos);
-
-                  // Put the CoM reference pos in the Pos
-                  // Origin reference frame.
-                  lV2COMRefPos = iPoseOrigin * lVCOMRefPos;
-
-                  MatrixHomogeneous lMLeftFootPosition = m_LeftFootPosition;
-                  MatrixHomogeneous lMRightFootPosition = m_RightFootPosition;
-
-                  m_LeftFootPosition = iPoseOrigin * lMLeftFootPosition;
-                  m_RightFootPosition = iPoseOrigin * lMRightFootPosition;
-
-                  for(unsigned int i=0;i<3;i++)
-                    {
-                      m_ZMPRefPos(i) = lV2ZMPRefPos(i);
-                      m_COMRefPos(i) = lV2COMRefPos(i);
-                    }
-
-                  WaistPoseAbsolute = iPoseOrigin * WaistPoseAbsolute;
-
-                  MatrixRotation newWaistRot;
-                  newWaistRot = WaistPoseAbsolute.linear();
-                  VectorRollPitchYaw newWaistRPY;
-                  newWaistRPY = (newWaistRot.eulerAngles(2,1,0)).reverse();
-                  m_WaistAttitude = newWaistRPY;
-
-                  m_WaistPosition = WaistPoseAbsolute.translation();
-
-                  m_WaistAttitudeMatrix = WaistPoseAbsolute;
-
-                  sotDEBUG(25) << "ComRef:  " << m_COMRefPos << endl;
-                  sotDEBUG(25) << "iPoseOrigin:  " << iPoseOrigin << endl;
-                }
-              sotDEBUG(25) << "After egocentered frame " << endl;
-
-              sotDEBUG(25) << "ComRef:  " << m_COMRefPos << endl;
-              sotDEBUG(25) << "LeftFootRef:  " << m_LeftFootPosition << endl;
-              sotDEBUG(25) << "RightFootRef:  " << m_RightFootPosition << endl;
-              sotDEBUG(25) << "ZMPRefPos:  " << m_ZMPRefPos << endl;
-              sotDEBUG(25) << "m_MotionSinceInstanciationToThisSequence" <<
-                m_MotionSinceInstanciationToThisSequence<< std::endl;
-
+              // Set Next position ---------------------------------------------
               for(unsigned int i=0;i<3;i++)
-                m_ZMPPrevious[i] = m_ZMPRefPos(i);
-
-              m_dataInProcess = 1;
+              {
+                m_NextSamplingCOMRefPos(i) = m_COMRefPos(i);
+                m_NextSamplingdCOMRefPos(i) = m_dCOMRefPos(i);  
+                m_NextSamplingddCOMRefPos(i) = m_ddCOMRefPos(i);   
+                m_NextSamplingWaistAttAbs(i) = m_WaistAttitudeAbsolute(i);                         
+              }
+              
+              CopyFootPosition(lRightFootPosition,m_NextSamplingRightFootAbsPos);
+              CopyFootPosition(lLeftFootPosition,m_NextSamplingLeftFootAbsPos);              
             }
-          else
+            else
             {
               sotDEBUG(1) << "Error while compute one step of PG."
                           << m_dataInProcess << std::endl;
@@ -1586,13 +1528,185 @@ namespace dynamicgraph {
                 }
               m_dataInProcess = 0;
             }
-          sotDEBUG(25) << "After computing error "
-                       << m_JointErrorValuesForWalking << endl;
+            sotDEBUG(25) << "After computing error "
+                         << m_JointErrorValuesForWalking << endl;
+          }
+          else //Subsampling
+          {
+            SubsamplingVector(m_PrevSamplingCOMRefPos,m_NextSamplingCOMRefPos,
+              m_COMRefPos,m_count);
+            SubsamplingVector(m_PrevSamplingdCOMRefPos,m_NextSamplingdCOMRefPos,
+              m_dCOMRefPos,m_count);     
+            SubsamplingVector(m_PrevSamplingddCOMRefPos,m_NextSamplingddCOMRefPos,
+              m_ddCOMRefPos,m_count);               
+            SubsamplingVector(m_PrevSamplingWaistAttAbs,m_NextSamplingWaistAttAbs,
+              m_WaistAttitudeAbsolute,m_count);   
+            SubsamplingFootPos(m_PrevSamplingRightFootAbsPos,m_NextSamplingRightFootAbsPos
+              ,m_RightFootPosition, m_dotRightFootPosition,m_count);      
+            SubsamplingFootPos(m_PrevSamplingLeftFootAbsPos,m_NextSamplingLeftFootAbsPos
+              ,m_LeftFootPosition, m_dotLeftFootPosition,m_count);      
+          }
+
+          m_count++;
+
+          Eigen::Matrix<double, 4,1> newRefPos, oldRefPos;
+          oldRefPos(0) = m_COMRefPos(0); oldRefPos(1) = m_COMRefPos(1);
+          oldRefPos(2) = m_COMRefPos(2); oldRefPos(3) = 1.0;
+          newRefPos = m_MotionSinceInstanciationToThisSequence * oldRefPos;
+          m_COMRefPos(0) = newRefPos(0);
+          m_COMRefPos(1) = newRefPos(1);
+          m_COMRefPos(2) = newRefPos(2);
+
+          oldRefPos(0) = m_ZMPRefPos(0); oldRefPos(1) = m_ZMPRefPos(1);
+          oldRefPos(2) = m_ZMPRefPos(2); oldRefPos(3) = 1.0;
+          newRefPos = m_MotionSinceInstanciationToThisSequence * oldRefPos;
+          m_ZMPRefPos(0) = newRefPos(0);
+          m_ZMPRefPos(1) = newRefPos(1);
+          m_ZMPRefPos(2) = newRefPos(2);
+
+          /* We assume that the left foot is always the origin
+             of the new frame. */
+          m_LeftFootPosition = m_MotionSinceInstanciationToThisSequence
+            * m_LeftFootPosition;
+          m_RightFootPosition = m_MotionSinceInstanciationToThisSequence
+            * m_RightFootPosition;
+
+          sotDEBUG(25) << "lLeftFootPosition.stepType: "
+                       << lLeftFootPosition.stepType
+                       << " lRightFootPosition.stepType: "
+                       << lRightFootPosition.stepType <<endl;
+          // Find the support foot feet.
+          m_leftFootContact = true;
+          m_rightFootContact = true;
+          if (lLeftFootPosition.stepType==-1)
+            {
+              lSupportFoot=1; m_leftFootContact = true;
+              if (lRightFootPosition.stepType!=-1)
+                m_rightFootContact = false;
+              m_DoubleSupportPhaseState = 0;
+            }
+          else if (lRightFootPosition.stepType==-1)
+            {
+              lSupportFoot=0; m_rightFootContact = true;
+              if (lLeftFootPosition.stepType!=-1)
+                m_leftFootContact = false;
+              m_DoubleSupportPhaseState = 0;
+            }
+          else
+            /* m_LeftFootPosition.z ==m_RightFootPosition.z
+               We keep the previous support foot half the time
+               of the double support phase..
+               */
+            {
+              lSupportFoot=m_SupportFoot;
+            }
+
+          /* Update the class related member. */
+          m_SupportFoot = lSupportFoot;
+
+
+          // Waist ----------------------------------------------------------------------
+
+          if ((m_ReferenceFrame==EGOCENTERED_FRAME) ||
+              (m_ReferenceFrame==LEFT_FOOT_CENTERED_FRAME) ||
+              (m_ReferenceFrame==WAIST_CENTERED_FRAME))
+            {
+              sotDEBUG(25) << "Inside egocentered frame " <<endl;
+              MatrixHomogeneous PoseOrigin,iPoseOrigin, WaistPoseAbsolute;
+
+              getAbsoluteWaistPosAttHomogeneousMatrix(WaistPoseAbsolute);
+
+              if (m_ReferenceFrame==EGOCENTERED_FRAME)
+                {
+                  if (m_SupportFoot==1)
+                    PoseOrigin = m_LeftFootPosition;
+                  else
+                    PoseOrigin = m_RightFootPosition;
+                }
+              else if (m_ReferenceFrame==LEFT_FOOT_CENTERED_FRAME)
+                {
+                  PoseOrigin = m_LeftFootPosition;
+                }
+              else if (m_ReferenceFrame==WAIST_CENTERED_FRAME)
+                {
+                  PoseOrigin = WaistPoseAbsolute;
+                }
+              iPoseOrigin = PoseOrigin.inverse();
+
+              sotDEBUG(25) << "Old ComRef:  " << m_COMRefPos << endl;
+              sotDEBUG(25) << "Old LeftFootRef:  "
+                           << m_LeftFootPosition << endl;
+              sotDEBUG(25) << "Old RightFootRef:  "
+                           << m_RightFootPosition << endl;
+              sotDEBUG(25) << "Old PoseOrigin:  "
+                           << PoseOrigin << endl;
+
+              Eigen::Matrix<double, 4,1> lVZMPRefPos, lV2ZMPRefPos;
+              Eigen::Matrix<double, 4,1> lVCOMRefPos, lV2COMRefPos;
+
+              for(unsigned int li=0;li<3;li++)
+                {
+                  lVZMPRefPos(li) = m_ZMPRefPos(li);
+                  lVCOMRefPos(li) = m_COMRefPos(li);
+                }
+              lVZMPRefPos(3) = lVCOMRefPos(3) = 1.0;
+
+              // We do not touch to ZMP.
+              lV2ZMPRefPos = iPoseOrigin *
+                (WaistPoseAbsolute * lVZMPRefPos);
+
+              // Put the CoM reference pos in the Pos
+              // Origin reference frame.
+              lV2COMRefPos = iPoseOrigin * lVCOMRefPos;
+
+              MatrixHomogeneous lMLeftFootPosition = m_LeftFootPosition;
+              MatrixHomogeneous lMRightFootPosition = m_RightFootPosition;
+
+              m_LeftFootPosition = iPoseOrigin * lMLeftFootPosition;
+              m_RightFootPosition = iPoseOrigin * lMRightFootPosition;
+
+              for(unsigned int i=0;i<3;i++)
+                {
+                  m_ZMPRefPos(i) = lV2ZMPRefPos(i);
+                  m_COMRefPos(i) = lV2COMRefPos(i);
+                }
+
+              WaistPoseAbsolute = iPoseOrigin * WaistPoseAbsolute;
+
+              MatrixRotation newWaistRot;
+              newWaistRot = WaistPoseAbsolute.linear();
+              VectorRollPitchYaw newWaistRPY;
+              newWaistRPY = (newWaistRot.eulerAngles(2,1,0)).reverse();
+              m_WaistAttitude = newWaistRPY;
+
+              m_WaistPosition = WaistPoseAbsolute.translation();
+
+              m_WaistAttitudeMatrix = WaistPoseAbsolute;
+
+              sotDEBUG(25) << "ComRef:  " << m_COMRefPos << endl;
+              sotDEBUG(25) << "iPoseOrigin:  " << iPoseOrigin << endl;
+          }
+          sotDEBUG(25) << "After egocentered frame " << endl;
+
+          sotDEBUG(25) << "ComRef:  " << m_COMRefPos << endl;
+          sotDEBUG(25) << "LeftFootRef:  " << m_LeftFootPosition << endl;
+          sotDEBUG(25) << "RightFootRef:  " << m_RightFootPosition << endl;
+          sotDEBUG(25) << "ZMPRefPos:  " << m_ZMPRefPos << endl;
+          sotDEBUG(25) << "m_MotionSinceInstanciationToThisSequence" <<
+            m_MotionSinceInstanciationToThisSequence<< std::endl;
+
+          for(unsigned int i=0;i<3;i++)
+          {
+            m_ZMPPrevious[i] = m_ZMPRefPos(i);
+          }
+
+          m_dataInProcess = 1;
+
         }
       else
         {
           m_COMRefPos = comSIN.access(time);
-
+          // TODO: change that initialisation
           m_COMRefPos(0) = -0.00316374;
           m_COMRefPos(1) = 0.00123738;
           m_COMRefPos(2) = 0.875624;

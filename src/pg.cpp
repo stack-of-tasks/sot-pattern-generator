@@ -1156,449 +1156,452 @@ namespace dynamicgraph {
                    << m_RightFootPosition << endl;
 
       sotDEBUGIN(15);
-      if(m_trigger)
-      {
-        if (m_PGI!=0)
-          {
-            // TODO: Calling firstSINTERN may cause an infinite loop
-            // since the function initonestepofcontrol calls without
-            // control this actual function. 'Hopefully', the function
-            // pointer of firstSINTERN has been earlier destroyed
-            // by setconstant(0).
-            firstSINTERN(time);
-            Vector CurrentState = motorControlJointPositionSIN(time);
-            assert( CurrentState.size() == robotSize );
 
-            /*! \brief Absolute Position for the left and right feet. */
-            pg::FootAbsolutePosition lLeftFootPosition,
-              lRightFootPosition;
-            lLeftFootPosition.x=0.0;lLeftFootPosition.y=0.0;
-            lLeftFootPosition.z=0.0;
-            lRightFootPosition.x=0.0;lRightFootPosition.y=0.0;
-            lRightFootPosition.z=0.0;
-            /*! \brief Absolute position of the reference CoM. */
-            pg::COMState lCOMRefState;
-            sotDEBUG(45) << "mc = " << CurrentState << std::endl;
+      if (m_PGI!=0 and m_trigger)
+        {
+          // TODO: Calling firstSINTERN may cause an infinite loop
+          // since the function initonestepofcontrol calls without
+          // control this actual function. 'Hopefully', the function
+          // pointer of firstSINTERN has been earlier destroyed
+          // by setconstant(0).
+          firstSINTERN(time);
+          Vector CurrentState = motorControlJointPositionSIN(time);
+          assert( CurrentState.size() == robotSize );
 
-            Eigen::VectorXd CurrentConfiguration(robotSize);
-            Eigen::VectorXd CurrentVelocity(robotSize);
-            Eigen::VectorXd CurrentAcceleration(robotSize);
-            Eigen::VectorXd ZMPTarget(3);
-            ZMPTarget.setZero();
+          /*! \brief Absolute Position for the left and right feet. */
+          pg::FootAbsolutePosition lLeftFootPosition,
+            lRightFootPosition;
+          lLeftFootPosition.x=0.0;lLeftFootPosition.y=0.0;
+          lLeftFootPosition.z=0.0;
+          lRightFootPosition.x=0.0;lRightFootPosition.y=0.0;
+          lRightFootPosition.z=0.0;
+          /*! \brief Absolute position of the reference CoM. */
+          pg::COMState lCOMRefState;
+          sotDEBUG(45) << "mc = " << CurrentState << std::endl;
 
-            sotDEBUG(25) << "Before One Step of control "
-                         << lCOMRefState.x[0] << " "
-                         << lCOMRefState.y[0] << " "
-                         << lCOMRefState.z[0] << endl;
-            sotDEBUG(4) << " VelocityReference "
-                        << m_VelocityReference << endl;
+          Eigen::VectorXd CurrentConfiguration(robotSize);
+          Eigen::VectorXd CurrentVelocity(robotSize);
+          Eigen::VectorXd CurrentAcceleration(robotSize);
+          Eigen::VectorXd ZMPTarget(3);
+          ZMPTarget.setZero();
 
-            m_PGI->setVelocityReference(m_VelocityReference(0),
-                                        m_VelocityReference(1),
-                                        m_VelocityReference(2));
+          sotDEBUG(25) << "Before One Step of control "
+                       << lCOMRefState.x[0] << " "
+                       << lCOMRefState.y[0] << " "
+                       << lCOMRefState.z[0] << endl;
+          sotDEBUG(4) << " VelocityReference "
+                      << m_VelocityReference << endl;
 
-            try{
-              if(m_feedBackControl)
-                {
-                  Eigen::Vector3d curCoMState ;
-                  Eigen::Vector3d curZMP;
+          m_PGI->setVelocityReference(m_VelocityReference(0),
+                                      m_VelocityReference(1),
+                                      m_VelocityReference(2));
 
-                  curCoMState = comStateSIN(time);
-                  curZMP = zmpSIN(time);
-
-                  lCOMRefState.x[0] = curCoMState(0) ;
-                  lCOMRefState.y[0] = curCoMState(1) ;
-                  lCOMRefState.z[0] = curCoMState(2) ;
-                  lCOMRefState.x[2] =
-                    (lCOMRefState.x[0]-curZMP(0))*9.81
-                    /lCOMRefState.z[0];
-                  lCOMRefState.y[2] =
-                    (lCOMRefState.y[0]-curZMP(1))*9.81
-                    /lCOMRefState.z[0];
-                  lCOMRefState.z[2] = 0.0 ;
-
-                  //          for (unsigned i=0 ; i<3 ; ++i)
-                  //            lCOMRefState.x[i] = curCoMState(i) ;
-                  //          for (unsigned i=0 ; i<3 ; ++i)
-                  //            lCOMRefState.y[i] = curCoMState(i+3) ;
-                  //          for (unsigned i=0 ; i<3 ; ++i)
-                  //            lCOMRefState.z[i] = curCoMState(i+6) ;
-
-                  //          ZMPTarget(0) = lCOMRefState.x[0]
-                  // -lCOMRefState.x[2]*lCOMRefState.z[0]/9.81 ;
-                  //          ZMPTarget(1) = lCOMRefState.y[0]-
-                  //  lCOMRefState.y[2]*lCOMRefState.z[0]/9.81 ;
-                  //          ZMPTarget(2) = 0.0;
-                  //to be fixed considering the support foot
-                }
-            }catch(...)
+          try{
+            if(m_feedBackControl)
               {
-                cout << "problems with signals reading" << endl;
-                useFeedBackSignals(false);
-              };
+                Eigen::Vector3d curCoMState ;
+                Eigen::Vector3d curZMP;
 
-            try{
-              if(m_forceFeedBack)
-                {
-                  Vector extForce (3);
-                  extForce = forceSIN(time);
-                  if(time<50*0.005)
-                    {
-                      m_initForce=extForce;
-                    }
-                  extForce -= m_initForce;
-                  unsigned int n=321;
-                  if(m_bufferForce.size()<n-1)
-                    {
-                      m_bufferForce.push_back(extForce);
-                    }
-                  else
-                    {
-                      m_bufferForce.push_back(extForce);
-                      double ltmp1(0.0), ltmp2(0.0), ltmp3(0.0) ;
-                      for(unsigned int k=0;k<m_filterWindow.size();k++)
-                        {
-                          ltmp1 += m_filterWindow[k]*m_bufferForce[n-1-k](0);
-                          ltmp2 += m_filterWindow[k]*m_bufferForce[n-1-k](1);
-                          ltmp3 += m_filterWindow[k]*m_bufferForce[n-1-k](2);
-                        }
-                      extForce(0) = ltmp1 ;
-                      extForce(1) = ltmp2 ;
-                      extForce(2) = ltmp3 ;
-                      m_bufferForce.pop_front();
-                    }
-                  double threshold = 7.0;
-                  double thresholdy = 4.0;
-                  if(extForce(0)>threshold)
-                    extForce(0)=threshold;
-                  if(extForce(0)<-threshold)
-                    extForce(0)=-threshold;
+                curCoMState = comStateSIN(time);
+                curZMP = zmpSIN(time);
 
-                  if(extForce(1)>thresholdy)
-                    extForce(1)=thresholdy;
-                  if(extForce(1)<-thresholdy)
-                    extForce(1)=-thresholdy;
+                lCOMRefState.x[0] = curCoMState(0) ;
+                lCOMRefState.y[0] = curCoMState(1) ;
+                lCOMRefState.z[0] = curCoMState(2) ;
+                lCOMRefState.x[2] =
+                  (lCOMRefState.x[0]-curZMP(0))*9.81
+                  /lCOMRefState.z[0];
+                lCOMRefState.y[2] =
+                  (lCOMRefState.y[0]-curZMP(1))*9.81
+                  /lCOMRefState.z[0];
+                lCOMRefState.z[2] = 0.0 ;
 
-                  if(extForce(2)>threshold)
-                    extForce(2)=threshold;
-                  if(extForce(2)<-threshold)
-                    extForce(2)=-threshold;
+                //          for (unsigned i=0 ; i<3 ; ++i)
+                //            lCOMRefState.x[i] = curCoMState(i) ;
+                //          for (unsigned i=0 ; i<3 ; ++i)
+                //            lCOMRefState.y[i] = curCoMState(i+3) ;
+                //          for (unsigned i=0 ; i<3 ; ++i)
+                //            lCOMRefState.z[i] = curCoMState(i+6) ;
 
-                  if((extForce(0)*extForce(0)+extForce(1)*extForce(1)) < 100)
-                    {
-                      extForce(0)=0.0;
-                      extForce(1)=0.0;
-                    }
-                  m_currentForces = extForce ;
-                  ostringstream oss ("");
-                  //oss << ":perturbationforce " << extForce(0) << " "
-                  // << extForce(1) << " " << extForce(2);
-                  oss << ":perturbationforce " << -m_currentForces(1)
-                      << " " << /*m_currentForces(0)*/0.0
-                      << " " << m_currentForces(2);
-                  // cout << oss.str() << endl ;
-                  pgCommandLine(oss.str());
-                }
-            }catch(...)
+                //          ZMPTarget(0) = lCOMRefState.x[0]
+                // -lCOMRefState.x[2]*lCOMRefState.z[0]/9.81 ;
+                //          ZMPTarget(1) = lCOMRefState.y[0]-
+                //  lCOMRefState.y[2]*lCOMRefState.z[0]/9.81 ;
+                //          ZMPTarget(2) = 0.0;
+                //to be fixed considering the support foot
+              }
+          }catch(...)
+            {
+              cout << "problems with signals reading" << endl;
+              useFeedBackSignals(false);
+            };
+
+          try{
+            if(m_forceFeedBack)
               {
-                //cout << "problems with force signals reading" << endl;
-              };
-
-            // Test if the pattern value has some value to provide.
-            if (m_PGI->RunOneStepOfTheControlLoop(CurrentConfiguration,
-                                                  CurrentVelocity,
-                                                  CurrentAcceleration,
-                                                  ZMPTarget,
-                                                  lCOMRefState,
-                                                  lLeftFootPosition,
-                                                  lRightFootPosition))
-              {
-                sotDEBUG(25) << "After One Step of control " << endl
-                             << "CurrentState:" << CurrentState << endl
-                             << "CurrentConfiguration:" << CurrentConfiguration
-                             << endl;
-
-                m_ZMPRefPos(0) = ZMPTarget[0];
-                m_ZMPRefPos(1) = ZMPTarget[1];
-                m_ZMPRefPos(2) = ZMPTarget[2];
-                m_ZMPRefPos(3) = 1.0;
-                sotDEBUG(2) << "ZMPTarget returned by the PG: "
-                            << m_ZMPRefPos <<endl;
-                for(int i=0;i<3;i++)
+                Vector extForce (3);
+                extForce = forceSIN(time);
+                if(time<50*0.005)
                   {
-                    m_WaistPositionAbsolute(i) = CurrentConfiguration(i);
-                    m_WaistAttitudeAbsolute(i) = CurrentConfiguration(i+3);
+                    m_initForce=extForce;
                   }
-                m_COMRefPos(0) = lCOMRefState.x[0];
-                m_COMRefPos(1) = lCOMRefState.y[0];
-                m_COMRefPos(2) = lCOMRefState.z[0];
-                sotDEBUG(2) << "COMRefPos returned by the PG: "
-                            << m_COMRefPos <<endl;
-                m_dCOMRefPos(0) = lCOMRefState.x[1];
-                m_dCOMRefPos(1) = lCOMRefState.y[1];
-                m_dCOMRefPos(2) = lCOMRefState.z[1];
-                
-                m_ddCOMRefPos(0) = lCOMRefState.x[2];
-                m_ddCOMRefPos(1) = lCOMRefState.y[2];
-                m_ddCOMRefPos(2) = lCOMRefState.z[2];
-                // HERE -------------------------------
-
-                m_ComAttitude(0) = lCOMRefState.roll[0];
-                m_ComAttitude(1) = lCOMRefState.pitch[0];
-                m_ComAttitude(2) = lCOMRefState.yaw[0];
-
-                m_dComAttitude(0) = lCOMRefState.roll[1];
-                m_dComAttitude(1) = lCOMRefState.pitch[1];
-                m_dComAttitude(2) = lCOMRefState.yaw[1];
-
-                m_ddComAttitude(0) = lCOMRefState.roll[2];
-                m_ddComAttitude(1) = lCOMRefState.pitch[2];
-                m_ddComAttitude(2) = lCOMRefState.yaw[2];              
-
-                sotDEBUG(2) << "dCOMRefPos returned by the PG: "
-                            << m_dCOMRefPos <<endl;
-                sotDEBUG(2) << "CurrentState.size()"
-                            << CurrentState.size()<<endl;
-                sotDEBUG(2) << "CurrentConfiguration.size()"
-                            << CurrentConfiguration.size()<<endl;
-                sotDEBUG(2) << "m_JointErrorValuesForWalking.size(): "
-                            << m_JointErrorValuesForWalking.size() <<endl;
-
-
-                // In this setting we assume that there is a
-                // proper mapping between
-                // CurrentState and CurrentConfiguration.
-                Vector::Index SizeCurrentState = CurrentState.size();
-                Vector::Index SizeCurrentConfiguration =
-                  CurrentConfiguration.size()-6;
-                Vector::Index MinSize = std::min(SizeCurrentState,
-                                                 SizeCurrentConfiguration);
-
-                if (m_JointErrorValuesForWalking.size()>=MinSize)
+                extForce -= m_initForce;
+                unsigned int n=321;
+                if(m_bufferForce.size()<n-1)
                   {
-                    for(unsigned int li=0;li<MinSize;li++)
-                      m_JointErrorValuesForWalking(li)=
-                        (CurrentConfiguration(li+6)- CurrentState(li) )
-                        /m_TimeStep;
+                    m_bufferForce.push_back(extForce);
                   }
                 else
                   {
-                    std::cout <<"The state of the robot and the one "
-                              << "return by the WPG are different"
-                              << std::endl;
-                    sotDEBUG(25) << "Size not coherent between "
-                                 << "CurrentState and "
-                                 << "m_JointErrorValuesForWalking: "
-                                 << CurrentState.size()<< " "
-                                 << m_JointErrorValuesForWalking.size()<< " "
-                                 << endl;
-                  }
-                sotDEBUG(2) << "Juste after updating "
-                            << "m_JointErrorValuesForWalking" << endl;
-
-                sotDEBUG(1) << "lLeftFootPosition : "
-                            << lLeftFootPosition.x << " "
-                            << lLeftFootPosition.y << " "
-                            << lLeftFootPosition.z << " "
-                            << lLeftFootPosition.theta << endl;
-                sotDEBUG(1) << "lRightFootPosition : "
-                            << lRightFootPosition.x << " "
-                            << lRightFootPosition.y << " "
-                            << lRightFootPosition.z << " "
-                            << lRightFootPosition.theta << endl;
-
-                sotDEBUG(25) << "lCOMPosition : "
-                             << lCOMRefState.x[0] << " "
-                             << lCOMRefState.y[0] << " "
-                             << lCOMRefState.z[0] <<  endl;
-
-                /* Fill in the homogeneous matrix using the
-                   world reference frame*/
-                FromAbsoluteFootPosToDotHomogeneous(lLeftFootPosition,
-                                                    m_LeftFootPosition,
-                                                    m_dotLeftFootPosition);
-                FromAbsoluteFootPosToDotHomogeneous(lRightFootPosition,
-                                                    m_RightFootPosition,
-                                                    m_dotRightFootPosition);
-
-                /* We assume that the left foot is always the origin
-                   of the new frame. */
-                m_LeftFootPosition = m_MotionSinceInstanciationToThisSequence
-                  * m_LeftFootPosition;
-                m_RightFootPosition = m_MotionSinceInstanciationToThisSequence
-                  * m_RightFootPosition;
-
-                Eigen::Matrix<double, 4,1> newRefPos, oldRefPos;
-                oldRefPos(0) = m_COMRefPos(0); oldRefPos(1) = m_COMRefPos(1);
-                oldRefPos(2) = m_COMRefPos(2); oldRefPos(3) = 1.0;
-                newRefPos = m_MotionSinceInstanciationToThisSequence * oldRefPos;
-                m_COMRefPos(0) = newRefPos(0);
-                m_COMRefPos(1) = newRefPos(1);
-                m_COMRefPos(2) = newRefPos(2);
-
-                oldRefPos(0) = m_ZMPRefPos(0); oldRefPos(1) = m_ZMPRefPos(1);
-                oldRefPos(2) = m_ZMPRefPos(2); oldRefPos(3) = 1.0;
-                newRefPos = m_MotionSinceInstanciationToThisSequence * oldRefPos;
-                m_ZMPRefPos(0) = newRefPos(0);
-                m_ZMPRefPos(1) = newRefPos(1);
-                m_ZMPRefPos(2) = newRefPos(2);
-
-                sotDEBUG(25) << "lLeftFootPosition.stepType: "
-                             << lLeftFootPosition.stepType
-                             << " lRightFootPosition.stepType: "
-                             << lRightFootPosition.stepType <<endl;
-                // Find the support foot feet.
-                m_leftFootContact = true;
-                m_rightFootContact = true;
-                if (lLeftFootPosition.stepType==-1)
-                  {
-                    lSupportFoot=1; m_leftFootContact = true;
-                    if (lRightFootPosition.stepType!=-1)
-                      m_rightFootContact = false;
-                    m_DoubleSupportPhaseState = 0;
-                  }
-                else if (lRightFootPosition.stepType==-1)
-                  {
-                    lSupportFoot=0; m_rightFootContact = true;
-                    if (lLeftFootPosition.stepType!=-1)
-                      m_leftFootContact = false;
-                    m_DoubleSupportPhaseState = 0;
-                  }
-                else
-                  /* m_LeftFootPosition.z ==m_RightFootPosition.z
-                     We keep the previous support foot half the time
-                     of the double support phase..
-                     */
-                  {
-                    lSupportFoot=m_SupportFoot;
-                  }
-
-                /* Update the class related member. */
-                m_SupportFoot = lSupportFoot;
-
-                if ((m_ReferenceFrame==EGOCENTERED_FRAME) ||
-                    (m_ReferenceFrame==LEFT_FOOT_CENTERED_FRAME) ||
-                    (m_ReferenceFrame==WAIST_CENTERED_FRAME))
-                  {
-                    sotDEBUG(25) << "Inside egocentered frame " <<endl;
-                    MatrixHomogeneous PoseOrigin,iPoseOrigin, WaistPoseAbsolute;
-
-                    getAbsoluteWaistPosAttHomogeneousMatrix(WaistPoseAbsolute);
-
-                    if (m_ReferenceFrame==EGOCENTERED_FRAME)
+                    m_bufferForce.push_back(extForce);
+                    double ltmp1(0.0), ltmp2(0.0), ltmp3(0.0) ;
+                    for(unsigned int k=0;k<m_filterWindow.size();k++)
                       {
-                        if (m_SupportFoot==1)
-                          PoseOrigin = m_LeftFootPosition;
-                        else
-                          PoseOrigin = m_RightFootPosition;
+                        ltmp1 += m_filterWindow[k]*m_bufferForce[n-1-k](0);
+                        ltmp2 += m_filterWindow[k]*m_bufferForce[n-1-k](1);
+                        ltmp3 += m_filterWindow[k]*m_bufferForce[n-1-k](2);
                       }
-                    else if (m_ReferenceFrame==LEFT_FOOT_CENTERED_FRAME)
-                      {
+                    extForce(0) = ltmp1 ;
+                    extForce(1) = ltmp2 ;
+                    extForce(2) = ltmp3 ;
+                    m_bufferForce.pop_front();
+                  }
+                double threshold = 7.0;
+                double thresholdy = 4.0;
+                if(extForce(0)>threshold)
+                  extForce(0)=threshold;
+                if(extForce(0)<-threshold)
+                  extForce(0)=-threshold;
+
+                if(extForce(1)>thresholdy)
+                  extForce(1)=thresholdy;
+                if(extForce(1)<-thresholdy)
+                  extForce(1)=-thresholdy;
+
+                if(extForce(2)>threshold)
+                  extForce(2)=threshold;
+                if(extForce(2)<-threshold)
+                  extForce(2)=-threshold;
+
+                if((extForce(0)*extForce(0)+extForce(1)*extForce(1)) < 100)
+                  {
+                    extForce(0)=0.0;
+                    extForce(1)=0.0;
+                  }
+                m_currentForces = extForce ;
+                ostringstream oss ("");
+                //oss << ":perturbationforce " << extForce(0) << " "
+                // << extForce(1) << " " << extForce(2);
+                oss << ":perturbationforce " << -m_currentForces(1)
+                    << " " << /*m_currentForces(0)*/0.0
+                    << " " << m_currentForces(2);
+                // cout << oss.str() << endl ;
+                pgCommandLine(oss.str());
+              }
+          }catch(...)
+            {
+              //cout << "problems with force signals reading" << endl;
+            };
+
+          // Test if the pattern value has some value to provide.
+          if (m_PGI->RunOneStepOfTheControlLoop(CurrentConfiguration,
+                                                CurrentVelocity,
+                                                CurrentAcceleration,
+                                                ZMPTarget,
+                                                lCOMRefState,
+                                                lLeftFootPosition,
+                                                lRightFootPosition))
+            {
+              sotDEBUG(25) << "After One Step of control " << endl
+                           << "CurrentState:" << CurrentState << endl
+                           << "CurrentConfiguration:" << CurrentConfiguration
+                           << endl;
+
+              m_ZMPRefPos(0) = ZMPTarget[0];
+              m_ZMPRefPos(1) = ZMPTarget[1];
+              m_ZMPRefPos(2) = ZMPTarget[2];
+              m_ZMPRefPos(3) = 1.0;
+              sotDEBUG(2) << "ZMPTarget returned by the PG: "
+                          << m_ZMPRefPos <<endl;
+              for(int i=0;i<3;i++)
+                {
+                  m_WaistPositionAbsolute(i) = CurrentConfiguration(i);
+                  m_WaistAttitudeAbsolute(i) = CurrentConfiguration(i+3);
+                }
+              m_COMRefPos(0) = lCOMRefState.x[0];
+              m_COMRefPos(1) = lCOMRefState.y[0];
+              m_COMRefPos(2) = lCOMRefState.z[0];
+              sotDEBUG(2) << "COMRefPos returned by the PG: "
+                          << m_COMRefPos <<endl;
+              m_dCOMRefPos(0) = lCOMRefState.x[1];
+              m_dCOMRefPos(1) = lCOMRefState.y[1];
+              m_dCOMRefPos(2) = lCOMRefState.z[1];
+              
+              m_ddCOMRefPos(0) = lCOMRefState.x[2];
+              m_ddCOMRefPos(1) = lCOMRefState.y[2];
+              m_ddCOMRefPos(2) = lCOMRefState.z[2];
+              // HERE -------------------------------
+
+              m_ComAttitude(0) = lCOMRefState.roll[0];
+              m_ComAttitude(1) = lCOMRefState.pitch[0];
+              m_ComAttitude(2) = lCOMRefState.yaw[0];
+
+              m_dComAttitude(0) = lCOMRefState.roll[1];
+              m_dComAttitude(1) = lCOMRefState.pitch[1];
+              m_dComAttitude(2) = lCOMRefState.yaw[1];
+
+              m_ddComAttitude(0) = lCOMRefState.roll[2];
+              m_ddComAttitude(1) = lCOMRefState.pitch[2];
+              m_ddComAttitude(2) = lCOMRefState.yaw[2];              
+
+              sotDEBUG(2) << "dCOMRefPos returned by the PG: "
+                          << m_dCOMRefPos <<endl;
+              sotDEBUG(2) << "CurrentState.size()"
+                          << CurrentState.size()<<endl;
+              sotDEBUG(2) << "CurrentConfiguration.size()"
+                          << CurrentConfiguration.size()<<endl;
+              sotDEBUG(2) << "m_JointErrorValuesForWalking.size(): "
+                          << m_JointErrorValuesForWalking.size() <<endl;
+
+
+              // In this setting we assume that there is a
+              // proper mapping between
+              // CurrentState and CurrentConfiguration.
+              Vector::Index SizeCurrentState = CurrentState.size();
+              Vector::Index SizeCurrentConfiguration =
+                CurrentConfiguration.size()-6;
+              Vector::Index MinSize = std::min(SizeCurrentState,
+                                               SizeCurrentConfiguration);
+
+              if (m_JointErrorValuesForWalking.size()>=MinSize)
+                {
+                  for(unsigned int li=0;li<MinSize;li++)
+                    m_JointErrorValuesForWalking(li)=
+                      (CurrentConfiguration(li+6)- CurrentState(li) )
+                      /m_TimeStep;
+                }
+              else
+                {
+                  std::cout <<"The state of the robot and the one "
+                            << "return by the WPG are different"
+                            << std::endl;
+                  sotDEBUG(25) << "Size not coherent between "
+                               << "CurrentState and "
+                               << "m_JointErrorValuesForWalking: "
+                               << CurrentState.size()<< " "
+                               << m_JointErrorValuesForWalking.size()<< " "
+                               << endl;
+                }
+              sotDEBUG(2) << "Juste after updating "
+                          << "m_JointErrorValuesForWalking" << endl;
+
+              sotDEBUG(1) << "lLeftFootPosition : "
+                          << lLeftFootPosition.x << " "
+                          << lLeftFootPosition.y << " "
+                          << lLeftFootPosition.z << " "
+                          << lLeftFootPosition.theta << endl;
+              sotDEBUG(1) << "lRightFootPosition : "
+                          << lRightFootPosition.x << " "
+                          << lRightFootPosition.y << " "
+                          << lRightFootPosition.z << " "
+                          << lRightFootPosition.theta << endl;
+
+              sotDEBUG(25) << "lCOMPosition : "
+                           << lCOMRefState.x[0] << " "
+                           << lCOMRefState.y[0] << " "
+                           << lCOMRefState.z[0] <<  endl;
+
+              /* Fill in the homogeneous matrix using the
+                 world reference frame*/
+              FromAbsoluteFootPosToDotHomogeneous(lLeftFootPosition,
+                                                  m_LeftFootPosition,
+                                                  m_dotLeftFootPosition);
+              FromAbsoluteFootPosToDotHomogeneous(lRightFootPosition,
+                                                  m_RightFootPosition,
+                                                  m_dotRightFootPosition);
+
+              /* We assume that the left foot is always the origin
+                 of the new frame. */
+              m_LeftFootPosition = m_MotionSinceInstanciationToThisSequence
+                * m_LeftFootPosition;
+              m_RightFootPosition = m_MotionSinceInstanciationToThisSequence
+                * m_RightFootPosition;
+
+              Eigen::Matrix<double, 4,1> newRefPos, oldRefPos;
+              oldRefPos(0) = m_COMRefPos(0); oldRefPos(1) = m_COMRefPos(1);
+              oldRefPos(2) = m_COMRefPos(2); oldRefPos(3) = 1.0;
+              newRefPos = m_MotionSinceInstanciationToThisSequence * oldRefPos;
+              m_COMRefPos(0) = newRefPos(0);
+              m_COMRefPos(1) = newRefPos(1);
+              m_COMRefPos(2) = newRefPos(2);
+
+              oldRefPos(0) = m_ZMPRefPos(0); oldRefPos(1) = m_ZMPRefPos(1);
+              oldRefPos(2) = m_ZMPRefPos(2); oldRefPos(3) = 1.0;
+              newRefPos = m_MotionSinceInstanciationToThisSequence * oldRefPos;
+              m_ZMPRefPos(0) = newRefPos(0);
+              m_ZMPRefPos(1) = newRefPos(1);
+              m_ZMPRefPos(2) = newRefPos(2);
+
+              sotDEBUG(25) << "lLeftFootPosition.stepType: "
+                           << lLeftFootPosition.stepType
+                           << " lRightFootPosition.stepType: "
+                           << lRightFootPosition.stepType <<endl;
+              // Find the support foot feet.
+              m_leftFootContact = true;
+              m_rightFootContact = true;
+              if (lLeftFootPosition.stepType==-1)
+                {
+                  lSupportFoot=1; m_leftFootContact = true;
+                  if (lRightFootPosition.stepType!=-1)
+                    m_rightFootContact = false;
+                  m_DoubleSupportPhaseState = 0;
+                }
+              else if (lRightFootPosition.stepType==-1)
+                {
+                  lSupportFoot=0; m_rightFootContact = true;
+                  if (lLeftFootPosition.stepType!=-1)
+                    m_leftFootContact = false;
+                  m_DoubleSupportPhaseState = 0;
+                }
+              else
+                /* m_LeftFootPosition.z ==m_RightFootPosition.z
+                   We keep the previous support foot half the time
+                   of the double support phase..
+                   */
+                {
+                  lSupportFoot=m_SupportFoot;
+                }
+
+              /* Update the class related member. */
+              m_SupportFoot = lSupportFoot;
+
+              if ((m_ReferenceFrame==EGOCENTERED_FRAME) ||
+                  (m_ReferenceFrame==LEFT_FOOT_CENTERED_FRAME) ||
+                  (m_ReferenceFrame==WAIST_CENTERED_FRAME))
+                {
+                  sotDEBUG(25) << "Inside egocentered frame " <<endl;
+                  MatrixHomogeneous PoseOrigin,iPoseOrigin, WaistPoseAbsolute;
+
+                  getAbsoluteWaistPosAttHomogeneousMatrix(WaistPoseAbsolute);
+
+                  if (m_ReferenceFrame==EGOCENTERED_FRAME)
+                    {
+                      if (m_SupportFoot==1)
                         PoseOrigin = m_LeftFootPosition;
-                      }
-                    else if (m_ReferenceFrame==WAIST_CENTERED_FRAME)
-                      {
-                        PoseOrigin = WaistPoseAbsolute;
-                      }
-                    iPoseOrigin = PoseOrigin.inverse();
+                      else
+                        PoseOrigin = m_RightFootPosition;
+                    }
+                  else if (m_ReferenceFrame==LEFT_FOOT_CENTERED_FRAME)
+                    {
+                      PoseOrigin = m_LeftFootPosition;
+                    }
+                  else if (m_ReferenceFrame==WAIST_CENTERED_FRAME)
+                    {
+                      PoseOrigin = WaistPoseAbsolute;
+                    }
+                  iPoseOrigin = PoseOrigin.inverse();
 
-                    sotDEBUG(25) << "Old ComRef:  " << m_COMRefPos << endl;
-                    sotDEBUG(25) << "Old LeftFootRef:  "
-                                 << m_LeftFootPosition << endl;
-                    sotDEBUG(25) << "Old RightFootRef:  "
-                                 << m_RightFootPosition << endl;
-                    sotDEBUG(25) << "Old PoseOrigin:  "
-                                 << PoseOrigin << endl;
+                  sotDEBUG(25) << "Old ComRef:  " << m_COMRefPos << endl;
+                  sotDEBUG(25) << "Old LeftFootRef:  "
+                               << m_LeftFootPosition << endl;
+                  sotDEBUG(25) << "Old RightFootRef:  "
+                               << m_RightFootPosition << endl;
+                  sotDEBUG(25) << "Old PoseOrigin:  "
+                               << PoseOrigin << endl;
 
 
-                    Eigen::Matrix<double, 4,1> lVZMPRefPos, lV2ZMPRefPos;
-                    Eigen::Matrix<double, 4,1> lVCOMRefPos, lV2COMRefPos;
+                  Eigen::Matrix<double, 4,1> lVZMPRefPos, lV2ZMPRefPos;
+                  Eigen::Matrix<double, 4,1> lVCOMRefPos, lV2COMRefPos;
 
-                    for(unsigned int li=0;li<3;li++)
-                      {
-                        lVZMPRefPos(li) = m_ZMPRefPos(li);
-                        lVCOMRefPos(li) = m_COMRefPos(li);
-                      }
-                    lVZMPRefPos(3) = lVCOMRefPos(3) = 1.0;
+                  for(unsigned int li=0;li<3;li++)
+                    {
+                      lVZMPRefPos(li) = m_ZMPRefPos(li);
+                      lVCOMRefPos(li) = m_COMRefPos(li);
+                    }
+                  lVZMPRefPos(3) = lVCOMRefPos(3) = 1.0;
 
-                    // We do not touch to ZMP.
-                    lV2ZMPRefPos = iPoseOrigin *
-                      (WaistPoseAbsolute * lVZMPRefPos);
+                  // We do not touch to ZMP.
+                  lV2ZMPRefPos = iPoseOrigin *
+                    (WaistPoseAbsolute * lVZMPRefPos);
 
-                    // Put the CoM reference pos in the Pos
-                    // Origin reference frame.
-                    lV2COMRefPos = iPoseOrigin * lVCOMRefPos;
+                  // Put the CoM reference pos in the Pos
+                  // Origin reference frame.
+                  lV2COMRefPos = iPoseOrigin * lVCOMRefPos;
 
-                    MatrixHomogeneous lMLeftFootPosition = m_LeftFootPosition;
-                    MatrixHomogeneous lMRightFootPosition = m_RightFootPosition;
+                  MatrixHomogeneous lMLeftFootPosition = m_LeftFootPosition;
+                  MatrixHomogeneous lMRightFootPosition = m_RightFootPosition;
 
-                    m_LeftFootPosition = iPoseOrigin * lMLeftFootPosition;
-                    m_RightFootPosition = iPoseOrigin * lMRightFootPosition;
+                  m_LeftFootPosition = iPoseOrigin * lMLeftFootPosition;
+                  m_RightFootPosition = iPoseOrigin * lMRightFootPosition;
 
-                    for(unsigned int i=0;i<3;i++)
-                      {
-                        m_ZMPRefPos(i) = lV2ZMPRefPos(i);
-                        m_COMRefPos(i) = lV2COMRefPos(i);
-                      }
+                  for(unsigned int i=0;i<3;i++)
+                    {
+                      m_ZMPRefPos(i) = lV2ZMPRefPos(i);
+                      m_COMRefPos(i) = lV2COMRefPos(i);
+                    }
 
-                    WaistPoseAbsolute = iPoseOrigin * WaistPoseAbsolute;
+                  WaistPoseAbsolute = iPoseOrigin * WaistPoseAbsolute;
 
-                    MatrixRotation newWaistRot;
-                    newWaistRot = WaistPoseAbsolute.linear();
-                    VectorRollPitchYaw newWaistRPY;
-                    newWaistRPY = (newWaistRot.eulerAngles(2,1,0)).reverse();
-                    m_WaistAttitude = newWaistRPY;
+                  MatrixRotation newWaistRot;
+                  newWaistRot = WaistPoseAbsolute.linear();
+                  VectorRollPitchYaw newWaistRPY;
+                  newWaistRPY = (newWaistRot.eulerAngles(2,1,0)).reverse();
+                  m_WaistAttitude = newWaistRPY;
 
-                    m_WaistPosition = WaistPoseAbsolute.translation();
+                  m_WaistPosition = WaistPoseAbsolute.translation();
 
-                    m_WaistAttitudeMatrix = WaistPoseAbsolute;
+                  m_WaistAttitudeMatrix = WaistPoseAbsolute;
 
-                    sotDEBUG(25) << "ComRef:  " << m_COMRefPos << endl;
-                    sotDEBUG(25) << "iPoseOrigin:  " << iPoseOrigin << endl;
-                  }
-                sotDEBUG(25) << "After egocentered frame " << endl;
+                  sotDEBUG(25) << "ComRef:  " << m_COMRefPos << endl;
+                  sotDEBUG(25) << "iPoseOrigin:  " << iPoseOrigin << endl;
+                }
+              sotDEBUG(25) << "After egocentered frame " << endl;
 
-                sotDEBUG(25) << "ComRef:  " << m_COMRefPos << endl;
-                sotDEBUG(25) << "LeftFootRef:  " << m_LeftFootPosition << endl;
-                sotDEBUG(25) << "RightFootRef:  " << m_RightFootPosition << endl;
-                sotDEBUG(25) << "ZMPRefPos:  " << m_ZMPRefPos << endl;
-                sotDEBUG(25) << "m_MotionSinceInstanciationToThisSequence" <<
-                  m_MotionSinceInstanciationToThisSequence<< std::endl;
+              sotDEBUG(25) << "ComRef:  " << m_COMRefPos << endl;
+              sotDEBUG(25) << "LeftFootRef:  " << m_LeftFootPosition << endl;
+              sotDEBUG(25) << "RightFootRef:  " << m_RightFootPosition << endl;
+              sotDEBUG(25) << "ZMPRefPos:  " << m_ZMPRefPos << endl;
+              sotDEBUG(25) << "m_MotionSinceInstanciationToThisSequence" <<
+                m_MotionSinceInstanciationToThisSequence<< std::endl;
 
-                for(unsigned int i=0;i<3;i++)
-                  m_ZMPPrevious[i] = m_ZMPRefPos(i);
+              for(unsigned int i=0;i<3;i++)
+                m_ZMPPrevious[i] = m_ZMPRefPos(i);
 
-                m_dataInProcess = 1;
-              }
-            else
-              {
-                sotDEBUG(1) << "Error while compute one step of PG."
-                            << m_dataInProcess << std::endl;
-                // TODO: SOT_THROW
-                if (m_dataInProcess==1)
-                  {
-                    MatrixHomogeneous invInitLeftFootRef,Diff;
-                    invInitLeftFootRef =
-                      m_InitLeftFootPosition.inverse();
-                    Diff = invInitLeftFootRef * m_LeftFootPosition;
+              m_dataInProcess = 1;
+            }
+          else
+            {
+              sotDEBUG(1) << "Error while compute one step of PG."
+                          << m_dataInProcess << std::endl;
+              // TODO: SOT_THROW
+              if (m_dataInProcess==1)
+                {
+                  MatrixHomogeneous invInitLeftFootRef,Diff;
+                  invInitLeftFootRef =
+                    m_InitLeftFootPosition.inverse();
+                  Diff = invInitLeftFootRef * m_LeftFootPosition;
 
-                    m_k_Waist_kp1 = m_k_Waist_kp1 * Diff;
+                  m_k_Waist_kp1 = m_k_Waist_kp1 * Diff;
 
-                  }
-                m_dataInProcess = 0;
-              }
-            sotDEBUG(25) << "After computing error "
-                         << m_JointErrorValuesForWalking << endl;
-          }
-        else
-          {
-            m_COMRefPos = comSIN.access(time);
-            m_ZMPRefPos(0) = m_COMRefPos(0);
-            m_ZMPRefPos(1) = m_COMRefPos(1);
-            m_ZMPRefPos(2) = 0.0;
-            m_ZMPRefPos(3) = 1.0;
-          }
-      }
+                }
+              m_dataInProcess = 0;
+            }
+          sotDEBUG(25) << "After computing error "
+                       << m_JointErrorValuesForWalking << endl;
+        }
+      else
+        {
+          m_COMRefPos = comSIN.access(time);
+
+          m_COMRefPos(0) = -0.00316374;
+          m_COMRefPos(1) = 0.00123738;
+          m_COMRefPos(2) = 0.875624;
+          m_ZMPRefPos(0) = m_COMRefPos(0);
+          m_ZMPRefPos(1) = m_COMRefPos(1);
+          m_ZMPRefPos(2) = 0.0;
+          m_ZMPRefPos(3) = 1.0;
+        }
+
 
       sotDEBUG(25) << "LeftFootRef:  "
                    << m_LeftFootPosition << endl;

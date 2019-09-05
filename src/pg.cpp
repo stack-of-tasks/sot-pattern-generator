@@ -616,7 +616,7 @@ namespace dynamicgraph {
             m_InitRightFootPosition;
 
           m_LeftFootPosition = m_InitLeftFootPosition;
-           m_RightFootPosition = m_InitRightFootPosition;           
+          m_RightFootPosition = m_InitRightFootPosition;           
 
           sotDEBUG(5) << "m_InitCOMRefPos: " << m_InitCOMRefPos;
 
@@ -1709,6 +1709,8 @@ namespace dynamicgraph {
           m_COMRefPos(i) = m_InitCOMRefPos(i);
           m_ZMPRefPos(i) = m_InitZMPRefPos(i);          
         }        
+        m_RightFootPosition = m_InitRightFootPosition;
+        m_LeftFootPosition = m_InitLeftFootPosition;        
       } 
       else 
       {

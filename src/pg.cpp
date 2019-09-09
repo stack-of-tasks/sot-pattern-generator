@@ -510,6 +510,53 @@ namespace dynamicgraph {
 
           for(unsigned i=0;i<res.size();i++)
             res(i) = pos(i+6);
+          
+          // lWaistPosition(0) = 0.0;
+          // lWaistPosition(1) = 0.0;          
+          // lWaistPosition(2) = 1.019272;
+          // lWaistPosition(3) = 0.0;
+          // lWaistPosition(4) = 0.0;          
+          // lWaistPosition(5) = 0.0;
+
+          // res(18) = 0.0;
+          // res(19) = -0.000285;          
+          // res(20) = -0.4113544;
+          // res(21) = 0.8593958;
+          // res(22) = -0.4480414;          
+          // res(23) = 0.000285;
+
+          // res(24) = 0.0;
+          // res(25) = -0.000285;          
+          // res(26) = -0.4113544;
+          // res(27) = 0.8593958;
+          // res(28) = -0.4480414;          
+          // res(29) = 0.000285;
+
+          // res(30) = 0.0;
+          // res(31) = 0.006761;  
+
+          // res(0) = 0.0;
+          // res(1) = 0.0;
+          // res(2) = 0.0;          
+          // res(3) = 0.0;
+          // res(4) = 0.0;
+          // res(5) = 0.0;
+          // res(6) = 0.1; 
+
+          // res(14) = 0.05;
+
+          // res(7) = 0.0;
+          // res(8) = 0.0;
+          // res(9) = 0.0;          
+          // res(10) = 0.0;
+          // res(11) = 0.0;
+          // res(12) = 0.0;
+          // res(13) = 0.1;
+
+          // res(15) = 0.05;
+
+          // res(16) = 0.0;
+          // res(17) = 0.0;
 
           Vector lZMPPrevious = ZMPPreviousControllerSIN(m_LocalTime);
           for(unsigned int i=0;i<3;i++)
@@ -1006,7 +1053,6 @@ namespace dynamicgraph {
       res = m_leftFootContact;
       sotDEBUGOUT(25);
       return res;
-
     }
 
     bool & PatternGenerator ::
@@ -1017,7 +1063,6 @@ namespace dynamicgraph {
       res = m_rightFootContact;
       sotDEBUGOUT(25);
       return res;
-
     }
 
     int &PatternGenerator::
@@ -1367,7 +1412,7 @@ namespace dynamicgraph {
 
         if(m_count%5 == 0)
         {
-          if(m_count > 1)
+          if(m_count > 1) // Change of previous state
           {
             for(unsigned int i=0;i<3;i++)
             {
@@ -1545,7 +1590,6 @@ namespace dynamicgraph {
         SubsamplingFootPos(m_PrevSamplingLeftFootAbsPos,m_NextSamplingLeftFootAbsPos
           ,m_LeftFootPosition, m_dotLeftFootPosition,m_count);      
         
-
         m_count++;
 
         Eigen::Matrix<double, 4,1> newRefPos, oldRefPos;

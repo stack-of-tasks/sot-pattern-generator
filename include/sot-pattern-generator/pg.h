@@ -179,6 +179,9 @@ namespace dynamicgraph {
       /*! \brief iteration time. */
       unsigned int m_LocalTime;
 
+      /*! \brief count for subsampling. */
+      unsigned int m_count;      
+
     public: /* --- CONSTRUCTION --- */
 
       /*! \brief Default constructor. */
@@ -264,6 +267,9 @@ namespace dynamicgraph {
       /*! \brief Internal method to get the reference dCoM at a given time.*/
       dynamicgraph::Vector & getdCoMRef(dynamicgraph::Vector & res, int time);
 
+      /*! \brief Internal method to get the reference ddCoM at a given time.*/
+      dynamicgraph::Vector & getddCoMRef(dynamicgraph::Vector & res, int time);
+
       /*! \brief Internal method to get the external forces at a given time.*/
       dynamicgraph::Vector & getExternalForces
         (dynamicgraph::Vector & forces, int time);
@@ -291,6 +297,10 @@ namespace dynamicgraph {
       dynamicgraph::Vector & getdComAttitude
         (dynamicgraph::Vector &res, int time);
 
+      /*! \brief Internal method to get the second derivative of the com attitude. */
+      dynamicgraph::Vector & getddComAttitude
+        (dynamicgraph::Vector &res, int time);
+
       /*! \brief Internal method to get the attitude of the com. */
       dynamicgraph::Vector & getComAttitude
         (dynamicgraph::Vector &res, int time);
@@ -302,6 +312,11 @@ namespace dynamicgraph {
       /*! \brief Internal method to get the absolute attitude of the waist. */
       VectorRollPitchYaw & getWaistAttitudeAbsolute
         (VectorRollPitchYaw &res, int time);
+
+      /*! \brief Internal method to get the absolute attitude of the waist into 
+        an homogeneous matrix. */
+      MatrixHomogeneous & getWaistAttitudeMatrix
+        (MatrixHomogeneous &res, int time);        
 
       /*! \brief Internal method to get the dataInPorcess flag */
       unsigned & getDataInProcess(unsigned &res, int time);
@@ -333,7 +348,10 @@ namespace dynamicgraph {
       MatrixHomogeneous m_k_Waist_kp1;
 
       /*! \brief Absolute Position for the left and right feet. */
-      MatrixHomogeneous m_LeftFootPosition,m_RightFootPosition;
+      MatrixHomogeneous m_LeftFootPosition,m_RightFootPosition; 
+      PatternGeneratorJRL::FootAbsolutePosition m_PrevSamplingRightFootAbsPos, m_PrevSamplingLeftFootAbsPos;    
+      PatternGeneratorJRL::FootAbsolutePosition m_NextSamplingRightFootAbsPos, m_NextSamplingLeftFootAbsPos;
+      PatternGeneratorJRL::FootAbsolutePosition m_InitRightFootAbsPos, m_InitLeftFootAbsPos;    
 
       /*! \brief Absolute Derivate for the left and right feet. */
       MatrixHomogeneous m_dotLeftFootPosition,m_dotRightFootPosition;
@@ -356,15 +374,28 @@ namespace dynamicgraph {
         is seen as an inverted pendulum*/
       dynamicgraph::Vector m_ComAttitude;
 
-      /*! \brief Com Attitude: does not really exist apart when the robot
+      /*! \brief dCom Attitude: does not really exist apart when the robot
         is seen as an inverted pendulum*/
       dynamicgraph::Vector m_dComAttitude;
 
+      /*! \brief ddCom Attitude: does not really exist apart when the robot
+        is seen as an inverted pendulum*/
+      dynamicgraph::Vector m_ddComAttitude;      
+
       /*! \brief Absolute position of the reference CoM. */
       dynamicgraph::Vector m_COMRefPos;
-
+      dynamicgraph::Vector m_PrevSamplingCOMRefPos;
+      dynamicgraph::Vector m_NextSamplingCOMRefPos; 
+           
       /*! \brief Absolute position of the reference dCoM. */
       dynamicgraph::Vector m_dCOMRefPos;
+      dynamicgraph::Vector m_PrevSamplingdCOMRefPos;
+      dynamicgraph::Vector m_NextSamplingdCOMRefPos; 
+
+      /*! \brief Absolute position of the reference ddCoM. */
+      dynamicgraph::Vector m_ddCOMRefPos;
+      dynamicgraph::Vector m_PrevSamplingddCOMRefPos;
+      dynamicgraph::Vector m_NextSamplingddCOMRefPos; 
 
       /*! \brief Initial Absolute position of the reference ZMP. */
       dynamicgraph::Vector m_InitZMPRefPos;
@@ -387,6 +418,11 @@ namespace dynamicgraph {
 
       /*! \brief Waist Attitude Absolute */
       dynamicgraph::Vector m_WaistAttitudeAbsolute;
+      dynamicgraph::Vector m_PrevSamplingWaistAttAbs;
+      dynamicgraph::Vector m_NextSamplingWaistAttAbs;
+
+      /*! \brief Waist Attitude Homogeneous Matrix */
+      MatrixHomogeneous m_WaistAttitudeMatrix;     
 
       /*! \brief Joint values for walking. */
       dynamicgraph::Vector m_JointErrorValuesForWalking;
@@ -394,6 +430,12 @@ namespace dynamicgraph {
       /*! \brief Velocity reference for Herdt's PG */
       dynamicgraph::Vector m_VelocityReference;
 
+<<<<<<< HEAD
+=======
+      /*! \brief trigger to start walking */
+      bool m_trigger;
+
+>>>>>>> imaroger/devel
       /*! \brief true iff the pattern if dealing with data,
         false if pg is not
         * working anymore/yet. */
@@ -439,6 +481,33 @@ namespace dynamicgraph {
       void getAbsoluteWaistPosAttHomogeneousMatrix
         (MatrixHomogeneous &aWaistMH);
 
+      void SubsamplingFootPos(pg::FootAbsolutePosition &PrevFootPosition,
+      pg::FootAbsolutePosition &NextFootPosition, MatrixHomogeneous &FootPositionOut,
+      MatrixHomogeneous &dotFootPositionOut, unsigned int &count);  
+
+<<<<<<< HEAD
+      /*! \brief Internal method to get the initial
+        reference ZMP at a given time. */
+      dynamicgraph::Vector & getInitZMPRef
+        (dynamicgraph::Vector & res, int time);
+
+      /*! \brief Internal method to get the
+        initial reference CoM at a given time.*/
+      dynamicgraph::Vector & getInitCoMRef
+        (dynamicgraph::Vector & res, int time);
+
+      /*! \brief Internal method to get the initial
+        reference CoM at a given time.*/
+      dynamicgraph::Vector & getInitWaistPosRef
+        (dynamicgraph::Vector & res, int time);
+
+=======
+      void SubsamplingVector(dynamicgraph::Vector &PrevPosition, 
+        dynamicgraph::Vector &NextPosition, dynamicgraph::Vector &PositionOut, 
+        unsigned int &count);          
+
+      void CopyFootPosition(pg::FootAbsolutePosition &FootPositionIn,
+        pg::FootAbsolutePosition &FootPositionOut);
 
       /*! \brief Internal method to get the initial
         reference ZMP at a given time. */
@@ -455,6 +524,7 @@ namespace dynamicgraph {
       dynamicgraph::Vector & getInitWaistPosRef
         (dynamicgraph::Vector & res, int time);
 
+>>>>>>> imaroger/devel
       /*! \brief Internal method to get the initial
         reference CoM at a given time.*/
       VectorRollPitchYaw & getInitWaistAttRef
@@ -495,6 +565,7 @@ namespace dynamicgraph {
       /*! \brief Externalize the CoM reference. */
       SignalTimeDependent<dynamicgraph::Vector,int> dCoMRefSOUT;
 
+      SignalTimeDependent<dynamicgraph::Vector,int> ddCoMRefSOUT;
       /*! \brief Take the current CoM. */
       SignalPtr<dynamicgraph::Vector,int> comSIN;
 
@@ -515,6 +586,9 @@ namespace dynamicgraph {
 
       /*! \brief Take the current desired velocity. */
       SignalPtr<dynamicgraph::Vector,int> velocitydesSIN;
+
+      /*! \brief Take the current trigger to start OneStepOfControl. */
+      SignalPtr<bool,int> triggerSIN;     
 
       /*! \brief Take the current left foot homogeneous position. */
       SignalPtr<MatrixHomogeneous,int> LeftFootCurrentPosSIN;
@@ -551,6 +625,9 @@ namespace dynamicgraph {
       /*! \brief Externalize the dcom attitude. */
       SignalTimeDependent<dynamicgraph::Vector,int> dcomattitudeSOUT;
 
+      /*! \brief Externalize the ddcom attitude. */
+      SignalTimeDependent<dynamicgraph::Vector,int> ddcomattitudeSOUT;
+
       /*! \brief Externalize the waist attitude. */
       SignalTimeDependent<VectorRollPitchYaw,int>
         waistattitudeSOUT;
@@ -558,6 +635,13 @@ namespace dynamicgraph {
       /*! \brief Externalize the absolute waist attitude. */
       SignalTimeDependent<VectorRollPitchYaw,int>
         waistattitudeabsoluteSOUT;
+<<<<<<< HEAD
+=======
+
+      /*! \brief Externalize the absolute waist attitude into a homogeneous matrix. */
+      SignalTimeDependent<MatrixHomogeneous,int>
+        waistattitudematrixSOUT;
+>>>>>>> imaroger/devel
 
       /*! \brief Externalize the waist position. */
       SignalTimeDependent<dynamicgraph::Vector,int>

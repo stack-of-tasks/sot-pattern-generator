@@ -21,7 +21,6 @@
 #ifndef __SOT_PG_MANAGER_H__
 #define __SOT_PG_MANAGER_H__
 
-
 /* --------------------------------------------------------------------- */
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
@@ -33,67 +32,58 @@
 #include <dynamic-graph/entity.h>
 #include <dynamic-graph/signal-ptr.h>
 #include <dynamic-graph/signal-time-dependent.h>
-#include <sot-pattern-generator/step-queue.h>
 #include <sot-pattern-generator/pg.h>
-
+#include <sot-pattern-generator/step-queue.h>
 
 /* --------------------------------------------------------------------- */
 /* --- API ------------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-#if defined (WIN32)
-#  if defined (pg_manager_EXPORTS)
-#    define PGManager_EXPORT __declspec(dllexport)
-#  else
-#    define PGManager_EXPORT __declspec(dllimport)
-#  endif
+#if defined(WIN32)
+#if defined(pg_manager_EXPORTS)
+#define PGManager_EXPORT __declspec(dllexport)
 #else
-#  define PGManager_EXPORT
+#define PGManager_EXPORT __declspec(dllimport)
 #endif
-
+#else
+#define PGManager_EXPORT
+#endif
 
 namespace dynamicgraph {
-  namespace sot {
+namespace sot {
 
-    /* --------------------------------------------------------------------- */
-    /* --- CLASS ----------------------------------------------------------- */
-    /* --------------------------------------------------------------------- */
+/* --------------------------------------------------------------------- */
+/* --- CLASS ----------------------------------------------------------- */
+/* --------------------------------------------------------------------- */
 
-    class StepQueue;
-    class PatternGenerator;
+class StepQueue;
+class PatternGenerator;
 
-    /// Finds the PG and sends steps to the PG.
-    class PGManager_EXPORT PGManager
-      : public Entity
-    {
-    public: // Entity name
-      DYNAMIC_GRAPH_ENTITY_DECL();
+/// Finds the PG and sends steps to the PG.
+class PGManager_EXPORT PGManager : public Entity {
+public: // Entity name
+  DYNAMIC_GRAPH_ENTITY_DECL();
 
-    public: // Construction
+public: // Construction
+  PGManager(const std::string &name);
 
-      PGManager( const std::string& name );
+  void startSequence(const StepQueue &seq);
+  void stopSequence(const StepQueue &seq);
+  void introduceStep(StepQueue &queue);
+  double changeNextStep(StepQueue &queue);
 
-      void startSequence( const StepQueue& seq );
-      void stopSequence( const StepQueue& seq );
-      void introduceStep( StepQueue& queue );
-      double changeNextStep( StepQueue& queue );
+public: // Entity
+  virtual void display(std::ostream &os) const;
+  virtual void commandLine(const std::string &cmdLine,
+                           std::istringstream &cmdArgs, std::ostream &os);
 
-    public: // Entity
+private:
+  std::vector<FootPrint> stepbuf_;
+  PatternGenerator *spg_;
+  PatternGeneratorJRL::PatternGeneratorInterface *pgi_;
+};
 
-      virtual void display( std::ostream& os ) const;
-      virtual void commandLine( const std::string& cmdLine,
-                                std::istringstream& cmdArgs,
-                                std::ostream& os );
-
-    private:
-
-      std::vector<FootPrint> stepbuf_;
-      PatternGenerator * spg_;
-      PatternGeneratorJRL::PatternGeneratorInterface * pgi_;
-    };
-
-  } // namespace sot
-} // namespace dg
+} // namespace sot
+} // namespace dynamicgraph
 
 #endif
-

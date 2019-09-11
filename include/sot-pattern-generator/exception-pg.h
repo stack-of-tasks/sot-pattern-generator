@@ -17,7 +17,6 @@
  *
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-
 #ifndef __SOT_PATTERN_GENERATOR_EXCEPTION_H
 #define __SOT_PATTERN_GENERATOR_EXCEPTION_H
 
@@ -25,21 +24,20 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-
 #include <sot/core/exception-abstract.hh>
 
 /* --------------------------------------------------------------------- */
 /* --- API ------------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-#if defined (WIN32)
-#  if defined (exception_pg_EXPORTS)
-#    define EXCEPTION_PG_EXPORT __declspec(dllexport)
-#  else
-#    define EXCEPTION_PG_EXPORT __declspec(dllimport)
-#  endif
+#if defined(WIN32)
+#if defined(exception_pg_EXPORTS)
+#define EXCEPTION_PG_EXPORT __declspec(dllexport)
 #else
-#  define EXCEPTION_PG_EXPORT
+#define EXCEPTION_PG_EXPORT __declspec(dllimport)
+#endif
+#else
+#define EXCEPTION_PG_EXPORT
 #endif
 
 /* --------------------------------------------------------------------- */
@@ -47,44 +45,38 @@
 /* --------------------------------------------------------------------- */
 
 namespace dynamicgraph {
-  namespace sot {
+namespace sot {
 
-    /* \class ExceptionPatternGenerator
-     */
-    class EXCEPTION_PG_EXPORT ExceptionPatternGenerator
-      :public ExceptionAbstract
-    {
-    public:
-      enum ErrorCodeEnum
-      {
-        GENERIC = ExceptionAbstract::PATTERN_GENERATOR
-        ,READ_FILE
-        ,CANT_DESTROY_SIGNAL
-        ,JOINT_RANK
-        ,PATTERN_GENERATOR_JRL
-        ,SELECTOR_RANK
-        ,BAD_CAST
-      };
+/* \class ExceptionPatternGenerator
+ */
+class EXCEPTION_PG_EXPORT ExceptionPatternGenerator : public ExceptionAbstract {
+public:
+  enum ErrorCodeEnum {
+    GENERIC = ExceptionAbstract::PATTERN_GENERATOR,
+    READ_FILE,
+    CANT_DESTROY_SIGNAL,
+    JOINT_RANK,
+    PATTERN_GENERATOR_JRL,
+    SELECTOR_RANK,
+    BAD_CAST
+  };
 
-      static const std::string EXCEPTION_NAME;
-      virtual const std::string& getExceptionName( void )
-        const { return EXCEPTION_NAME; }
+  static const std::string EXCEPTION_NAME;
+  virtual const std::string &getExceptionName(void) const {
+    return EXCEPTION_NAME;
+  }
 
-    public:
+public:
+  ExceptionPatternGenerator(
+      const ExceptionPatternGenerator::ErrorCodeEnum &errcode,
+      const std::string &msg = "");
+  ExceptionPatternGenerator(
+      const ExceptionPatternGenerator::ErrorCodeEnum &errcode,
+      const std::string &msg, const char *format, ...);
+  virtual ~ExceptionPatternGenerator(void) throw() {}
+};
 
-      ExceptionPatternGenerator
-        ( const ExceptionPatternGenerator::ErrorCodeEnum& errcode,
-          const std::string & msg = "" );
-      ExceptionPatternGenerator
-        ( const ExceptionPatternGenerator::ErrorCodeEnum& errcode,
-          const std::string & msg,const char* format, ... );
-      virtual ~ExceptionPatternGenerator( void ) throw() {}
-
-    };
-
-  } // namespace dg
 } // namespace sot
-
+} // namespace dynamicgraph
 
 #endif /* #ifndef __SOT_PATTERN_GENERATOR_EXCEPTION_H */
-

@@ -20,115 +20,98 @@
 #ifndef __SOT_StepComputer_FORCE_H__
 #define __SOT_StepComputer_FORCE_H__
 
-
 /* --------------------------------------------------------------------- */
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
-
 
 /* SOT */
 #include <dynamic-graph/entity.h>
 #include <dynamic-graph/signal-ptr.h>
 #include <dynamic-graph/signal-time-dependent.h>
-#include <sot/core/matrix-geometry.hh>
-#include <sot-pattern-generator/step-observer.h>
 #include <sot-pattern-generator/step-checker.h>
 #include <sot-pattern-generator/step-computer.h>
+#include <sot-pattern-generator/step-observer.h>
+#include <sot/core/matrix-geometry.hh>
 /* STD */
-#include <string>
 #include <deque>
 #include <fstream>
-
+#include <string>
 
 /* --------------------------------------------------------------------- */
 /* --- API ------------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-#if defined (WIN32)
-#  if defined (step_computer_force_EXPORTS)
-#    define StepComputerFORCE_EXPORT __declspec(dllexport)
-#  else
-#    define StepComputerFORCE_EXPORT __declspec(dllimport)
-#  endif
+#if defined(WIN32)
+#if defined(step_computer_force_EXPORTS)
+#define StepComputerFORCE_EXPORT __declspec(dllexport)
 #else
-#  define StepComputerFORCE_EXPORT
+#define StepComputerFORCE_EXPORT __declspec(dllimport)
+#endif
+#else
+#define StepComputerFORCE_EXPORT
 #endif
 
 namespace dynamicgraph {
-  namespace sot {
+namespace sot {
 
-    /* --------------------------------------------------------------------- */
-    /* --- CLASS ----------------------------------------------------------- */
-    /* --------------------------------------------------------------------- */
+/* --------------------------------------------------------------------- */
+/* --- CLASS ----------------------------------------------------------- */
+/* --------------------------------------------------------------------- */
 
-    class StepQueue;
+class StepQueue;
 
-    /// Generates footsteps.
-    class StepComputerFORCE_EXPORT StepComputerForce
-      : public Entity, public StepComputer
-    {
-    public:
+/// Generates footsteps.
+class StepComputerFORCE_EXPORT StepComputerForce : public Entity,
+                                                   public StepComputer {
+public:
+  static const std::string CLASS_NAME;
+  virtual const std::string &getClassName(void) const { return CLASS_NAME; }
 
-      static const std::string CLASS_NAME;
-      virtual const std::string& getClassName( void )
-        const { return CLASS_NAME; }
+public: // Construction
+  StepComputerForce(const std::string &name);
 
-    public: // Construction
+public: // Methods
+  void changeFirstStep(StepQueue &queue, int timeCurr);
+  void nextStep(StepQueue &queue, int timeCurr);
 
-      StepComputerForce( const std::string& name );
+public: // Signals
+  SignalPtr<MatrixHomogeneous, int> waistMlhandSIN;
+  SignalPtr<MatrixHomogeneous, int> waistMrhandSIN;
+  SignalPtr<MatrixHomogeneous, int> referencePositionWaistSIN;
+  SignalPtr<Vector, int> stiffnessSIN;
+  SignalPtr<Vector, int> velocitySIN;
+  SignalPtr<unsigned, int> contactFootSIN;
 
-    public: // Methods
+  SignalTimeDependent<Vector, int> displacementSOUT;
+  SignalTimeDependent<Vector, int> forceSOUT;
+  SignalTimeDependent<Vector, int> forceLhandSOUT;
+  SignalTimeDependent<Vector, int> forceRhandSOUT;
 
-      void changeFirstStep( StepQueue& queue, int timeCurr );
-      void nextStep( StepQueue& queue, int timeCurr );
+  Vector &computeDisplacement(Vector &res, int timeCurr);
+  Vector &computeForce(Vector &res, int timeCurr);
+  Vector &computeForceL(Vector &res, int timeCurr);
+  Vector &computeForceR(Vector &res, int timeCurr);
+  Vector &computeHandForce(Vector &res, const MatrixHomogeneous &waMh,
+                           const MatrixHomogeneous &waMref, const Vector &F);
 
-    public: // Signals
+public: // Entity
+  virtual void display(std::ostream &os) const;
+  virtual void commandLine(const std::string &cmdLine,
+                           std::istringstream &cmdArgs, std::ostream &os);
 
-      SignalPtr< MatrixHomogeneous,int > waistMlhandSIN;
-      SignalPtr< MatrixHomogeneous,int > waistMrhandSIN;
-      SignalPtr< MatrixHomogeneous,int > referencePositionWaistSIN;
-      SignalPtr< Vector,int > stiffnessSIN;
-      SignalPtr< Vector,int > velocitySIN;
-      SignalPtr< unsigned,int > contactFootSIN;
+private: // Reference frame
+  MatrixHomogeneous waMref0;
+  StepObserver *twoHandObserver;
+  StepChecker checker;
 
-      SignalTimeDependent< Vector,int > displacementSOUT;
-      SignalTimeDependent< Vector,int > forceSOUT;
-      SignalTimeDependent< Vector,int > forceLhandSOUT;
-      SignalTimeDependent< Vector,int > forceRhandSOUT;
+  void thisIsZero();
 
-      Vector& computeDisplacement( Vector& res,int timeCurr );
-      Vector& computeForce( Vector& res,int timeCurr );
-      Vector& computeForceL( Vector& res,int timeCurr );
-      Vector& computeForceR( Vector& res,int timeCurr );
-      Vector& computeHandForce( Vector& res,
-                                    const MatrixHomogeneous& waMh,
-                                    const MatrixHomogeneous& waMref,
-                                    const Vector& F );
+private: // Debug
+  std::ofstream logChanges;
+  std::ofstream logPreview;
+};
 
-    public: // Entity
-
-      virtual void display( std::ostream& os ) const;
-      virtual void commandLine( const std::string& cmdLine,
-                                std::istringstream& cmdArgs,
-                                std::ostream& os );
-
-    private: // Reference frame
-
-      MatrixHomogeneous waMref0;
-      StepObserver* twoHandObserver;
-      StepChecker checker;
-
-      void thisIsZero();
-
-    private: // Debug
-
-      std::ofstream logChanges;
-      std::ofstream logPreview;
-    };
-
-
-  } // namespace sot
+} // namespace sot
 } // namespace dynamicgraph
 
 #endif // #ifndef __SOT_STEPCOMPUTER_H__
-

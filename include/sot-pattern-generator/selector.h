@@ -17,8 +17,6 @@
  *
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-
-
 #ifndef __SOT_Selector_H__
 #define __SOT_Selector_H__
 
@@ -39,83 +37,70 @@
 /* --- API ------------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
-#if defined (WIN32)
-#  if defined (selector_EXPORTS)
-#    define Selector_EXPORT __declspec(dllexport)
-#  else
-#    define Selector_EXPORT __declspec(dllimport)
-#  endif
+#if defined(WIN32)
+#if defined(selector_EXPORTS)
+#define Selector_EXPORT __declspec(dllexport)
 #else
-#  define Selector_EXPORT
+#define Selector_EXPORT __declspec(dllimport)
+#endif
+#else
+#define Selector_EXPORT
 #endif
 
 namespace dynamicgraph {
-  namespace sot{
+namespace sot {
 
-    /* --------------------------------------------------------------------- */
-    /* --- CLASS ----------------------------------------------------------- */
-    /* --------------------------------------------------------------------- */
+/* --------------------------------------------------------------------- */
+/* --- CLASS ----------------------------------------------------------- */
+/* --------------------------------------------------------------------- */
 
-    class Selector_EXPORT Selector
-      :public Entity
-    {
-    public:
-      DYNAMIC_GRAPH_ENTITY_DECL();
+class Selector_EXPORT Selector : public Entity {
+public:
+  DYNAMIC_GRAPH_ENTITY_DECL();
 
-    protected:
-      /** Number of signal type. For each signal type, you have
-       * one output and <nbEntries> inputs. */
-      unsigned int nbSignals;
-      /** Number of possible values for the selector. For each entry,
-       * you have one signal of each type. */
-      unsigned int nbEntries;
+protected:
+  /** Number of signal type. For each signal type, you have
+   * one output and <nbEntries> inputs. */
+  unsigned int nbSignals;
+  /** Number of possible values for the selector. For each entry,
+   * you have one signal of each type. */
+  unsigned int nbEntries;
 
-    public: /* --- CONSTRUCTION --- */
+public: /* --- CONSTRUCTION --- */
+  Selector(const std::string &name);
+  virtual ~Selector(void);
 
-      Selector( const std::string& name );
-      virtual ~Selector( void );
+public: /* --- SIGNAL --- */
+  SignalPtr<unsigned int, int> selectorSIN;
 
-    public: /* --- SIGNAL --- */
+  std::vector<std::vector<SignalBase<int> *> > inputsSIN;
+  std::vector<SignalBase<int> *> outputsSOUT;
 
-      SignalPtr<unsigned int,int> selectorSIN;
+public: /* --- FUNCTIONS --- */
+  template <class T>
+  static T &computeSelection(const unsigned int &sigNum,
+                             std::vector<SignalBase<int> *> &entriesSIN, T &res,
+                             const int &time);
 
-      std::vector< std::vector<SignalBase<int>* > > inputsSIN;
-      std::vector< SignalBase<int>* > outputsSOUT;
+  template <class T>
+  unsigned int createSignal(const std::string &shortname,
+                            const int &sigId = -1);
 
+  void resetSignals(const unsigned int &nbEntries,
+                    const unsigned int &nbSignals);
 
-    public: /* --- FUNCTIONS --- */
+public: /* --- PARAMS --- */
+  void initCommands(void);
+  virtual void commandLine(const std::string &cmdLine,
+                           std::istringstream &cmdArgs, std::ostream &os);
 
-      template< class T >
-        static T& computeSelection( const unsigned int & sigNum,
-                                    std::vector< SignalBase<int>* >& entriesSIN,
-                                    T& res,const int& time );
+  void create(const std::string &name, const std::string &type,
+              const int &sigId);
+  std::string getTypeList(void);
+  void getTypeList(std::ostream &os);
+};
 
-      template< class T >
-        unsigned int createSignal( const std::string& shortname,
-                                   const int & sigId=-1 );
-
-
-      void resetSignals( const unsigned int & nbEntries,
-                         const unsigned int & nbSignals );
-
-    public: /* --- PARAMS --- */
-      void initCommands( void );
-      virtual void commandLine( const std::string& cmdLine,
-                                std::istringstream& cmdArgs,
-                                std::ostream& os );
-
-      void create( const std::string& name,const std::string& type,
-                   const int & sigId );
-      std::string getTypeList( void );
-      void getTypeList( std::ostream& os );
-
-
-    };
-
-
-  } // namespace sot
-} // namespace dg
-
+} // namespace sot
+} // namespace dynamicgraph
 
 #endif // #ifndef __SOT_Selector_H__
-

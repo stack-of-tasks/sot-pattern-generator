@@ -32,16 +32,19 @@ int main (int , char** )
   aPG.pgCommandLine(":UpperBodyMotionParameters -0.1 -1.0 0.0");
 
 
-  std::istringstream val_jointPosition
-    ("[38](0.0, 0.0,  1.018213,  0.00  ,  0.0, 0.0,"
-     " 0.0,  0.0, -0.411354,  0.859395, -0.448041, -0.001708,"
-     " 0.0,  0.0, -0.411354,  0.859395, -0.448041, -0.001708,"
-     " 0.0 ,  0.006761,  0.25847 ,  0.173046, -0.0002, "
-     " -0.525366, 0.0, -0.0,  0.1, -0.005, -0.25847 ,"
-     " -0.173046, 0.0002  , -0.525366, 0.0,  0.0,"
-     "0.1,-0.005, 0.,  0. )");
+  dynamicgraph::Vector val_jointPosition(38);
+  double val_jointPositiond[38] =
+      { 0.0, 0.0,  1.018213,  0.0 ,  0.0, 0.0,
+        0.0,  0.0, -0.411354,  0.859395, -0.448041, -0.001708,
+        0.0,  0.0, -0.411354,  0.859395, -0.448041, -0.001708,
+        0.0 ,  0.006761,  0.25847 ,  0.173046, -0.0002, 
+        -0.525366, 0.0, -0.0,  0.1, -0.005, -0.25847 ,
+        -0.173046, 0.0002  , -0.525366, 0.0,  0.0,
+       0.1,-0.005, 0.,  0. };
 
-  aPG.jointPositionSIN.set(val_jointPosition);
+  for(unsigned int i=0;i<val_jointPosition.size();i++)
+    val_jointPosition[i]=val_jointPositiond[i];
+  aPG.jointPositionSIN.setConstant(val_jointPosition);
 
 
 }

@@ -18,18 +18,17 @@
  *
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-
 #ifndef __SOT_STEP_CHECKER_H__
 #define __SOT_STEP_CHECKER_H__
 
-#if defined (WIN32)
-#  if defined (step_checker_EXPORTS)
-#    define StepChecker_EXPORT __declspec(dllexport)
-#  else
-#    define StepChecker_EXPORT __declspec(dllimport)
-#  endif
+#if defined(WIN32)
+#if defined(step_checker_EXPORTS)
+#define StepChecker_EXPORT __declspec(dllexport)
 #else
-#  define StepChecker_EXPORT
+#define StepChecker_EXPORT __declspec(dllimport)
+#endif
+#else
+#define StepChecker_EXPORT
 #endif
 
 /* --------------------------------------------------------------------- */
@@ -37,17 +36,16 @@
 /* --------------------------------------------------------------------- */
 
 namespace dynamicgraph {
-  namespace sot {
+namespace sot {
 
-    class StepChecker_EXPORT StepChecker
-    {
-    public: // Methods
-      void clipStep(double x, double y, double & x_result, double & y_result);
-    };
+class StepChecker_EXPORT StepChecker {
+public: // Methods
+  void clipStep(double x, double y, double &x_result, double &y_result);
+};
 
-    int tata12;
+int tata12;
 
-  } //namespace sot
-} //namespace dynamicgraph
+} // namespace sot
+} // namespace dynamicgraph
 
 #endif

@@ -64,18 +64,18 @@ class StepQueue;
 /// Generates footsteps.
 class StepComputerJOYSTICK_EXPORT StepComputerJoystick : public Entity,
                                                          public StepComputer {
-public:
+ public:
   static const std::string CLASS_NAME;
   virtual const std::string &getClassName(void) const { return CLASS_NAME; }
 
-public: // Construction
+ public:  // Construction
   StepComputerJoystick(const std::string &name);
 
-public: // Methods
+ public:  // Methods
   void changeFirstStep(StepQueue &queue, int timeCurr);
   void nextStep(StepQueue &queue, int timeCurr);
 
-public: // Signals
+ public:  // Signals
   /*! \brief Entry of the joystick (x,y,theta)*/
   SignalPtr<Vector, int> joystickSIN;
   /*! \brief Getting the support foot */
@@ -83,27 +83,27 @@ public: // Signals
   /*! \brief Externalize the last step . */
   SignalTimeDependent<Vector, int> laststepSOUT;
 
-protected:
+ protected:
   Vector &getlaststep(Vector &res, int time);
 
-public: // Entity
+ public:  // Entity
   virtual void display(std::ostream &os) const;
   virtual void commandLine(const std::string &cmdLine,
                            std::istringstream &cmdArgs, std::ostream &os);
 
-private: // Reference frame
+ private:  // Reference frame
   StepChecker checker;
 
   void thisIsZero();
 
-private: // Debug
+ private:  // Debug
   std::ofstream logChanges;
   std::ofstream logPreview;
 
   double m_laststep[3];
 };
 
-} // namespace sot
-} // namespace dynamicgraph
+}  // namespace sot
+}  // namespace dynamicgraph
 
-#endif // #ifndef __SOT_STEPCOMPUTER_H__
+#endif  // #ifndef __SOT_STEPCOMPUTER_H__

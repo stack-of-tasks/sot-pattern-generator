@@ -58,13 +58,13 @@ namespace sot {
 enum ContactName { CONTACT_LEFT_FOOT, CONTACT_RIGHT_FOOT };
 
 class StepQueue_EXPORT FootPrint {
-public:
+ public:
   FootPrint();
   FootPrint(double x, double y, double theta, ContactName contact);
 
   double x, y, theta;  ///< The coordinates of the step (landing position of the
                        ///< fly foot).
-  ContactName contact; ///< Fly foot.
+  ContactName contact;  ///< Fly foot.
 };
 
 /// A step queue in the preview window.
@@ -75,22 +75,22 @@ public:
 /// \note{This entity class can not be instantiated in a shell since it does not
 /// register any factory. This behavior is intended.}
 class StepQueue_EXPORT StepQueue : public Entity {
-public: // Entity name
+ public:  // Entity name
   static const std::string CLASS_NAME;
   virtual const std::string &getClassName(void) const { return CLASS_NAME; }
 
-private: // Parameters
+ private:  // Parameters
   static const unsigned int QUEUE_SIZE;
   static const double ZERO_STEP_POSITION;
   static const FootPrint START_FOOT_PRINT;
 
-public: // Construction
+ public:  // Construction
   /// Builds a queue containing a starting step and three steps in the preview.
   /// The steps correspond to on-place stepping: (0, +/- y, 0), where
   /// y == StepQueue::ZERO_STEP_POSITION
   StepQueue(const std::string &name);
 
-public: // Queue manipulation
+ public:  // Queue manipulation
   /// Resets the queue to the initial condition (see the constructor,
   /// StepQueue::StepQueue).
   void startSequence();
@@ -117,7 +117,7 @@ public: // Queue manipulation
   /// pushStep.
   bool isFirstStepChanged() const;
 
-public: // Queue properties
+ public:  // Queue properties
   //@{
   /// Access to the step queue properties (constants).
   unsigned int size() const;
@@ -125,18 +125,18 @@ public: // Queue properties
   double getZeroStepPosition() const;
   //@}
 
-public: // Entity
+ public:  // Entity
   virtual void display(std::ostream &os) const;
   virtual void commandLine(const std::string &cmdLine,
                            std::istringstream &cmdArgs, std::ostream &os);
 
-private:
+ private:
   std::deque<FootPrint> footPrintList;
   FootPrint firstStepChange;
   bool firstStepChanged;
 };
 
-} // namespace sot
-} // namespace dynamicgraph
+}  // namespace sot
+}  // namespace dynamicgraph
 
 #endif

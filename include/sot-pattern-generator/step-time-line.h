@@ -80,21 +80,21 @@ namespace sot {
 /// \note{This entity class can not be instantiated in a shell since it does
 /// not register any factory. This behavior is intended.}
 class StepTimeLine_EXPORT StepTimeLine : public Entity {
-public: // Entity name
+ public:  // Entity name
   static const std::string CLASS_NAME;
   virtual const std::string &getClassName(void) const { return CLASS_NAME; }
 
-private:
+ private:
   static const unsigned int PERIOD_DEFAULT;
 
   /// Zero-based index of the first step to modify. The 0-th step
   /// is the very first step sent at the STARTING state.
   static const unsigned int FIRST_STEP_TO_MODIFY;
 
-public: // Construction
+ public:  // Construction
   StepTimeLine(const std::string &name);
 
-public: // Trigger
+ public:  // Trigger
   /// Trigger signal, to be updated periodically to trigger a
   /// call to the synchronization method. Typically, this signal
   /// is added to the periodic calls of OpenHRP.
@@ -104,21 +104,21 @@ public: // Trigger
   /// of all the sub-components used to generate and send the steps.
   int &triggerCall(int &dummy, int timeCurr);
 
-private: // State
+ private:  // State
   enum SteppingState {
-    STATE_STARTING, ///< Introducing 4 steps then switches to STATE_STARTED.
-    STATE_STOPPING, ///< Running but stop requested: introduce a last step
-                    /// and stop.
-    STATE_STARTED,  ///< Running, simply introduce steps.
-    STATE_STOPPED   ///< Nothing to do, cannot introduce steps in the FIFO
+    STATE_STARTING,  ///< Introducing 4 steps then switches to STATE_STARTED.
+    STATE_STOPPING,  ///< Running but stop requested: introduce a last step
+                     /// and stop.
+    STATE_STARTED,   ///< Running, simply introduce steps.
+    STATE_STOPPED    ///< Nothing to do, cannot introduce steps in the FIFO
   };
 
-public: // Entity
+ public:  // Entity
   virtual void display(std::ostream &os) const;
   virtual void commandLine(const std::string &cmdLine,
                            std::istringstream &cmdArgs, std::ostream &os);
 
-private:
+ private:
   StepQueue *stepQueue;
   StepComputer *stepComputer;
   PGManager *pgManager;
@@ -129,7 +129,7 @@ private:
   unsigned int nStartingSteps;
 };
 
-} // namespace sot
-} // namespace dynamicgraph
+}  // namespace sot
+}  // namespace dynamicgraph
 
 #endif

@@ -50,7 +50,7 @@ namespace sot {
 /* \class ExceptionPatternGenerator
  */
 class EXCEPTION_PG_EXPORT ExceptionPatternGenerator : public ExceptionAbstract {
-public:
+ public:
   enum ErrorCodeEnum {
     GENERIC = ExceptionAbstract::PATTERN_GENERATOR,
     READ_FILE,
@@ -66,7 +66,7 @@ public:
     return EXCEPTION_NAME;
   }
 
-public:
+ public:
   ExceptionPatternGenerator(
       const ExceptionPatternGenerator::ErrorCodeEnum &errcode,
       const std::string &msg = "");
@@ -76,7 +76,7 @@ public:
   virtual ~ExceptionPatternGenerator(void) throw() {}
 };
 
-} // namespace sot
-} // namespace dynamicgraph
+}  // namespace sot
+}  // namespace dynamicgraph
 
 #endif /* #ifndef __SOT_PATTERN_GENERATOR_EXCEPTION_H */

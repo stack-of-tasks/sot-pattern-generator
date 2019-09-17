@@ -21,8 +21,8 @@
 
 #include <time.h>
 #ifndef WIN32
-#include <iostream>
 #include <sys/time.h>
+#include <iostream>
 #else
 #include <Winsock2.h>
 #include <sot/core/utils-windows.hh>
@@ -43,15 +43,17 @@ DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(StepComputerJoystick,
                                    "StepComputerJoystick");
 
 StepComputerJoystick::StepComputerJoystick(const std::string &name)
-    : Entity(name), joystickSIN(NULL, "StepComputerJoystick(" + name +
-                                          ")::input(vector)::joystickin"),
-      contactFootSIN(NULL, "StepComputerJoystick(" + name +
-                               ")::input(uint)::contactfoot"),
+    : Entity(name),
+      joystickSIN(NULL, "StepComputerJoystick(" + name +
+                            ")::input(vector)::joystickin"),
+      contactFootSIN(
+          NULL, "StepComputerJoystick(" + name + ")::input(uint)::contactfoot"),
       laststepSOUT(
           boost::bind(&StepComputerJoystick::getlaststep, this, _1, _2),
           joystickSIN,
           "StepComputerJoystick(" + name + ")::output(vector)::laststep"),
-      checker(), logChanges("/tmp/stepcomp_changes.dat"),
+      checker(),
+      logChanges("/tmp/stepcomp_changes.dat"),
       logPreview("/tmp/stepcomp_preview.dat") {
   sotDEBUGIN(5);
 
@@ -155,8 +157,7 @@ void StepComputerJoystick::commandLine(const std::string &cmdLine,
 }
 
 Vector &StepComputerJoystick::getlaststep(Vector &res, int time) {
-  if (res.size() != 4)
-    res.resize(4);
+  if (res.size() != 4) res.resize(4);
 
   res(0) = m_laststep[0];
   res(1) = m_laststep[1];
@@ -165,5 +166,5 @@ Vector &StepComputerJoystick::getlaststep(Vector &res, int time) {
   return res;
 }
 
-} // namespace sot
-} // namespace dynamicgraph
+}  // namespace sot
+}  // namespace dynamicgraph

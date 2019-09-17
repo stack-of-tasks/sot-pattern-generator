@@ -63,28 +63,28 @@ class StepQueue;
 /// Generates footsteps.
 class StepComputerFORCE_EXPORT StepComputerPos : public Entity,
                                                  public StepComputer {
-public:
+ public:
   static const std::string CLASS_NAME;
   virtual const std::string &getClassName(void) const { return CLASS_NAME; }
 
-public: // Construction
+ public:  // Construction
   StepComputerPos(const std::string &name);
 
-public: // Methods
+ public:  // Methods
   void changeFirstStep(StepQueue &queue, int timeCurr);
   void nextStep(StepQueue &queue, int timeCurr);
 
-public: // Signals
+ public:  // Signals
   SignalPtr<MatrixHomogeneous, int> referencePositionLeftSIN;
   SignalPtr<MatrixHomogeneous, int> referencePositionRightSIN;
   SignalPtr<unsigned, int> contactFootSIN;
 
-public: // Entity
+ public:  // Entity
   virtual void display(std::ostream &os) const;
   virtual void commandLine(const std::string &cmdLine,
                            std::istringstream &cmdArgs, std::ostream &os);
 
-private: // Reference frame
+ private:  // Reference frame
   MatrixHomogeneous rfMref0;
   MatrixHomogeneous lfMref0;
   StepObserver *twoHandObserver;
@@ -92,12 +92,12 @@ private: // Reference frame
 
   void thisIsZero();
 
-private: // Debug
+ private:  // Debug
   std::ofstream logChanges;
   std::ofstream logPreview;
 };
 
-} // namespace sot
-} // namespace dynamicgraph
+}  // namespace sot
+}  // namespace dynamicgraph
 
-#endif // #ifndef __SOT_STEPCOMPUTER_H__
+#endif  // #ifndef __SOT_STEPCOMPUTER_H__

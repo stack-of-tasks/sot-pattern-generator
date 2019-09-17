@@ -36,13 +36,18 @@ const unsigned int StepTimeLine::PERIOD_DEFAULT = 160;
 const unsigned int StepTimeLine::FIRST_STEP_TO_MODIFY = 3;
 
 StepTimeLine::StepTimeLine(const std::string &name)
-    : Entity(name), triggerSOUT("NextStep(" + name + ")::input(dummy)::trigger")
+    : Entity(name),
+      triggerSOUT("NextStep(" + name + ")::input(dummy)::trigger")
 
       ,
-      stepQueue(0x0), stepComputer(0x0), pgManager(0x0)
+      stepQueue(0x0),
+      stepComputer(0x0),
+      pgManager(0x0)
 
       ,
-      state(STATE_STOPPED), timeLastIntroduction(0), period(PERIOD_DEFAULT),
+      state(STATE_STOPPED),
+      timeLastIntroduction(0),
+      period(PERIOD_DEFAULT),
       nStartingSteps(0) {
   sotDEBUGIN(5);
 
@@ -59,7 +64,7 @@ int &StepTimeLine::triggerCall(int &dummy, int timeCurrent) {
   if (state == STATE_STARTED) {
     int nextIntoductionTime = timeLastIntroduction + period;
 
-    if (nextIntoductionTime <= timeCurrent) { // condition (A)
+    if (nextIntoductionTime <= timeCurrent) {  // condition (A)
       if (nStartingSteps < FIRST_STEP_TO_MODIFY) {
         ++nStartingSteps;
       } else {
@@ -101,14 +106,14 @@ void StepTimeLine::display(std::ostream &os) const {
   os << " - period: " << period << std::endl;
 
   switch (state) {
-  case STATE_STARTING:
-    os << " - state: starting" << std::endl;
-  case STATE_STARTED:
-    os << " - state: started" << std::endl;
-  case STATE_STOPPING:
-    os << " - state: stopping" << std::endl;
-  case STATE_STOPPED:
-    os << " - state: stopped" << std::endl;
+    case STATE_STARTING:
+      os << " - state: starting" << std::endl;
+    case STATE_STARTED:
+      os << " - state: started" << std::endl;
+    case STATE_STOPPING:
+      os << " - state: stopping" << std::endl;
+    case STATE_STOPPED:
+      os << " - state: stopped" << std::endl;
   }
 }
 
@@ -153,21 +158,21 @@ void StepTimeLine::commandLine(const std::string &cmdLine,
     } else {
       os << "state = ";
       switch (state) {
-      case STATE_STARTING:
-        os << "starting";
-        break;
-      case STATE_STARTED:
-        os << "started";
-        break;
-      case STATE_STOPPING:
-        os << "stopping";
-        break;
-      case STATE_STOPPED:
-        os << "stopped";
-        break;
-      default:
-        os << "should never happen";
-        break;
+        case STATE_STARTING:
+          os << "starting";
+          break;
+        case STATE_STARTED:
+          os << "started";
+          break;
+        case STATE_STOPPING:
+          os << "stopping";
+          break;
+        case STATE_STOPPED:
+          os << "stopped";
+          break;
+        default:
+          os << "should never happen";
+          break;
       }
       os << std::endl;
     }
@@ -175,5 +180,5 @@ void StepTimeLine::commandLine(const std::string &cmdLine,
   }
 }
 
-} // namespace sot
-} // namespace dynamicgraph
+}  // namespace sot
+}  // namespace dynamicgraph

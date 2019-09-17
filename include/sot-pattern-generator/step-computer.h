@@ -50,13 +50,13 @@ class StepQueue;
 
 /// Generates footsteps.
 class StepComputer {
-public: // Methods
+ public:  // Methods
   virtual void changeFirstStep(StepQueue &queue, int timeCurr) = 0;
   virtual void nextStep(StepQueue &queue, int timeCurr) = 0;
   virtual ~StepComputer(){};
 };
 
-} // namespace sot
-} // namespace dynamicgraph
+}  // namespace sot
+}  // namespace dynamicgraph
 
-#endif // #ifndef __SOT_STEPCOMPUTER_H__
+#endif  // #ifndef __SOT_STEPCOMPUTER_H__

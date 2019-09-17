@@ -39,13 +39,13 @@ namespace dynamicgraph {
 namespace sot {
 
 class StepChecker_EXPORT StepChecker {
-public: // Methods
+ public:  // Methods
   void clipStep(double x, double y, double &x_result, double &y_result);
 };
 
 int tata12;
 
-} // namespace sot
-} // namespace dynamicgraph
+}  // namespace sot
+}  // namespace dynamicgraph
 
 #endif

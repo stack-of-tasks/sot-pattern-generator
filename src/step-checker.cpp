@@ -58,11 +58,9 @@ void StepChecker::clipStep(double x, double y, double &x_result,
     }
   }
 
-  if (x < 0)
-    x_result = -x_result;
-  if (y < 0)
-    y_result = -y_result;
+  if (x < 0) x_result = -x_result;
+  if (y < 0) y_result = -y_result;
 }
 
-} // namespace sot
-} // namespace dynamicgraph
+}  // namespace sot
+}  // namespace dynamicgraph

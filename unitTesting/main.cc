@@ -9,7 +9,7 @@ int main (int , char** )
   dynamicgraph::sot::PatternGenerator aPG;
 
   std::string aRobotURDF
-    ("/opt/openrobots/share/talos_data/robots/talos_reduced_wpg.urdf");
+    ("/opt/openrobots/share/talos_data/urdf/talos_reduced_wpg.urdf");
   std::string aRobotSRDF
     ("/opt/openrobots/share/talos_data/srdf/talos_wpg.srdf");
 
@@ -37,7 +37,7 @@ int main (int , char** )
       { 0.0, 0.0,  1.018213,  0.0 ,  0.0, 0.0,
         0.0,  0.0, -0.411354,  0.859395, -0.448041, -0.001708,
         0.0,  0.0, -0.411354,  0.859395, -0.448041, -0.001708,
-        0.0 ,  0.006761,  0.25847 ,  0.173046, -0.0002, 
+        0.0 ,  0.006761,  0.25847 ,  0.173046, -0.0002,
         -0.525366, 0.0, -0.0,  0.1, -0.005, -0.25847 ,
         -0.173046, 0.0002  , -0.525366, 0.0,  0.0,
        0.1,-0.005, 0.,  0. };

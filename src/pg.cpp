@@ -26,6 +26,7 @@
 
 //#define VP_DEBUG
 //#define VP_DEBUG_MODE 45
+#include <pinocchio/fwd.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 

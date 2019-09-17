@@ -27,6 +27,8 @@
 /* STD */
 #include <string>
 
+#include <pinocchio/fwd.hpp>
+
 /* SOT */
 
 #include <dynamic-graph/entity.h>
@@ -463,7 +465,7 @@ protected:
                           pg::FootAbsolutePosition &NextFootPosition,
                           MatrixHomogeneous &FootPositionOut,
                           MatrixHomogeneous &dotFootPositionOut,
-                          unsigned int &count);  
+                          unsigned int &count);
 
   void SubsamplingVector(dynamicgraph::Vector &PrevPosition,
                          dynamicgraph::Vector &NextPosition,

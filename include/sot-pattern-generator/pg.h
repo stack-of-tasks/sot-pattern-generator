@@ -29,6 +29,7 @@
 
 /* SOT */
 
+#include <pinocchio/fwd.hpp>
 #include <dynamic-graph/entity.h>
 #include <dynamic-graph/pool.h>
 #include <dynamic-graph/signal-ptr.h>

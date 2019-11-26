@@ -1,5 +1,5 @@
-include(../cmake/python.cmake)
-findpython()
+#include(../cmake/python.cmake)
+#findpython()
 
 if(HRP2_14_DESCRIPTION_FOUND)
 

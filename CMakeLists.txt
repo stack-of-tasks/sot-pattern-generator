@@ -18,13 +18,8 @@ SET(CXX_DISABLE_WERROR True)
 INCLUDE(cmake/base.cmake)
 
 # Specify the project.
-cmake_policy(SET CMP0048 NEW)
-PROJECT(${PROJECT_NAME}
-  LANGUAGES
-  CXX
-  VERSION
-  ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}
-  )
+COMPUTE_PROJECT_ARGS(PROJECT_ARGS LANGUAGES CXX C)
+PROJECT(${PROJECT_NAME} ${PROJECT_ARGS})
 
 find_package (Boost REQUIRED
   python filesystem system thread program_options unit_test_framework)

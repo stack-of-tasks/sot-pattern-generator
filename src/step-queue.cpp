@@ -126,5 +126,5 @@ void StepQueue::commandLine(const std::string &cmdLine,
   }
 }
 
-} // namespace sot
-} // namespace dynamicgraph
+}  // namespace sot
+}  // namespace dynamicgraph

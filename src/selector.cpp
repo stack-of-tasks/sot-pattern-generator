@@ -22,11 +22,11 @@
 #include <sot/core/debug.hh>
 #ifdef VP_DEBUG
 class selector__INIT {
-public:
+ public:
   selector__INIT(void) { dynamicgraph::sot::DebugTrace::openFile(); }
 };
 selector__INIT selector_initiator;
-#endif //#ifdef VP_DEBUG
+#endif  //#ifdef VP_DEBUG
 
 #include <dynamic-graph/all-commands.h>
 #include <dynamic-graph/factory.h>
@@ -61,7 +61,7 @@ Selector::~Selector(void) {
 /* --- SIGNALS --------------------------------------------------------- */
 /* --- SIGNALS --------------------------------------------------------- */
 /* --- SIGNALS --------------------------------------------------------- */
-#define SOT_CALL_SIG(sotName, sotType)                                         \
+#define SOT_CALL_SIG(sotName, sotType) \
   boost::bind(&Signal<sotType, int>::access, &sotName, _2)
 
 template <class T>
@@ -77,8 +77,7 @@ unsigned int Selector::createSignal(const std::string &shortname,
         sigId = i;
         break;
       }
-  if ((sigId__ < 0) || (sigId > nbSignals))
-    return -1;
+  if ((sigId__ < 0) || (sigId > nbSignals)) return -1;
 
   /* Set up the input signal vector. */
   std::vector<SignalBase<int> *> &entriesSIN = inputsSIN[sigId];
@@ -171,8 +170,7 @@ void Selector::resetSignals(const unsigned int &nbEntries__,
     for (std::vector<SignalBase<int> *>::iterator iterSig = iter->begin();
          iterSig < iter->end(); ++iterSig) {
       SignalBase<int> *sigPtr = *iterSig;
-      if (NULL != sigPtr)
-        delete sigPtr;
+      if (NULL != sigPtr) delete sigPtr;
     }
   }
   inputsSIN.resize(nbSignals__);
@@ -182,8 +180,7 @@ void Selector::resetSignals(const unsigned int &nbEntries__,
   for (std::vector<SignalBase<int> *>::iterator iterSig = outputsSOUT.begin();
        iterSig < outputsSOUT.end(); ++iterSig) {
     SignalBase<int> *sigPtr = *iterSig;
-    if (NULL != sigPtr)
-      delete sigPtr;
+    if (NULL != sigPtr) delete sigPtr;
   }
   outputsSOUT.resize(nbSignals);
 }
@@ -192,10 +189,10 @@ void Selector::resetSignals(const unsigned int &nbEntries__,
 /* --- PARAMS --------------------------------------------------------------- */
 /* --- PARAMS --------------------------------------------------------------- */
 
-#define SOT_SELECTOR_CREATE_TYPE(sotType, sotTypeName)                         \
-  if (dORc && (type == sotTypeName))                                           \
-    selec.createSignal<sotType>(name, sigId);                                  \
-  else                                                                         \
+#define SOT_SELECTOR_CREATE_TYPE(sotType, sotTypeName) \
+  if (dORc && (type == sotTypeName))                   \
+    selec.createSignal<sotType>(name, sigId);          \
+  else                                                 \
     oss << "  - " << sotTypeName << std::endl;
 
 static void displayOrCreate(Selector &selec, bool dORc, std::ostream &os,
@@ -216,8 +213,7 @@ static void displayOrCreate(Selector &selec, bool dORc, std::ostream &os,
   /* ------------------------------------------------------------------------ */
   /* ------------------------------------------------------------------------ */
 
-  if (!dORc)
-    os << "Types available:" << std::endl << oss.str();
+  if (!dORc) os << "Types available:" << std::endl << oss.str();
   sotDEBUGOUT(15);
 }
 
@@ -295,5 +291,5 @@ void Selector::commandLine(const std::string &cmdLine,
   }
 }
 
-} // namespace sot
-} // namespace dynamicgraph
+}  // namespace sot
+}  // namespace dynamicgraph

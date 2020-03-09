@@ -21,8 +21,8 @@
 
 #include <time.h>
 #ifndef WIN32
-#include <iostream>
 #include <sys/time.h>
+#include <iostream>
 #else
 #include <Winsock2.h>
 #include <jrl/mal/boost.hh>
@@ -45,13 +45,16 @@ DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(StepComputerPos, "StepComputerPos");
 
 StepComputerPos::StepComputerPos(const std::string &name)
     : Entity(name),
-      referencePositionLeftSIN(NULL, "StepComputerPos(" + name +
-                                         ")::input(vector)::posrefleft"),
-      referencePositionRightSIN(NULL, "StepComputerPos(" + name +
-                                          ")::input(vector)::posrefright"),
+      referencePositionLeftSIN(
+          NULL, "StepComputerPos(" + name + ")::input(vector)::posrefleft"),
+      referencePositionRightSIN(
+          NULL, "StepComputerPos(" + name + ")::input(vector)::posrefright"),
       contactFootSIN(NULL,
                      "StepComputerPos(" + name + ")::input(uint)::contactfoot"),
-      rfMref0(), lfMref0(), twoHandObserver(0x0), checker(),
+      rfMref0(),
+      lfMref0(),
+      twoHandObserver(0x0),
+      checker(),
       logChanges("/tmp/stepcomp_changes.dat"),
       logPreview("/tmp/stepcomp_preview.dat") {
   sotDEBUGIN(5);
@@ -92,14 +95,14 @@ void StepComputerPos::changeFirstStep(StepQueue &queue, int timeCurr) {
 
   MatrixHomogeneous ffMref, ffMref0;
   MatrixHomogeneous sfMff;
-  if (sfoot != 1) // --- left foot support ---
+  if (sfoot != 1)  // --- left foot support ---
   {
     ffMref = referencePositionRightSIN.access(timeCurr);
     ffMref0 = rfMref0;
     MatrixHomogeneous sfMw;
     sfMw = wMlf.inverse();
     sfMff = sfMw * wMrf;
-  } else // -- right foot support ---
+  } else  // -- right foot support ---
   {
     ffMref = referencePositionLeftSIN.access(timeCurr);
     ffMref0 = lfMref0;
@@ -173,7 +176,7 @@ void StepComputerPos::changeFirstStep(StepQueue &queue, int timeCurr) {
   }
 
   double nx = 0, ny = 0;
-  if (sfoot != 1) { // left foot support phase
+  if (sfoot != 1) {  // left foot support phase
     if (y > 0) {
       y = -0.001;
     }
@@ -251,5 +254,5 @@ void StepComputerPos::commandLine(const std::string &cmdLine,
   }
 }
 
-} // namespace sot
-} // namespace dynamicgraph
+}  // namespace sot
+}  // namespace dynamicgraph

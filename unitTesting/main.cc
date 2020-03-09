@@ -4,14 +4,13 @@
 
 #include <sot-pattern-generator/pg.h>
 
-int main (int , char** )
-{
+int main(int, char**) {
   dynamicgraph::sot::PatternGenerator aPG;
 
-  std::string aRobotURDF
-    ("/opt/openrobots/share/talos_data/robots/talos_reduced_wpg.urdf");
-  std::string aRobotSRDF
-    ("/opt/openrobots/share/talos_data/srdf/talos_wpg.srdf");
+  std::string aRobotURDF(
+      "/opt/openrobots/share/talos_data/urdf/talos_reduced_wpg.urdf");
+  std::string aRobotSRDF(
+      "/opt/openrobots/share/talos_data/srdf/talos_wpg.srdf");
 
   aPG.setURDFFile(aRobotURDF);
   aPG.setSRDFFile(aRobotSRDF);
@@ -31,20 +30,16 @@ int main (int , char** )
   aPG.pgCommandLine(":TimeDistributeParameters 2.0 3.5 1.0 3.0");
   aPG.pgCommandLine(":UpperBodyMotionParameters -0.1 -1.0 0.0");
 
-
   dynamicgraph::Vector val_jointPosition(38);
-  double val_jointPositiond[38] =
-      { 0.0, 0.0,  1.018213,  0.0 ,  0.0, 0.0,
-        0.0,  0.0, -0.411354,  0.859395, -0.448041, -0.001708,
-        0.0,  0.0, -0.411354,  0.859395, -0.448041, -0.001708,
-        0.0 ,  0.006761,  0.25847 ,  0.173046, -0.0002, 
-        -0.525366, 0.0, -0.0,  0.1, -0.005, -0.25847 ,
-        -0.173046, 0.0002  , -0.525366, 0.0,  0.0,
-       0.1,-0.005, 0.,  0. };
+  double val_jointPositiond[38] = {
+      0.0,       0.0,       1.018213,  0.0,       0.0,       0.0,      0.0,
+      0.0,       -0.411354, 0.859395,  -0.448041, -0.001708, 0.0,      0.0,
+      -0.411354, 0.859395,  -0.448041, -0.001708, 0.0,       0.006761, 0.25847,
+      0.173046,  -0.0002,   -0.525366, 0.0,       -0.0,      0.1,      -0.005,
+      -0.25847,  -0.173046, 0.0002,    -0.525366, 0.0,       0.0,      0.1,
+      -0.005,    0.,        0.};
 
-  for(unsigned int i=0;i<val_jointPosition.size();i++)
-    val_jointPosition[i]=val_jointPositiond[i];
+  for (unsigned int i = 0; i < val_jointPosition.size(); i++)
+    val_jointPosition[i] = val_jointPositiond[i];
   aPG.jointPositionSIN.setConstant(val_jointPosition);
-
-
 }

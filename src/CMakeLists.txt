@@ -1,28 +1,9 @@
 # Copyright 2010, François Bleibel, Olivier Stasse, JRL, CNRS/AIST
 #
-# This file is part of sot-pattern-generator.
-# sot-pattern-generator is free software: you can redistribute it and/or
-# modify it under the terms of the GNU Lesser General Public License
-# as published by the Free Software Foundation, either version 3 of
-# the License, or (at your option) any later version.
-#
-# sot-pattern-generator is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# General Lesser Public License for more details.  You should have
-# received a copy of the GNU Lesser General Public License along with
-# sot-pattern-generator. If not, see <http://www.gnu.org/licenses/>.
-
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include)
-
-# Make the config_private.hh file available
-#CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/private_cmake/config_private.hh.cmake
-#               ${CMAKE_BINARY_DIR}/include/${HEADER_DIR}/config_private.hh)
 
 ADD_DEFINITIONS(-DDEBUG=2)
 
 SET(LIBRARY_NAME ${PROJECT_NAME})
-
 
 # dependent on nothing
 SET(plugins_0
@@ -114,9 +95,15 @@ FOREACH(LIBRARY_NAME ${plugins})
   TARGET_LINK_LIBRARIES(${LIBRARY_NAME} sot-core::sot-core)
   
 
+<<<<<<< HEAD
   INSTALL(TARGETS ${LIBRARY_NAME}
     EXPORT ${TARGETS_EXPORT_NAME}
     DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/plugin)
+=======
+  IF(NOT INSTALL_PYTHON_INTERFACE_ONLY)
+    INSTALL(TARGETS ${LIBRARY_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/plugin)
+  ENDIF(NOT INSTALL_PYTHON_INTERFACE_ONLY)
+>>>>>>> devel
 
   # --- PY ---
   IF(BUILD_PYTHON_INTERFACE)

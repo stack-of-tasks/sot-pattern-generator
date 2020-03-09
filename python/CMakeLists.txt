@@ -1,6 +1,9 @@
+<<<<<<< HEAD
 #include(../cmake/python.cmake)
 #findpython()
 
+=======
+>>>>>>> devel
 if(HRP2_14_DESCRIPTION_FOUND)
 
   configure_file(${CMAKE_SOURCE_DIR}/python/walkhrp2.py.cmake

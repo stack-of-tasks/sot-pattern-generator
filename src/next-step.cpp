@@ -21,8 +21,8 @@
 
 #include <sot-pattern-generator/next-step.h>
 
-#include <cmath>
 #include <time.h>
+#include <cmath>
 #ifndef WIN32
 #include <sys/time.h>
 #else
@@ -42,32 +42,37 @@ DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(NextStep, "NextStep");
 /* --- CONSTRUCT -------------------------------------------------------- */
 /* --- CONSTRUCT -------------------------------------------------------- */
 
-const unsigned int NextStep::PERIOD_DEFAULT = 160; // 160iter=800ms
+const unsigned int NextStep::PERIOD_DEFAULT = 160;  // 160iter=800ms
 const double NextStep::ZERO_STEP_POSITION_DEFAULT = 0.19;
 
 NextStep::NextStep(const std::string &name)
     : Entity(name)
 
       ,
-      footPrintList(), period(PERIOD_DEFAULT), timeLastIntroduction(0)
+      footPrintList(),
+      period(PERIOD_DEFAULT),
+      timeLastIntroduction(0)
 
       ,
-      mode(MODE_3D), state(STATE_STOPED)
+      mode(MODE_3D),
+      state(STATE_STOPED)
 
       ,
       zeroStepPosition(ZERO_STEP_POSITION_DEFAULT)
 
       ,
-      rfMref0(), lfMref0(), twoHandObserver(name)
+      rfMref0(),
+      lfMref0(),
+      twoHandObserver(name)
 
       ,
       verbose(0x0)
 
       ,
-      referencePositionLeftSIN(NULL, "NextStep(" + name +
-                                         ")::input(vector)::posrefleft"),
-      referencePositionRightSIN(NULL, "NextStep(" + name +
-                                          ")::input(vector)::posrefright")
+      referencePositionLeftSIN(
+          NULL, "NextStep(" + name + ")::input(vector)::posrefleft"),
+      referencePositionRightSIN(
+          NULL, "NextStep(" + name + ")::input(vector)::posrefright")
 
       ,
       contactFootSIN(NULL, "NextStep(" + name + ")::input(uint)::contactfoot"),
@@ -111,14 +116,14 @@ void NextStep::nextStep(const int &timeCurr) {
 
   MatrixHomogeneous ffMref, ffMref0;
   MatrixHomogeneous sfMff;
-  if (sfoot != 1) // --- left foot support ---
+  if (sfoot != 1)  // --- left foot support ---
   {
     ffMref = referencePositionRightSIN.access(timeCurr);
     ffMref0 = rfMref0;
     MatrixHomogeneous sfMw;
     sfMw = wMlf.inverse();
     sfMff = sfMw * wMrf;
-  } else // -- right foot support ---
+  } else  // -- right foot support ---
   {
     ffMref = referencePositionLeftSIN.access(timeCurr);
     ffMref0 = lfMref0;
@@ -290,8 +295,7 @@ void NextStep::starter(const int &timeCurr) {
   introductionCallBack(-1);
 
   timeLastIntroduction = timeCurr - period + 1;
-  if (verbose)
-    (*verbose) << "NextStep started." << std::endl;
+  if (verbose) (*verbose) << "NextStep started." << std::endl;
 
   sotDEBUGOUT(15);
   return;
@@ -312,39 +316,39 @@ int &NextStep::triggerCall(int &dummy, int timeCurrent) {
   sotDEBUGIN(45);
 
   switch (state) {
-  case STATE_STOPED:
-    break;
-  case STATE_STARTED: {
-    int nextIntoductionTime = timeLastIntroduction + period;
-    if (nextIntoductionTime <= timeCurrent) {
-      nextStep(timeCurrent);
-      if (NULL != verbose) {
-        FootPrint &lastStep = footPrintList.back();
-        (*verbose) << "<T=" << timeCurrent << "> Introduced a new step: ";
-        switch (lastStep.contact) {
-        case CONTACT_LEFT_FOOT:
-          (*verbose) << "LF ";
-          break;
-        case CONTACT_RIGHT_FOOT:
-          (*verbose) << "RF ";
-          break;
+    case STATE_STOPED:
+      break;
+    case STATE_STARTED: {
+      int nextIntoductionTime = timeLastIntroduction + period;
+      if (nextIntoductionTime <= timeCurrent) {
+        nextStep(timeCurrent);
+        if (NULL != verbose) {
+          FootPrint &lastStep = footPrintList.back();
+          (*verbose) << "<T=" << timeCurrent << "> Introduced a new step: ";
+          switch (lastStep.contact) {
+            case CONTACT_LEFT_FOOT:
+              (*verbose) << "LF ";
+              break;
+            case CONTACT_RIGHT_FOOT:
+              (*verbose) << "RF ";
+              break;
+          }
+          (*verbose) << lastStep.x << "," << lastStep.y << "," << lastStep.theta
+                     << std::endl;
         }
-        (*verbose) << lastStep.x << "," << lastStep.y << "," << lastStep.theta
-                   << std::endl;
+        introductionCallBack(timeCurrent);
+        timeLastIntroduction = timeCurrent;
       }
-      introductionCallBack(timeCurrent);
-      timeLastIntroduction = timeCurrent;
+      break;
     }
-    break;
-  }
-  case STATE_STARTING: {
-    starter(timeCurrent);
-    break;
-  }
-  case STATE_STOPING: {
-    stoper(timeCurrent);
-    break;
-  }
+    case STATE_STARTING: {
+      starter(timeCurrent);
+      break;
+    }
+    case STATE_STOPING: {
+      stoper(timeCurrent);
+      break;
+    }
   };
 
   sotDEBUGOUT(45);
@@ -362,12 +366,12 @@ void NextStep::display(std::ostream &os) const {
        iter != footPrintList.end(); ++iter) {
     os << "<time=" << iter->introductionTime << "> ";
     switch (iter->contact) {
-    case CONTACT_LEFT_FOOT:
-      os << "LF ";
-      break;
-    case CONTACT_RIGHT_FOOT:
-      os << "RF ";
-      break;
+      case CONTACT_LEFT_FOOT:
+        os << "LF ";
+        break;
+      case CONTACT_RIGHT_FOOT:
+        os << "RF ";
+        break;
     }
     os << "(" << iter->x << "," << iter->y << "," << iter->theta << ")"
        << std::endl;
@@ -397,21 +401,21 @@ void NextStep::commandLine(const std::string &cmdLine,
     } else {
       os << "state = ";
       switch (state) {
-      case STATE_STARTING:
-        os << "starting";
-        break;
-      case STATE_STOPING:
-        os << "stoping";
-        break;
-      case STATE_STARTED:
-        os << "started";
-        break;
-      case STATE_STOPED:
-        os << "stoped";
-        break;
-      default:
-        os << "error";
-        break;
+        case STATE_STARTING:
+          os << "starting";
+          break;
+        case STATE_STOPING:
+          os << "stoping";
+          break;
+        case STATE_STARTED:
+          os << "started";
+          break;
+        case STATE_STOPED:
+          os << "stoped";
+          break;
+        default:
+          os << "error";
+          break;
       }
       os << std::endl;
     }
@@ -526,9 +530,8 @@ NextStepTwoHandObserver::operator SignalArray<int>() {
           << referenceAccelerationSOUT);
 }
 
-MatrixHomogeneous &
-NextStepTwoHandObserver::computeRefPos(MatrixHomogeneous &res, int timeCurr,
-                                       const MatrixHomogeneous &wMsf) {
+MatrixHomogeneous &NextStepTwoHandObserver::computeRefPos(
+    MatrixHomogeneous &res, int timeCurr, const MatrixHomogeneous &wMsf) {
   sotDEBUGIN(15);
 
 #define RIGHT_HAND_REFERENCE 1
@@ -582,9 +585,8 @@ NextStepTwoHandObserver::computeRefPos(MatrixHomogeneous &res, int timeCurr,
   return res;
 }
 
-MatrixHomogeneous &
-NextStepTwoHandObserver::computeReferencePositionLeft(MatrixHomogeneous &res,
-                                                      int timeCurr) {
+MatrixHomogeneous &NextStepTwoHandObserver::computeReferencePositionLeft(
+    MatrixHomogeneous &res, int timeCurr) {
   sotDEBUGIN(15);
 
   const MatrixHomogeneous &wMsf = leftFootPositionSIN(timeCurr);
@@ -593,9 +595,8 @@ NextStepTwoHandObserver::computeReferencePositionLeft(MatrixHomogeneous &res,
   return computeRefPos(res, timeCurr, wMsf);
 }
 
-MatrixHomogeneous &
-NextStepTwoHandObserver::computeReferencePositionRight(MatrixHomogeneous &res,
-                                                       int timeCurr) {
+MatrixHomogeneous &NextStepTwoHandObserver::computeReferencePositionRight(
+    MatrixHomogeneous &res, int timeCurr) {
   sotDEBUGIN(15);
 
   const MatrixHomogeneous &wMsf = rightFootPositionSIN(timeCurr);
@@ -626,5 +627,5 @@ Vector &NextStepTwoHandObserver::computeReferenceAcceleration(const Vector &,
   return res;
 }
 
-} // namespace sot
-} // namespace dynamicgraph
+}  // namespace sot
+}  // namespace dynamicgraph

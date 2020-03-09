@@ -54,12 +54,12 @@ namespace dynamicgraph {
 namespace sot {
 
 class NextStepPGSOT_EXPORT NextStepPgSot : public NextStep {
-public:
+ public:
   DYNAMIC_GRAPH_ENTITY_DECL();
   static const unsigned int ADDING_STEP = 0;
   static const unsigned int CHANGING_STEP = 1;
 
-protected:
+ protected:
   typedef std::pair<unsigned int, PatternGeneratorJRL::FootAbsolutePosition>
       FootPrint_t;
   std::vector<FootPrint_t> stepbuf;
@@ -76,21 +76,21 @@ protected:
     which handle the pattern generator. */
   PatternGenerator *m_sPG;
 
-public: /* --- CONSTRUCTION --- */
+ public: /* --- CONSTRUCTION --- */
   NextStepPgSot(const std::string &name);
   virtual ~NextStepPgSot(void) {}
 
-public: /* --- FUNCTIONS --- */
+ public: /* --- FUNCTIONS --- */
   virtual void starter(const int &timeCurr);
   virtual void stoper(const int &timeCurr);
   virtual void introductionCallBack(const int &timeCurr);
 
-public: /* --- ENTITY INHERITANCE --- */
+ public: /* --- ENTITY INHERITANCE --- */
   virtual void commandLine(const std::string &cmdLine,
                            std::istringstream &cmdArgs, std::ostream &os);
 };
 
-} // namespace sot
-} // namespace dynamicgraph
+}  // namespace sot
+}  // namespace dynamicgraph
 
-#endif // #ifndef __SOT_NextStep_OHRP_H__
+#endif  // #ifndef __SOT_NextStep_OHRP_H__

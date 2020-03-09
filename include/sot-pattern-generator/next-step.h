@@ -24,6 +24,8 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
+#include <pinocchio/fwd.hpp>
+
 /* SOT */
 #include <dynamic-graph/entity.h>
 #include <dynamic-graph/signal-ptr.h>
@@ -63,7 +65,7 @@ namespace sot {
  * the Pattern Generator.
  */
 class SOTNEXTSTEP_EXPORT NextStepTwoHandObserver {
-public:
+ public:
   SignalPtr<MatrixHomogeneous, int> referencePositionLeftSIN;
   SignalPtr<Vector, int> referenceVelocityLeftSIN;
   SignalPtr<Vector, int> referenceAccelerationLeftSIN;
@@ -79,7 +81,7 @@ public:
   SignalTimeDependent<Vector, int> referenceVelocitySOUT;
   SignalTimeDependent<Vector, int> referenceAccelerationSOUT;
 
-public:
+ public:
   NextStepTwoHandObserver(const std::string &name);
 
   MatrixHomogeneous &computeReferencePositionLeft(MatrixHomogeneous &res,
@@ -94,7 +96,7 @@ public:
   SignalArray<int> getSignals(void);
   operator SignalArray<int>();
 
-private:
+ private:
   MatrixHomogeneous &computeRefPos(MatrixHomogeneous &res, int timeCurr,
                                    const MatrixHomogeneous &wMsf);
 };
@@ -110,65 +112,65 @@ private:
  * which corresponds to a change in the future steps.
  */
 class SOTNEXTSTEP_EXPORT NextStep : public Entity {
-public:
+ public:
   DYNAMIC_GRAPH_ENTITY_DECL();
 
-protected: /* --- FOOT PRINT LIST --- */
+ protected: /* --- FOOT PRINT LIST --- */
   enum ContactName { CONTACT_LEFT_FOOT, CONTACT_RIGHT_FOOT };
   class FootPrint {
-  public:
+   public:
     double x, y, theta;
     ContactName contact;
     int introductionTime;
   };
   std::deque<FootPrint> footPrintList;
 
-protected: /* --- INTRODUCTION PERIOD --- */
+ protected: /* --- INTRODUCTION PERIOD --- */
   unsigned int period;
   static const unsigned int PERIOD_DEFAULT;
   int timeLastIntroduction;
 
-protected: /* --- STATE --- */
+ protected: /* --- STATE --- */
   enum SteppingMode { MODE_1D, MODE_3D };
   SteppingMode mode;
   enum SteppingState {
-    STATE_STARTING //! Introducing 4 steps then switches to STATE_STARTED.
+    STATE_STARTING  //! Introducing 4 steps then switches to STATE_STARTED.
     ,
-    STATE_STOPING //! Running but stop requested: introduce a last step
-                  // and stop.
+    STATE_STOPING  //! Running but stop requested: introduce a last step
+                   // and stop.
     ,
-    STATE_STARTED //! Running, simply introduce steps.
+    STATE_STARTED  //! Running, simply introduce steps.
     ,
-    STATE_STOPED //! Nothing to do, cannot introduce steps in the FIFO
+    STATE_STOPED  //! Nothing to do, cannot introduce steps in the FIFO
   };
   SteppingState state;
 
-protected: /* --- STEPPING --- */
+ protected: /* --- STEPPING --- */
   double zeroStepPosition;
-  static const double ZERO_STEP_POSITION_DEFAULT; // = .19
+  static const double ZERO_STEP_POSITION_DEFAULT;  // = .19
 
-protected: /* --- REFERENCE FRAME --- */
+ protected: /* --- REFERENCE FRAME --- */
   MatrixHomogeneous rfMref0;
   MatrixHomogeneous lfMref0;
   NextStepTwoHandObserver twoHandObserver;
 
   void thisIsZero();
 
-protected: /* --- DEBUG --- */
+ protected: /* --- DEBUG --- */
   std::ostream *verbose;
 
-public: /* --- CONSTRUCTION --- */
+ public: /* --- CONSTRUCTION --- */
   NextStep(const std::string &name);
   virtual ~NextStep(void);
 
-public: /* --- Signal --- */
+ public: /* --- Signal --- */
   SignalPtr<MatrixHomogeneous, int> referencePositionLeftSIN;
   SignalPtr<MatrixHomogeneous, int> referencePositionRightSIN;
   SignalPtr<unsigned, int> contactFootSIN;
 
   Signal<int, int> triggerSOUT;
 
-public: /* --- FUNCTIONS --- */
+ public: /* --- FUNCTIONS --- */
   virtual void nextStep(const int &timeCurr);
   virtual void starter(const int &timeCurr);
   virtual void stoper(const int &timeCurr);
@@ -177,13 +179,13 @@ public: /* --- FUNCTIONS --- */
 
   int &triggerCall(int &dummy, int timeCurr);
 
-public: /* --- PARAMS --- */
+ public: /* --- PARAMS --- */
   virtual void display(std::ostream &os) const;
   virtual void commandLine(const std::string &cmdLine,
                            std::istringstream &cmdArgs, std::ostream &os);
 };
 
-} // namespace sot
-} // namespace dynamicgraph
+}  // namespace sot
+}  // namespace dynamicgraph
 
-#endif // #ifndef __SOT_SOTNEXTSTEP_H__
+#endif  // #ifndef __SOT_SOTNEXTSTEP_H__

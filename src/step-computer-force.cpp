@@ -21,8 +21,8 @@
 
 #include <time.h>
 #ifndef WIN32
-#include <iostream>
 #include <sys/time.h>
+#include <iostream>
 #else
 #include <Winsock2.h>
 #include <jrl/mal/boost.hh>
@@ -45,14 +45,15 @@ namespace sot {
 DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(StepComputerForce, "StepComputerForce");
 
 StepComputerForce::StepComputerForce(const std::string &name)
-    : Entity(name), waistMlhandSIN(NULL, "StepComputerForce(" + name +
-                                             ")::input(vector)::waistMlhand")
+    : Entity(name),
+      waistMlhandSIN(
+          NULL, "StepComputerForce(" + name + ")::input(vector)::waistMlhand")
 
       ,
-      waistMrhandSIN(NULL, "StepComputerForce(" + name +
-                               ")::input(vector)::waistMrhand"),
-      referencePositionWaistSIN(NULL, "StepComputerForce(" + name +
-                                          ")::input(vector)::posrefwaist")
+      waistMrhandSIN(
+          NULL, "StepComputerForce(" + name + ")::input(vector)::waistMrhand"),
+      referencePositionWaistSIN(
+          NULL, "StepComputerForce(" + name + ")::input(vector)::posrefwaist")
 
       ,
       stiffnessSIN(NULL,
@@ -63,8 +64,8 @@ StepComputerForce::StepComputerForce(const std::string &name)
                   "StepComputerForce(" + name + ")::input(vector)::velocity")
 
       ,
-      contactFootSIN(NULL, "StepComputerForce(" + name +
-                               ")::input(uint)::contactfoot")
+      contactFootSIN(
+          NULL, "StepComputerForce(" + name + ")::input(uint)::contactfoot")
 
       ,
       displacementSOUT(
@@ -88,7 +89,9 @@ StepComputerForce::StepComputerForce(const std::string &name)
           boost::bind(&StepComputerForce::computeForceR, this, _1, _2),
           waistMrhandSIN << referencePositionWaistSIN << forceSOUT,
           "StepComputerForce(" + name + ")::output(vector)::forceR"),
-      waMref0(), twoHandObserver(0x0), checker(),
+      waMref0(),
+      twoHandObserver(0x0),
+      checker(),
       logChanges("/tmp/stepcomp_changes.dat"),
       logPreview("/tmp/stepcomp_preview.dat") {
   sotDEBUGIN(5);
@@ -250,9 +253,9 @@ void StepComputerForce::changeFirstStep(StepQueue &queue, int timeCurr) {
   unsigned sfoot = contactFootSIN.access(timeCurr);
 
   double y_default = 0;
-  if (sfoot != 1) { // --- left foot support ---
+  if (sfoot != 1) {  // --- left foot support ---
     y_default = -0.19;
-  } else { // -- right foot support ---
+  } else {  // -- right foot support ---
     y_default = 0.19;
   }
 
@@ -283,7 +286,7 @@ void StepComputerForce::changeFirstStep(StepQueue &queue, int timeCurr) {
   }
 
   double nx = 0, ny = 0;
-  if (sfoot != 1) { // left foot support phase
+  if (sfoot != 1) {  // left foot support phase
     if (y > 0) {
       y = -0.001;
     }
@@ -358,5 +361,5 @@ void StepComputerForce::commandLine(const std::string &cmdLine,
   }
 }
 
-} // namespace sot
-} // namespace dynamicgraph
+}  // namespace sot
+}  // namespace dynamicgraph

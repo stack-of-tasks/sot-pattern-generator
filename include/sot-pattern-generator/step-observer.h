@@ -56,11 +56,11 @@ namespace sot {
 /// frames are computed both in the left and right foot frames,
 /// and in the waist frame.
 class StepObserver_EXPORT StepObserver : public Entity {
-public:
+ public:
   static const std::string CLASS_NAME;
   virtual const std::string &getClassName(void) const { return CLASS_NAME; }
 
-public:
+ public:
   SignalPtr<MatrixHomogeneous, int> leftHandPositionSIN;
   SignalPtr<MatrixHomogeneous, int> rightHandPositionSIN;
 
@@ -77,13 +77,13 @@ public:
   /// Reference frame in the waist coordinates.
   SignalTimeDependent<MatrixHomogeneous, int> referencePositionWaistSOUT;
 
-public: // methods
+ public:  // methods
   StepObserver(const std::string &name);
 
   SignalArray<int> getSignals(void);
   operator SignalArray<int>();
 
-public: // signal callbacks
+ public:  // signal callbacks
   MatrixHomogeneous &computeReferencePositionLeft(MatrixHomogeneous &res,
                                                   int timeCurr);
   MatrixHomogeneous &computeReferencePositionRight(MatrixHomogeneous &res,
@@ -91,17 +91,17 @@ public: // signal callbacks
   MatrixHomogeneous &computeReferencePositionWaist(MatrixHomogeneous &res,
                                                    int timeCurr);
 
-public: // Entity
+ public:  // Entity
   virtual void display(std::ostream &os) const;
   virtual void commandLine(const std::string &cmdLine,
                            std::istringstream &cmdArgs, std::ostream &os);
 
-private: // helpers
+ private:  // helpers
   MatrixHomogeneous &computeRefPos(MatrixHomogeneous &res, int timeCurr,
                                    const MatrixHomogeneous &wMref);
 };
 
-} // namespace sot
-} // namespace dynamicgraph
+}  // namespace sot
+}  // namespace dynamicgraph
 
 #endif

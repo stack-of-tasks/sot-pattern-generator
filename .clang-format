@@ -1,0 +1,6 @@
+---
+BasedOnStyle: Google
+IncludeCategories:
+  - Regex: 'pinocchio/fwd.hpp'
+    Priority: 1
+...

@@ -27,6 +27,8 @@
 /* STD */
 #include <string>
 
+#include <pinocchio/fwd.hpp>
+
 /* SOT */
 
 #include <pinocchio/fwd.hpp>
@@ -73,7 +75,7 @@ namespace sot {
 
 */
 class PatternGenerator_EXPORT PatternGenerator : public Entity {
-public:
+ public:
   // overload the new[] eigen operator
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -100,11 +102,11 @@ public:
   /*! @} */
 
   /*! Class name */
-protected:
-public:
+ protected:
+ public:
   DYNAMIC_GRAPH_ENTITY_DECL();
 
-protected:
+ protected:
   /*! \brief The model of the robot. */
   pinocchio::Model m_robotModel;
   /*! \brief Pointer towards the robot model inside jrl-walkgen. */
@@ -176,13 +178,13 @@ protected:
   /*! \brief count for subsampling. */
   unsigned int m_count;
 
-public: /* --- CONSTRUCTION --- */
+ public: /* --- CONSTRUCTION --- */
   /*! \brief Default constructor. */
   PatternGenerator(const std::string &name = "PatternGenerator");
   /*! \brief Default destructor. */
   virtual ~PatternGenerator(void);
 
-public: /* --- MODEL CREATION --- */
+ public: /* --- MODEL CREATION --- */
   /*! \name Methods related to the data files.
     @{
   */
@@ -228,7 +230,7 @@ public: /* --- MODEL CREATION --- */
 
   /*! @} */
 
-public: /* --- SIGNALS --- */
+ public: /* --- SIGNALS --- */
   typedef int Dummy;
 
   /*! \name Internal signals.
@@ -243,7 +245,7 @@ public: /* --- SIGNALS --- */
 
   /*! @} */
 
-protected:
+ protected:
   /*! \name Internal methods to access reference trajectories.
     @{
   */
@@ -446,10 +448,9 @@ protected:
 
   /*! \brief Transfert from a current absolute foot position
     to a dot homogeneous matrix. */
-  void
-  FromAbsoluteFootPosToDotHomogeneous(pg::FootAbsolutePosition aFootPosition,
-                                      MatrixHomogeneous &aFootMH,
-                                      MatrixHomogeneous &adotFootMH);
+  void FromAbsoluteFootPosToDotHomogeneous(
+      pg::FootAbsolutePosition aFootPosition, MatrixHomogeneous &aFootMH,
+      MatrixHomogeneous &adotFootMH);
 
   /*! \brief Transfert from a current absolute foot position
     to a homogeneous matrix. */
@@ -464,7 +465,7 @@ protected:
                           pg::FootAbsolutePosition &NextFootPosition,
                           MatrixHomogeneous &FootPositionOut,
                           MatrixHomogeneous &dotFootPositionOut,
-                          unsigned int &count);  
+                          unsigned int &count);
 
   void SubsamplingVector(dynamicgraph::Vector &PrevPosition,
                          dynamicgraph::Vector &NextPosition,
@@ -501,7 +502,7 @@ protected:
   bool &getLeftFootContact(bool &res, int time);
   bool &getRightFootContact(bool &res, int time);
 
-public:
+ public:
   /*! \name External signals
     @{ */
   /*! \brief Real state position values. */
@@ -630,11 +631,11 @@ public:
     @{ */
 
   /*! @} */
-protected:
+ protected:
   /*! Storing the previous ZMP value. */
   Eigen::VectorXd m_ZMPPrevious;
 
-public: /* --- PARAMS --- */
+ public: /* --- PARAMS --- */
   void initCommands(void);
   int stringToReferenceEnum(const std::string &FrameReference);
   void setReferenceFromString(const std::string &str);
@@ -647,7 +648,7 @@ public: /* --- PARAMS --- */
   void debug(void);
 };
 
-} // namespace sot
-} // namespace dynamicgraph
+}  // namespace sot
+}  // namespace dynamicgraph
 
-#endif // #ifndef __SOT_PATTERN_GENERATOR_H__
+#endif  // #ifndef __SOT_PATTERN_GENERATOR_H__

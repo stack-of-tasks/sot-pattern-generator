@@ -55,10 +55,10 @@ namespace sot {
 /* --------------------------------------------------------------------- */
 
 class Selector_EXPORT Selector : public Entity {
-public:
+ public:
   DYNAMIC_GRAPH_ENTITY_DECL();
 
-protected:
+ protected:
   /** Number of signal type. For each signal type, you have
    * one output and <nbEntries> inputs. */
   unsigned int nbSignals;
@@ -66,17 +66,17 @@ protected:
    * you have one signal of each type. */
   unsigned int nbEntries;
 
-public: /* --- CONSTRUCTION --- */
+ public: /* --- CONSTRUCTION --- */
   Selector(const std::string &name);
   virtual ~Selector(void);
 
-public: /* --- SIGNAL --- */
+ public: /* --- SIGNAL --- */
   SignalPtr<unsigned int, int> selectorSIN;
 
   std::vector<std::vector<SignalBase<int> *> > inputsSIN;
   std::vector<SignalBase<int> *> outputsSOUT;
 
-public: /* --- FUNCTIONS --- */
+ public: /* --- FUNCTIONS --- */
   template <class T>
   static T &computeSelection(const unsigned int &sigNum,
                              std::vector<SignalBase<int> *> &entriesSIN, T &res,
@@ -89,7 +89,7 @@ public: /* --- FUNCTIONS --- */
   void resetSignals(const unsigned int &nbEntries,
                     const unsigned int &nbSignals);
 
-public: /* --- PARAMS --- */
+ public: /* --- PARAMS --- */
   void initCommands(void);
   virtual void commandLine(const std::string &cmdLine,
                            std::istringstream &cmdArgs, std::ostream &os);
@@ -100,7 +100,7 @@ public: /* --- PARAMS --- */
   void getTypeList(std::ostream &os);
 };
 
-} // namespace sot
-} // namespace dynamicgraph
+}  // namespace sot
+}  // namespace dynamicgraph
 
-#endif // #ifndef __SOT_Selector_H__
+#endif  // #ifndef __SOT_Selector_H__

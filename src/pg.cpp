@@ -26,17 +26,18 @@
 
 //#define VP_DEBUG
 //#define VP_DEBUG_MODE 45
+#include <pinocchio/fwd.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
 #include <sot/core/debug.hh>
 #ifdef VP_DEBUG
 class sotPG__INIT {
-public:
+ public:
   sotPG__INIT(void) { dynamicgraph::sot::DebugTrace::openFile(); }
 };
 sotPG__INIT sotPG_initiator;
-#endif //#ifdef VP_DEBUG
+#endif  //#ifdef VP_DEBUG
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
@@ -57,8 +58,14 @@ namespace sot {
 DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(PatternGenerator, "PatternGenerator");
 
 PatternGenerator::PatternGenerator(const std::string &name)
-    : Entity(name), m_PGI(0), m_PreviewControlParametersFile(), m_urdfFile(""),
-      m_srdfFile(""), m_xmlRankFile(""), m_soleWidth(0), m_init(false),
+    : Entity(name),
+      m_PGI(0),
+      m_PreviewControlParametersFile(),
+      m_urdfFile(""),
+      m_srdfFile(""),
+      m_xmlRankFile(""),
+      m_soleWidth(0),
+      m_init(false),
       m_InitPositionByRealState(true),
       firstSINTERN(
           boost::bind(&PatternGenerator::InitOneStepOfControl, this, _1, _2),
@@ -72,15 +79,15 @@ PatternGenerator::PatternGenerator(const std::string &name)
 
       ,
       m_dataInProcess(0),
-      m_rightFootContact(true) // It is assumed that the robot is standing.
+      m_rightFootContact(true)  // It is assumed that the robot is standing.
       ,
       m_leftFootContact(true),
-      jointPositionSIN(NULL, "PatternGenerator(" + name +
-                                 ")::input(vector)::position")
+      jointPositionSIN(
+          NULL, "PatternGenerator(" + name + ")::input(vector)::position")
 
       ,
-      motorControlJointPositionSIN(NULL, "PatternGenerator(" + name +
-                                             ")::input(vector)::motorcontrol")
+      motorControlJointPositionSIN(
+          NULL, "PatternGenerator(" + name + ")::input(vector)::motorcontrol")
 
       ,
       ZMPPreviousControllerSIN(NULL,
@@ -126,8 +133,8 @@ PatternGenerator::PatternGenerator(const std::string &name)
                 "PatternGenerator(" + name + ")::output(vector)::forceSOUT")
 
       ,
-      velocitydesSIN(NULL, "PatternGenerator(" + name +
-                               ")::input(vector)::velocitydes")
+      velocitydesSIN(
+          NULL, "PatternGenerator(" + name + ")::input(vector)::velocitydes")
 
       ,
       triggerSIN(NULL, "PatternGenerator(" + name + ")::input(bool)::trigger")
@@ -374,7 +381,7 @@ PatternGenerator::PatternGenerator(const std::string &name)
 
   m_k_Waist_kp1.setIdentity();
 
-  m_SupportFoot = 1; // Means that we do not know which support foot it is.
+  m_SupportFoot = 1;  // Means that we do not know which support foot it is.
   m_ReferenceFrame = WORLD_FRAME;
 
   sotDEBUGIN(5);
@@ -484,11 +491,9 @@ PatternGenerator::PatternGenerator(const std::string &name)
     m_filterWindow[i] = tmp * tmp;
   }
 
-  for (int i = 0; i < n + 1; i++)
-    sum += m_filterWindow[i];
+  for (int i = 0; i < n + 1; i++) sum += m_filterWindow[i];
 
-  for (int i = 0; i < n + 1; i++)
-    m_filterWindow[i] /= sum;
+  for (int i = 0; i < n + 1; i++) m_filterWindow[i] /= sum;
 
   m_initForce.resize(6);
   m_currentForces.resize(6);
@@ -519,8 +524,7 @@ bool PatternGenerator::InitState(void) {
 
     res.resize(pos.size() - 6);
 
-    for (unsigned i = 0; i < res.size(); i++)
-      res(i) = pos(i + 6);
+    for (unsigned i = 0; i < res.size(); i++) res(i) = pos(i + 6);
 
     // lWaistPosition(0) = 0.0;
     // lWaistPosition(1) = 0.0;
@@ -570,8 +574,7 @@ bool PatternGenerator::InitState(void) {
     // res(17) = 0.0;
 
     Vector lZMPPrevious = ZMPPreviousControllerSIN(m_LocalTime);
-    for (unsigned int i = 0; i < 3; i++)
-      m_ZMPPrevious[i] = lZMPPrevious(i);
+    for (unsigned int i = 0; i < 3; i++) m_ZMPPrevious[i] = lZMPPrevious(i);
   } else {
     res = motorControlJointPositionSIN(m_LocalTime);
     // for(unsigned i=0;i<res.size();i++)
@@ -588,8 +591,7 @@ bool PatternGenerator::InitState(void) {
   try {
     Eigen::VectorXd bres;
     bres.resize(res.size());
-    for (int i = 0; i < res.size(); i++)
-      bres(i) = res(i);
+    for (int i = 0; i < res.size(); i++) bres(i) = res(i);
     m_PGI->SetCurrentJointValues(bres);
 
     // Evaluate current position of the COM, ZMP and feet
@@ -598,8 +600,8 @@ bool PatternGenerator::InitState(void) {
     Eigen::Vector3d lStartingZMPPosition;
 
     m_PGI->EvaluateStartingState(lStartingCOMState, lStartingZMPPosition,
-                                 lWaistPosition,
-                                 m_InitLeftFootAbsPos, m_InitRightFootAbsPos);
+                                 lWaistPosition, m_InitLeftFootAbsPos,
+                                 m_InitRightFootAbsPos);
 
     // Put inside sotHomogeneous representation
     m_InitCOMRefPos(0) = lStartingCOMState.x[0];
@@ -715,13 +717,13 @@ bool PatternGenerator::buildModel(void) {
       aFoot.soleHeight = v.second.get<double>("height");
       aFoot.soleWidth = v.second.get<double>("width");
       aFoot.soleDepth = v.second.get<double>("depth");
-    } // BOOST_FOREACH
+    }  // BOOST_FOREACH
     path = "robot.specificities.feet.right.anklePosition";
     BOOST_FOREACH (const ptree::value_type &v, pt.get_child(path.c_str())) {
       aFoot.anklePosition(0) = v.second.get<double>("x");
       aFoot.anklePosition(1) = v.second.get<double>("y");
       aFoot.anklePosition(2) = v.second.get<double>("z");
-    } // BOOST_FOREACH
+    }  // BOOST_FOREACH
     pinocchio::FrameIndex ra = m_robotModel.getFrameId("r_ankle");
     aFoot.associatedAnkle = m_robotModel.frames.at(ra).parent;
     m_PR->initializeRightFoot(aFoot);
@@ -731,13 +733,13 @@ bool PatternGenerator::buildModel(void) {
       aFoot.soleHeight = v.second.get<double>("height");
       aFoot.soleWidth = v.second.get<double>("width");
       aFoot.soleDepth = v.second.get<double>("depth");
-    } // BOOST_FOREACH
+    }  // BOOST_FOREACH
     path = "robot.specificities.feet.left.anklePosition";
     BOOST_FOREACH (const ptree::value_type &v, pt.get_child(path.c_str())) {
       aFoot.anklePosition(0) = v.second.get<double>("x");
       aFoot.anklePosition(1) = v.second.get<double>("y");
       aFoot.anklePosition(2) = v.second.get<double>("z");
-    } // BOOST_FOREACH
+    }  // BOOST_FOREACH
     pinocchio::FrameIndex la = m_robotModel.getFrameId("l_ankle");
     aFoot.associatedAnkle = m_robotModel.frames.at(la).parent;
     m_PR->initializeLeftFoot(aFoot);
@@ -912,9 +914,8 @@ Vector &PatternGenerator::getInitWaistPosRef(Vector &InitWaistRefval,
   sotDEBUGOUT(25);
   return InitWaistRefval;
 }
-VectorRollPitchYaw &
-PatternGenerator::getInitWaistAttRef(VectorRollPitchYaw &InitWaistRefval,
-                                     int /*time*/) {
+VectorRollPitchYaw &PatternGenerator::getInitWaistAttRef(
+    VectorRollPitchYaw &InitWaistRefval, int /*time*/) {
   sotDEBUGIN(25);
 
   for (unsigned int i = 0; i < 3; ++i)
@@ -924,8 +925,8 @@ PatternGenerator::getInitWaistAttRef(VectorRollPitchYaw &InitWaistRefval,
   return InitWaistRefval;
 }
 
-MatrixHomogeneous &
-PatternGenerator::getLeftFootRef(MatrixHomogeneous &LeftFootRefVal, int time) {
+MatrixHomogeneous &PatternGenerator::getLeftFootRef(
+    MatrixHomogeneous &LeftFootRefVal, int time) {
   sotDEBUGIN(25);
 
   OneStepOfControlS(time);
@@ -934,9 +935,8 @@ PatternGenerator::getLeftFootRef(MatrixHomogeneous &LeftFootRefVal, int time) {
   return LeftFootRefVal;
 }
 
-MatrixHomogeneous &
-PatternGenerator::getRightFootRef(MatrixHomogeneous &RightFootRefval,
-                                  int time) {
+MatrixHomogeneous &PatternGenerator::getRightFootRef(
+    MatrixHomogeneous &RightFootRefval, int time) {
   sotDEBUGIN(25);
 
   OneStepOfControlS(time);
@@ -945,9 +945,8 @@ PatternGenerator::getRightFootRef(MatrixHomogeneous &RightFootRefval,
   sotDEBUGOUT(25);
   return RightFootRefval;
 }
-MatrixHomogeneous &
-PatternGenerator::getdotLeftFootRef(MatrixHomogeneous &LeftFootRefVal,
-                                    int time) {
+MatrixHomogeneous &PatternGenerator::getdotLeftFootRef(
+    MatrixHomogeneous &LeftFootRefVal, int time) {
   sotDEBUGIN(25);
 
   OneStepOfControlS(time);
@@ -955,9 +954,8 @@ PatternGenerator::getdotLeftFootRef(MatrixHomogeneous &LeftFootRefVal,
   sotDEBUGOUT(25);
   return LeftFootRefVal;
 }
-MatrixHomogeneous &
-PatternGenerator::getdotRightFootRef(MatrixHomogeneous &RightFootRefval,
-                                     int time) {
+MatrixHomogeneous &PatternGenerator::getdotRightFootRef(
+    MatrixHomogeneous &RightFootRefval, int time) {
   sotDEBUGIN(25);
 
   OneStepOfControlS(time);
@@ -967,18 +965,16 @@ PatternGenerator::getdotRightFootRef(MatrixHomogeneous &RightFootRefval,
   return RightFootRefval;
 }
 
-MatrixHomogeneous &
-PatternGenerator::getInitLeftFootRef(MatrixHomogeneous &LeftFootRefVal,
-                                     int /*time*/) {
+MatrixHomogeneous &PatternGenerator::getInitLeftFootRef(
+    MatrixHomogeneous &LeftFootRefVal, int /*time*/) {
   sotDEBUGIN(25);
 
   LeftFootRefVal = m_InitLeftFootPosition;
   sotDEBUGOUT(25);
   return LeftFootRefVal;
 }
-MatrixHomogeneous &
-PatternGenerator::getInitRightFootRef(MatrixHomogeneous &RightFootRefval,
-                                      int /*time*/) {
+MatrixHomogeneous &PatternGenerator::getInitRightFootRef(
+    MatrixHomogeneous &RightFootRefval, int /*time*/) {
   sotDEBUGIN(25);
 
   RightFootRefval = m_InitRightFootPosition;
@@ -986,9 +982,8 @@ PatternGenerator::getInitRightFootRef(MatrixHomogeneous &RightFootRefval,
   return RightFootRefval;
 }
 
-MatrixHomogeneous &
-PatternGenerator::getFlyingFootRef(MatrixHomogeneous &FlyingFootRefval,
-                                   int time) {
+MatrixHomogeneous &PatternGenerator::getFlyingFootRef(
+    MatrixHomogeneous &FlyingFootRefval, int time) {
   sotDEBUGIN(25);
   OneStepOfControlS(time);
   FlyingFootRefval = m_FlyingFootPosition;
@@ -1025,11 +1020,11 @@ int &PatternGenerator::InitOneStepOfControl(int &dummy, int /*time*/) {
 
 void PatternGenerator::getAbsoluteWaistPosAttHomogeneousMatrix(
     MatrixHomogeneous &aWaistMH) {
-  const double cr = cos(m_WaistAttitudeAbsolute(0)); // ROLL
+  const double cr = cos(m_WaistAttitudeAbsolute(0));  // ROLL
   const double sr = sin(m_WaistAttitudeAbsolute(0));
-  const double cp = cos(m_WaistAttitudeAbsolute(1)); // PITCH
+  const double cp = cos(m_WaistAttitudeAbsolute(1));  // PITCH
   const double sp = sin(m_WaistAttitudeAbsolute(1));
-  const double cy = cos(m_WaistAttitudeAbsolute(2)); // YAW
+  const double cy = cos(m_WaistAttitudeAbsolute(2));  // YAW
   const double sy = sin(m_WaistAttitudeAbsolute(2));
 
   aWaistMH.matrix().setZero();
@@ -1060,8 +1055,7 @@ void PatternGenerator::FromAbsoluteFootPosToDotHomogeneous(
   FromAbsoluteFootPosToHomogeneous(aFootPosition, aFootMH);
 
   for (unsigned int i = 0; i < 3; i++)
-    for (unsigned int j = 0; j < 3; j++)
-      Rot(i, j) = aFootMH(i, j);
+    for (unsigned int j = 0; j < 3; j++) Rot(i, j) = aFootMH(i, j);
 
   Twist(0, 0) = 0.0;
   Twist(0, 1) = -aFootPosition.dtheta;
@@ -1076,8 +1070,7 @@ void PatternGenerator::FromAbsoluteFootPosToDotHomogeneous(
   dRot = Twist * Rot;
 
   for (unsigned int i = 0; i < 3; i++)
-    for (unsigned int j = 0; j < 3; j++)
-      adotFootMH(i, j) = dRot(i, j);
+    for (unsigned int j = 0; j < 3; j++) adotFootMH(i, j) = dRot(i, j);
 
   adotFootMH(0, 3) = aFootPosition.dx;
   adotFootMH(1, 3) = aFootPosition.dy;
@@ -1166,15 +1159,14 @@ void PatternGenerator::CopyFootPosition(
 
 int &PatternGenerator::OneStepOfControl(int &dummy, int time) {
   m_LocalTime = time;
-  int lSupportFoot; // Local support foot.
+  int lSupportFoot;  // Local support foot.
   // Default value
   m_JointErrorValuesForWalking.fill(0.0);
   const dynamicgraph::Vector::Index robotSize =
       m_JointErrorValuesForWalking.size() + 6;
 
   try {
-    for (unsigned int i = 0; i < 3; i++)
-      m_ZMPRefPos(i) = m_ZMPPrevious[i];
+    for (unsigned int i = 0; i < 3; i++) m_ZMPRefPos(i) = m_ZMPPrevious[i];
   } catch (...) {
     m_ZMPRefPos(0) = m_ZMPRefPos(1) = m_ZMPRefPos(2) = 0.0;
     m_ZMPRefPos(3) = 1.0;
@@ -1301,20 +1293,14 @@ int &PatternGenerator::OneStepOfControl(int &dummy, int time) {
         }
         double threshold = 7.0;
         double thresholdy = 4.0;
-        if (extForce(0) > threshold)
-          extForce(0) = threshold;
-        if (extForce(0) < -threshold)
-          extForce(0) = -threshold;
+        if (extForce(0) > threshold) extForce(0) = threshold;
+        if (extForce(0) < -threshold) extForce(0) = -threshold;
 
-        if (extForce(1) > thresholdy)
-          extForce(1) = thresholdy;
-        if (extForce(1) < -thresholdy)
-          extForce(1) = -thresholdy;
+        if (extForce(1) > thresholdy) extForce(1) = thresholdy;
+        if (extForce(1) < -thresholdy) extForce(1) = -thresholdy;
 
-        if (extForce(2) > threshold)
-          extForce(2) = threshold;
-        if (extForce(2) < -threshold)
-          extForce(2) = -threshold;
+        if (extForce(2) > threshold) extForce(2) = threshold;
+        if (extForce(2) < -threshold) extForce(2) = -threshold;
 
         if ((extForce(0) * extForce(0) + extForce(1) * extForce(1)) < 100) {
           extForce(0) = 0.0;
@@ -1334,7 +1320,7 @@ int &PatternGenerator::OneStepOfControl(int &dummy, int time) {
     };
 
     if (m_count % 5 == 0) {
-      if (m_count > 1) // Change of previous state
+      if (m_count > 1)  // Change of previous state
       {
         for (unsigned int i = 0; i < 3; i++) {
           m_PrevSamplingCOMRefPos(i) = m_NextSamplingCOMRefPos(i);
@@ -1522,14 +1508,12 @@ int &PatternGenerator::OneStepOfControl(int &dummy, int time) {
     if (lLeftFootPosition.stepType == -1) {
       lSupportFoot = 1;
       m_leftFootContact = true;
-      if (lRightFootPosition.stepType != -1)
-        m_rightFootContact = false;
+      if (lRightFootPosition.stepType != -1) m_rightFootContact = false;
       m_DoubleSupportPhaseState = 0;
     } else if (lRightFootPosition.stepType == -1) {
       lSupportFoot = 0;
       m_rightFootContact = true;
-      if (lLeftFootPosition.stepType != -1)
-        m_leftFootContact = false;
+      if (lLeftFootPosition.stepType != -1) m_leftFootContact = false;
       m_DoubleSupportPhaseState = 0;
     } else
     /* m_LeftFootPosition.z ==m_RightFootPosition.z
@@ -1643,7 +1627,6 @@ int &PatternGenerator::OneStepOfControl(int &dummy, int time) {
     m_ZMPRefPos(3) = 1.0;
   }
 
-
   sotDEBUG(25) << "LeftFootRef:  " << m_LeftFootPosition << endl;
   sotDEBUG(25) << "RightFootRef:  " << m_RightFootPosition << endl;
   sotDEBUG(25) << "COMRef:  " << m_COMRefPos << endl;
@@ -1698,10 +1681,10 @@ void PatternGenerator::initCommands(void) {
   // displayfiles... later too
   addCommand(
       "buildModel",
-      makeCommandVoid0(*this,
-                       (void (PatternGenerator::*)(void)) &
-                           PatternGenerator::buildModel,
-                       docCommandVoid0("From the files, parse and build.")));
+      makeCommandVoid0(
+          *this,
+          (void (PatternGenerator::*)(void)) & PatternGenerator::buildModel,
+          docCommandVoid0("From the files, parse and build.")));
   addCommand(
       "initState",
       makeCommandVoid0(
@@ -1770,11 +1753,11 @@ void PatternGenerator::initCommands(void) {
 
   // Change next step : todo (deal with FootAbsolutePosition...).
 
-  addCommand("debug",
-             makeCommandVoid0(*this,
-                              (void (PatternGenerator::*)(void)) &
-                                  PatternGenerator::debug,
-                              docCommandVoid0("Launch a debug command.")));
+  addCommand(
+      "debug",
+      makeCommandVoid0(
+          *this, (void (PatternGenerator::*)(void)) & PatternGenerator::debug,
+          docCommandVoid0("Launch a debug command.")));
 }
 
 void PatternGenerator::debug(void) {
@@ -1831,8 +1814,9 @@ int PatternGenerator::stringToReferenceEnum(const std::string &FrameReference) {
     return LEFT_FOOT_CENTERED_FRAME;
   else if (FrameReference == "Waistcentered")
     return WAIST_CENTERED_FRAME;
-  assert(false && "String name should be in the list "
-                  "World|Egocentered|LeftFootcentered|Waistcentered");
+  assert(false &&
+         "String name should be in the list "
+         "World|Egocentered|LeftFootcentered|Waistcentered");
   return 0;
 }
 
@@ -1867,8 +1851,8 @@ VectorRollPitchYaw &PatternGenerator::getWaistAttitude(VectorRollPitchYaw &res,
   return res;
 }
 
-dynamicgraph::Vector &
-PatternGenerator::getdComAttitude(dynamicgraph::Vector &res, int time) {
+dynamicgraph::Vector &PatternGenerator::getdComAttitude(
+    dynamicgraph::Vector &res, int time) {
   sotDEBUGIN(5);
   OneStepOfControlS(time);
   res.resize(3);
@@ -1880,8 +1864,8 @@ PatternGenerator::getdComAttitude(dynamicgraph::Vector &res, int time) {
   return res;
 }
 
-dynamicgraph::Vector &
-PatternGenerator::getddComAttitude(dynamicgraph::Vector &res, int time) {
+dynamicgraph::Vector &PatternGenerator::getddComAttitude(
+    dynamicgraph::Vector &res, int time) {
   sotDEBUGIN(5);
   OneStepOfControlS(time);
   res.resize(3);
@@ -1893,8 +1877,8 @@ PatternGenerator::getddComAttitude(dynamicgraph::Vector &res, int time) {
   return res;
 }
 
-dynamicgraph::Vector &
-PatternGenerator::getComAttitude(dynamicgraph::Vector &res, int time) {
+dynamicgraph::Vector &PatternGenerator::getComAttitude(
+    dynamicgraph::Vector &res, int time) {
   sotDEBUGIN(5);
   OneStepOfControlS(time);
   res.resize(3);
@@ -1906,8 +1890,8 @@ PatternGenerator::getComAttitude(dynamicgraph::Vector &res, int time) {
   return res;
 }
 
-VectorRollPitchYaw &
-PatternGenerator::getWaistAttitudeAbsolute(VectorRollPitchYaw &res, int time) {
+VectorRollPitchYaw &PatternGenerator::getWaistAttitudeAbsolute(
+    VectorRollPitchYaw &res, int time) {
   sotDEBUGIN(5);
   OneStepOfControlS(time);
   sotDEBUG(15) << "I survived one step of control" << std::endl;
@@ -1919,8 +1903,8 @@ PatternGenerator::getWaistAttitudeAbsolute(VectorRollPitchYaw &res, int time) {
   return res;
 }
 
-MatrixHomogeneous &
-PatternGenerator::getWaistAttitudeMatrix(MatrixHomogeneous &res, int time) {
+MatrixHomogeneous &PatternGenerator::getWaistAttitudeMatrix(
+    MatrixHomogeneous &res, int time) {
   sotDEBUGIN(5);
   OneStepOfControlS(time);
   res = m_WaistAttitudeMatrix;
@@ -1960,5 +1944,5 @@ void PatternGenerator::setSoleParameters(const double &inSoleLength,
   m_soleLength = inSoleLength;
   m_soleWidth = inSoleWidth;
 }
-} // namespace sot
-} // namespace dynamicgraph
+}  // namespace sot
+}  // namespace dynamicgraph

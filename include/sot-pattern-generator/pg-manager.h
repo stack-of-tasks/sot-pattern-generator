@@ -25,6 +25,8 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
+#include <pinocchio/fwd.hpp>
+
 /* Matrix */
 #include <Eigen/Dense>
 
@@ -61,10 +63,10 @@ class PatternGenerator;
 
 /// Finds the PG and sends steps to the PG.
 class PGManager_EXPORT PGManager : public Entity {
-public: // Entity name
+ public:  // Entity name
   DYNAMIC_GRAPH_ENTITY_DECL();
 
-public: // Construction
+ public:  // Construction
   PGManager(const std::string &name);
 
   void startSequence(const StepQueue &seq);
@@ -72,18 +74,18 @@ public: // Construction
   void introduceStep(StepQueue &queue);
   double changeNextStep(StepQueue &queue);
 
-public: // Entity
+ public:  // Entity
   virtual void display(std::ostream &os) const;
   virtual void commandLine(const std::string &cmdLine,
                            std::istringstream &cmdArgs, std::ostream &os);
 
-private:
+ private:
   std::vector<FootPrint> stepbuf_;
   PatternGenerator *spg_;
   PatternGeneratorJRL::PatternGeneratorInterface *pgi_;
 };
 
-} // namespace sot
-} // namespace dynamicgraph
+}  // namespace sot
+}  // namespace dynamicgraph
 
 #endif

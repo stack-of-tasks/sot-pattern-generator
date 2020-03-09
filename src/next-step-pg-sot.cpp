@@ -19,11 +19,11 @@
 
 #include <sot-pattern-generator/next-step-pg-sot.h>
 
-#include <algorithm>
-#include <cmath>
 #include <dynamic-graph/factory.h>
 #include <dynamic-graph/pool.h>
 #include <sot-pattern-generator/exception-pg.h>
+#include <algorithm>
+#include <cmath>
 #include <sot/core/debug.hh>
 #include <sot/core/macros-signal.hh>
 
@@ -99,10 +99,8 @@ void positionClipper(double x, double y, double &x_result, double &y_result) {
     }
   }
 
-  if (x < 0)
-    x_result = -x_result;
-  if (y < 0)
-    y_result = -y_result;
+  if (x < 0) x_result = -x_result;
+  if (y < 0) y_result = -y_result;
 }
 
 /* --- FUNCTIONS -------------------------------------------------- */
@@ -197,10 +195,8 @@ void NextStepPgSot::introductionCallBack(const int &timeCurr) {
 #if 1
           if (0 && mode == MODE_1D) {
             const double LIMIT_X = 0.20;
-            if (NextFAPx < -LIMIT_X)
-              NextFAPx = -LIMIT_X;
-            if (NextFAPx > LIMIT_X)
-              NextFAPx = LIMIT_X;
+            if (NextFAPx < -LIMIT_X) NextFAPx = -LIMIT_X;
+            if (NextFAPx > LIMIT_X) NextFAPx = LIMIT_X;
             NextFAPtheta = 0.;
             NextFAPy = 0.;
           } else {
@@ -209,14 +205,11 @@ void NextStepPgSot::introductionCallBack(const int &timeCurr) {
             // const double LIMIT_Y_INF = 0.03;
             const double THETA_MAX = 9.;
 
-            if (NextFAPtheta < -THETA_MAX)
-              NextFAPtheta = -THETA_MAX;
-            if (NextFAPtheta > THETA_MAX)
-              NextFAPtheta = THETA_MAX;
+            if (NextFAPtheta < -THETA_MAX) NextFAPtheta = -THETA_MAX;
+            if (NextFAPtheta > THETA_MAX) NextFAPtheta = THETA_MAX;
 
             if (lSupportFoot == 1) {
-              if (NextFAPy < 0)
-                NextFAPy = -NextFAPy;
+              if (NextFAPy < 0) NextFAPy = -NextFAPy;
               double Next_xResult;
               double Next_yResult;
               positionClipper(NextFAPx, NextFAPy, Next_xResult, Next_yResult);
@@ -232,8 +225,7 @@ void NextStepPgSot::introductionCallBack(const int &timeCurr) {
                         << std::endl;
               NextFAPy = NextFAPy - 0.19;
             } else {
-              if (NextFAPy > 0)
-                NextFAPy = -NextFAPy;
+              if (NextFAPy > 0) NextFAPy = -NextFAPy;
               double Next_xResult;
               double Next_yResult;
               positionClipper(NextFAPx, NextFAPy, Next_xResult, Next_yResult);
@@ -289,12 +281,10 @@ void NextStepPgSot::commandLine(const std::string &cmdLine,
   } else if ("initPg" == cmdLine) {
     std::string name = "pg";
     cmdArgs >> std::ws;
-    if (cmdArgs.good())
-      cmdArgs >> name;
+    if (cmdArgs.good()) cmdArgs >> name;
     pgEntity = &(PoolStorage::getInstance()->getEntity(name));
     m_sPG = dynamic_cast<PatternGenerator *>(pgEntity);
-    if (m_sPG != 0)
-      m_PGI = m_sPG->GetPatternGeneratorInterface();
+    if (m_sPG != 0) m_PGI = m_sPG->GetPatternGeneratorInterface();
   } else if ("stepmodificationmode" == cmdLine) {
     std::string stgmode;
     cmdArgs >> std::ws;
@@ -323,5 +313,5 @@ void NextStepPgSot::commandLine(const std::string &cmdLine,
   }
 }
 
-} // namespace sot
-} // namespace dynamicgraph
+}  // namespace sot
+}  // namespace dynamicgraph

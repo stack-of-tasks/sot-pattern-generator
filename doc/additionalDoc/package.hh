@@ -18,15 +18,15 @@
  * with sot-pattern-generator.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
 \mainpage
 
 \section intro_sot-pattern-generator Introduction
 
-This package wraps the walk pattern generator exposed by walkGenJrl (package jrl-walkgen)
-for use in the stack of tasks. Hence, by using this package, you can create
-several \ref dynamicgraph::Entity "entities" to control the walk pattern of a humanoid robot.
+This package wraps the walk pattern generator exposed by walkGenJrl (package
+jrl-walkgen) for use in the stack of tasks. Hence, by using this package, you
+can create several \ref dynamicgraph::Entity "entities" to control the walk
+pattern of a humanoid robot.
 
 \section req Requirements
 This package has the following dependencies:
@@ -36,12 +36,14 @@ This package has the following dependencies:
 \li hrp2Dynamics [optional]
 \li hrp2-10-small [optional]
 
-To download and install these packages, please visit https://github.com/jrl-umi3218.
+To download and install these packages, please visit
+https://github.com/jrl-umi3218.
 
 \section overview API overview
-As most packages based on the dynamic-graph framework (see https://github.com/jrl-umi3218/dynamic-graph),
-the functionality is exposed through entities. Hence .so or .dll (dynamic-link) libraries are
-generated in the dynamic-graph plugins directory.
+As most packages based on the dynamic-graph framework (see
+https://github.com/jrl-umi3218/dynamic-graph), the functionality is exposed
+through entities. Hence .so or .dll (dynamic-link) libraries are generated in
+the dynamic-graph plugins directory.
 
 The following entities are created by this package:\n
 (all entites are placed in the namespace sot::)

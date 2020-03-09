@@ -17,9 +17,9 @@
  *
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-#include <cstdio>
 #include <sot-pattern-generator/exception-pg.h>
 #include <stdarg.h>
+#include <cstdio>
 
 namespace dynamicgraph {
 namespace sot {
@@ -52,8 +52,8 @@ ExceptionPatternGenerator::ExceptionPatternGenerator(
   va_end(args);
 }
 
-} // namespace sot
-} // namespace dynamicgraph
+}  // namespace sot
+}  // namespace dynamicgraph
 
 /*
  * Local variables:

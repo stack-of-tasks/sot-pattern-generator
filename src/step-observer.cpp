@@ -18,16 +18,16 @@ StepObserver::StepObserver(const std::string &name)
                           "StepObserver(" + name + ")::input(vector)::lefthand")
 
       ,
-      rightHandPositionSIN(NULL, "StepObserver(" + name +
-                                     ")::input(vector)::righthand")
+      rightHandPositionSIN(
+          NULL, "StepObserver(" + name + ")::input(vector)::righthand")
 
       ,
-      leftFootPositionSIN(NULL, "StepObserver(" + name +
-                                    ")::input(matrixhomo)::leftfoot")
+      leftFootPositionSIN(
+          NULL, "StepObserver(" + name + ")::input(matrixhomo)::leftfoot")
 
       ,
-      rightFootPositionSIN(NULL, "StepObserver(" + name +
-                                     ")::input(matrixhomo)::rightfoot")
+      rightFootPositionSIN(
+          NULL, "StepObserver(" + name + ")::input(matrixhomo)::rightfoot")
 
       ,
       waistPositionSIN(NULL,
@@ -124,9 +124,8 @@ MatrixHomogeneous &StepObserver::computeRefPos(MatrixHomogeneous &res,
   return res;
 }
 
-MatrixHomogeneous &
-StepObserver::computeReferencePositionLeft(MatrixHomogeneous &res,
-                                           int timeCurr) {
+MatrixHomogeneous &StepObserver::computeReferencePositionLeft(
+    MatrixHomogeneous &res, int timeCurr) {
   sotDEBUGIN(15);
 
   const MatrixHomogeneous &wMref = leftFootPositionSIN(timeCurr);
@@ -135,9 +134,8 @@ StepObserver::computeReferencePositionLeft(MatrixHomogeneous &res,
   return computeRefPos(res, timeCurr, wMref);
 }
 
-MatrixHomogeneous &
-StepObserver::computeReferencePositionRight(MatrixHomogeneous &res,
-                                            int timeCurr) {
+MatrixHomogeneous &StepObserver::computeReferencePositionRight(
+    MatrixHomogeneous &res, int timeCurr) {
   sotDEBUGIN(15);
 
   const MatrixHomogeneous &wMref = rightFootPositionSIN(timeCurr);
@@ -146,9 +144,8 @@ StepObserver::computeReferencePositionRight(MatrixHomogeneous &res,
   return computeRefPos(res, timeCurr, wMref);
 }
 
-MatrixHomogeneous &
-StepObserver::computeReferencePositionWaist(MatrixHomogeneous &res,
-                                            int timeCurr) {
+MatrixHomogeneous &StepObserver::computeReferencePositionWaist(
+    MatrixHomogeneous &res, int timeCurr) {
   sotDEBUGIN(15);
 
   const MatrixHomogeneous &wMref = waistPositionSIN(timeCurr);
@@ -169,5 +166,5 @@ void StepObserver::commandLine(const std::string &cmdLine,
   }
 }
 
-} // namespace sot
-} // namespace dynamicgraph
+}  // namespace sot
+}  // namespace dynamicgraph

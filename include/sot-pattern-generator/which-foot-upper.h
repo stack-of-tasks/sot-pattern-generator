@@ -55,10 +55,10 @@ namespace sot {
 /* --------------------------------------------------------------------- */
 
 class WhichFootUpper_EXPORT WhichFootUpper : public Entity {
-public:
+ public:
   DYNAMIC_GRAPH_ENTITY_DECL();
 
-protected:
+ protected:
   static const unsigned int INDEX_LEFT_FOOT_DEFAULT;
   static const unsigned int INDEX_RIGHT_FOOT_DEFAULT;
   unsigned int indexLeftFoot, indexRightFoot;
@@ -68,11 +68,11 @@ protected:
 
   unsigned int lastFoot;
 
-public: /* --- CONSTRUCTION --- */
+ public: /* --- CONSTRUCTION --- */
   WhichFootUpper(const std::string &name);
   virtual ~WhichFootUpper(void);
 
-public: /* --- SIGNAL --- */
+ public: /* --- SIGNAL --- */
   SignalPtr<MatrixRotation, int> waistRsensorSIN;
   SignalPtr<MatrixRotation, int> worldRsensorSIN;
   SignalPtr<MatrixHomogeneous, int> waistMlfootSIN;
@@ -85,7 +85,7 @@ public: /* --- SIGNAL --- */
   SignalPtr<MatrixHomogeneous, int> waistMsensorSIN;
   SignalTimeDependent<MatrixRotation, int> waistRsensorSOUT;
 
-public: /* --- FUNCTIONS --- */
+ public: /* --- FUNCTIONS --- */
   static MatrixHomogeneous &computeFootPosition(
       const MatrixHomogeneous &waistMfoot, const MatrixRotation &waistRsensor,
       const MatrixRotation &worldRsensor, MatrixHomogeneous &res);
@@ -96,12 +96,12 @@ public: /* --- FUNCTIONS --- */
                           const MatrixHomogeneous &waistMrfoot,
                           unsigned int &res);
 
-public: /* --- PARAMS --- */
+ public: /* --- PARAMS --- */
   virtual void commandLine(const std::string &cmdLine,
                            std::istringstream &cmdArgs, std::ostream &os);
 };
 
-} // namespace sot
-} // namespace dynamicgraph
+}  // namespace sot
+}  // namespace dynamicgraph
 
-#endif // #ifndef __SOT_WhichFootUpper_H__
+#endif  // #ifndef __SOT_WhichFootUpper_H__

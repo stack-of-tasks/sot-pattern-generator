@@ -36,9 +36,11 @@ typedef Eigen::Matrix<double, 4, 4> &(MatrixHomogeneous::*ExtractMemberType)(
     void)const;
 
 WhichFootUpper::WhichFootUpper(const std::string &name)
-    : Entity(name), indexLeftFoot(INDEX_LEFT_FOOT_DEFAULT),
+    : Entity(name),
+      indexLeftFoot(INDEX_LEFT_FOOT_DEFAULT),
       indexRightFoot(INDEX_RIGHT_FOOT_DEFAULT),
-      triggerThreshold(TRIGGER_THRESHOLD_DEFAULT), lastFoot(indexLeftFoot)
+      triggerThreshold(TRIGGER_THRESHOLD_DEFAULT),
+      lastFoot(indexLeftFoot)
 
       ,
       waistRsensorSIN(NULL, "WhichFootUpper(" + name +
@@ -51,18 +53,18 @@ WhichFootUpper::WhichFootUpper(const std::string &name)
                                ")::input(matrixhomogeneous)::waistMrfoot")
 
       ,
-      worldMlfootSOUT(SOT_INIT_SIGNAL_3(WhichFootUpper::computeFootPosition,
-                                        waistMlfootSIN, MatrixHomogeneous,
-                                        waistRsensorSIN, MatrixRotation,
-                                        worldRsensorSIN, MatrixRotation),
-                      "WhichFootUpper(" + name +
-                          ")::output(MatrixHomogeneous)::worldMlfoot"),
-      worldMrfootSOUT(SOT_INIT_SIGNAL_3(WhichFootUpper::computeFootPosition,
-                                        waistMrfootSIN, MatrixHomogeneous,
-                                        waistRsensorSIN, MatrixRotation,
-                                        worldRsensorSIN, MatrixRotation),
-                      "WhichFootUpper(" + name +
-                          ")::output(MatrixHomogeneous)::worldMrfoot"),
+      worldMlfootSOUT(
+          SOT_INIT_SIGNAL_3(WhichFootUpper::computeFootPosition, waistMlfootSIN,
+                            MatrixHomogeneous, waistRsensorSIN, MatrixRotation,
+                            worldRsensorSIN, MatrixRotation),
+          "WhichFootUpper(" + name +
+              ")::output(MatrixHomogeneous)::worldMlfoot"),
+      worldMrfootSOUT(
+          SOT_INIT_SIGNAL_3(WhichFootUpper::computeFootPosition, waistMrfootSIN,
+                            MatrixHomogeneous, waistRsensorSIN, MatrixRotation,
+                            worldRsensorSIN, MatrixRotation),
+          "WhichFootUpper(" + name +
+              ")::output(MatrixHomogeneous)::worldMrfoot"),
       whichFootSOUT(SOT_MEMBER_SIGNAL_2(WhichFootUpper::whichFoot,
                                         waistMlfootSIN, MatrixHomogeneous,
                                         waistMrfootSIN, MatrixHomogeneous),
@@ -187,5 +189,5 @@ void WhichFootUpper::commandLine(const std::string &cmdLine,
   } else {
   }
 }
-} // namespace sot
-} // namespace dynamicgraph
+}  // namespace sot
+}  // namespace dynamicgraph

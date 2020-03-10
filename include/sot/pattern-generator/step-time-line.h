@@ -34,9 +34,9 @@
 #include <dynamic-graph/entity.h>
 #include <dynamic-graph/signal-ptr.h>
 #include <dynamic-graph/signal-time-dependent.h>
-#include <sot-pattern-generator/pg-manager.h>
-#include <sot-pattern-generator/step-computer.h>
-#include <sot-pattern-generator/step-queue.h>
+#include <sot/pattern-generator/pg-manager.h>
+#include <sot/pattern-generator/step-computer.h>
+#include <sot/pattern-generator/step-queue.h>
 
 /* --------------------------------------------------------------------- */
 /* --- API ------------------------------------------------------------- */

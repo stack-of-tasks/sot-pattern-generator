@@ -1,6 +1,6 @@
 #include <cmath>
 
-#include <sot-pattern-generator/step-checker.h>
+#include <sot/pattern-generator/step-checker.h>
 
 namespace dynamicgraph {
 namespace sot {

@@ -18,10 +18,10 @@
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 #include <dynamic-graph/factory.h>
-#include <sot-pattern-generator/which-foot-upper.h>
+#include <sot/pattern-generator/which-foot-upper.h>
 #include <sot/core/debug.hh>
 #include <sot/core/macros-signal.hh>
-//#include <sot-pattern-generator/exception-pg.h>
+//#include <sot/pattern-generator/exception-pg.h>
 
 namespace dynamicgraph {
 namespace sot {

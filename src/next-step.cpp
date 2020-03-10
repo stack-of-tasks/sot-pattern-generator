@@ -19,7 +19,7 @@
 
 #include <sot/core/debug.hh>
 
-#include <sot-pattern-generator/next-step.h>
+#include <sot/pattern-generator/next-step.h>
 
 #include <time.h>
 #include <cmath>

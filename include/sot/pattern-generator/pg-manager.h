@@ -2,9 +2,9 @@
  * Copyright Projet JRL-Japan, 2007
  *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  *
- * File:      StepComputer.h
+ * File:      PGManager.h
  * Project:   SOT
- * Author:    Paul Evrard, Nicolas Mansard
+ * Author:    Nicolas Mansard, Olivier Stasse, Paul Evrard
  *
  * Version control
  * ===============
@@ -14,41 +14,41 @@
  * Description
  * ============
  *
+ * PGManager entity: configures the PG and sends steps.
  *
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-#ifndef __SOT_StepComputer_FORCE_H__
-#define __SOT_StepComputer_FORCE_H__
+#ifndef __SOT_PG_MANAGER_H__
+#define __SOT_PG_MANAGER_H__
 
 /* --------------------------------------------------------------------- */
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
+#include <pinocchio/fwd.hpp>
+
+/* Matrix */
+#include <Eigen/Dense>
+
 /* SOT */
 #include <dynamic-graph/entity.h>
 #include <dynamic-graph/signal-ptr.h>
 #include <dynamic-graph/signal-time-dependent.h>
-#include <sot-pattern-generator/step-checker.h>
-#include <sot-pattern-generator/step-computer.h>
-#include <sot-pattern-generator/step-observer.h>
-#include <sot/core/matrix-geometry.hh>
-/* STD */
-#include <deque>
-#include <fstream>
-#include <string>
+#include <sot/pattern-generator/pg.h>
+#include <sot/pattern-generator/step-queue.h>
 
 /* --------------------------------------------------------------------- */
 /* --- API ------------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
 #if defined(WIN32)
-#if defined(step_computer_pos_EXPORTS)
-#define StepComputerFORCE_EXPORT __declspec(dllexport)
+#if defined(pg_manager_EXPORTS)
+#define PGManager_EXPORT __declspec(dllexport)
 #else
-#define StepComputerFORCE_EXPORT __declspec(dllimport)
+#define PGManager_EXPORT __declspec(dllimport)
 #endif
 #else
-#define StepComputerFORCE_EXPORT
+#define PGManager_EXPORT
 #endif
 
 namespace dynamicgraph {
@@ -59,45 +59,33 @@ namespace sot {
 /* --------------------------------------------------------------------- */
 
 class StepQueue;
+class PatternGenerator;
 
-/// Generates footsteps.
-class StepComputerFORCE_EXPORT StepComputerPos : public Entity,
-                                                 public StepComputer {
- public:
-  static const std::string CLASS_NAME;
-  virtual const std::string &getClassName(void) const { return CLASS_NAME; }
+/// Finds the PG and sends steps to the PG.
+class PGManager_EXPORT PGManager : public Entity {
+ public:  // Entity name
+  DYNAMIC_GRAPH_ENTITY_DECL();
 
  public:  // Construction
-  StepComputerPos(const std::string &name);
+  PGManager(const std::string &name);
 
- public:  // Methods
-  void changeFirstStep(StepQueue &queue, int timeCurr);
-  void nextStep(StepQueue &queue, int timeCurr);
-
- public:  // Signals
-  SignalPtr<MatrixHomogeneous, int> referencePositionLeftSIN;
-  SignalPtr<MatrixHomogeneous, int> referencePositionRightSIN;
-  SignalPtr<unsigned, int> contactFootSIN;
+  void startSequence(const StepQueue &seq);
+  void stopSequence(const StepQueue &seq);
+  void introduceStep(StepQueue &queue);
+  double changeNextStep(StepQueue &queue);
 
  public:  // Entity
   virtual void display(std::ostream &os) const;
   virtual void commandLine(const std::string &cmdLine,
                            std::istringstream &cmdArgs, std::ostream &os);
 
- private:  // Reference frame
-  MatrixHomogeneous rfMref0;
-  MatrixHomogeneous lfMref0;
-  StepObserver *twoHandObserver;
-  StepChecker checker;
-
-  void thisIsZero();
-
- private:  // Debug
-  std::ofstream logChanges;
-  std::ofstream logPreview;
+ private:
+  std::vector<FootPrint> stepbuf_;
+  PatternGenerator *spg_;
+  PatternGeneratorJRL::PatternGeneratorInterface *pgi_;
 };
 
 }  // namespace sot
 }  // namespace dynamicgraph
 
-#endif  // #ifndef __SOT_STEPCOMPUTER_H__
+#endif

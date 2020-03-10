@@ -17,11 +17,11 @@
  *
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-#include <sot-pattern-generator/next-step-pg-sot.h>
+#include <sot/pattern-generator/next-step-pg-sot.h>
 
 #include <dynamic-graph/factory.h>
 #include <dynamic-graph/pool.h>
-#include <sot-pattern-generator/exception-pg.h>
+#include <sot/pattern-generator/exception-pg.h>
 #include <algorithm>
 #include <cmath>
 #include <sot/core/debug.hh>

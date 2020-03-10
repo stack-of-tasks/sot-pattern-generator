@@ -28,9 +28,9 @@
 #include <dynamic-graph/entity.h>
 #include <dynamic-graph/signal-ptr.h>
 #include <dynamic-graph/signal-time-dependent.h>
-#include <sot-pattern-generator/step-checker.h>
-#include <sot-pattern-generator/step-computer.h>
-#include <sot-pattern-generator/step-observer.h>
+#include <sot/pattern-generator/step-checker.h>
+#include <sot/pattern-generator/step-computer.h>
+#include <sot/pattern-generator/step-observer.h>
 #include <sot/core/matrix-geometry.hh>
 /* STD */
 #include <deque>

@@ -2,7 +2,7 @@
  *  Copyright
  */
 
-#include <sot-pattern-generator/pg.h>
+#include <sot/pattern-generator/pg.h>
 
 int main(int, char**) {
   dynamicgraph::sot::PatternGenerator aPG;

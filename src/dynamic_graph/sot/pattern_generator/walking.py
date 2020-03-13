@@ -7,7 +7,7 @@ from dynamic_graph.sot.core.math_small_entities import (Inverse_of_matrixHomo, M
                                                         Multiply_matrixHomo_vector, Multiply_of_matrixHomo,
                                                         PoseRollPitchYawToMatrixHomo, Stack_of_vector)
 from dynamic_graph.sot.core.matrix_util import matrixToTuple
-from dynamic_graph.sot.dynamics_pinocchio import DynamicPinocchio
+from dynamic_graph.sot.dynamic_pinocchio import DynamicPinocchio
 from dynamic_graph.sot.pattern_generator import PatternGenerator, Selector
 
 

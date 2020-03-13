@@ -4,7 +4,7 @@ from numpy import array, dot
 
 from dynamic_graph import plug
 from dynamic_graph.sot.core import TaskPD
-from dynamic_graph.sot.dynamics_pinocchio import (Dynamic, Inverse_of_matrixHomo, Multiply_matrixHomo_vector,
+from dynamic_graph.sot.dynamic_pinocchio import (Dynamic, Inverse_of_matrixHomo, Multiply_matrixHomo_vector,
                                                   Multiply_of_matrixHomo, PoseRollPitchYawToMatrixHomo,
                                                   Stack_of_vector)
 from dynamic_graph.sot.pattern_generator import PatternGenerator, Selector

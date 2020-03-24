@@ -35,7 +35,8 @@
 #include <dynamic-graph/pool.h>
 #include <dynamic-graph/signal-ptr.h>
 #include <dynamic-graph/signal-time-dependent.h>
-#include <sot-pattern-generator/exception-pg.h>
+#include <pinocchio/fwd.hpp>
+#include <sot/pattern-generator/exception-pg.h>
 #include <sot/core/flags.hh>
 #include <sot/core/matrix-geometry.hh>
 

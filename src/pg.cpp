@@ -49,7 +49,7 @@ sotPG__INIT sotPG_initiator;
 #include <dynamic-graph/factory.h>
 #include <sot/core/matrix-geometry.hh>
 
-#include <sot-pattern-generator/pg.h>
+#include <sot/pattern-generator/pg.h>
 
 using namespace std;
 namespace dynamicgraph {

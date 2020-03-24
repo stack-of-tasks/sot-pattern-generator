@@ -1,0 +1,26 @@
+<package format="2">
+  <name>sot-pattern-generator</name>
+  <version>3.2.3</version>
+  <description>
+    jrl-walkgen bindings for dynamic-graph
+  </description>
+  <maintainer email="ostasse@laas.fr">Olivier Stasse</maintainer>
+  <license>BSDv2</license>
+
+  <url>http://github.com/stack-of-tasks/sot-talos</url>
+  <author>Olivier Stasse</author>
+
+  <build_depend>roscpp</build_depend>
+  <build_depend>dynamic-graph-python</build_depend>
+  <build_depend>jrl-walkgen</build_depend>
+  <build_depend>sot-core</build_depend>
+
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>dynamic-graph-python</exec_depend>
+  <exec_depend>jrl-walkgen</exec_depend>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <doc_depend>doxygen</doc_depend>
+
+</package>

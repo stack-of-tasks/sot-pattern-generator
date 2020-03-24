@@ -19,8 +19,8 @@
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 #include <dynamic-graph/factory.h>
-#include <sot-pattern-generator/pg-manager.h>
-#include <sot-pattern-generator/pg.h>
+#include <sot/pattern-generator/pg-manager.h>
+#include <sot/pattern-generator/pg.h>
 #include <sot/core/debug.hh>
 
 namespace dynamicgraph {

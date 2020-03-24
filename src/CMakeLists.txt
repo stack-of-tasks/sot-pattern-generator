@@ -1,9 +1,7 @@
-# Copyright 2010, François Bleibel, Olivier Stasse, JRL, CNRS/AIST
+# Copyright 2010, 2020, François Bleibel, Olivier Stasse, Guilhem Saurel, JRL, CNRS/AIST, LAAS-CNRS
 #
 
 ADD_DEFINITIONS(-DDEBUG=2)
-
-SET(LIBRARY_NAME ${PROJECT_NAME})
 
 # dependent on nothing
 SET(plugins_0
@@ -43,71 +41,53 @@ SET(plugins
   pg
   )
 
-SET(plugins_common_deps
-  exception-pg)
+SET(next-step-pg-sot_plugins_deps next-step pg)
+SET(step-computer_plugins_deps step-queue step-checker step-observer)
+SET(step-computer-force_plugins_deps ${step-computer_plugins_deps})
+SET(step-computer-pos_plugins_deps ${step-computer_plugins_deps})
+SET(step-computer-joystick_plugins_deps ${step-computer_plugins_deps})
+SET(pg-manager_plugins_deps step-queue pg)
+SET(step-time-line_plugins_deps step-queue pg-manager)
 
-# Add specific plugins dependencies.
-SET (next-step-pg-sot_plugins_dependencies next-step pg)
-SET (step-computer_plugins_dependencies step-queue step-checker step-observer)
-SET (step-computer-force_plugins_dependencies ${step-computer_plugins_dependencies})
-SET (step-computer-pos_plugins_dependencies ${step-computer_plugins_dependencies})
-SET (step-computer-joystick_plugins_dependencies ${step-computer_plugins_dependencies})
-SET (pg-manager_plugins_dependencies step-queue pg)
-SET (step-time-line_plugins_dependencies step-queue pg-manager)
+FOREACH(plugin ${plugins})
+  GET_FILENAME_COMPONENT(LIBRARY_NAME ${plugin} NAME)
+  ADD_LIBRARY(${LIBRARY_NAME} SHARED ${plugin}
+    ../include/${CUSTOM_HEADER_DIR}/${LIBRARY_NAME}.h)
 
-# --- PLUGIN COMPILATION/INSTALLATION
-FOREACH(LIBRARY_NAME ${plugins})
-  ADD_LIBRARY(${LIBRARY_NAME}
-    SHARED
-    ${LIBRARY_NAME}.cpp
-    ../include/sot-pattern-generator/${LIBRARY_NAME}.h)
+  IF(SUFFIX_SO_VERSION)
+    SET_TARGET_PROPERTIES(${LIBRARY_NAME} PROPERTIES SOVERSION ${PROJECT_VERSION})
+  ENDIF(SUFFIX_SO_VERSION)
 
-  SET_TARGET_PROPERTIES(${LIBRARY_NAME}
-    PROPERTIES
-    SOVERSION ${PROJECT_VERSION}
-    INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/plugin
-    PREFIX "")
+  TARGET_LINK_LIBRARIES(${LIBRARY_NAME} ${${LIBRARY_NAME}_deps}
+    jrl-walkgen::jrl-walkgen sot-core::sot-core)
 
-  # inter-plugins dependendies
-  IF(NOT ${LIBRARY_NAME} STREQUAL ${plugins_common_deps})
-    TARGET_LINK_LIBRARIES(${LIBRARY_NAME} ${plugins_common_deps})
-    ADD_DEPENDENCIES(${LIBRARY_NAME} ${plugins_common_deps})
-  ENDIF(NOT ${LIBRARY_NAME} STREQUAL ${plugins_common_deps})
-
-  FOREACH(dep ${${LIBRARY_NAME}_plugins_dependencies})
-    TARGET_LINK_LIBRARIES(${LIBRARY_NAME} ${dep})
-    ADD_DEPENDENCIES(${LIBRARY_NAME} ${dep})
-  ENDFOREACH(dep)
-
-  SET_TARGET_PROPERTIES(${LIBRARY_NAME}
-    PROPERTIES
-    LINK_FLAGS "${${PROJECT_NAME}_src_LDFLAGS}")
-
-  PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} jrl-walkgen)
-  PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} pinocchio)
-  PKG_CONFIG_USE_DEPENDENCY(${LIBRARY_NAME} sot-core)
+  IF(NOT LIBRARY_NAME STREQUAL "exception-pg")
+    TARGET_LINK_LIBRARIES(${LIBRARY_NAME} exception-pg)
+  ENDIF(NOT LIBRARY_NAME STREQUAL "exception-pg")
 
   IF(NOT INSTALL_PYTHON_INTERFACE_ONLY)
-    INSTALL(TARGETS ${LIBRARY_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/plugin)
+    INSTALL(TARGETS ${LIBRARY_NAME} EXPORT ${TARGETS_EXPORT_NAME}
+      DESTINATION ${DYNAMIC_GRAPH_PLUGINDIR})
   ENDIF(NOT INSTALL_PYTHON_INTERFACE_ONLY)
 
   # --- PY ---
   IF(BUILD_PYTHON_INTERFACE)
     STRING(REPLACE - _ PYTHON_LIBRARY_NAME ${LIBRARY_NAME})
-
-    DYNAMIC_GRAPH_PYTHON_MODULE("${PYTHON_LOCAL_PATH}/${PYTHON_LIBRARY_NAME}"
-      ${LIBRARY_NAME} sot-pattern_generator-${PYTHON_LIBRARY_NAME}-wrap)
+    DYNAMIC_GRAPH_PYTHON_MODULE("${PYTHON_DIR}/${PYTHON_LIBRARY_NAME}"
+      ${LIBRARY_NAME} ${PROJECT_NAME}-${PYTHON_LIBRARY_NAME}-wrap)
   ENDIF(BUILD_PYTHON_INTERFACE)
-
-ENDFOREACH(LIBRARY_NAME)
+ENDFOREACH(plugin)
 
 # --- PY ---
 IF(BUILD_PYTHON_INTERFACE)
-  INSTALL(FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_graph/sot/pattern_generator/__init__.py
-    ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_graph/sot/pattern_generator/meta_selector.py
-    ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_graph/sot/pattern_generator/meta_pg.py
-    ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_graph/sot/pattern_generator/walking.py
-    DESTINATION ${PYTHON_SITELIB}/dynamic_graph/sot/pattern_generator/
+  SET(${PROJECT_NAME}_PYTHON
+    __init__.py
+    meta_selector.py
+    meta_pg.py
+    walking.py
     )
+
+  FOREACH(file ${${PROJECT_NAME}_PYTHON})
+    PYTHON_INSTALL_ON_SITE("dynamic_graph/${PYTHON_DIR}" ${file})
+  ENDFOREACH(file ${${PROJECT_NAME}_PYTHON})
 ENDIF(BUILD_PYTHON_INTERFACE)

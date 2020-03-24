@@ -29,10 +29,10 @@
 #endif /*WIN32*/
 
 #include <dynamic-graph/factory.h>
-#include <sot-pattern-generator/exception-pg.h>
-#include <sot-pattern-generator/step-checker.h>
-#include <sot-pattern-generator/step-computer-joystick.h>
-#include <sot-pattern-generator/step-queue.h>
+#include <sot/pattern-generator/exception-pg.h>
+#include <sot/pattern-generator/step-checker.h>
+#include <sot/pattern-generator/step-computer-joystick.h>
+#include <sot/pattern-generator/step-queue.h>
 #include <sot/core/debug.hh>
 #include <sot/core/macros-signal.hh>
 

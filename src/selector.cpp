@@ -30,8 +30,8 @@ selector__INIT selector_initiator;
 
 #include <dynamic-graph/all-commands.h>
 #include <dynamic-graph/factory.h>
-#include <sot-pattern-generator/exception-pg.h>
-#include <sot-pattern-generator/selector.h>
+#include <sot/pattern-generator/exception-pg.h>
+#include <sot/pattern-generator/selector.h>
 
 namespace dynamicgraph {
 namespace sot {

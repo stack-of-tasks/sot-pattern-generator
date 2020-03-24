@@ -25,8 +25,8 @@
 /* --------------------------------------------------------------------- */
 
 /* SOT */
-#include <sot-pattern-generator/next-step.h>
-#include <sot-pattern-generator/pg.h>
+#include <sot/pattern-generator/next-step.h>
+#include <sot/pattern-generator/pg.h>
 
 /* STD */
 #include <deque>

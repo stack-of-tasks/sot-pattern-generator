@@ -43,7 +43,29 @@ IF(BUILD_PYTHON_INTERFACE)
     PKG_CONFIG_REQUIRES dynamic-graph-python)
 ENDIF(BUILD_PYTHON_INTERFACE)
 
-ADD_SUBDIRECTORY(include/${CUSTOM_HEADER_DIR})
+# Main Library
+SET(${PROJECT_NAME}_HEADERS
+  include/${CUSTOM_HEADER_DIR}/next-step.h
+  include/${CUSTOM_HEADER_DIR}/exception-pg.h
+  include/${CUSTOM_HEADER_DIR}/next-step-pg-sot.h
+  include/${CUSTOM_HEADER_DIR}/pg.h
+  include/${CUSTOM_HEADER_DIR}/pg-manager.h
+  include/${CUSTOM_HEADER_DIR}/step-queue.h
+  include/${CUSTOM_HEADER_DIR}/selector.h
+  include/${CUSTOM_HEADER_DIR}/step-checker.h
+  include/${CUSTOM_HEADER_DIR}/step-time-line.h
+  include/${CUSTOM_HEADER_DIR}/step-observer.h
+  include/${CUSTOM_HEADER_DIR}/step-computer.h
+  include/${CUSTOM_HEADER_DIR}/step-computer-force.h
+  include/${CUSTOM_HEADER_DIR}/step-computer-joystick.h
+  include/${CUSTOM_HEADER_DIR}/step-computer-pos.h
+  include/${CUSTOM_HEADER_DIR}/which-foot-upper.h
+  )
+
+ADD_LIBRARY(${PROJECT_NAME} INTERFACE)
+TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} INTERFACE $<INSTALL_INTERFACE:include>)
+INSTALL(TARGETS ${PROJECT_NAME} EXPORT ${TARGETS_EXPORT_NAME} DESTINATION lib)
+
 ADD_SUBDIRECTORY(src)
 IF(BUILD_PYTHON_INTERFACE)
   ADD_SUBDIRECTORY(python)

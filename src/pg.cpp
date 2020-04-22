@@ -229,11 +229,11 @@ PatternGenerator::PatternGenerator(const std::string &name)
               ")::output(vectorRPY)::waistattitudeabsolute")
 
       ,
-      waistattitudematrixSOUT(
-          boost::bind(&PatternGenerator::getWaistAttitudeMatrix, this, _1, _2),
+      waistattitudematrixabsoluteSOUT(
+          boost::bind(&PatternGenerator::getWaistAttitudeMatrixAbsolute, this, _1, _2),
           OneStepOfControlS,
           "PatternGenerator(" + name +
-              ")::output(homogeneousmatrix)::waistattitudematrix")
+              ")::output(homogeneousmatrix)::waistattitudematrixabsolute")
 
       ,
       waistpositionSOUT(
@@ -368,7 +368,7 @@ PatternGenerator::PatternGenerator(const std::string &name)
   m_WaistPositionAbsolute.resize(3);
   m_WaistPositionAbsolute.fill(0);
 
-  m_WaistAttitudeMatrix.setIdentity();
+  m_WaistAttitudeMatrixAbsolute.setIdentity();
   m_LeftFootPosition.setIdentity();
   m_RightFootPosition.setIdentity();
 
@@ -464,7 +464,7 @@ PatternGenerator::PatternGenerator(const std::string &name)
   signalRegistration(SupportFootSOUT << jointWalkingErrorPositionSOUT
                                      << comattitudeSOUT << dcomattitudeSOUT
                                      << ddcomattitudeSOUT << waistattitudeSOUT
-                                     << waistattitudematrixSOUT);
+                                     << waistattitudematrixabsoluteSOUT);
 
   signalRegistration(waistpositionSOUT << waistattitudeabsoluteSOUT
                                        << waistpositionabsoluteSOUT);
@@ -1359,6 +1359,9 @@ int &PatternGenerator::OneStepOfControl(int &dummy, int time) {
           m_WaistPositionAbsolute(i) = CurrentConfiguration(i);
           m_WaistAttitudeAbsolute(i) = CurrentConfiguration(i + 3);
         }
+
+        getAbsoluteWaistPosAttHomogeneousMatrix(m_WaistAttitudeMatrixAbsolute);
+
         m_COMRefPos(0) = lCOMRefState.x[0];
         m_COMRefPos(1) = lCOMRefState.y[0];
         m_COMRefPos(2) = lCOMRefState.z[0];
@@ -1470,6 +1473,9 @@ int &PatternGenerator::OneStepOfControl(int &dummy, int time) {
     SubsamplingFootPos(m_PrevSamplingLeftFootAbsPos,
                        m_NextSamplingLeftFootAbsPos, m_LeftFootPosition,
                        m_dotLeftFootPosition, m_count);
+
+    getAbsoluteWaistPosAttHomogeneousMatrix(m_WaistAttitudeMatrixAbsolute);
+    // end added lines for test on waist
 
     m_count++;
 
@@ -1592,7 +1598,7 @@ int &PatternGenerator::OneStepOfControl(int &dummy, int time) {
 
       m_WaistPosition = WaistPoseAbsolute.translation();
 
-      m_WaistAttitudeMatrix = WaistPoseAbsolute;
+      m_WaistAttitudeMatrixAbsolute = WaistPoseAbsolute;
 
       sotDEBUG(25) << "ComRef:  " << m_COMRefPos << endl;
       sotDEBUG(25) << "iPoseOrigin:  " << iPoseOrigin << endl;
@@ -1903,11 +1909,11 @@ VectorRollPitchYaw &PatternGenerator::getWaistAttitudeAbsolute(
   return res;
 }
 
-MatrixHomogeneous &PatternGenerator::getWaistAttitudeMatrix(
+MatrixHomogeneous &PatternGenerator::getWaistAttitudeMatrixAbsolute(
     MatrixHomogeneous &res, int time) {
   sotDEBUGIN(5);
   OneStepOfControlS(time);
-  res = m_WaistAttitudeMatrix;
+  res = m_WaistAttitudeMatrixAbsolute;
   sotDEBUGOUT(5);
   return res;
 }

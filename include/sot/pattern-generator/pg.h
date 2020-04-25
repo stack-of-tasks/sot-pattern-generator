@@ -303,8 +303,8 @@ class PatternGenerator_EXPORT PatternGenerator : public Entity {
 
   /*! \brief Internal method to get the absolute attitude of the waist into
     an homogeneous matrix. */
-  MatrixHomogeneous &getWaistAttitudeMatrixAbsolute
-      (MatrixHomogeneous &res, int time);
+  MatrixHomogeneous &getWaistAttitudeMatrixAbsolute(MatrixHomogeneous &res,
+                                                    int time);
 
   /*! \brief Internal method to get the dataInPorcess flag */
   unsigned &getDataInProcess(unsigned &res, int time);

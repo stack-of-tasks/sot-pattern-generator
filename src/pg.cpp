@@ -230,7 +230,8 @@ PatternGenerator::PatternGenerator(const std::string &name)
 
       ,
       waistattitudematrixabsoluteSOUT(
-          boost::bind(&PatternGenerator::getWaistAttitudeMatrixAbsolute, this, _1, _2),
+          boost::bind(&PatternGenerator::getWaistAttitudeMatrixAbsolute, this,
+                      _1, _2),
           OneStepOfControlS,
           "PatternGenerator(" + name +
               ")::output(homogeneousmatrix)::waistattitudematrixabsolute")

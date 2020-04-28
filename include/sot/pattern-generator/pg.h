@@ -303,7 +303,8 @@ class PatternGenerator_EXPORT PatternGenerator : public Entity {
 
   /*! \brief Internal method to get the absolute attitude of the waist into
     an homogeneous matrix. */
-  MatrixHomogeneous &getWaistAttitudeMatrix(MatrixHomogeneous &res, int time);
+  MatrixHomogeneous &getWaistAttitudeMatrixAbsolute(MatrixHomogeneous &res,
+                                                    int time);
 
   /*! \brief Internal method to get the dataInPorcess flag */
   unsigned &getDataInProcess(unsigned &res, int time);
@@ -411,7 +412,7 @@ class PatternGenerator_EXPORT PatternGenerator : public Entity {
   dynamicgraph::Vector m_NextSamplingWaistAttAbs;
 
   /*! \brief Waist Attitude Homogeneous Matrix */
-  MatrixHomogeneous m_WaistAttitudeMatrix;
+  MatrixHomogeneous m_WaistAttitudeMatrixAbsolute;
 
   /*! \brief Joint values for walking. */
   dynamicgraph::Vector m_JointErrorValuesForWalking;
@@ -593,7 +594,7 @@ class PatternGenerator_EXPORT PatternGenerator : public Entity {
 
   /*! \brief Externalize the absolute waist attitude into a homogeneous matrix.
    */
-  SignalTimeDependent<MatrixHomogeneous, int> waistattitudematrixSOUT;
+  SignalTimeDependent<MatrixHomogeneous, int> waistattitudematrixabsoluteSOUT;
 
   /*! \brief Externalize the waist position. */
   SignalTimeDependent<dynamicgraph::Vector, int> waistpositionSOUT;

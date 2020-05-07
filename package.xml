@@ -1,6 +1,6 @@
 <package format="2">
   <name>sot-pattern-generator</name>
-  <version>3.2.3</version>
+  <version>3.3.0</version>
   <description>
     jrl-walkgen bindings for dynamic-graph
   </description>

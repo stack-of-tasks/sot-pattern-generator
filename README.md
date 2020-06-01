@@ -2,8 +2,8 @@ sot-pattern-generator
 =====================
 
 [![Building Status](https://travis-ci.org/stack-of-tasks/sot-pattern-generator.svg?branch=master)](https://travis-ci.org/stack-of-tasks/sot-pattern-generator)
-[![Pipeline status](https://gepgitlab.laas.fr/stack-of-tasks/sot-pattern-generator/badges/master/pipeline.svg)](https://gepgitlab.laas.fr/stack-of-tasks/sot-pattern-generator/commits/master)
-[![Coverage report](https://gepgitlab.laas.fr/stack-of-tasks/sot-pattern-generator/badges/master/coverage.svg?job=doc-coverage)](http://projects.laas.fr/gepetto/doc/stack-of-tasks/sot-pattern-generator/master/coverage/)
+[![Pipeline status](https://gitlab.laas.fr/stack-of-tasks/sot-pattern-generator/badges/master/pipeline.svg)](https://gitlab.laas.fr/stack-of-tasks/sot-pattern-generator/commits/master)
+[![Coverage report](https://gitlab.laas.fr/stack-of-tasks/sot-pattern-generator/badges/master/coverage.svg?job=doc-coverage)](http://projects.laas.fr/gepetto/doc/stack-of-tasks/sot-pattern-generator/master/coverage/)
 
 This software provides jrl-walkgen bindings for the dynamic-graph
 package. It allows the computation of whole-body biped walk

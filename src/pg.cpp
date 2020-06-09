@@ -304,7 +304,12 @@ PatternGenerator::PatternGenerator(const std::string &name)
       rightFootContactSOUT(
           boost::bind(&PatternGenerator::getRightFootContact, this, _1, _2),
           OneStepOfControlS,
-          "PatternGenerator(" + name + ")::output(bool)::rightfootcontact")
+          "PatternGenerator(" + name + ")::output(bool)::rightfootcontact"),
+
+      contactPhaseSOUT(
+          boost::bind(&PatternGenerator::getContactPhase, this, _1, _2),
+          OneStepOfControlS,
+          "PatternGenerator(" + name + ")::output(double)::contactphase")
 
 {
   m_MotionSinceInstanciationToThisSequence.setIdentity();
@@ -312,7 +317,7 @@ PatternGenerator::PatternGenerator(const std::string &name)
   m_LocalTime = 0;
   m_count = 0;
   m_TimeStep = 0.005;
-  m_DoubleSupportPhaseState = false;
+  m_DoubleSupportPhaseState = true;
   m_forceFeedBack = false;
   m_feedBackControl = false;
 
@@ -477,7 +482,7 @@ PatternGenerator::PatternGenerator(const std::string &name)
                                     << InitLeftFootRefSOUT
                                     << InitRightFootRefSOUT);
 
-  signalRegistration(leftFootContactSOUT << rightFootContactSOUT);
+  signalRegistration(leftFootContactSOUT << rightFootContactSOUT << contactPhaseSOUT);
 
 #endif
   initCommands();
@@ -1008,6 +1013,20 @@ bool &PatternGenerator ::getRightFootContact(bool &res, int time) {
   return res;
 }
 
+double &PatternGenerator ::getContactPhase(double &res, int time) {
+  sotDEBUGIN(25);
+  OneStepOfControlS(time);
+  if ((m_leftFootContact) && !(m_DoubleSupportPhaseState)){
+    res = 1.0;
+  } else if ((m_rightFootContact) && !(m_DoubleSupportPhaseState)){
+    res = -1.0;
+  } else {
+    res = 0.0;
+  }
+  sotDEBUGOUT(25);
+  return res;
+}
+
 int &PatternGenerator::InitOneStepOfControl(int &dummy, int /*time*/) {
   sotDEBUGIN(15);
   // TODO: modified first to avoid the loop.
@@ -1510,18 +1529,27 @@ int &PatternGenerator::OneStepOfControl(int &dummy, int time) {
                  << " lRightFootPosition.stepType: "
                  << lRightFootPosition.stepType << endl;
     // Find the support foot feet.
-    m_leftFootContact = true;
-    m_rightFootContact = true;
+    
+    if ((lLeftFootPosition.stepType == 10) || (lRightFootPosition.stepType == 10)){
+      m_leftFootContact = true;
+      m_rightFootContact = true;
+      m_DoubleSupportPhaseState = true;
+    }
+
     if (lLeftFootPosition.stepType == -1) {
       lSupportFoot = 1;
       m_leftFootContact = true;
-      if (lRightFootPosition.stepType != -1) m_rightFootContact = false;
-      m_DoubleSupportPhaseState = 0;
+      if ((lRightFootPosition.stepType != -1) && (lRightFootPosition.stepType != 10)){
+        m_rightFootContact = false;
+        m_DoubleSupportPhaseState = false;
+      } 
     } else if (lRightFootPosition.stepType == -1) {
       lSupportFoot = 0;
       m_rightFootContact = true;
-      if (lLeftFootPosition.stepType != -1) m_leftFootContact = false;
-      m_DoubleSupportPhaseState = 0;
+      if ((lLeftFootPosition.stepType != -1) && (lLeftFootPosition.stepType != 10)) {
+        m_leftFootContact = false;
+        m_DoubleSupportPhaseState = false;
+      }
     } else
     /* m_LeftFootPosition.z ==m_RightFootPosition.z
        We keep the previous support foot half the time

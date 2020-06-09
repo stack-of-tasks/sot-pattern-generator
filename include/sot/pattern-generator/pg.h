@@ -502,6 +502,8 @@ class PatternGenerator_EXPORT PatternGenerator : public Entity {
     the feet. */
   bool &getLeftFootContact(bool &res, int time);
   bool &getRightFootContact(bool &res, int time);
+  /*! \brief Internal method to get the information of contact phase leftFoot=1, rightFoot=-1, doubleSupport=0. */
+  double &getContactPhase(double &res, int time);
 
  public:
   /*! \name External signals
@@ -627,6 +629,9 @@ class PatternGenerator_EXPORT PatternGenerator : public Entity {
   SignalTimeDependent<bool, int> leftFootContactSOUT;
   SignalTimeDependent<bool, int> rightFootContactSOUT;
   /*! @} */
+
+  /*! \brief Int Vector of contact phase: leftFoot=1, rightFoot=-1, doubleSupport=0. */
+  SignalTimeDependent<double, int> contactPhaseSOUT;
 
   /*! \name Reimplement the interface of the plugin.
     @{ */

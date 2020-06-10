@@ -175,9 +175,7 @@ class PatternGenerator_EXPORT PatternGenerator : public Entity {
   /*! \brief Time step */
   double m_TimeStep;
 
-  /*! \brief Double support phase detected. */
-  bool m_DoubleSupportPhaseState;
-  /*! \brief Current contact phase defined by enum: leftFoot=1, rightFoot=-1, doubleSupport=0. */
+  /*! \brief Current support/contact phase defined by enum: leftFoot=1, rightFoot=-1, doubleSupport=0. */
   SupportPhase m_ContactPhase;
   int m_DSStartingTime;
 

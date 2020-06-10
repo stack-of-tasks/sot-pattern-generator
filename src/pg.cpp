@@ -317,7 +317,6 @@ PatternGenerator::PatternGenerator(const std::string &name)
   m_LocalTime = 0;
   m_count = 0;
   m_TimeStep = 0.005;
-  m_DoubleSupportPhaseState = true;
   m_ContactPhase = DOUBLE_SUPPORT_PHASE;
   m_forceFeedBack = false;
   m_feedBackControl = false;
@@ -1523,29 +1522,34 @@ int &PatternGenerator::OneStepOfControl(int &dummy, int time) {
     sotDEBUG(25) << "lLeftFootPosition.stepType: " << lLeftFootPosition.stepType
                  << " lRightFootPosition.stepType: "
                  << lRightFootPosition.stepType << endl;
+
     // Find the support foot feet.
-    
+    // If stepType = -1 -> single support phase on the dedicated foot
+    // If stepType = 10 -> double support phase (both feet should have stepType=10)
     if ((lLeftFootPosition.stepType == 10) || (lRightFootPosition.stepType == 10)){
       m_leftFootContact = true;
       m_rightFootContact = true;
-      m_DoubleSupportPhaseState = true;
       m_ContactPhase = DOUBLE_SUPPORT_PHASE;
     }
 
     if (lLeftFootPosition.stepType == -1) {
       lSupportFoot = 1;
       m_leftFootContact = true;
-      if ((lRightFootPosition.stepType != -1) && (lRightFootPosition.stepType != 10)){
+      // It is almost certain that when there is single support on a foot
+      // the other one cannot be in simple support (neither in double support)
+      // This if is certainly always true -> to be checked
+      if (lRightFootPosition.stepType != -1){
         m_rightFootContact = false;
-        m_DoubleSupportPhaseState = false;
         m_ContactPhase = LEFT_SUPPORT_PHASE;
       } 
     } else if (lRightFootPosition.stepType == -1) {
       lSupportFoot = 0;
       m_rightFootContact = true;
-      if ((lLeftFootPosition.stepType != -1) && (lLeftFootPosition.stepType != 10)) {
+      // It is almost certain that when there is single support on a foot
+      // the other one cannot be in simple support (neither in double support)
+      // This if is certainly always true -> to be checked
+      if (lLeftFootPosition.stepType != -1) {
         m_leftFootContact = false;
-        m_DoubleSupportPhaseState = false;
         m_ContactPhase = RIGHT_SUPPORT_PHASE;
       }
     } else

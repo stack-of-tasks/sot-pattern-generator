@@ -62,6 +62,13 @@ namespace pg = PatternGeneratorJRL;
 namespace dynamicgraph {
 namespace sot {
 
+/// Define the support phase of the robot
+enum SupportPhase {
+  DOUBLE_SUPPORT_PHASE = 0,
+  LEFT_SUPPORT_PHASE = 1,
+  RIGHT_SUPPORT_PHASE = -1,
+};
+
 /* --------------------------------------------------------------------- */
 /* --- CLASS ----------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
@@ -170,6 +177,8 @@ class PatternGenerator_EXPORT PatternGenerator : public Entity {
 
   /*! \brief Double support phase detected. */
   bool m_DoubleSupportPhaseState;
+  /*! \brief Current contact phase defined by enum: leftFoot=1, rightFoot=-1, doubleSupport=0. */
+  SupportPhase m_ContactPhase;
   int m_DSStartingTime;
 
   /*! \brief iteration time. */
@@ -503,7 +512,7 @@ class PatternGenerator_EXPORT PatternGenerator : public Entity {
   bool &getLeftFootContact(bool &res, int time);
   bool &getRightFootContact(bool &res, int time);
   /*! \brief Internal method to get the information of contact phase leftFoot=1, rightFoot=-1, doubleSupport=0. */
-  double &getContactPhase(double &res, int time);
+  int &getContactPhase(int &res, int time);
 
  public:
   /*! \name External signals
@@ -630,8 +639,8 @@ class PatternGenerator_EXPORT PatternGenerator : public Entity {
   SignalTimeDependent<bool, int> rightFootContactSOUT;
   /*! @} */
 
-  /*! \brief Int Vector of contact phase: leftFoot=1, rightFoot=-1, doubleSupport=0. */
-  SignalTimeDependent<double, int> contactPhaseSOUT;
+  /*! \brief Int Vector of support phase: leftFoot=1, rightFoot=-1, doubleSupport=0 (see enum). */
+  SignalTimeDependent<int, int> contactPhaseSOUT;
 
   /*! \name Reimplement the interface of the plugin.
     @{ */

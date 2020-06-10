@@ -309,7 +309,7 @@ PatternGenerator::PatternGenerator(const std::string &name)
       contactPhaseSOUT(
           boost::bind(&PatternGenerator::getContactPhase, this, _1, _2),
           OneStepOfControlS,
-          "PatternGenerator(" + name + ")::output(double)::contactphase")
+          "PatternGenerator(" + name + ")::output(int)::contactphase")
 
 {
   m_MotionSinceInstanciationToThisSequence.setIdentity();
@@ -318,6 +318,7 @@ PatternGenerator::PatternGenerator(const std::string &name)
   m_count = 0;
   m_TimeStep = 0.005;
   m_DoubleSupportPhaseState = true;
+  m_ContactPhase = DOUBLE_SUPPORT_PHASE;
   m_forceFeedBack = false;
   m_feedBackControl = false;
 
@@ -1013,16 +1014,10 @@ bool &PatternGenerator ::getRightFootContact(bool &res, int time) {
   return res;
 }
 
-double &PatternGenerator ::getContactPhase(double &res, int time) {
+int &PatternGenerator ::getContactPhase(int &res, int time) {
   sotDEBUGIN(25);
   OneStepOfControlS(time);
-  if ((m_leftFootContact) && !(m_DoubleSupportPhaseState)){
-    res = 1.0;
-  } else if ((m_rightFootContact) && !(m_DoubleSupportPhaseState)){
-    res = -1.0;
-  } else {
-    res = 0.0;
-  }
+  res = m_ContactPhase;
   sotDEBUGOUT(25);
   return res;
 }
@@ -1534,6 +1529,7 @@ int &PatternGenerator::OneStepOfControl(int &dummy, int time) {
       m_leftFootContact = true;
       m_rightFootContact = true;
       m_DoubleSupportPhaseState = true;
+      m_ContactPhase = DOUBLE_SUPPORT_PHASE;
     }
 
     if (lLeftFootPosition.stepType == -1) {
@@ -1542,6 +1538,7 @@ int &PatternGenerator::OneStepOfControl(int &dummy, int time) {
       if ((lRightFootPosition.stepType != -1) && (lRightFootPosition.stepType != 10)){
         m_rightFootContact = false;
         m_DoubleSupportPhaseState = false;
+        m_ContactPhase = LEFT_SUPPORT_PHASE;
       } 
     } else if (lRightFootPosition.stepType == -1) {
       lSupportFoot = 0;
@@ -1549,6 +1546,7 @@ int &PatternGenerator::OneStepOfControl(int &dummy, int time) {
       if ((lLeftFootPosition.stepType != -1) && (lLeftFootPosition.stepType != 10)) {
         m_leftFootContact = false;
         m_DoubleSupportPhaseState = false;
+        m_ContactPhase = RIGHT_SUPPORT_PHASE;
       }
     } else
     /* m_LeftFootPosition.z ==m_RightFootPosition.z

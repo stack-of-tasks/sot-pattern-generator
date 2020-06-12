@@ -7,10 +7,8 @@
 int main(int, char**) {
   dynamicgraph::sot::PatternGenerator aPG;
 
-  std::string aRobotURDF(
-      "/opt/openrobots/share/talos_data/urdf/talos_reduced_wpg.urdf");
-  std::string aRobotSRDF(
-      "/opt/openrobots/share/talos_data/srdf/talos_wpg.srdf");
+  std::string aRobotURDF(URDF_FULL_PATH);
+  std::string aRobotSRDF(SRDF_FULL_PATH);
 
   aPG.setURDFFile(aRobotURDF);
   aPG.setSRDFFile(aRobotSRDF);

@@ -1526,7 +1526,9 @@ int &PatternGenerator::OneStepOfControl(int &dummy, int time) {
     // Find the support foot feet.
     // If stepType = -1 -> single support phase on the dedicated foot
     // If stepType = 10 -> double support phase (both feet should have stepType=10)
-    if ((lLeftFootPosition.stepType == 10) || (lRightFootPosition.stepType == 10)){
+    // If stepType = 11 -> double support phase between 2 single support phases for Kajita Algorithm
+    if ((lLeftFootPosition.stepType == 10) || (lRightFootPosition.stepType == 10) || 
+        (lLeftFootPosition.stepType == 11) || (lRightFootPosition.stepType == 11)){
       m_leftFootContact = true;
       m_rightFootContact = true;
       m_ContactPhase = DOUBLE_SUPPORT_PHASE;

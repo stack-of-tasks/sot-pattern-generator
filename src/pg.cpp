@@ -27,10 +27,14 @@
 //#define VP_DEBUG
 //#define VP_DEBUG_MODE 45
 #include <pinocchio/fwd.hpp>
+
+#include <stdexcept>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
 #include <sot/core/debug.hh>
+#include <sot/core/robot-utils.hh>
+
 #ifdef VP_DEBUG
 class sotPG__INIT {
  public:
@@ -669,13 +673,13 @@ bool PatternGenerator::buildModel(void) {
         << " PatternGenerator::buildModel "
         << "The robot with name " << model_name
         << " was not found !";
-    throw std::invalid_arguments(oss.str());
+    throw std::invalid_argument(oss.str());
     ok=false;
     return false;
   }
 
   // Then set the robot model.
-  aRobotUtil->get_parameter(parameter_name,lrobot_description);
+  lrobot_description = aRobotUtil->get_parameter(lparameter_name);
 
   pinocchio::urdf::buildModelFromXML(lrobot_description,
                                      pinocchio::JointModelFreeFlyer(),

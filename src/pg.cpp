@@ -48,6 +48,8 @@ sotPG__INIT sotPG_initiator;
 
 #include "pinocchio/parsers/srdf.hpp"
 #include "pinocchio/parsers/urdf.hpp"
+#include "pinocchio/algorithm/joint-configuration.hpp"
+#include "pinocchio/algorithm/model.hpp"
 
 #include <dynamic-graph/all-commands.h>
 #include <dynamic-graph/factory.h>
@@ -626,20 +628,6 @@ bool PatternGenerator::InitState(void) {
     m_LeftFootPosition = m_InitLeftFootPosition;
     m_RightFootPosition = m_InitRightFootPosition;
 
-    sotDEBUG(5) << "m_InitCOMRefPos: " << m_InitCOMRefPos;
-
-    sotDEBUG(5) << "m_InitZMPRefPos: " << m_InitZMPRefPos;
-    sotDEBUG(5) << "m_LeftFootPosition: " << m_LeftFootPosition;
-    sotDEBUG(5) << "m_RightFootPosition: " << m_RightFootPosition;
-    sotDEBUG(5) << "m_MotionSinceInstanciationToThisSequence"
-                << m_MotionSinceInstanciationToThisSequence << std::endl;
-
-    sotDEBUG(5) << " Init Waist Ref. Position " << m_InitWaistRefPos << endl;
-    sotDEBUG(5) << " Init Waist Ref. Attitude " << m_InitWaistRefAtt << endl;
-
-    sotDEBUG(5) << "ILF :" << m_InitLeftFootPosition << " "
-                << "LRF :" << m_InitRightFootPosition << endl;
-
   } catch (...) {
     SOT_THROW ExceptionPatternGenerator(
         ExceptionPatternGenerator::PATTERN_GENERATOR_JRL,
@@ -678,14 +666,34 @@ bool PatternGenerator::buildModel(void) {
     return false;
   }
 
-  // Then set the robot model.
-  lrobot_description = aRobotUtil->get_parameter(lparameter_name);
+  // Then build a complete robot model.
+  lrobot_description = aRobotUtil->get_parameter<string>(lparameter_name);
 
+  pinocchio::Model lrobotModel;
   pinocchio::urdf::buildModelFromXML(lrobot_description,
                                      pinocchio::JointModelFreeFlyer(),
-                                     m_robotModel);
+                                     lrobotModel);
 
-  m_robotData = new pinocchio::Data(m_robotModel);
+  // Then extract a reduced model
+  Eigen::VectorXd q_neutral= neutral(lrobotModel);
+  ExtractJointMimics an_extract_joint_mimics(lrobot_description);
+  const std::vector<std::string> &
+      list_of_joints_to_lock_by_name =
+      an_extract_joint_mimics.get_mimic_joints();
+
+  std::vector<pinocchio::JointIndex> list_of_joints_to_lock_by_id;
+  for(auto it : list_of_joints_to_lock_by_name)
+  {
+    const std::string & joint_name = it;
+    if(m_robotModel.existJointName(joint_name)) // do not consider joint that are not in the model
+      list_of_joints_to_lock_by_id.
+          push_back(m_robotModel.getJointId(joint_name));
+  }
+  m_robotModel = pinocchio::buildReducedModel(m_robotModel,
+                                              list_of_joints_to_lock_by_id,
+                                              q_neutral);
+
+
   // Creating the humanoid robot.
   m_PR = new pg::PinocchioRobot();
   m_PR->initializeRobotModelAndData(&m_robotModel, m_robotData);

@@ -640,10 +640,11 @@ bool PatternGenerator::InitState(void) {
   return true;
 }
 
-bool PatternGenerator::buildModel(void) {
-  bool ok = true;
+bool PatternGenerator::buildReducedModel(void) {
+
   // Name of the parameter
-  std::string lparameter_name("robot_description");
+  std::string lparameter_name("/robot_description");
+
   // Model of the robot inside a string.
   std::string lrobot_description;
 
@@ -662,12 +663,18 @@ bool PatternGenerator::buildModel(void) {
         << "The robot with name " << model_name
         << " was not found !";
     throw std::invalid_argument(oss.str());
-    ok=false;
     return false;
   }
 
-  // Then build a complete robot model.
-  lrobot_description = aRobotUtil->get_parameter<string>(lparameter_name);
+  try {
+    // Then build a complete robot model.
+    lrobot_description = aRobotUtil->get_parameter<string>(lparameter_name);
+  }  catch (...) {
+    SOT_THROW ExceptionPatternGenerator(
+        ExceptionPatternGenerator::PATTERN_GENERATOR_JRL,
+        "Error while getting parameter " + lparameter_name + " for the WPG.");
+    return false;
+  }
 
   pinocchio::Model lrobotModel;
   pinocchio::urdf::buildModelFromXML(lrobot_description,
@@ -685,7 +692,8 @@ bool PatternGenerator::buildModel(void) {
   for(auto it : list_of_joints_to_lock_by_name)
   {
     const std::string & joint_name = it;
-    if(m_robotModel.existJointName(joint_name)) // do not consider joint that are not in the model
+    if(m_robotModel.existJointName(joint_name))
+      // do not consider joint that are not in the model
       list_of_joints_to_lock_by_id.
           push_back(m_robotModel.getJointId(joint_name));
   }
@@ -693,49 +701,65 @@ bool PatternGenerator::buildModel(void) {
                                               list_of_joints_to_lock_by_id,
                                               q_neutral);
 
+  return true;
+}
+
+
+bool PatternGenerator::buildPGI(void) {
+
+  bool ok = true;
+
+  // Build the reduced model of the robot
+  buildReducedModel();
 
   // Creating the humanoid robot.
   m_PR = new pg::PinocchioRobot();
   m_PR->initializeRobotModelAndData(&m_robotModel, m_robotData);
+
   // Read xml/srdf stream
-  std::ifstream srdf_stream(m_srdfFile.c_str());
   using boost::property_tree::ptree;
   ptree pt;
   try {
-    read_xml(srdf_stream, pt);
+
     // Initialize the Right Foot
     pg::PRFoot aFoot;
-    string path = "robot.specificities.feet.right.size";
+    string path = "/robot/specificities/feet/right/size";
     BOOST_FOREACH (const ptree::value_type &v, pt.get_child(path.c_str())) {
       aFoot.soleHeight = v.second.get<double>("height");
       aFoot.soleWidth = v.second.get<double>("width");
       aFoot.soleDepth = v.second.get<double>("depth");
-    }  // BOOST_FOREACH
-    path = "robot.specificities.feet.right.anklePosition";
+    }
+
+    path = "/robot/specificities/feet/right/anklePosition";
     BOOST_FOREACH (const ptree::value_type &v, pt.get_child(path.c_str())) {
       aFoot.anklePosition(0) = v.second.get<double>("x");
       aFoot.anklePosition(1) = v.second.get<double>("y");
       aFoot.anklePosition(2) = v.second.get<double>("z");
-    }  // BOOST_FOREACH
+    }
+
     pinocchio::FrameIndex ra = m_robotModel.getFrameId("r_ankle");
     aFoot.associatedAnkle = m_robotModel.frames.at(ra).parent;
     m_PR->initializeRightFoot(aFoot);
+
     // Initialize the Left Foot
-    path = "robot.specificities.feet.left.size";
+    path = "/robot/specificities/feet/left/size";
     BOOST_FOREACH (const ptree::value_type &v, pt.get_child(path.c_str())) {
       aFoot.soleHeight = v.second.get<double>("height");
       aFoot.soleWidth = v.second.get<double>("width");
       aFoot.soleDepth = v.second.get<double>("depth");
     }  // BOOST_FOREACH
-    path = "robot.specificities.feet.left.anklePosition";
+
+    path = "/robot/specificities/feet/left/anklePosition";
     BOOST_FOREACH (const ptree::value_type &v, pt.get_child(path.c_str())) {
       aFoot.anklePosition(0) = v.second.get<double>("x");
       aFoot.anklePosition(1) = v.second.get<double>("y");
       aFoot.anklePosition(2) = v.second.get<double>("z");
     }  // BOOST_FOREACH
+
     pinocchio::FrameIndex la = m_robotModel.getFrameId("l_ankle");
     aFoot.associatedAnkle = m_robotModel.frames.at(la).parent;
     m_PR->initializeLeftFoot(aFoot);
+
   } catch (...) {
     cerr << "problem while reading the srdf file. File corrupted?" << endl;
     ok = false;
@@ -1682,8 +1706,9 @@ void PatternGenerator::initCommands(void) {
       "buildModel",
       makeCommandVoid0(
           *this,
-          (void (PatternGenerator::*)(void)) & PatternGenerator::buildModel,
-          docCommandVoid0("From the files, parse and build.")));
+          (void (PatternGenerator::*)(void)) & PatternGenerator::buildPGI,
+          docCommandVoid0("From the files, parse and build the robot model and"
+                          " the Walking Pattern Generator.")));
   addCommand(
       "initState",
       makeCommandVoid0(

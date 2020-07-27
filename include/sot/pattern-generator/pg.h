@@ -189,9 +189,13 @@ class PatternGenerator_EXPORT PatternGenerator : public Entity {
     @{
   */
 
-  /*! \brief Build the pattern generator interface from a Urdf
-    and SRDF file. */
-  bool buildModel(void);
+  /*! \brief Build the pattern generator interface from the parameter
+    "/robot_description" and the informations in
+    "/robot/specifificities/feet/[right|left]/[size|anklePosition]*/
+  bool buildPGI(void);
+
+  /*! \brief Build the reduced model. */
+  bool buildReducedModel(void);
 
   /*! \brief Initialize the state of the robot. */
   bool InitState(void);

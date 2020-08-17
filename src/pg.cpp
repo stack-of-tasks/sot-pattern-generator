@@ -614,7 +614,7 @@ bool PatternGenerator::InitState(void) {
 bool PatternGenerator::buildReducedModel(void) {
 
   // Name of the parameter
-  std::string lparameter_name("/robot_description");
+  const std::string lparameter_name("/robot_description");
 
   // Model of the robot inside a string.
   std::string lrobot_description;
@@ -1572,8 +1572,6 @@ int &PatternGenerator::OneStepOfControl(int &dummy, int time) {
                  << " lRightFootPosition.stepType: "
                  << lRightFootPosition.stepType << endl;
     // Find the support foot feet.
-    m_leftFootContact = true;
-    m_rightFootContact = true;
     // If stepType = -1 -> single support phase on the dedicated foot
     // If stepType = 10 -> double support phase (both feet should have stepType=10)
     // If stepType = 11 -> double support phase between 2 single support phases for Kajita Algorithm
@@ -1597,8 +1595,13 @@ int &PatternGenerator::OneStepOfControl(int &dummy, int time) {
     } else if (lRightFootPosition.stepType == -1) {
       lSupportFoot = 0;
       m_rightFootContact = true;
-      if (lLeftFootPosition.stepType != -1) m_leftFootContact = false;
-      m_DoubleSupportPhaseState = 0;
+      // It is almost certain that when there is single support on a foot
+      // the other one cannot be in simple support (neither in double support)
+      // This if is certainly always true -> to be checked
+      if (lLeftFootPosition.stepType != -1) {
+        m_leftFootContact = false;
+        m_ContactPhase = RIGHT_SUPPORT_PHASE;
+      }
     } else
     /* m_LeftFootPosition.z ==m_RightFootPosition.z
        We keep the previous support foot half the time

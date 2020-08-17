@@ -56,7 +56,7 @@ void PGManager::startSequence(const StepQueue &seq) {
   sotDEBUG(15) << "Cmd: " << cmdstd.str() << std::endl;
 }
 
-void PGManager::stopSequence(const StepQueue &seq) {
+void PGManager::stopSequence(const StepQueue &/* seq */) {
   if (!spg_) {
     sotERROR << "PG not set" << std::endl;
     return;

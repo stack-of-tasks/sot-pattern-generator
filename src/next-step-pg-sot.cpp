@@ -174,7 +174,7 @@ void NextStepPgSot::introductionCallBack(const int &timeCurr) {
 
           PatternGeneratorJRL::FootAbsolutePosition aFAP;
 
-          unsigned int lSupportFoot = 0;
+          int lSupportFoot = 0;
 
           lSupportFoot = m_sPG->SupportFootSOUT(timeCurr);
 

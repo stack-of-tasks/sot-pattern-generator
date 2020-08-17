@@ -35,6 +35,85 @@
 #include <sot/core/debug.hh>
 #include <sot/core/robot-utils.hh>
 
+using namespace std;
+
+void setEndEffectorParameters(  dynamicgraph::sot::RobotUtilShrPtr aRobotUtil) {
+
+  std::string lparameter_name = "/pg/remap/r_ankle";
+  std::string lparameter_value = "leg_right_6_link";
+  aRobotUtil->set_parameter<string>(lparameter_name,lparameter_value);
+
+  lparameter_name = "/pg/remap/l_ankle";
+  lparameter_value = "leg_left_6_link";
+  aRobotUtil->set_parameter<string>(lparameter_name,lparameter_value);
+
+  lparameter_name = "/pg/remap/r_wrist";
+  lparameter_value = "arm_right_7_link";
+  aRobotUtil->set_parameter<string>(lparameter_name,lparameter_value);
+
+  lparameter_name = "/pg/remap/l_wrist";
+  lparameter_value = "arm_left_7_link";
+  aRobotUtil->set_parameter<string>(lparameter_name,lparameter_value);
+
+  lparameter_name = "/pg/remap/body";
+  lparameter_value = "base_link";
+  aRobotUtil->set_parameter<string>(lparameter_name,lparameter_value);
+
+  lparameter_name = "/pg/remap/torso";
+  lparameter_value = "torso_2_link";
+  aRobotUtil->set_parameter<string>(lparameter_name,lparameter_value);
+
+}
+
+void setFeetParameters(dynamicgraph::sot::RobotUtilShrPtr aRobotUtil){
+  std::vector<std::string> lparameter_names_suffix =
+      { "size/height",
+        "size/width",
+        "size/depth",
+        "anklePosition/x",
+        "anklePosition/y",
+        "anklePosition/z"};
+  std::vector<double> lparameter_values =
+      { 0.122, 0.205, 0.107, 0.0, 0.0, 0.107};
+
+  std::string lparameter_names_prefix =
+      "/robot/specificities/feet/";
+  for (unsigned int i=0;i<6;i++)
+  {
+    std::string full_parameter_name = lparameter_names_prefix + "right/" +
+        lparameter_names_suffix[i];
+
+    aRobotUtil->set_parameter<double>(full_parameter_name,
+                                      lparameter_values[i]);
+    full_parameter_name = lparameter_names_prefix + "left/" +
+        lparameter_names_suffix[i];
+    aRobotUtil->set_parameter<double>(full_parameter_name,
+                                      lparameter_values[i]);
+  }
+}
+
+void setParameters(std::string &lrobot_description) {
+  dynamicgraph::sot::RobotUtilShrPtr aRobotUtil;
+
+    // Reading the parameter.
+  string model_name("robot");
+
+  // Search for the robot util related to robot_name.
+  if (!dynamicgraph::sot::isNameInRobotUtil(model_name))
+    aRobotUtil = dynamicgraph::sot::createRobotUtil(model_name);
+
+  std::string lparameter_name("/robot_description");
+
+  // Then set the complete robot model in the parameter set.
+  aRobotUtil->set_parameter<string>(lparameter_name,lrobot_description);
+
+  /// Specify the end effectors in the parameter server object.
+  setEndEffectorParameters(aRobotUtil);
+
+  /// Specify the size of the feet.
+  setFeetParameters(aRobotUtil);
+}
+
 int main(int, char**) {
   using namespace std;
   dynamicgraph::sot::PatternGenerator aPG;
@@ -51,7 +130,7 @@ int main(int, char**) {
   for (auto test_path : paths)
   {
     filename = test_path +
-        string("/share/talos_data/urdf/talos_reduced_wpg.urdf");
+        string("/share/talos_data/urdf/talos_full_v2.urdf");
     if ( boost::filesystem::exists(filename))
       break;
 
@@ -81,24 +160,11 @@ int main(int, char**) {
   unsigned int idx = 0;
   for (auto an_it_of_robot : *alist_of_robots)
   {
-    std::cout << idx++ << " " << an_it_of_robot << std::endl;
+    std::cout << __FILE__ << " "
+              << idx++ << " " << an_it_of_robot << std::endl;
   }
 
-  // Reading the parameter.
-  string model_name("robot");
-
-  // Search for the robot util related to robot_name.
-  dynamicgraph::sot::RobotUtilShrPtr aRobotUtil =
-      dynamicgraph::sot::getRobotUtil(model_name);
-
-  std::cout << dynamicgraph::sot::RefVoidRobotUtil() << std::endl;
-  std::cout << aRobotUtil.get() << std::endl;
-  if (aRobotUtil == dynamicgraph::sot::RefVoidRobotUtil())
-    aRobotUtil = dynamicgraph::sot::createRobotUtil(model_name);
-  std::cout << aRobotUtil.get() << std::endl;
-
-  // Then build the complete robot model.
-  aRobotUtil->set_parameter<string>(lparameter_name,lrobot_description);
+  setParameters(lrobot_description);
 
   // Build the pattern generator
   aPG.buildPGI();

@@ -28,6 +28,7 @@
 //#define VP_DEBUG_MODE 45
 #include <pinocchio/fwd.hpp>
 
+#include <sstream>
 #include <stdexcept>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
@@ -311,6 +312,11 @@ PatternGenerator::PatternGenerator(const std::string &name)
           boost::bind(&PatternGenerator::getRightFootContact, this, _1, _2),
           OneStepOfControlS,
           "PatternGenerator(" + name + ")::output(bool)::rightfootcontact")
+      ,
+      contactPhaseSOUT(
+          boost::bind(&PatternGenerator::getContactPhase, this, _1, _2),
+          OneStepOfControlS,
+          "PatternGenerator(" + name + ")::output(int)::contactphase")
 
 {
   m_MotionSinceInstanciationToThisSequence.setIdentity();
@@ -318,7 +324,7 @@ PatternGenerator::PatternGenerator(const std::string &name)
   m_LocalTime = 0;
   m_count = 0;
   m_TimeStep = 0.005;
-  m_DoubleSupportPhaseState = false;
+  m_ContactPhase = DOUBLE_SUPPORT_PHASE;
   m_forceFeedBack = false;
   m_feedBackControl = false;
 
@@ -419,42 +425,6 @@ PatternGenerator::PatternGenerator(const std::string &name)
   // For debug, register OSOC (not relevant for normal use).
   signalRegistration(OneStepOfControlS);
 
-#if 0
-
-      signalRegistration( jointPositionSIN <<
-                          motorControlJointPositionSIN <<
-                          ZMPPreviousControllerSIN <<
-                          ZMPRefSOUT <<
-                          CoMRefSOUT <<
-                          dCoMRefSOUT);
-      signalRegistration( dataInProcessSOUT <<
-                          LeftFootCurrentPosSIN <<
-                          RightFootCurrentPosSIN <<
-                          LeftFootRefSOUT <<
-                          RightFootRefSOUT);
-
-      signalRegistration( SupportFootSOUT <<
-                          jointWalkingErrorPositionSOUT <<
-                          waistattitudeSOUT <<
-                          waistpositionSOUT <<
-                          waistattitudeabsoluteSOUT <<
-                          waistpositionabsoluteSOUT);
-
-      signalRegistration( comattitudeSOUT <<
-                          dcomattitudeSOUT );
-
-      signalRegistration( dotLeftFootRefSOUT <<
-                          dotRightFootRefSOUT);
-
-      signalRegistration( InitZMPRefSOUT <<
-                          InitCoMRefSOUT <<
-                          InitWaistPosRefSOUT <<
-                          InitWaistAttRefSOUT <<
-                          InitLeftFootRefSOUT <<
-                          InitRightFootRefSOUT <<
-                          comSIN <<
-                          velocitydesSIN);
-#else
   signalRegistration(dataInProcessSOUT);
 
   signalRegistration(jointPositionSIN << motorControlJointPositionSIN
@@ -483,9 +453,8 @@ PatternGenerator::PatternGenerator(const std::string &name)
                                     << InitLeftFootRefSOUT
                                     << InitRightFootRefSOUT);
 
-  signalRegistration(leftFootContactSOUT << rightFootContactSOUT);
+  signalRegistration(leftFootContactSOUT << rightFootContactSOUT << contactPhaseSOUT);
 
-#endif
   initCommands();
 
   // init filter for force signals "to be removed"
@@ -656,7 +625,6 @@ bool PatternGenerator::buildReducedModel(void) {
   // Search for the robot util related to robot_name.
   sot::RobotUtilShrPtr aRobotUtil = sot::getRobotUtil(model_name);
 
-  std::cout << "PG:buildReducedModel:" << aRobotUtil.get() << std::endl;
   // If does not exist then it is created.
   if (aRobotUtil.get() == sot::RefVoidRobotUtil().get())
   {
@@ -1090,6 +1058,14 @@ bool &PatternGenerator ::getRightFootContact(bool &res, int time) {
   sotDEBUGIN(25);
   OneStepOfControlS(time);
   res = m_rightFootContact;
+  sotDEBUGOUT(25);
+  return res;
+}
+
+int &PatternGenerator ::getContactPhase(int &res, int time) {
+  sotDEBUGIN(25);
+  OneStepOfControlS(time);
+  res = m_ContactPhase;
   sotDEBUGOUT(25);
   return res;
 }
@@ -1598,11 +1574,26 @@ int &PatternGenerator::OneStepOfControl(int &dummy, int time) {
     // Find the support foot feet.
     m_leftFootContact = true;
     m_rightFootContact = true;
+    // If stepType = -1 -> single support phase on the dedicated foot
+    // If stepType = 10 -> double support phase (both feet should have stepType=10)
+    // If stepType = 11 -> double support phase between 2 single support phases for Kajita Algorithm
+    if ((lLeftFootPosition.stepType == 10) || (lRightFootPosition.stepType == 10) ||
+        (lLeftFootPosition.stepType == 11) || (lRightFootPosition.stepType == 11)){
+      m_leftFootContact = true;
+      m_rightFootContact = true;
+      m_ContactPhase = DOUBLE_SUPPORT_PHASE;
+    }
+
     if (lLeftFootPosition.stepType == -1) {
       lSupportFoot = 1;
       m_leftFootContact = true;
-      if (lRightFootPosition.stepType != -1) m_rightFootContact = false;
-      m_DoubleSupportPhaseState = 0;
+      // It is almost certain that when there is single support on a foot
+      // the other one cannot be in simple support (neither in double support)
+      // This if is certainly always true -> to be checked
+      if (lRightFootPosition.stepType != -1){
+        m_rightFootContact = false;
+        m_ContactPhase = LEFT_SUPPORT_PHASE;
+      }
     } else if (lRightFootPosition.stepType == -1) {
       lSupportFoot = 0;
       m_rightFootContact = true;
@@ -2037,7 +2028,6 @@ void PatternGenerator::setSoleParameters(const double &inSoleLength,
                                          const double &inSoleWidth) {
   m_soleLength = inSoleLength;
   m_soleWidth = inSoleWidth;
-}}
-
-// namespace sot
+}
+}  // namespace sot
 }  // namespace dynamicgraph

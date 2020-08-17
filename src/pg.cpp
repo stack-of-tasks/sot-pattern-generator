@@ -490,17 +490,19 @@ PatternGenerator::PatternGenerator(const std::string &name)
 
   // init filter for force signals "to be removed"
   m_bufferForce.clear();
-  int n = 10;
+  std::vector<double>::size_type n = 10;
   double sum = 0, tmp = 0;
-  m_filterWindow.resize(n + 1);
-  for (int i = 0; i < n + 1; i++) {
+  m_filterWindow.resize((std::vector<double>::size_type)(n + 1));
+  for (std::vector<double>::size_type i = 0; i < n + 1; i++) {
     tmp = sin((M_PI * i) / n);
     m_filterWindow[i] = tmp * tmp;
   }
 
-  for (int i = 0; i < n + 1; i++) sum += m_filterWindow[i];
+  for (std::vector<double>::size_type i = 0; i < n + 1; i++)
+    sum += m_filterWindow[i];
 
-  for (int i = 0; i < n + 1; i++) m_filterWindow[i] /= sum;
+  for (std::vector<double>::size_type i = 0; i < n + 1; i++)
+    m_filterWindow[i] /= sum;
 
   m_initForce.resize(6);
   m_currentForces.resize(6);
@@ -654,8 +656,9 @@ bool PatternGenerator::buildReducedModel(void) {
   // Search for the robot util related to robot_name.
   sot::RobotUtilShrPtr aRobotUtil = sot::getRobotUtil(model_name);
 
+  std::cout << "PG:buildReducedModel:" << aRobotUtil.get() << std::endl;
   // If does not exist then it is created.
-  if (aRobotUtil == sot::RefVoidRobotUtil())
+  if (aRobotUtil.get() == sot::RefVoidRobotUtil().get())
   {
     ostringstream oss;
     oss << __FILE__
@@ -681,27 +684,105 @@ bool PatternGenerator::buildReducedModel(void) {
                                      pinocchio::JointModelFreeFlyer(),
                                      lrobotModel);
 
+
   // Then extract a reduced model
   Eigen::VectorXd q_neutral= neutral(lrobotModel);
   ExtractJointMimics an_extract_joint_mimics(lrobot_description);
+
   const std::vector<std::string> &
       list_of_joints_to_lock_by_name =
       an_extract_joint_mimics.get_mimic_joints();
+
+  std::ostringstream oss;
+  oss << "Size of mimic joints: "
+      << lrobotModel.nq << " "
+      << list_of_joints_to_lock_by_name.size() << " "
+      << q_neutral.size();
+  sendMsg(oss.str(), MSG_TYPE_INFO);
 
   std::vector<pinocchio::JointIndex> list_of_joints_to_lock_by_id;
   for(auto it : list_of_joints_to_lock_by_name)
   {
     const std::string & joint_name = it;
-    if(m_robotModel.existJointName(joint_name))
+
+    if(lrobotModel.existJointName(joint_name))
+    {
+
       // do not consider joint that are not in the model
       list_of_joints_to_lock_by_id.
-          push_back(m_robotModel.getJointId(joint_name));
+          push_back(lrobotModel.getJointId(joint_name));
+    }
+    else
+      std::cout << "joint_name not found: " << joint_name << std::endl;
+
   }
-  m_robotModel = pinocchio::buildReducedModel(m_robotModel,
-                                              list_of_joints_to_lock_by_id,
-                                              q_neutral);
+
+  if (list_of_joints_to_lock_by_id.size()==0)
+    m_robotModel = pinocchio::buildReducedModel(lrobotModel,
+                                                list_of_joints_to_lock_by_id,
+                                                q_neutral);
+  else
+    m_robotModel = lrobotModel;
+
+  m_robotData = new pinocchio::Data(m_robotModel);
 
   return true;
+}
+
+bool PatternGenerator::addComplementaryFrames() {
+  // Reading the parameter.
+  std::string model_name("robot");
+
+  // Search for the robot util related to robot_name.
+  sot::RobotUtilShrPtr aRobotUtil = sot::getRobotUtil(model_name);
+
+  std::vector<std::string> lparameter_names = { "/pg/remap/l_ankle",
+                                                "/pg/remap/r_ankle",
+                                                "/pg/remap/l_wrist",
+                                                "/pg/remap/r_wrist",
+                                                "/pg/remap/body",
+                                                "/pg/remap/torso"};
+
+  std::vector<std::string> lframe_remapped = { "l_ankle",
+                                               "r_ankle",
+                                               "l_wrist",
+                                               "r_wrist",
+                                               "BODY",
+                                               "torso"};
+
+  auto it_frame_remap = lframe_remapped.begin();
+  for(auto it_param_name: lparameter_names) {
+    std::string lbody_name;
+    lbody_name = aRobotUtil->get_parameter<string>(it_param_name);
+    pinocchio::Model::Index idx = m_robotModel.getFrameId(lbody_name);
+    m_robotModel.frames[idx].name = *it_frame_remap;
+    it_frame_remap++;
+  }
+
+  return true;
+}
+
+
+void PatternGenerator::readFootParameters(std::string & rootFootPath, pg::PRFoot &aFoot) {
+  // Reading the parameter.
+  std::string model_name("robot");
+
+  // Search for the robot util related to robot_name.
+  sot::RobotUtilShrPtr aRobotUtil = sot::getRobotUtil(model_name);
+
+  std::string pathname = rootFootPath + "/size/height";
+  aFoot.soleHeight = aRobotUtil->get_parameter<double>(pathname);
+  pathname = rootFootPath + "/size/width";
+  aFoot.soleWidth = aRobotUtil->get_parameter<double>(pathname);
+  pathname = rootFootPath + "/size/depth";
+  aFoot.soleDepth = aRobotUtil->get_parameter<double>(pathname);
+
+  pathname = rootFootPath + "/anklePosition/x";
+  aFoot.anklePosition(0) = aRobotUtil->get_parameter<double>(pathname);
+  pathname = rootFootPath + "/anklePosition/y";
+  aFoot.anklePosition(1) = aRobotUtil->get_parameter<double>(pathname);
+  pathname = rootFootPath + "/anklePosition/z";
+  aFoot.anklePosition(2) = aRobotUtil->get_parameter<double>(pathname);
 }
 
 
@@ -711,6 +792,8 @@ bool PatternGenerator::buildPGI(void) {
 
   // Build the reduced model of the robot
   buildReducedModel();
+  addComplementaryFrames();
+
 
   // Creating the humanoid robot.
   m_PR = new pg::PinocchioRobot();
@@ -723,45 +806,32 @@ bool PatternGenerator::buildPGI(void) {
 
     // Initialize the Right Foot
     pg::PRFoot aFoot;
-    string path = "/robot/specificities/feet/right/size";
-    BOOST_FOREACH (const ptree::value_type &v, pt.get_child(path.c_str())) {
-      aFoot.soleHeight = v.second.get<double>("height");
-      aFoot.soleWidth = v.second.get<double>("width");
-      aFoot.soleDepth = v.second.get<double>("depth");
-    }
 
-    path = "/robot/specificities/feet/right/anklePosition";
-    BOOST_FOREACH (const ptree::value_type &v, pt.get_child(path.c_str())) {
-      aFoot.anklePosition(0) = v.second.get<double>("x");
-      aFoot.anklePosition(1) = v.second.get<double>("y");
-      aFoot.anklePosition(2) = v.second.get<double>("z");
-    }
-
+    // First find the joint to which the r_ankle body is related
     pinocchio::FrameIndex ra = m_robotModel.getFrameId("r_ankle");
     aFoot.associatedAnkle = m_robotModel.frames.at(ra).parent;
+
+    // Then populates the PRFoot structure with the property tree.
+    std::string path = "/robot/specificities/feet/right";
+    readFootParameters(path, aFoot);
+
+    // Initialize internal state of the right foot.
     m_PR->initializeRightFoot(aFoot);
 
     // Initialize the Left Foot
-    path = "/robot/specificities/feet/left/size";
-    BOOST_FOREACH (const ptree::value_type &v, pt.get_child(path.c_str())) {
-      aFoot.soleHeight = v.second.get<double>("height");
-      aFoot.soleWidth = v.second.get<double>("width");
-      aFoot.soleDepth = v.second.get<double>("depth");
-    }  // BOOST_FOREACH
-
-    path = "/robot/specificities/feet/left/anklePosition";
-    BOOST_FOREACH (const ptree::value_type &v, pt.get_child(path.c_str())) {
-      aFoot.anklePosition(0) = v.second.get<double>("x");
-      aFoot.anklePosition(1) = v.second.get<double>("y");
-      aFoot.anklePosition(2) = v.second.get<double>("z");
-    }  // BOOST_FOREACH
-
+    // First find the joint to which the l_ankle body is related
     pinocchio::FrameIndex la = m_robotModel.getFrameId("l_ankle");
     aFoot.associatedAnkle = m_robotModel.frames.at(la).parent;
+
+    // Then populates the PRFoot structure with the property tree.
+    path = "/robot/specificities/feet/left";
+    readFootParameters(path, aFoot);
+
+    // Initialize internal state of the left foot.
     m_PR->initializeLeftFoot(aFoot);
 
   } catch (...) {
-    cerr << "problem while reading the srdf file. File corrupted?" << endl;
+    cerr << "problem while setting the feet informations. File corrupted?" << endl;
     ok = false;
   }
 
@@ -1857,8 +1927,8 @@ Vector &PatternGenerator::getjointWalkingErrorPosition(Vector &res, int time) {
   return res;
 }
 
-unsigned int &PatternGenerator::getSupportFoot(unsigned int &res,
-                                               int /*time*/) {
+int &PatternGenerator::getSupportFoot(int &res,
+                                      int /*time*/) {
   res = m_SupportFoot;
   return res;
 }
@@ -1967,6 +2037,7 @@ void PatternGenerator::setSoleParameters(const double &inSoleLength,
                                          const double &inSoleWidth) {
   m_soleLength = inSoleLength;
   m_soleWidth = inSoleWidth;
-}
-}  // namespace sot
+}}
+
+// namespace sot
 }  // namespace dynamicgraph

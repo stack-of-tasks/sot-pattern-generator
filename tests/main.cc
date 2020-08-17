@@ -149,10 +149,10 @@ int main(int, char**) {
   oss << talos_reduced_wpg_file.rdbuf();
 
   // Name of the parameter
-  string lparameter_name("/robot_description");
+  const string lparameter_name("/robot_description");
 
   // Model of the robot inside a string.
-  string lrobot_description = oss.str();
+  const string lrobot_description = oss.str();
 
   std::shared_ptr<std::vector<std::string>>
       alist_of_robots = dynamicgraph::sot::getListOfRobots();

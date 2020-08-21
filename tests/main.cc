@@ -92,7 +92,7 @@ void setFeetParameters(dynamicgraph::sot::RobotUtilShrPtr aRobotUtil){
   }
 }
 
-void setParameters(std::string &lrobot_description) {
+void setParameters(const std::string &lrobot_description) {
   dynamicgraph::sot::RobotUtilShrPtr aRobotUtil;
 
     // Reading the parameter.

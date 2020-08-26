@@ -105,26 +105,10 @@ int main(int, char**) {
   using namespace std;
   dynamicgraph::sot::PatternGenerator aPG;
 
-  // Get environment variable CMAKE_PREFIX_PATH
-  const string s_cmake_prefix_path = getenv( "CMAKE_PREFIX_PATH" );
-
-  // Read the various paths
-  vector<string> paths;
-  boost::split(paths, s_cmake_prefix_path, boost::is_any_of(":;"));
 
   // Search talos_reduced_wpg.urdf
-  string filename="";
-  for (auto test_path : paths)
-  {
-    filename = test_path +
-        string("/share/talos_data/urdf/talos_full_v2.urdf");
-    if ( boost::filesystem::exists(filename))
-      break;
-
-  }
-
-  // If not found fails
-  if (filename.size()==0)
+  string filename(URDF_FULL_PATH);
+  if (!boost::filesystem::exists(filename))
   {
     cerr << "Unable to find talos_reduced_wpg.urdf" << endl;
     exit(-1);

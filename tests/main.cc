@@ -10,23 +10,10 @@
 #ifdef BOOST_MPL_LIMIT_VECTOR_SIZE
 #pragma push_macro("BOOST_MPL_LIMIT_VECTOR_SIZE")
 #undef BOOST_MPL_LIMIT_VECTOR_SIZE
-#define BOOST_MPL_LIMIT_VECTOR_SIZE_PUSH
-#endif
-
-#ifdef BOOST_MPL_LIMIT_LIST_SIZE
-#pragma push_macro("BOOST_MPL_LIMIT_LIST_SIZE")
-#undef BOOST_MPL_LIMIT_LIST_SIZE
-#define BOOST_MPL_LIMIT_LIST_SIZE_PUSH
-#endif
-
 #include <boost/property_tree/ptree.hpp>
-
-#ifdef BOOST_MPL_LIMIT_VECTOR_SIZE_PUSH
 #pragma pop_macro("BOOST_MPL_LIMIT_VECTOR_SIZE")
-#endif
-
-#ifdef BOOST_MPL_LIMIT_LIST_SIZE_PUSH
-#pragma pop_macro("BOOST_MPL_LIMIT_LIST_SIZE")
+#else
+#include <boost/property_tree/ptree.hpp>
 #endif
 
 #include <boost/algorithm/string.hpp>

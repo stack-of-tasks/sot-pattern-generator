@@ -180,11 +180,26 @@ class PatternGenerator_EXPORT PatternGenerator : public Entity {
   int m_DSStartingTime;
 
   /*! \brief iteration time. */
-  unsigned int m_LocalTime;
+  int m_LocalTime;
 
   /*! \brief count for subsampling. */
   unsigned int m_count;
 
+  /* \name Body names of the end effectors
+     @{ */
+  /* \brief Left ankle */
+  std::string m_left_ankle_body_name;
+
+  /* \brief Right ankle */
+  std::string m_right_ankle_body_name;
+
+  /* \brief Left wrist */
+  std::string m_left_wrist_body_name;
+
+  /* \brief Right wrist */
+  std::string m_right_wrist_body_name;
+
+  /* @} */
  public: /* --- CONSTRUCTION --- */
   /*! \brief Default constructor. */
   PatternGenerator(const std::string &name = "PatternGenerator");
@@ -196,9 +211,19 @@ class PatternGenerator_EXPORT PatternGenerator : public Entity {
     @{
   */
 
-  /*! \brief Build the pattern generator interface from a Urdf
-    and SRDF file. */
-  bool buildModel(void);
+  /*! \brief Build the pattern generator interface from the parameter
+    "/robot_description" and the informations in
+    "/robot/specifificities/feet/[right|left]/[size|anklePosition]*/
+  bool buildPGI(void);
+
+  /*! \brief Add complementary frame. */
+  bool addComplementaryFrames();
+
+  /*! \brief Build the reduced model. */
+  bool buildReducedModel(void);
+
+  /*! \brief readFootParameters */
+  void readFootParameters(std::string &rootFootPath, pg::PRFoot &aFoot);
 
   /*! \brief Initialize the state of the robot. */
   bool InitState(void);
@@ -326,7 +351,7 @@ class PatternGenerator_EXPORT PatternGenerator : public Entity {
   /*! @} */
 
   /*! \brief Getting the current support foot: 1 Left -1 Right. */
-  unsigned int &getSupportFoot(unsigned int &res, int time);
+  int &getSupportFoot(int &res, int time);
 
   /*! \brief Trigger the initialization of the algorithm */
   int &InitOneStepOfControl(int &dummy, int time);
@@ -581,7 +606,7 @@ class PatternGenerator_EXPORT PatternGenerator : public Entity {
   SignalTimeDependent<MatrixHomogeneous, int> FlyingFootRefSOUT;
 
   /*! \brief Externalize the support foot. */
-  SignalTimeDependent<unsigned int, int> SupportFootSOUT;
+  SignalTimeDependent<int, int> SupportFootSOUT;
 
   /*! \brief Externalize the joint values for walking. */
   SignalTimeDependent<dynamicgraph::Vector, int> jointWalkingErrorPositionSOUT;

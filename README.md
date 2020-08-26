@@ -1,7 +1,6 @@
 sot-pattern-generator
 =====================
-
-[![Building Status](https://travis-ci.org/stack-of-tasks/sot-pattern-generator.svg?branch=master)](https://travis-ci.org/stack-of-tasks/sot-pattern-generator)
+[![License](https://img.shields.io/badge/License-BSD%202--Clause-green.svg)](https://opensource.org/licenses/BSD-2-Clause)
 [![Pipeline status](https://gitlab.laas.fr/stack-of-tasks/sot-pattern-generator/badges/master/pipeline.svg)](https://gitlab.laas.fr/stack-of-tasks/sot-pattern-generator/commits/master)
 [![Coverage report](https://gitlab.laas.fr/stack-of-tasks/sot-pattern-generator/badges/master/coverage.svg?job=doc-coverage)](http://projects.laas.fr/gepetto/doc/stack-of-tasks/sot-pattern-generator/master/coverage/)
 

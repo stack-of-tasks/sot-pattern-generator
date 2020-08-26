@@ -722,8 +722,19 @@ bool PatternGenerator::addComplementaryFrames() {
   for(auto it_param_name: lparameter_names) {
     std::string lbody_name;
     lbody_name = aRobotUtil->get_parameter<string>(it_param_name);
-    pinocchio::Model::Index idx = m_robotModel.getFrameId(lbody_name);
-    m_robotModel.frames[idx].name = *it_frame_remap;
+    if (m_robotModel.existFrame(lbody_name))
+    {
+      pinocchio::Model::Index idx = m_robotModel.getFrameId(lbody_name);
+      m_robotModel.frames[idx].name = *it_frame_remap;
+    }
+    else
+    {
+      SOT_THROW ExceptionPatternGenerator(
+        ExceptionPatternGenerator::PATTERN_GENERATOR_JRL,
+        "Error for parameter " + it_param_name + " body name " +
+        lbody_name + " doest no exist");
+      return false;
+    }
     it_frame_remap++;
   }
 

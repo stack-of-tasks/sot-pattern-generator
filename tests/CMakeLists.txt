@@ -5,6 +5,7 @@
 ADD_DEFINITIONS(-DDEBUG=2)
 
 ADD_UNIT_TEST(main_test main.cc)
+
 TARGET_LINK_LIBRARIES(main_test
   jrl-walkgen::jrl-walkgen
   sot-core::sot-core
@@ -20,8 +21,7 @@ TARGET_LINK_LIBRARIES(main_test
   pg-manager
   )
 
-SET(urdfpath ${TALOS_DATA_PREFIX}/share/talos_data/urdf/talos_reduced_wpg.urdf)
-SET(srdfpath ${TALOS_DATA_PREFIX}/share/talos_data/srdf/talos_wpg.srdf)
+SET(urdfpath ${TALOS_DATA_PREFIX}/share/talos_data/urdf/talos_full_v2.urdf)
 
 TARGET_COMPILE_DEFINITIONS(main_test PUBLIC
-  URDF_FULL_PATH="${urdfpath}" SRDF_FULL_PATH="${srdfpath}")
+  URDF_FULL_PATH="${urdfpath}" )

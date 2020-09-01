@@ -1,23 +1,18 @@
 /*
  *  Copyright
  */
-#include <iostream>
-#include <string>
-#include <sstream>
 #include <algorithm>
+#include <iostream>
 #include <iterator>
+#include <sstream>
+#include <string>
 
-#ifdef BOOST_MPL_LIMIT_VECTOR_SIZE
-#pragma push_macro("BOOST_MPL_LIMIT_VECTOR_SIZE")
-#undef BOOST_MPL_LIMIT_VECTOR_SIZE
-#include <boost/property_tree/ptree.hpp>
-#pragma pop_macro("BOOST_MPL_LIMIT_VECTOR_SIZE")
-#else
-#include <boost/property_tree/ptree.hpp>
-#endif
+#include <pinocchio/fwd.hpp>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/property_tree/ptree.hpp>
+
 #include <sot/pattern-generator/pg.h>
 #include <sot/core/debug.hh>
 #include <sot/core/robot-utils.hh>

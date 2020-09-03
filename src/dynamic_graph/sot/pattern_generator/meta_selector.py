@@ -1,6 +1,6 @@
 from dynamic_graph import plug
 
-from .selector import Selector
+from .selector import Selector as Base
 
 print("With meta selector")
 
@@ -11,25 +11,22 @@ print("With meta selector")
 #  %                             ,['matrixHomo','pg_H_sf',pg.rightfootref,pg.leftfootref]
 #  %                             ,['matrixHomo','wa_H_sf',geom.rf,geom.lf]
 #  %                             )
-Selector.basicInit = Selector.__init__
 
 
-def metaSelectorInit(self, name, *signalPlug):
-    self.basicInit(name)
-    if len(signalPlug):
-        nbOut = len(signalPlug)
-        nbIn = len(signalPlug[0]) - 2
-        self.reset(nbIn, nbOut)
-        idxOut = 0
-        for sigOut in signalPlug:
-            typeSig = sigOut[0]
-            nameSig = sigOut[1]
-            self.create(typeSig, nameSig, idxOut)
-            idxIn = 0
-            for sigIn in sigOut[2:]:
-                plug(sigIn, self.signal(nameSig + str(idxIn)))
-                idxIn += 1
-            idxOut += 1
-
-
-Selector.__init__ = metaSelectorInit
+class Selector:
+    def __init__(self, name, *signalPlug):
+        self = Base(name)
+        if len(signalPlug):
+            nbOut = len(signalPlug)
+            nbIn = len(signalPlug[0]) - 2
+            self.reset(nbIn, nbOut)
+            idxOut = 0
+            for sigOut in signalPlug:
+                typeSig = sigOut[0]
+                nameSig = sigOut[1]
+                self.create(typeSig, nameSig, idxOut)
+                idxIn = 0
+                for sigIn in sigOut[2:]:
+                    plug(sigIn, self.signal(nameSig + str(idxIn)))
+                    idxIn += 1
+                idxOut += 1

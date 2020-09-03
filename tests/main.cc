@@ -17,6 +17,8 @@
 #include <sot/core/debug.hh>
 #include <sot/core/robot-utils.hh>
 
+#include <example-robot-data/path.hpp>
+
 using namespace std;
 
 void setEndEffectorParameters(  dynamicgraph::sot::RobotUtilShrPtr aRobotUtil) {
@@ -101,7 +103,7 @@ int main(int, char**) {
   dynamicgraph::sot::PatternGenerator aPG;
 
   // Search talos_reduced_wpg.urdf
-  string filename(URDF_FULL_PATH);
+  string filename(EXAMPLE_ROBOT_DATA_MODEL_DIR "/talos_data/robots/talos_full_v2.urdf");
   if (!boost::filesystem::exists(filename))
   {
     cerr << "Unable to find talos_reduced_wpg.urdf" << endl;

@@ -1,5 +1,6 @@
-from selector import Selector
 from dynamic_graph import plug
+
+from .selector import Selector
 
 print("With meta selector")
 

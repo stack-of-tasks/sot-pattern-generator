@@ -4,8 +4,8 @@
   <description>
     jrl-walkgen bindings for dynamic-graph
   </description>
-  <maintainer email="ostasse@laas.fr">Olivier Stasse</maintainer>
-  <license>BSDv2</license>
+  <maintainer email="guilhem.saurel@laas.fr">Guilhem Saurel</maintainer>
+  <license>BSD</license>
 
   <url>http://github.com/stack-of-tasks/sot-talos</url>
   <author>Olivier Stasse</author>

@@ -17,14 +17,16 @@
  *
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-#include <cmath>
-
 #include <time.h>
+
+#include <cmath>
 #ifndef WIN32
 #include <sys/time.h>
+
 #include <iostream>
 #else
 #include <Winsock2.h>
+
 #include <jrl/mal/boost.hh>
 #include <sot/core/utils-windows.hh>
 #endif /*WIN32*/
@@ -35,6 +37,7 @@
 #include <sot/pattern-generator/step-checker.h>
 #include <sot/pattern-generator/step-computer-force.h>
 #include <sot/pattern-generator/step-queue.h>
+
 #include <sot/core/debug.hh>
 #include <sot/core/macros-signal.hh>
 #include <sot/core/matrix-geometry.hh>

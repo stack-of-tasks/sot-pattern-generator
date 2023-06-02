@@ -1,5 +1,5 @@
 language: cpp
-compiler: 
+compiler:
 - gcc
 env:
   global:
@@ -25,4 +25,3 @@ before_install:
 script: ./.travis/run build
 after_success: ./.travis/run after_success
 after_failure: ./.travis/run after_failure
-

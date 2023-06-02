@@ -21,6 +21,7 @@
 #include <dynamic-graph/factory.h>
 #include <sot/pattern-generator/pg-manager.h>
 #include <sot/pattern-generator/pg.h>
+
 #include <sot/core/debug.hh>
 
 namespace dynamicgraph {
@@ -56,7 +57,7 @@ void PGManager::startSequence(const StepQueue &seq) {
   sotDEBUG(15) << "Cmd: " << cmdstd.str() << std::endl;
 }
 
-void PGManager::stopSequence(const StepQueue &/* seq */) {
+void PGManager::stopSequence(const StepQueue & /* seq */) {
   if (!spg_) {
     sotERROR << "PG not set" << std::endl;
     return;

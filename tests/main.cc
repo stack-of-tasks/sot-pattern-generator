@@ -1,76 +1,65 @@
 /*
  *  Copyright
  */
+#include <sot/pattern-generator/pg.h>
+
 #include <algorithm>
-#include <iostream>
-#include <iterator>
-#include <sstream>
-#include <string>
-
-#include <pinocchio/fwd.hpp>
-
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/property_tree/ptree.hpp>
-
-#include <sot/pattern-generator/pg.h>
+#include <example-robot-data/path.hpp>
+#include <iostream>
+#include <iterator>
+#include <pinocchio/fwd.hpp>
 #include <sot/core/debug.hh>
 #include <sot/core/robot-utils.hh>
-
-#include <example-robot-data/path.hpp>
+#include <sstream>
+#include <string>
 
 using namespace std;
 
-void setEndEffectorParameters(  dynamicgraph::sot::RobotUtilShrPtr aRobotUtil) {
-
+void setEndEffectorParameters(dynamicgraph::sot::RobotUtilShrPtr aRobotUtil) {
   std::string lparameter_name = "/pg/remap/r_ankle";
   std::string lparameter_value = "leg_right_6_link";
-  aRobotUtil->set_parameter<string>(lparameter_name,lparameter_value);
+  aRobotUtil->set_parameter<string>(lparameter_name, lparameter_value);
 
   lparameter_name = "/pg/remap/l_ankle";
   lparameter_value = "leg_left_6_link";
-  aRobotUtil->set_parameter<string>(lparameter_name,lparameter_value);
+  aRobotUtil->set_parameter<string>(lparameter_name, lparameter_value);
 
   lparameter_name = "/pg/remap/r_wrist";
   lparameter_value = "arm_right_7_link";
-  aRobotUtil->set_parameter<string>(lparameter_name,lparameter_value);
+  aRobotUtil->set_parameter<string>(lparameter_name, lparameter_value);
 
   lparameter_name = "/pg/remap/l_wrist";
   lparameter_value = "arm_left_7_link";
-  aRobotUtil->set_parameter<string>(lparameter_name,lparameter_value);
+  aRobotUtil->set_parameter<string>(lparameter_name, lparameter_value);
 
   lparameter_name = "/pg/remap/body";
   lparameter_value = "base_link";
-  aRobotUtil->set_parameter<string>(lparameter_name,lparameter_value);
+  aRobotUtil->set_parameter<string>(lparameter_name, lparameter_value);
 
   lparameter_name = "/pg/remap/torso";
   lparameter_value = "torso_2_link";
-  aRobotUtil->set_parameter<string>(lparameter_name,lparameter_value);
-
+  aRobotUtil->set_parameter<string>(lparameter_name, lparameter_value);
 }
 
-void setFeetParameters(dynamicgraph::sot::RobotUtilShrPtr aRobotUtil){
-  std::vector<std::string> lparameter_names_suffix =
-      { "size/height",
-        "size/width",
-        "size/depth",
-        "anklePosition/x",
-        "anklePosition/y",
-        "anklePosition/z"};
-  std::vector<double> lparameter_values =
-      { 0.122, 0.205, 0.107, 0.0, 0.0, 0.107};
+void setFeetParameters(dynamicgraph::sot::RobotUtilShrPtr aRobotUtil) {
+  std::vector<std::string> lparameter_names_suffix = {
+      "size/height",     "size/width",      "size/depth",
+      "anklePosition/x", "anklePosition/y", "anklePosition/z"};
+  std::vector<double> lparameter_values = {0.122, 0.205, 0.107,
+                                           0.0,   0.0,   0.107};
 
-  std::string lparameter_names_prefix =
-      "/robot/specificities/feet/";
-  for (unsigned int i=0;i<6;i++)
-  {
-    std::string full_parameter_name = lparameter_names_prefix + "right/" +
-        lparameter_names_suffix[i];
+  std::string lparameter_names_prefix = "/robot/specificities/feet/";
+  for (unsigned int i = 0; i < 6; i++) {
+    std::string full_parameter_name =
+        lparameter_names_prefix + "right/" + lparameter_names_suffix[i];
 
     aRobotUtil->set_parameter<double>(full_parameter_name,
                                       lparameter_values[i]);
-    full_parameter_name = lparameter_names_prefix + "left/" +
-        lparameter_names_suffix[i];
+    full_parameter_name =
+        lparameter_names_prefix + "left/" + lparameter_names_suffix[i];
     aRobotUtil->set_parameter<double>(full_parameter_name,
                                       lparameter_values[i]);
   }
@@ -79,7 +68,7 @@ void setFeetParameters(dynamicgraph::sot::RobotUtilShrPtr aRobotUtil){
 void setParameters(const std::string &lrobot_description) {
   dynamicgraph::sot::RobotUtilShrPtr aRobotUtil;
 
-    // Reading the parameter.
+  // Reading the parameter.
   string model_name("robot");
 
   // Search for the robot util related to robot_name.
@@ -89,7 +78,7 @@ void setParameters(const std::string &lrobot_description) {
   std::string lparameter_name("/robot_description");
 
   // Then set the complete robot model in the parameter set.
-  aRobotUtil->set_parameter<string>(lparameter_name,lrobot_description);
+  aRobotUtil->set_parameter<string>(lparameter_name, lrobot_description);
 
   /// Specify the end effectors in the parameter server object.
   setEndEffectorParameters(aRobotUtil);
@@ -98,14 +87,14 @@ void setParameters(const std::string &lrobot_description) {
   setFeetParameters(aRobotUtil);
 }
 
-int main(int, char**) {
+int main(int, char **) {
   using namespace std;
   dynamicgraph::sot::PatternGenerator aPG;
 
   // Search talos_reduced_wpg.urdf
-  string filename(EXAMPLE_ROBOT_DATA_MODEL_DIR "/talos_data/robots/talos_full_v2.urdf");
-  if (!boost::filesystem::exists(filename))
-  {
+  string filename(EXAMPLE_ROBOT_DATA_MODEL_DIR
+                  "/talos_data/robots/talos_full_v2.urdf");
+  if (!boost::filesystem::exists(filename)) {
     cerr << "Unable to find talos_reduced_wpg.urdf" << endl;
     exit(-1);
   }
@@ -121,14 +110,12 @@ int main(int, char**) {
   // Model of the robot inside a string.
   const string lrobot_description = oss.str();
 
-  std::shared_ptr<std::vector<std::string>>
-      alist_of_robots = dynamicgraph::sot::getListOfRobots();
+  std::shared_ptr<std::vector<std::string>> alist_of_robots =
+      dynamicgraph::sot::getListOfRobots();
 
   unsigned int idx = 0;
-  for (auto an_it_of_robot : *alist_of_robots)
-  {
-    std::cout << __FILE__ << " "
-              << idx++ << " " << an_it_of_robot << std::endl;
+  for (auto an_it_of_robot : *alist_of_robots) {
+    std::cout << __FILE__ << " " << idx++ << " " << an_it_of_robot << std::endl;
   }
 
   setParameters(lrobot_description);

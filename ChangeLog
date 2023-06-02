@@ -5,8 +5,8 @@ CHANGELOG
  * Update CMakeLists.txt
  * Merge pull request #9 from aclodic/master
  * [Travis] Add dependency in jrl_dynamics_urdf using hydro. Remove clang.
- * Remove hard coded joint mapping in pg configuration 
-	Make URDF or VRML use transparent for the user (if a urdf file has been specified it will be used otherwise the vrml option will be used) 
+ * Remove hard coded joint mapping in pg configuration
+	Make URDF or VRML use transparent for the user (if a urdf file has been specified it will be used otherwise the vrml option will be used)
 	Factorize pg initialisation code (initPg fonction creation)
  * Correct the initialization values for HRP4.
  * Use loadUrdf rather than loadFromParameterServer.

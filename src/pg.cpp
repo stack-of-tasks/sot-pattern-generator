@@ -24,17 +24,15 @@
 /* indent-tabs-mode: nil */
 /* End:                         */
 
-//#define VP_DEBUG
-//#define VP_DEBUG_MODE 45
-#include <pinocchio/fwd.hpp>
-
-#include <sstream>
-#include <stdexcept>
+// #define VP_DEBUG
+// #define VP_DEBUG_MODE 45
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
-
+#include <pinocchio/fwd.hpp>
 #include <sot/core/debug.hh>
 #include <sot/core/robot-utils.hh>
+#include <sstream>
+#include <stdexcept>
 
 #ifdef VP_DEBUG
 class sotPG__INIT {
@@ -42,21 +40,20 @@ class sotPG__INIT {
   sotPG__INIT(void) { dynamicgraph::sot::DebugTrace::openFile(); }
 };
 sotPG__INIT sotPG_initiator;
-#endif  //#ifdef VP_DEBUG
-
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
-
-#include "pinocchio/parsers/srdf.hpp"
-#include "pinocchio/parsers/urdf.hpp"
-#include "pinocchio/algorithm/joint-configuration.hpp"
-#include "pinocchio/algorithm/model.hpp"
+#endif  // #ifdef VP_DEBUG
 
 #include <dynamic-graph/all-commands.h>
 #include <dynamic-graph/factory.h>
+#include <sot/pattern-generator/pg.h>
+
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 #include <sot/core/matrix-geometry.hh>
 
-#include <sot/pattern-generator/pg.h>
+#include "pinocchio/algorithm/joint-configuration.hpp"
+#include "pinocchio/algorithm/model.hpp"
+#include "pinocchio/parsers/srdf.hpp"
+#include "pinocchio/parsers/urdf.hpp"
 
 using namespace std;
 namespace dynamicgraph {
@@ -311,8 +308,7 @@ PatternGenerator::PatternGenerator(const std::string &name)
       rightFootContactSOUT(
           boost::bind(&PatternGenerator::getRightFootContact, this, _1, _2),
           OneStepOfControlS,
-          "PatternGenerator(" + name + ")::output(bool)::rightfootcontact")
-      ,
+          "PatternGenerator(" + name + ")::output(bool)::rightfootcontact"),
       contactPhaseSOUT(
           boost::bind(&PatternGenerator::getContactPhase, this, _1, _2),
           OneStepOfControlS,
@@ -453,7 +449,8 @@ PatternGenerator::PatternGenerator(const std::string &name)
                                     << InitLeftFootRefSOUT
                                     << InitRightFootRefSOUT);
 
-  signalRegistration(leftFootContactSOUT << rightFootContactSOUT << contactPhaseSOUT);
+  signalRegistration(leftFootContactSOUT << rightFootContactSOUT
+                                         << contactPhaseSOUT);
 
   initCommands();
 
@@ -612,7 +609,6 @@ bool PatternGenerator::InitState(void) {
 }
 
 bool PatternGenerator::buildReducedModel(void) {
-
   // Name of the parameter
   const std::string lparameter_name("/robot_description");
 
@@ -626,13 +622,10 @@ bool PatternGenerator::buildReducedModel(void) {
   sot::RobotUtilShrPtr aRobotUtil = sot::getRobotUtil(model_name);
 
   // If does not exist then it is created.
-  if (aRobotUtil.get() == sot::RefVoidRobotUtil().get())
-  {
+  if (aRobotUtil.get() == sot::RefVoidRobotUtil().get()) {
     ostringstream oss;
-    oss << __FILE__
-        << " PatternGenerator::buildModel "
-        << "The robot with name " << model_name
-        << " was not found !";
+    oss << __FILE__ << " PatternGenerator::buildModel "
+        << "The robot with name " << model_name << " was not found !";
     throw std::invalid_argument(oss.str());
     return false;
   }
@@ -640,7 +633,7 @@ bool PatternGenerator::buildReducedModel(void) {
   try {
     // Then build a complete robot model.
     lrobot_description = aRobotUtil->get_parameter<string>(lparameter_name);
-  }  catch (...) {
+  } catch (...) {
     SOT_THROW ExceptionPatternGenerator(
         ExceptionPatternGenerator::PATTERN_GENERATOR_JRL,
         "Error while getting parameter " + lparameter_name + " for the WPG.");
@@ -648,47 +641,36 @@ bool PatternGenerator::buildReducedModel(void) {
   }
 
   pinocchio::Model lrobotModel;
-  pinocchio::urdf::buildModelFromXML(lrobot_description,
-                                     pinocchio::JointModelFreeFlyer(),
-                                     lrobotModel);
-
+  pinocchio::urdf::buildModelFromXML(
+      lrobot_description, pinocchio::JointModelFreeFlyer(), lrobotModel);
 
   // Then extract a reduced model
-  Eigen::VectorXd q_neutral= neutral(lrobotModel);
+  Eigen::VectorXd q_neutral = neutral(lrobotModel);
   ExtractJointMimics an_extract_joint_mimics(lrobot_description);
 
-  const std::vector<std::string> &
-      list_of_joints_to_lock_by_name =
+  const std::vector<std::string> &list_of_joints_to_lock_by_name =
       an_extract_joint_mimics.get_mimic_joints();
 
   std::ostringstream oss;
-  oss << "Size of mimic joints: "
-      << lrobotModel.nq << " "
-      << list_of_joints_to_lock_by_name.size() << " "
-      << q_neutral.size();
+  oss << "Size of mimic joints: " << lrobotModel.nq << " "
+      << list_of_joints_to_lock_by_name.size() << " " << q_neutral.size();
   sendMsg(oss.str(), MSG_TYPE_INFO);
 
   std::vector<pinocchio::JointIndex> list_of_joints_to_lock_by_id;
-  for(auto it : list_of_joints_to_lock_by_name)
-  {
-    const std::string & joint_name = it;
+  for (auto it : list_of_joints_to_lock_by_name) {
+    const std::string &joint_name = it;
 
-    if(lrobotModel.existJointName(joint_name))
-    {
-
+    if (lrobotModel.existJointName(joint_name)) {
       // do not consider joint that are not in the model
-      list_of_joints_to_lock_by_id.
-          push_back(lrobotModel.getJointId(joint_name));
-    }
-    else
+      list_of_joints_to_lock_by_id.push_back(
+          lrobotModel.getJointId(joint_name));
+    } else
       std::cout << "joint_name not found: " << joint_name << std::endl;
-
   }
 
-  if (list_of_joints_to_lock_by_id.size()==0)
-    m_robotModel = pinocchio::buildReducedModel(lrobotModel,
-                                                list_of_joints_to_lock_by_id,
-                                                q_neutral);
+  if (list_of_joints_to_lock_by_id.size() == 0)
+    m_robotModel = pinocchio::buildReducedModel(
+        lrobotModel, list_of_joints_to_lock_by_id, q_neutral);
   else
     m_robotModel = lrobotModel;
 
@@ -704,35 +686,25 @@ bool PatternGenerator::addComplementaryFrames() {
   // Search for the robot util related to robot_name.
   sot::RobotUtilShrPtr aRobotUtil = sot::getRobotUtil(model_name);
 
-  std::vector<std::string> lparameter_names = { "/pg/remap/l_ankle",
-                                                "/pg/remap/r_ankle",
-                                                "/pg/remap/l_wrist",
-                                                "/pg/remap/r_wrist",
-                                                "/pg/remap/body",
-                                                "/pg/remap/torso"};
+  std::vector<std::string> lparameter_names = {
+      "/pg/remap/l_ankle", "/pg/remap/r_ankle", "/pg/remap/l_wrist",
+      "/pg/remap/r_wrist", "/pg/remap/body",    "/pg/remap/torso"};
 
-  std::vector<std::string> lframe_remapped = { "l_ankle",
-                                               "r_ankle",
-                                               "l_wrist",
-                                               "r_wrist",
-                                               "BODY",
-                                               "torso"};
+  std::vector<std::string> lframe_remapped = {"l_ankle", "r_ankle", "l_wrist",
+                                              "r_wrist", "BODY",    "torso"};
 
   auto it_frame_remap = lframe_remapped.begin();
-  for(auto it_param_name: lparameter_names) {
+  for (auto it_param_name : lparameter_names) {
     std::string lbody_name;
     lbody_name = aRobotUtil->get_parameter<string>(it_param_name);
-    if (m_robotModel.existFrame(lbody_name))
-    {
+    if (m_robotModel.existFrame(lbody_name)) {
       pinocchio::Model::Index idx = m_robotModel.getFrameId(lbody_name);
       m_robotModel.frames[idx].name = *it_frame_remap;
-    }
-    else
-    {
+    } else {
       SOT_THROW ExceptionPatternGenerator(
-        ExceptionPatternGenerator::PATTERN_GENERATOR_JRL,
-        "Error for parameter " + it_param_name + " body name " +
-        lbody_name + " doest no exist");
+          ExceptionPatternGenerator::PATTERN_GENERATOR_JRL,
+          "Error for parameter " + it_param_name + " body name " + lbody_name +
+              " doest no exist");
       return false;
     }
     it_frame_remap++;
@@ -741,8 +713,8 @@ bool PatternGenerator::addComplementaryFrames() {
   return true;
 }
 
-
-void PatternGenerator::readFootParameters(std::string & rootFootPath, pg::PRFoot &aFoot) {
+void PatternGenerator::readFootParameters(std::string &rootFootPath,
+                                          pg::PRFoot &aFoot) {
   // Reading the parameter.
   std::string model_name("robot");
 
@@ -764,15 +736,12 @@ void PatternGenerator::readFootParameters(std::string & rootFootPath, pg::PRFoot
   aFoot.anklePosition(2) = aRobotUtil->get_parameter<double>(pathname);
 }
 
-
 bool PatternGenerator::buildPGI(void) {
-
   bool ok = true;
 
   // Build the reduced model of the robot
   buildReducedModel();
   addComplementaryFrames();
-
 
   // Creating the humanoid robot.
   m_PR = new pg::PinocchioRobot();
@@ -782,7 +751,6 @@ bool PatternGenerator::buildPGI(void) {
   using boost::property_tree::ptree;
   ptree pt;
   try {
-
     // Initialize the Right Foot
     pg::PRFoot aFoot;
 
@@ -810,7 +778,8 @@ bool PatternGenerator::buildPGI(void) {
     m_PR->initializeLeftFoot(aFoot);
 
   } catch (...) {
-    cerr << "problem while setting the feet informations. File corrupted?" << endl;
+    cerr << "problem while setting the feet informations. File corrupted?"
+         << endl;
     ok = false;
   }
 
@@ -1585,10 +1554,13 @@ int &PatternGenerator::OneStepOfControl(int &dummy, int time) {
 
     // Find the support foot feet.
     // If stepType = -1 -> single support phase on the dedicated foot
-    // If stepType = 10 -> double support phase (both feet should have stepType=10)
-    // If stepType = 11 -> double support phase between 2 single support phases for Kajita Algorithm
-    if ((lLeftFootPosition.stepType == 10) || (lRightFootPosition.stepType == 10) ||
-        (lLeftFootPosition.stepType == 11) || (lRightFootPosition.stepType == 11)){
+    // If stepType = 10 -> double support phase (both feet should have
+    // stepType=10) If stepType = 11 -> double support phase between 2 single
+    // support phases for Kajita Algorithm
+    if ((lLeftFootPosition.stepType == 10) ||
+        (lRightFootPosition.stepType == 10) ||
+        (lLeftFootPosition.stepType == 11) ||
+        (lRightFootPosition.stepType == 11)) {
       m_leftFootContact = true;
       m_rightFootContact = true;
       m_ContactPhase = DOUBLE_SUPPORT_PHASE;
@@ -1600,7 +1572,7 @@ int &PatternGenerator::OneStepOfControl(int &dummy, int time) {
       // It is almost certain that when there is single support on a foot
       // the other one cannot be in simple support (neither in double support)
       // This if is certainly always true -> to be checked
-      if (lRightFootPosition.stepType != -1){
+      if (lRightFootPosition.stepType != -1) {
         m_rightFootContact = false;
         m_ContactPhase = LEFT_SUPPORT_PHASE;
       }
@@ -1781,15 +1753,14 @@ void PatternGenerator::initCommands(void) {
   addCommand(
       "buildModel",
       makeCommandVoid0(
-          *this,
-          (void (PatternGenerator::*)(void)) & PatternGenerator::buildPGI,
+          *this, (void(PatternGenerator::*)(void)) & PatternGenerator::buildPGI,
           docCommandVoid0("From the files, parse and build the robot model and"
                           " the Walking Pattern Generator.")));
   addCommand(
       "initState",
       makeCommandVoid0(
           *this,
-          (void (PatternGenerator::*)(void)) & PatternGenerator::InitState,
+          (void(PatternGenerator::*)(void)) & PatternGenerator::InitState,
           docCommandVoid0("From q and model, compute the initial geometry.")));
 
   addCommand(
@@ -1856,7 +1827,7 @@ void PatternGenerator::initCommands(void) {
   addCommand(
       "debug",
       makeCommandVoid0(
-          *this, (void (PatternGenerator::*)(void)) & PatternGenerator::debug,
+          *this, (void(PatternGenerator::*)(void)) & PatternGenerator::debug,
           docCommandVoid0("Launch a debug command.")));
 }
 
@@ -1933,8 +1904,7 @@ Vector &PatternGenerator::getjointWalkingErrorPosition(Vector &res, int time) {
   return res;
 }
 
-int &PatternGenerator::getSupportFoot(int &res,
-                                      int /*time*/) {
+int &PatternGenerator::getSupportFoot(int &res, int /*time*/) {
   res = m_SupportFoot;
   return res;
 }

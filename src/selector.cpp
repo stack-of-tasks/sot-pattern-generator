@@ -17,8 +17,8 @@
  *
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-//#define VP_DEBUG
-//#define VP_DEBUG_MODE 50
+// #define VP_DEBUG
+// #define VP_DEBUG_MODE 50
 #include <sot/core/debug.hh>
 #ifdef VP_DEBUG
 class selector__INIT {
@@ -26,7 +26,7 @@ class selector__INIT {
   selector__INIT(void) { dynamicgraph::sot::DebugTrace::openFile(); }
 };
 selector__INIT selector_initiator;
-#endif  //#ifdef VP_DEBUG
+#endif  // #ifdef VP_DEBUG
 
 #include <dynamic-graph/all-commands.h>
 #include <dynamic-graph/factory.h>

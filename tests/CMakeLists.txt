@@ -1,12 +1,13 @@
 #
-#  Copyright
+# Copyright
 #
 
-ADD_DEFINITIONS(-DDEBUG=2)
+add_definitions(-DDEBUG=2)
 
-ADD_UNIT_TEST(main_test main.cc)
+add_unit_test(main_test main.cc)
 
-TARGET_LINK_LIBRARIES(main_test
+target_link_libraries(
+  main_test
   jrl-walkgen::jrl-walkgen
   sot-core::sot-core
   example-robot-data::example-robot-data
@@ -19,5 +20,4 @@ TARGET_LINK_LIBRARIES(main_test
   step-time-line
   which-foot-upper
   pg
-  pg-manager
-  )
+  pg-manager)

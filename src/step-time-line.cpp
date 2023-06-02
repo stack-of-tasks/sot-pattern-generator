@@ -24,6 +24,7 @@
 #include <dynamic-graph/factory.h>
 #include <dynamic-graph/pool.h>
 #include <sot/pattern-generator/step-time-line.h>
+
 #include <sot/core/debug.hh>
 
 namespace dynamicgraph {

@@ -19,6 +19,7 @@
 
 #include <sot/pattern-generator/exception-pg.h>
 #include <stdarg.h>
+
 #include <cstdio>
 
 namespace dynamicgraph {

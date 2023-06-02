@@ -7,7 +7,6 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/property_tree/ptree.hpp>
-#include <example-robot-data/path.hpp>
 #include <iostream>
 #include <iterator>
 #include <pinocchio/fwd.hpp>

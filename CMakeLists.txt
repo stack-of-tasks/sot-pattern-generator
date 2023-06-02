@@ -48,8 +48,8 @@ include("${JRL_CMAKE_MODULES}/python.cmake")
 
 # Project definition
 compute_project_args(PROJECT_ARGS LANGUAGES CXX C)
-check_minimal_cxx_standard(14 ENFORCE)
 project(${PROJECT_NAME} ${PROJECT_ARGS})
+check_minimal_cxx_standard(14 ENFORCE)
 
 # Project dependencies
 add_project_dependency(jrl-walkgen REQUIRED)

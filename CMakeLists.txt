@@ -44,7 +44,6 @@ endif()
 
 include("${JRL_CMAKE_MODULES}/base.cmake")
 include("${JRL_CMAKE_MODULES}/boost.cmake")
-include("${JRL_CMAKE_MODULES}/python.cmake")
 
 # Project definition
 compute_project_args(PROJECT_ARGS LANGUAGES CXX C)
@@ -69,6 +68,7 @@ if(BUILD_PYTHON_INTERFACE)
     # least fo boost 1.73 to 1.75
     add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
   endif()
+  include("${JRL_CMAKE_MODULES}/python.cmake")
 endif(BUILD_PYTHON_INTERFACE)
 
 # Main Library

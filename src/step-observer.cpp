@@ -1,7 +1,7 @@
-#include <cmath>
-
 #include <dynamic-graph/factory.h>
 #include <sot/pattern-generator/step-observer.h>
+
+#include <cmath>
 #include <sot/core/debug.hh>
 #include <sot/core/matrix-geometry.hh>
 

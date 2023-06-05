@@ -21,6 +21,7 @@
 
 #include <dynamic-graph/factory.h>
 #include <sot/pattern-generator/step-queue.h>
+
 #include <sot/core/debug.hh>
 
 namespace dynamicgraph {

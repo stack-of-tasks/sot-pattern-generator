@@ -17,20 +17,21 @@
  *
  * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-#include <sot/core/debug.hh>
-
 #include <sot/pattern-generator/next-step.h>
-
 #include <time.h>
+
 #include <cmath>
+#include <sot/core/debug.hh>
 #ifndef WIN32
 #include <sys/time.h>
 #else
 #include <Winsock2.h>
+
 #include <sot/core/utils-windows.hh>
 #endif /*WIN32*/
 
 #include <dynamic-graph/factory.h>
+
 #include <sot/core/macros-signal.hh>
 
 namespace dynamicgraph {

@@ -25,9 +25,8 @@
 /* --------------------------------------------------------------------- */
 
 /* STD */
-#include <string>
-
 #include <pinocchio/fwd.hpp>
+#include <string>
 
 /* SOT */
 
@@ -35,8 +34,9 @@
 #include <dynamic-graph/pool.h>
 #include <dynamic-graph/signal-ptr.h>
 #include <dynamic-graph/signal-time-dependent.h>
-#include <pinocchio/fwd.hpp>
 #include <sot/pattern-generator/exception-pg.h>
+
+#include <pinocchio/fwd.hpp>
 #include <sot/core/flags.hh>
 #include <sot/core/matrix-geometry.hh>
 
@@ -175,7 +175,8 @@ class PatternGenerator_EXPORT PatternGenerator : public Entity {
   /*! \brief Time step */
   double m_TimeStep;
 
-  /*! \brief Current support/contact phase defined by enum: leftFoot=1, rightFoot=-1, doubleSupport=0. */
+  /*! \brief Current support/contact phase defined by enum: leftFoot=1,
+   * rightFoot=-1, doubleSupport=0. */
   SupportPhase m_ContactPhase;
   int m_DSStartingTime;
 
@@ -534,7 +535,8 @@ class PatternGenerator_EXPORT PatternGenerator : public Entity {
     the feet. */
   bool &getLeftFootContact(bool &res, int time);
   bool &getRightFootContact(bool &res, int time);
-  /*! \brief Internal method to get the information of contact phase leftFoot=1, rightFoot=-1, doubleSupport=0. */
+  /*! \brief Internal method to get the information of contact phase leftFoot=1,
+   * rightFoot=-1, doubleSupport=0. */
   int &getContactPhase(int &res, int time);
 
  public:
@@ -662,7 +664,8 @@ class PatternGenerator_EXPORT PatternGenerator : public Entity {
   SignalTimeDependent<bool, int> rightFootContactSOUT;
   /*! @} */
 
-  /*! \brief Int Vector of support phase: leftFoot=1, rightFoot=-1, doubleSupport=0 (see enum). */
+  /*! \brief Int Vector of support phase: leftFoot=1, rightFoot=-1,
+   * doubleSupport=0 (see enum). */
   SignalTimeDependent<int, int> contactPhaseSOUT;
 
   /*! \name Reimplement the interface of the plugin.

@@ -7,10 +7,11 @@ print("With meta selector")
 # Define a new constructor for the selector entity. The basic Selector(name)
 # constructor is still valid.
 # Typical use below:
-#  % selecSupportFoot = Selector('selecSupportFoot'
-#  %                             ,['matrixHomo','pg_H_sf',pg.rightfootref,pg.leftfootref]
-#  %                             ,['matrixHomo','wa_H_sf',geom.rf,geom.lf]
-#  %                             )
+# selecSupportFoot = Selector(
+# "selecSupportFoot",
+# ["matrixHomo", "pg_H_sf", pg.rightfootref, pg.leftfootref],
+# ["matrixHomo", "wa_H_sf", geom.rf, geom.lf],
+# )
 
 
 class Selector:

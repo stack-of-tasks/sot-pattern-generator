@@ -19,9 +19,10 @@
 
 #include <dynamic-graph/factory.h>
 #include <sot/pattern-generator/which-foot-upper.h>
+
 #include <sot/core/debug.hh>
 #include <sot/core/macros-signal.hh>
-//#include <sot/pattern-generator/exception-pg.h>
+// #include <sot/pattern-generator/exception-pg.h>
 
 namespace dynamicgraph {
 namespace sot {
@@ -33,7 +34,7 @@ const unsigned int WhichFootUpper::INDEX_RIGHT_FOOT_DEFAULT = 1;
 
 const double WhichFootUpper::TRIGGER_THRESHOLD_DEFAULT = 5e-4;
 typedef Eigen::Matrix<double, 4, 4> &(MatrixHomogeneous::*ExtractMemberType)(
-    void)const;
+    void) const;
 
 WhichFootUpper::WhichFootUpper(const std::string &name)
     : Entity(name),

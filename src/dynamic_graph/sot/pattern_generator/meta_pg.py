@@ -1,26 +1,32 @@
 from math import atan2, pi
 
+from dynamic_graph.sot.core.task_pd import TaskPD
+from dynamic_graph.sot.dynamic_pinocchio import (
+    Dynamic,
+    Inverse_of_matrixHomo,
+    Multiply_matrixHomo_vector,
+    Multiply_of_matrixHomo,
+    PoseRollPitchYawToMatrixHomo,
+    Stack_of_vector,
+)
 from numpy import array, dot
 
 from dynamic_graph import plug
-from dynamic_graph.sot.core.task_pd import TaskPD
-from dynamic_graph.sot.dynamic_pinocchio import (Dynamic, Inverse_of_matrixHomo, Multiply_matrixHomo_vector,
-                                                 Multiply_of_matrixHomo, PoseRollPitchYawToMatrixHomo, Stack_of_vector)
 from dynamic_graph.sot.pattern_generator import PatternGenerator, Selector
 
 
 class MetaPG:
     def __init__(self, dyn):
-        self.pg = PatternGenerator('pg')
+        self.pg = PatternGenerator("pg")
 
-        modelDir = dyn.getProperty('vrmlDirectory')
-        modelName = dyn.getProperty('vrmlMainFile')
-        specificitiesPath = dyn.getProperty('xmlSpecificityFile')
-        jointRankPath = dyn.getProperty('xmlRankFile')
+        modelDir = dyn.getProperty("vrmlDirectory")
+        modelName = dyn.getProperty("vrmlMainFile")
+        specificitiesPath = dyn.getProperty("xmlSpecificityFile")
+        jointRankPath = dyn.getProperty("xmlRankFile")
         robotDim = len(dyn.position.value)
         # print(modelDir,modelName,specificitiesPath,jointRankPath,robotDim)
 
-        self.pg.setVrmlDir(modelDir + '/')
+        self.pg.setVrmlDir(modelDir + "/")
         self.pg.setVrml(modelName)
         self.pg.setXmlSpec(specificitiesPath)
         self.pg.setXmlRank(jointRankPath)
@@ -44,7 +50,7 @@ class MetaPG:
 
         plug(dyn.position, self.pg.position)
         plug(dyn.com, self.pg.com)
-        self.pg.motorcontrol.value = robotDim * (0, )
+        self.pg.motorcontrol.value = robotDim * (0,)
         self.pg.zmppreviouscontroller.value = (0, 0, 0)
 
         self.pg.initState()
@@ -53,58 +59,60 @@ class MetaPG:
         self.geom = Dynamic("geom")
         self.geom.setFiles(modelDir, modelName, specificitiesPath, jointRankPath)
         self.geom.parse()
-        self.geom.createOpPoint('rf', 'right-ankle')
-        self.geom.createOpPoint('lf', 'left-ankle')
+        self.geom.createOpPoint("rf", "right-ankle")
+        self.geom.createOpPoint("lf", "left-ankle")
         plug(dyn.position, self.geom.position)
-        self.geom.ffposition.value = 6 * (0, )
-        self.geom.velocity.value = robotDim * (0, )
-        self.geom.acceleration.value = robotDim * (0, )
+        self.geom.ffposition.value = 6 * (0,)
+        self.geom.velocity.value = robotDim * (0,)
+        self.geom.acceleration.value = robotDim * (0,)
 
         # --- Selector of Com Ref: when pg is stopped, pg.inprocess becomes 0
-        self.comRef = Selector('comRef', ['vector', 'ref', dyn.com, self.pg.comref])
+        self.comRef = Selector("comRef", ["vector", "ref", dyn.com, self.pg.comref])
         plug(self.pg.inprocess, self.comRef.selec)
 
-        self.selecSupportFoot = Selector('selecSupportFoot',
-                                         ['matrixHomo', 'pg_H_sf', self.pg.rightfootref, self.pg.leftfootref],
-                                         ['matrixHomo', 'wa_H_sf', self.geom.rf, self.geom.lf])
+        self.selecSupportFoot = Selector(
+            "selecSupportFoot",
+            ["matrixHomo", "pg_H_sf", self.pg.rightfootref, self.pg.leftfootref],
+            ["matrixHomo", "wa_H_sf", self.geom.rf, self.geom.lf],
+        )
         plug(self.pg.SupportFoot, self.selecSupportFoot.selec)
-        self.sf_H_wa = Inverse_of_matrixHomo('sf_H_wa')
+        self.sf_H_wa = Inverse_of_matrixHomo("sf_H_wa")
         plug(self.selecSupportFoot.wa_H_sf, self.sf_H_wa.sin)
-        self.pg_H_wa = Multiply_of_matrixHomo('pg_H_wa')
+        self.pg_H_wa = Multiply_of_matrixHomo("pg_H_wa")
         plug(self.selecSupportFoot.pg_H_sf, self.pg_H_wa.sin1)
         plug(self.sf_H_wa.sout, self.pg_H_wa.sin2)
 
         # --- Compute the ZMP ref in the Waist reference frame.
-        self.wa_H_pg = Inverse_of_matrixHomo('wa_H_pg')
+        self.wa_H_pg = Inverse_of_matrixHomo("wa_H_pg")
         plug(self.pg_H_wa.sout, self.wa_H_pg.sin)
-        self.wa_zmp = Multiply_matrixHomo_vector('wa_zmp')
+        self.wa_zmp = Multiply_matrixHomo_vector("wa_zmp")
         plug(self.wa_H_pg.sout, self.wa_zmp.sin1)
         plug(self.pg.zmpref, self.wa_zmp.sin2)
 
         # --- Build the converter object for the waist task
-        self.waistReferenceVector = Stack_of_vector('waistReferenceVector')
+        self.waistReferenceVector = Stack_of_vector("waistReferenceVector")
         plug(self.pg.initwaistposref, self.waistReferenceVector.sin1)
         # plug(self.pg.initwaistattref,self.waistReferenceVector.sin2)
         plug(self.pg.comattitude, self.waistReferenceVector.sin2)
         self.waistReferenceVector.selec1(0, 3)
         self.waistReferenceVector.selec2(0, 3)
 
-        self.waistReference = PoseRollPitchYawToMatrixHomo('waistReference')
+        self.waistReference = PoseRollPitchYawToMatrixHomo("waistReference")
         plug(self.waistReferenceVector.sout, self.waistReference.sin)
 
     def plugZmp(self, robot):
         # Connect the ZMPref to OpenHRP in the waist reference frame.
-        self.pg.parseCmd(':SetZMPFrame world')
+        self.pg.parseCmd(":SetZMPFrame world")
         plug(self.wa_zmp.sout, robot.zmp)
 
     def plugWaistTask(self, taskWaist):
         plug(self.waistReference.sout, taskWaist.featureDes.position)
-        taskWaist.feature.selec.value = '111100'
+        taskWaist.feature.selec.value = "111100"
 
     def plugComTask(self, taskCom):
         plug(self.comRef.ref, taskCom.featureDes.errorIN)
         plug(self.pg.dcomref, taskCom.featureDes.errordotIN)
-        taskCom.task = TaskPD('taskComPD')
+        taskCom.task = TaskPD("taskComPD")
         taskCom.task.add(taskCom.feature.name)
         # This next line is not very nice. The principle should be reported in Task.
         plug(taskCom.feature.errordot, taskCom.task.errorDot)
@@ -114,37 +122,38 @@ class MetaPG:
         taskCom.task.setBeta(-1)
 
     def startHerdt(self, xyconstraint=True):
-        self.pg.parseCmd(':SetAlgoForZmpTrajectory Herdt')
-        self.pg.parseCmd(':doublesupporttime 0.1')
-        self.pg.parseCmd(':singlesupporttime 0.7')
+        self.pg.parseCmd(":SetAlgoForZmpTrajectory Herdt")
+        self.pg.parseCmd(":doublesupporttime 0.1")
+        self.pg.parseCmd(":singlesupporttime 0.7")
         # When velocity reference is at zero, the robot stops all motion after n steps
-        self.pg.parseCmd(':numberstepsbeforestop 2')
+        self.pg.parseCmd(":numberstepsbeforestop 2")
         # Set constraints on XY
         if xyconstraint:
-            self.pg.parseCmd(':setfeetconstraint XY 0.09 0.06')
+            self.pg.parseCmd(":setfeetconstraint XY 0.09 0.06")
         # The next command must be runned after a OpenHRP.inc ... ???
         # Start the robot with a speed of 0.1 m/0.8 s.
-        self.pg.parseCmd(':HerdtOnline 0.1 0.0 0.0')
+        self.pg.parseCmd(":HerdtOnline 0.1 0.0 0.0")
 
 
 # --- WALK TRACKER -------------------------------------------------------------
 # --- WALK TRACKER -------------------------------------------------------------
 # --- WALK TRACKER -------------------------------------------------------------
 class WalkTracker:
-    '''
+    """
     PD controller on the Herdt PG input: given a time-dependant function of the
     target position, compute the velocity input to be apply on the PG to track
     the target.
-    '''
+    """
+
     def __init__(self, traj, dyn, pg, Kp=1.0, dt=0.005):
-        '''
+        """
         traj is the functor (input T, output arrayX2 for the 2D position, or
         pair of arrayX2 for position and derivative).  dyn and pg are the
         entities of the dynamic model (to get the current position) and of the
         PG computer (to send the reference). Kp is the gain of the PD. dt is
         the period of the control, to be used to compute the target derivative
         if traj returns only the position.
-        '''
+        """
         self.Kp = Kp
         self.trajfunction = traj
         self.pg = pg
@@ -152,22 +161,22 @@ class WalkTracker:
         self.dyn = dyn
         self.dt = dt
 
-    def setDisplay(self, viewer, target='zmp', vector='axis1'):
-        '''
+    def setDisplay(self, viewer, target="zmp", vector="axis1"):
+        """
         If needed, the PD can be displayed on a viewer, using the two object
         names given in input.
-        '''
+        """
         self.viewer = viewer
         self.viewTarget = target
         self.viewVelocity = vector
 
     def getPositionAndDerivative(self, t):
-        '''
+        """
         Call the traj function, and if needed compute the numerical derivative.
-        '''
+        """
         res = self.trajfunction(t)
         if isinstance(res[0], float):
-            if 'trajprec' in self.__dict__ and 'dt' in self.__dict__:
+            if "trajprec" in self.__dict__ and "dt" in self.__dict__:
                 deriv = (res - self.trajprec) / ((t - self.tprec) * self.dt)
             else:
                 deriv = array([0, 0])
@@ -177,10 +186,10 @@ class WalkTracker:
         return res
 
     def update(self, t):
-        '''
+        """
         Compute the PD law and send it to the PG. This function can be called
         at every time iteration, but only works along the defined rate.
-        '''
+        """
         if t % self.rate != 1:
             return
 
@@ -194,11 +203,15 @@ class WalkTracker:
         wo_vref = self.Kp * (pref - p) + v
         wa_vref = dot(waRwo, wo_vref)
 
-        dth = ((thref - th + pi) % (2 * pi) - pi)
+        dth = (thref - th + pi) % (2 * pi) - pi
         vref = (wa_vref[0], wa_vref[1], self.Kp * dth)
         self.pg.velocitydes.value = vref
 
-        if 'viewer' in self.__dict__:
-            self.viewer.updateElementConfig(self.viewTarget, (float(pref[0]), float(pref[1]), 0, 0, 0, 0))
-            self.viewer.updateElementConfig(self.viewVelocity, (float((p + 10 * v)[0]), float(
-                (p + 10 * v)[1]), 0, 0, 0, thref))
+        if "viewer" in self.__dict__:
+            self.viewer.updateElementConfig(
+                self.viewTarget, (float(pref[0]), float(pref[1]), 0, 0, 0, 0)
+            )
+            self.viewer.updateElementConfig(
+                self.viewVelocity,
+                (float((p + 10 * v)[0]), float((p + 10 * v)[1]), 0, 0, 0, thref),
+            )

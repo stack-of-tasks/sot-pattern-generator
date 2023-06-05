@@ -26,9 +26,10 @@
 
 // #define VP_DEBUG
 // #define VP_DEBUG_MODE 45
+#include <pinocchio/fwd.hpp>
+// pin first
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
-#include <pinocchio/fwd.hpp>
 #include <sot/core/debug.hh>
 #include <sot/core/robot-utils.hh>
 #include <sstream>

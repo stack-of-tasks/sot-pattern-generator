@@ -1455,14 +1455,13 @@ int &PatternGenerator::OneStepOfControl(int &dummy, int time) {
         } else {
           std::cout << "The state of the robot and the one "
                     << "return by the WPG are different" << std::endl;
-          sotDEBUG(25) << "Size not coherent between "
-                       << "CurrentState and "
+          sotDEBUG(25) << "Size not coherent between " << "CurrentState and "
                        << "m_JointErrorValuesForWalking: "
                        << CurrentState.size() << " "
                        << m_JointErrorValuesForWalking.size() << " " << endl;
         }
-        sotDEBUG(2) << "Juste after updating "
-                    << "m_JointErrorValuesForWalking" << endl;
+        sotDEBUG(2) << "Juste after updating " << "m_JointErrorValuesForWalking"
+                    << endl;
 
         sotDEBUG(1) << "lLeftFootPosition : " << lLeftFootPosition.x << " "
                     << lLeftFootPosition.y << " " << lLeftFootPosition.z << " "

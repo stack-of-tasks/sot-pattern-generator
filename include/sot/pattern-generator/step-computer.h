@@ -54,7 +54,7 @@ class StepComputer {
  public:  // Methods
   virtual void changeFirstStep(StepQueue &queue, int timeCurr) = 0;
   virtual void nextStep(StepQueue &queue, int timeCurr) = 0;
-  virtual ~StepComputer(){};
+  virtual ~StepComputer() {};
 };
 
 }  // namespace sot

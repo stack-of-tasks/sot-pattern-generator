@@ -1754,14 +1754,13 @@ void PatternGenerator::initCommands(void) {
   addCommand(
       "buildModel",
       makeCommandVoid0(
-          *this, (void(PatternGenerator::*)(void)) & PatternGenerator::buildPGI,
+          *this, (void (PatternGenerator::*)(void))&PatternGenerator::buildPGI,
           docCommandVoid0("From the files, parse and build the robot model and"
                           " the Walking Pattern Generator.")));
   addCommand(
       "initState",
       makeCommandVoid0(
-          *this,
-          (void(PatternGenerator::*)(void)) & PatternGenerator::InitState,
+          *this, (void (PatternGenerator::*)(void))&PatternGenerator::InitState,
           docCommandVoid0("From q and model, compute the initial geometry.")));
 
   addCommand(
@@ -1828,7 +1827,7 @@ void PatternGenerator::initCommands(void) {
   addCommand(
       "debug",
       makeCommandVoid0(
-          *this, (void(PatternGenerator::*)(void)) & PatternGenerator::debug,
+          *this, (void (PatternGenerator::*)(void))&PatternGenerator::debug,
           docCommandVoid0("Launch a debug command.")));
 }
 

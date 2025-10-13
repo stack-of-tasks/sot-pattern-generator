@@ -46,7 +46,7 @@ DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(NextStep, "NextStep");
 const unsigned int NextStep::PERIOD_DEFAULT = 160;  // 160iter=800ms
 const double NextStep::ZERO_STEP_POSITION_DEFAULT = 0.19;
 
-NextStep::NextStep(const std::string &name)
+NextStep::NextStep(const std::string& name)
     : Entity(name)
 
       ,
@@ -103,13 +103,13 @@ NextStep::~NextStep(void) {
 /* --- FUNCTIONS ------------------------------------------------------- */
 /* --- FUNCTIONS ------------------------------------------------------- */
 
-void NextStep::nextStep(const int &timeCurr) {
+void NextStep::nextStep(const int& timeCurr) {
   sotDEBUGIN(15);
 
-  const unsigned &sfoot = contactFootSIN(timeCurr);
-  const MatrixHomogeneous &wMlf =
+  const unsigned& sfoot = contactFootSIN(timeCurr);
+  const MatrixHomogeneous& wMlf =
       twoHandObserver.leftFootPositionSIN.access(timeCurr);
-  const MatrixHomogeneous &wMrf =
+  const MatrixHomogeneous& wMrf =
       twoHandObserver.rightFootPositionSIN.access(timeCurr);
 
   // actual and reference position of reference frame in fly foot,
@@ -257,7 +257,7 @@ void NextStep::thisIsZero() {
   sotDEBUGOUT(15);
 }
 
-void NextStep::starter(const int &timeCurr) {
+void NextStep::starter(const int& timeCurr) {
   sotDEBUGIN(15);
 
   footPrintList.clear();
@@ -302,7 +302,7 @@ void NextStep::starter(const int &timeCurr) {
   return;
 }
 
-void NextStep::stoper(const int &) {
+void NextStep::stoper(const int&) {
   sotDEBUGIN(15);
 
   sotDEBUGOUT(15);
@@ -313,7 +313,7 @@ void NextStep::stoper(const int &) {
 /* --- SIGNALS ---------------------------------------------------------- */
 /* --- SIGNALS ---------------------------------------------------------- */
 
-int &NextStep::triggerCall(int &dummy, int timeCurrent) {
+int& NextStep::triggerCall(int& dummy, int timeCurrent) {
   sotDEBUGIN(45);
 
   switch (state) {
@@ -324,7 +324,7 @@ int &NextStep::triggerCall(int &dummy, int timeCurrent) {
       if (nextIntoductionTime <= timeCurrent) {
         nextStep(timeCurrent);
         if (NULL != verbose) {
-          FootPrint &lastStep = footPrintList.back();
+          FootPrint& lastStep = footPrintList.back();
           (*verbose) << "<T=" << timeCurrent << "> Introduced a new step: ";
           switch (lastStep.contact) {
             case CONTACT_LEFT_FOOT:
@@ -361,7 +361,7 @@ int &NextStep::triggerCall(int &dummy, int timeCurrent) {
 /* --- PARAMS ---------------------------------------------------------- */
 /* --- PARAMS ---------------------------------------------------------- */
 
-void NextStep::display(std::ostream &os) const {
+void NextStep::display(std::ostream& os) const {
   os << "NextStep <" << getName() << ">:" << std::endl;
   for (std::deque<FootPrint>::const_iterator iter = footPrintList.begin();
        iter != footPrintList.end(); ++iter) {
@@ -379,8 +379,8 @@ void NextStep::display(std::ostream &os) const {
   }
 }
 
-void NextStep::commandLine(const std::string &cmdLine,
-                           std::istringstream &cmdArgs, std::ostream &os) {
+void NextStep::commandLine(const std::string& cmdLine,
+                           std::istringstream& cmdArgs, std::ostream& os) {
   if (cmdLine == "help") {
     os << "NextStep: " << std::endl
        << " - verbose [OFF]" << std::endl
@@ -457,7 +457,7 @@ void NextStep::commandLine(const std::string &cmdLine,
 /* --- TWO HAND -------------------------------------------------------- */
 /* --- TWO HAND -------------------------------------------------------- */
 
-NextStepTwoHandObserver::NextStepTwoHandObserver(const std::string &name)
+NextStepTwoHandObserver::NextStepTwoHandObserver(const std::string& name)
     : referencePositionLeftSIN(NULL, "NextStepTwoHandObserver(" + name +
                                          ")::input(vector)::positionLeft"),
       referenceVelocityLeftSIN(NULL, "NextStepTwoHandObserver(" + name +
@@ -531,22 +531,22 @@ NextStepTwoHandObserver::operator SignalArray<int>() {
           << referenceAccelerationSOUT);
 }
 
-MatrixHomogeneous &NextStepTwoHandObserver::computeRefPos(
-    MatrixHomogeneous &res, int timeCurr, const MatrixHomogeneous &wMsf) {
+MatrixHomogeneous& NextStepTwoHandObserver::computeRefPos(
+    MatrixHomogeneous& res, int timeCurr, const MatrixHomogeneous& wMsf) {
   sotDEBUGIN(15);
 
 #define RIGHT_HAND_REFERENCE 1
 #if RIGHT_HAND_REFERENCE
 
-  const MatrixHomogeneous &wMrh = referencePositionRightSIN(timeCurr);
+  const MatrixHomogeneous& wMrh = referencePositionRightSIN(timeCurr);
   MatrixHomogeneous sfMw;
   sfMw = wMsf.inverse();
   res = sfMw * wMrh;
 
 #else
 
-  const MatrixHomogeneous &wMlh = referencePositionLeftSIN(timeCurr);
-  const MatrixHomogeneous &wMrh = referencePositionRightSIN(timeCurr);
+  const MatrixHomogeneous& wMlh = referencePositionLeftSIN(timeCurr);
+  const MatrixHomogeneous& wMrh = referencePositionRightSIN(timeCurr);
 
   MatrixHomogeneous sfMw;
   sfMw = wMsf.inverse();
@@ -586,29 +586,29 @@ MatrixHomogeneous &NextStepTwoHandObserver::computeRefPos(
   return res;
 }
 
-MatrixHomogeneous &NextStepTwoHandObserver::computeReferencePositionLeft(
-    MatrixHomogeneous &res, int timeCurr) {
+MatrixHomogeneous& NextStepTwoHandObserver::computeReferencePositionLeft(
+    MatrixHomogeneous& res, int timeCurr) {
   sotDEBUGIN(15);
 
-  const MatrixHomogeneous &wMsf = leftFootPositionSIN(timeCurr);
+  const MatrixHomogeneous& wMsf = leftFootPositionSIN(timeCurr);
 
   sotDEBUGOUT(15);
   return computeRefPos(res, timeCurr, wMsf);
 }
 
-MatrixHomogeneous &NextStepTwoHandObserver::computeReferencePositionRight(
-    MatrixHomogeneous &res, int timeCurr) {
+MatrixHomogeneous& NextStepTwoHandObserver::computeReferencePositionRight(
+    MatrixHomogeneous& res, int timeCurr) {
   sotDEBUGIN(15);
 
-  const MatrixHomogeneous &wMsf = rightFootPositionSIN(timeCurr);
+  const MatrixHomogeneous& wMsf = rightFootPositionSIN(timeCurr);
 
   sotDEBUGOUT(15);
   return computeRefPos(res, timeCurr, wMsf);
 }
 
-Vector &NextStepTwoHandObserver::computeReferenceVelocity(const Vector &,
-                                                          const Vector &,
-                                                          Vector &res) {
+Vector& NextStepTwoHandObserver::computeReferenceVelocity(const Vector&,
+                                                          const Vector&,
+                                                          Vector& res) {
   sotDEBUGIN(15);
 
   /* TODO */
@@ -617,9 +617,9 @@ Vector &NextStepTwoHandObserver::computeReferenceVelocity(const Vector &,
   return res;
 }
 
-Vector &NextStepTwoHandObserver::computeReferenceAcceleration(const Vector &,
-                                                              const Vector &,
-                                                              Vector &res) {
+Vector& NextStepTwoHandObserver::computeReferenceAcceleration(const Vector&,
+                                                              const Vector&,
+                                                              Vector& res) {
   sotDEBUGIN(15);
 
   /* TODO */

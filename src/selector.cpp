@@ -38,7 +38,7 @@ namespace sot {
 
 DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(Selector, "Selector");
 
-Selector::Selector(const std::string &name)
+Selector::Selector(const std::string& name)
     : Entity(name),
       selectorSIN(NULL, "Selector(" + name + ")::input(uint)::selec") {
   sotDEBUGIN(5);
@@ -65,8 +65,8 @@ Selector::~Selector(void) {
   boost::bind(&Signal<sotType, int>::access, &sotName, _2)
 
 template <class T>
-unsigned int Selector::createSignal(const std::string &shortname,
-                                    const int &sigId__) {
+unsigned int Selector::createSignal(const std::string& shortname,
+                                    const int& sigId__) {
   sotDEBUGIN(15);
 
   unsigned int sigId = sigId__;
@@ -80,7 +80,7 @@ unsigned int Selector::createSignal(const std::string &shortname,
   if ((sigId__ < 0) || (sigId > nbSignals)) return -1;
 
   /* Set up the input signal vector. */
-  std::vector<SignalBase<int> *> &entriesSIN = inputsSIN[sigId];
+  std::vector<SignalBase<int>*>& entriesSIN = inputsSIN[sigId];
   for (unsigned int i = 0; i < entriesSIN.size(); ++i) {
     if (NULL != entriesSIN[i]) {
       signalDeregistration(entriesSIN[i]->getName());
@@ -99,7 +99,7 @@ unsigned int Selector::createSignal(const std::string &shortname,
     signame.str("");
     signame << "Selector(" << Entity::getName() << ")::input("
             << typeid(T).name() << ")::" << shortname << i;
-    SignalPtr<T, int> *sigIn = new SignalPtr<T, int>(NULL, signame.str());
+    SignalPtr<T, int>* sigIn = new SignalPtr<T, int>(NULL, signame.str());
     inputsSIN[sigId][i] = sigIn;
 
     signalRegistration(*sigIn);
@@ -115,7 +115,7 @@ unsigned int Selector::createSignal(const std::string &shortname,
   signame << "Selector(" << Entity::getName() << ")::output("
           << typeid(T).name() << ")::" << shortname;
 
-  SignalTimeDependent<T, int> *sigOut = new SignalTimeDependent<T, int>(
+  SignalTimeDependent<T, int>* sigOut = new SignalTimeDependent<T, int>(
       boost::bind(&Selector::computeSelection<T>,
                   SOT_CALL_SIG(selectorSIN, unsigned int),
                   boost::ref(entriesSIN), _1, _2),
@@ -129,9 +129,9 @@ unsigned int Selector::createSignal(const std::string &shortname,
 }
 
 template <class T>
-T &Selector::computeSelection(const unsigned int &sigNum,
-                              std::vector<SignalBase<int> *> &entriesSIN,
-                              T &res, const int &time) {
+T& Selector::computeSelection(const unsigned int& sigNum,
+                              std::vector<SignalBase<int>*>& entriesSIN, T& res,
+                              const int& time) {
   sotDEBUGIN(15);
 
   sotDEBUG(25) << "Type " << typeid(T).name() << std::endl;
@@ -146,8 +146,8 @@ T &Selector::computeSelection(const unsigned int &sigNum,
   }
 
   sotDEBUG(25) << "Sig name " << entriesSIN[sigNum]->getName() << std::endl;
-  SignalPtr<T, int> *sigSpec =
-      dynamic_cast<SignalPtr<T, int> *>(entriesSIN[sigNum]);
+  SignalPtr<T, int>* sigSpec =
+      dynamic_cast<SignalPtr<T, int>*>(entriesSIN[sigNum]);
   if (NULL == sigSpec) {
     SOT_THROW ExceptionPatternGenerator(
         ExceptionPatternGenerator::BAD_CAST,
@@ -162,14 +162,14 @@ T &Selector::computeSelection(const unsigned int &sigNum,
   return res;
 }
 
-void Selector::resetSignals(const unsigned int &nbEntries__,
-                            const unsigned int &nbSignals__) {
-  for (std::vector<std::vector<SignalBase<int> *> >::iterator iter =
+void Selector::resetSignals(const unsigned int& nbEntries__,
+                            const unsigned int& nbSignals__) {
+  for (std::vector<std::vector<SignalBase<int>*> >::iterator iter =
            inputsSIN.begin();
        iter < inputsSIN.end(); ++iter) {
-    for (std::vector<SignalBase<int> *>::iterator iterSig = iter->begin();
+    for (std::vector<SignalBase<int>*>::iterator iterSig = iter->begin();
          iterSig < iter->end(); ++iterSig) {
-      SignalBase<int> *sigPtr = *iterSig;
+      SignalBase<int>* sigPtr = *iterSig;
       if (NULL != sigPtr) delete sigPtr;
     }
   }
@@ -177,9 +177,9 @@ void Selector::resetSignals(const unsigned int &nbEntries__,
   nbSignals = nbSignals__;
   nbEntries = nbEntries__;
 
-  for (std::vector<SignalBase<int> *>::iterator iterSig = outputsSOUT.begin();
+  for (std::vector<SignalBase<int>*>::iterator iterSig = outputsSOUT.begin();
        iterSig < outputsSOUT.end(); ++iterSig) {
-    SignalBase<int> *sigPtr = *iterSig;
+    SignalBase<int>* sigPtr = *iterSig;
     if (NULL != sigPtr) delete sigPtr;
   }
   outputsSOUT.resize(nbSignals);
@@ -195,10 +195,10 @@ void Selector::resetSignals(const unsigned int &nbEntries__,
   else                                                 \
     oss << "  - " << sotTypeName << std::endl;
 
-static void displayOrCreate(Selector &selec, bool dORc, std::ostream &os,
-                            const std::string &name = "",
-                            const std::string &type = "",
-                            const int &sigId = -1) {
+static void displayOrCreate(Selector& selec, bool dORc, std::ostream& os,
+                            const std::string& name = "",
+                            const std::string& type = "",
+                            const int& sigId = -1) {
   sotDEBUGIN(15);
   std::ostringstream oss;
 
@@ -239,8 +239,8 @@ void Selector::initCommands(void) {
                  docCommandVerbose("Get the list of all possible types.")));
 }
 
-void Selector::create(const std::string &type, const std::string &name,
-                      const int &sigId) {
+void Selector::create(const std::string& type, const std::string& name,
+                      const int& sigId) {
   std::ostringstream dummy;
   displayOrCreate(*this, true, dummy, name, type, sigId);
 }
@@ -249,10 +249,10 @@ std::string Selector::getTypeList(void) {
   displayOrCreate(*this, false, sout);
   return sout.str();
 }
-void Selector::getTypeList(std::ostream &os) { os << getTypeList(); }
+void Selector::getTypeList(std::ostream& os) { os << getTypeList(); }
 
-void Selector::commandLine(const std::string &cmdLine,
-                           std::istringstream &cmdArgs, std::ostream &os) {
+void Selector::commandLine(const std::string& cmdLine,
+                           std::istringstream& cmdArgs, std::ostream& os) {
   if (cmdLine == "help") {
     os << "Selector: " << std::endl
        << "  - typeList: display the available types. " << std::endl

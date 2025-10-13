@@ -59,7 +59,7 @@ namespace sot {
 class StepObserver_EXPORT StepObserver : public Entity {
  public:
   static const std::string CLASS_NAME;
-  virtual const std::string &getClassName(void) const { return CLASS_NAME; }
+  virtual const std::string& getClassName(void) const { return CLASS_NAME; }
 
  public:
   SignalPtr<MatrixHomogeneous, int> leftHandPositionSIN;
@@ -79,27 +79,27 @@ class StepObserver_EXPORT StepObserver : public Entity {
   SignalTimeDependent<MatrixHomogeneous, int> referencePositionWaistSOUT;
 
  public:  // methods
-  StepObserver(const std::string &name);
+  StepObserver(const std::string& name);
 
   SignalArray<int> getSignals(void);
   operator SignalArray<int>();
 
  public:  // signal callbacks
-  MatrixHomogeneous &computeReferencePositionLeft(MatrixHomogeneous &res,
+  MatrixHomogeneous& computeReferencePositionLeft(MatrixHomogeneous& res,
                                                   int timeCurr);
-  MatrixHomogeneous &computeReferencePositionRight(MatrixHomogeneous &res,
+  MatrixHomogeneous& computeReferencePositionRight(MatrixHomogeneous& res,
                                                    int timeCurr);
-  MatrixHomogeneous &computeReferencePositionWaist(MatrixHomogeneous &res,
+  MatrixHomogeneous& computeReferencePositionWaist(MatrixHomogeneous& res,
                                                    int timeCurr);
 
  public:  // Entity
-  virtual void display(std::ostream &os) const;
-  virtual void commandLine(const std::string &cmdLine,
-                           std::istringstream &cmdArgs, std::ostream &os);
+  virtual void display(std::ostream& os) const;
+  virtual void commandLine(const std::string& cmdLine,
+                           std::istringstream& cmdArgs, std::ostream& os);
 
  private:  // helpers
-  MatrixHomogeneous &computeRefPos(MatrixHomogeneous &res, int timeCurr,
-                                   const MatrixHomogeneous &wMref);
+  MatrixHomogeneous& computeRefPos(MatrixHomogeneous& res, int timeCurr,
+                                   const MatrixHomogeneous& wMref);
 };
 
 }  // namespace sot

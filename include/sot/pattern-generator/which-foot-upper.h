@@ -70,7 +70,7 @@ class WhichFootUpper_EXPORT WhichFootUpper : public Entity {
   unsigned int lastFoot;
 
  public: /* --- CONSTRUCTION --- */
-  WhichFootUpper(const std::string &name);
+  WhichFootUpper(const std::string& name);
   virtual ~WhichFootUpper(void);
 
  public: /* --- SIGNAL --- */
@@ -87,19 +87,19 @@ class WhichFootUpper_EXPORT WhichFootUpper : public Entity {
   SignalTimeDependent<MatrixRotation, int> waistRsensorSOUT;
 
  public: /* --- FUNCTIONS --- */
-  static MatrixHomogeneous &computeFootPosition(
-      const MatrixHomogeneous &waistMfoot, const MatrixRotation &waistRsensor,
-      const MatrixRotation &worldRsensor, MatrixHomogeneous &res);
+  static MatrixHomogeneous& computeFootPosition(
+      const MatrixHomogeneous& waistMfoot, const MatrixRotation& waistRsensor,
+      const MatrixRotation& worldRsensor, MatrixHomogeneous& res);
 
-  MatrixRotation &computeRotationMatrix(MatrixRotation &rotMat, int time);
+  MatrixRotation& computeRotationMatrix(MatrixRotation& rotMat, int time);
 
-  unsigned int &whichFoot(const MatrixHomogeneous &waistMlfoot,
-                          const MatrixHomogeneous &waistMrfoot,
-                          unsigned int &res);
+  unsigned int& whichFoot(const MatrixHomogeneous& waistMlfoot,
+                          const MatrixHomogeneous& waistMrfoot,
+                          unsigned int& res);
 
  public: /* --- PARAMS --- */
-  virtual void commandLine(const std::string &cmdLine,
-                           std::istringstream &cmdArgs, std::ostream &os);
+  virtual void commandLine(const std::string& cmdLine,
+                           std::istringstream& cmdArgs, std::ostream& os);
 };
 
 }  // namespace sot

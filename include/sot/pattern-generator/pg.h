@@ -117,11 +117,11 @@ class PatternGenerator_EXPORT PatternGenerator : public Entity {
   /*! \brief The model of the robot. */
   pinocchio::Model m_robotModel;
   /*! \brief Pointer towards the robot model inside jrl-walkgen. */
-  pg::PinocchioRobot *m_PR;
+  pg::PinocchioRobot* m_PR;
   /*! \brief The pointor toward the robot data. */
-  pinocchio::Data *m_robotData;
+  pinocchio::Data* m_robotData;
   /*! \brief Pointer towards the interface of the pattern generator. */
-  pg::PatternGeneratorInterface *m_PGI;
+  pg::PatternGeneratorInterface* m_PGI;
 
   /*! \name Fields to store name and positions of data files
     @{
@@ -203,7 +203,7 @@ class PatternGenerator_EXPORT PatternGenerator : public Entity {
   /* @} */
  public: /* --- CONSTRUCTION --- */
   /*! \brief Default constructor. */
-  PatternGenerator(const std::string &name = "PatternGenerator");
+  PatternGenerator(const std::string& name = "PatternGenerator");
   /*! \brief Default destructor. */
   virtual ~PatternGenerator(void);
 
@@ -224,40 +224,40 @@ class PatternGenerator_EXPORT PatternGenerator : public Entity {
   bool buildReducedModel(void);
 
   /*! \brief readFootParameters */
-  void readFootParameters(std::string &rootFootPath, pg::PRFoot &aFoot);
+  void readFootParameters(std::string& rootFootPath, pg::PRFoot& aFoot);
 
   /*! \brief Initialize the state of the robot. */
   bool InitState(void);
 
   /*! \brief Set the directory which contains the parameters
     for the preview control. */
-  void setPreviewControlParametersFile(const std::string &filename);
+  void setPreviewControlParametersFile(const std::string& filename);
 
   /*! \brief Set the path which contains the URDF files robot's model. */
-  void setURDFFile(const std::string &filename);
+  void setURDFFile(const std::string& filename);
 
   /*! \brief Set the path which contains the SRDF files robot's model.
     More precisely this file describes which joints are the hands, feet.
     For more information please see the documentation of walkGenJRL.
   */
-  void setSRDFFile(const std::string &filename);
+  void setSRDFFile(const std::string& filename);
 
   /*! \brief Set the path which contains the Joint Rank model. */
-  void setXmlRankFile(const std::string &filename);
+  void setXmlRankFile(const std::string& filename);
 
   /*! \brief Set the name of the file specifying the control parameters
     of the preview control. */
-  void setParamPreviewFile(const std::string &filename);
+  void setParamPreviewFile(const std::string& filename);
 
   /*! \brief Set the foot parameters */
-  void setSoleParameters(const double &inSoleLength, const double &inSoleWidth);
+  void setSoleParameters(const double& inSoleLength, const double& inSoleWidth);
 
   /*! \brief Set mapping between a link and actual robot name */
-  void addJointMapping(const std::string &link, const std::string &repName);
+  void addJointMapping(const std::string& link, const std::string& repName);
 
   /*! \brief Give access directly to the pattern generator...
     You really have to know what your are doing. */
-  pg::PatternGeneratorInterface *GetPatternGeneratorInterface() {
+  pg::PatternGeneratorInterface* GetPatternGeneratorInterface() {
     return m_PGI;
   };
 
@@ -283,81 +283,81 @@ class PatternGenerator_EXPORT PatternGenerator : public Entity {
     @{
   */
   /*! \brief Internal method to get the reference ZMP at a given time. */
-  dynamicgraph::Vector &getZMPRef(dynamicgraph::Vector &res, int time);
+  dynamicgraph::Vector& getZMPRef(dynamicgraph::Vector& res, int time);
 
   /*! \brief Internal method to get the reference CoM at a given time.*/
-  dynamicgraph::Vector &getCoMRef(dynamicgraph::Vector &res, int time);
+  dynamicgraph::Vector& getCoMRef(dynamicgraph::Vector& res, int time);
 
   /*! \brief Internal method to get the reference dCoM at a given time.*/
-  dynamicgraph::Vector &getdCoMRef(dynamicgraph::Vector &res, int time);
+  dynamicgraph::Vector& getdCoMRef(dynamicgraph::Vector& res, int time);
 
   /*! \brief Internal method to get the reference ddCoM at a given time.*/
-  dynamicgraph::Vector &getddCoMRef(dynamicgraph::Vector &res, int time);
+  dynamicgraph::Vector& getddCoMRef(dynamicgraph::Vector& res, int time);
 
   /*! \brief Internal method to get the external forces at a given time.*/
-  dynamicgraph::Vector &getExternalForces(dynamicgraph::Vector &forces,
+  dynamicgraph::Vector& getExternalForces(dynamicgraph::Vector& forces,
                                           int time);
 
   /*! \brief Internal method to get the position of the left foot. */
-  MatrixHomogeneous &getLeftFootRef(MatrixHomogeneous &res, int time);
+  MatrixHomogeneous& getLeftFootRef(MatrixHomogeneous& res, int time);
 
   /*! \brief Internal method to get the position of the right foot. */
-  MatrixHomogeneous &getRightFootRef(MatrixHomogeneous &res, int time);
+  MatrixHomogeneous& getRightFootRef(MatrixHomogeneous& res, int time);
 
   /*! \brief Internal method to get the derivative of the left foot. */
-  MatrixHomogeneous &getdotLeftFootRef(MatrixHomogeneous &res, int time);
+  MatrixHomogeneous& getdotLeftFootRef(MatrixHomogeneous& res, int time);
 
   /*! \brief Internal method to get the derivative of the right foot. */
-  MatrixHomogeneous &getdotRightFootRef(MatrixHomogeneous &res, int time);
+  MatrixHomogeneous& getdotRightFootRef(MatrixHomogeneous& res, int time);
 
   /*! \brief Internal method to get the position of the flying foot. */
-  MatrixHomogeneous &getFlyingFootRef(MatrixHomogeneous &res, int time);
+  MatrixHomogeneous& getFlyingFootRef(MatrixHomogeneous& res, int time);
 
   /*! \brief Internal method to get the joint position for walking. */
-  dynamicgraph::Vector &getjointWalkingErrorPosition(dynamicgraph::Vector &res,
+  dynamicgraph::Vector& getjointWalkingErrorPosition(dynamicgraph::Vector& res,
                                                      int time);
 
   /*! \brief Internal method to get the derivative of the com attitude. */
-  dynamicgraph::Vector &getdComAttitude(dynamicgraph::Vector &res, int time);
+  dynamicgraph::Vector& getdComAttitude(dynamicgraph::Vector& res, int time);
 
   /*! \brief Internal method to get the second derivative of the com attitude.
    */
-  dynamicgraph::Vector &getddComAttitude(dynamicgraph::Vector &res, int time);
+  dynamicgraph::Vector& getddComAttitude(dynamicgraph::Vector& res, int time);
 
   /*! \brief Internal method to get the attitude of the com. */
-  dynamicgraph::Vector &getComAttitude(dynamicgraph::Vector &res, int time);
+  dynamicgraph::Vector& getComAttitude(dynamicgraph::Vector& res, int time);
 
   /*! \brief Internal method to get the attitude of the waist. */
-  VectorRollPitchYaw &getWaistAttitude(VectorRollPitchYaw &res, int time);
+  VectorRollPitchYaw& getWaistAttitude(VectorRollPitchYaw& res, int time);
 
   /*! \brief Internal method to get the absolute attitude of the waist. */
-  VectorRollPitchYaw &getWaistAttitudeAbsolute(VectorRollPitchYaw &res,
+  VectorRollPitchYaw& getWaistAttitudeAbsolute(VectorRollPitchYaw& res,
                                                int time);
 
   /*! \brief Internal method to get the absolute attitude of the waist into
     an homogeneous matrix. */
-  MatrixHomogeneous &getWaistAttitudeMatrixAbsolute(MatrixHomogeneous &res,
+  MatrixHomogeneous& getWaistAttitudeMatrixAbsolute(MatrixHomogeneous& res,
                                                     int time);
 
   /*! \brief Internal method to get the dataInPorcess flag */
-  unsigned &getDataInProcess(unsigned &res, int time);
+  unsigned& getDataInProcess(unsigned& res, int time);
 
   /*! \brief Internal method to get the position of the waist. */
-  dynamicgraph::Vector &getWaistPosition(dynamicgraph::Vector &res, int time);
+  dynamicgraph::Vector& getWaistPosition(dynamicgraph::Vector& res, int time);
 
   /*! \brief Internal method to get the absolute position of the waist. */
-  dynamicgraph::Vector &getWaistPositionAbsolute(dynamicgraph::Vector &res,
+  dynamicgraph::Vector& getWaistPositionAbsolute(dynamicgraph::Vector& res,
                                                  int time);
 
   /*! @} */
 
   /*! \brief Getting the current support foot: 1 Left -1 Right. */
-  int &getSupportFoot(int &res, int time);
+  int& getSupportFoot(int& res, int time);
 
   /*! \brief Trigger the initialization of the algorithm */
-  int &InitOneStepOfControl(int &dummy, int time);
+  int& InitOneStepOfControl(int& dummy, int time);
   /*! \brief Trigger one step of the algorithm. */
-  int &OneStepOfControl(int &dummy, int time);
+  int& OneStepOfControl(int& dummy, int time);
 
   /*! \name Keep information computed once for each time.
     @{
@@ -478,66 +478,66 @@ class PatternGenerator_EXPORT PatternGenerator : public Entity {
     pattern generator interface.
     \par[in] The command line (optional option)
     \par[in] */
-  void ParseCmdFile(std::istringstream &cmdArg, std::ostream &os);
+  void ParseCmdFile(std::istringstream& cmdArg, std::ostream& os);
 
   /*! \brief Transfert from a current absolute foot position
     to a dot homogeneous matrix. */
   void FromAbsoluteFootPosToDotHomogeneous(
-      pg::FootAbsolutePosition aFootPosition, MatrixHomogeneous &aFootMH,
-      MatrixHomogeneous &adotFootMH);
+      pg::FootAbsolutePosition aFootPosition, MatrixHomogeneous& aFootMH,
+      MatrixHomogeneous& adotFootMH);
 
   /*! \brief Transfert from a current absolute foot position
     to a homogeneous matrix. */
   void FromAbsoluteFootPosToHomogeneous(pg::FootAbsolutePosition aFootPosition,
-                                        MatrixHomogeneous &aFootMH);
+                                        MatrixHomogeneous& aFootMH);
 
   /*! \brief Provide an homogeneous matrix
     from the current waist position and attitude*/
-  void getAbsoluteWaistPosAttHomogeneousMatrix(MatrixHomogeneous &aWaistMH);
+  void getAbsoluteWaistPosAttHomogeneousMatrix(MatrixHomogeneous& aWaistMH);
 
-  void SubsamplingFootPos(pg::FootAbsolutePosition &PrevFootPosition,
-                          pg::FootAbsolutePosition &NextFootPosition,
-                          MatrixHomogeneous &FootPositionOut,
-                          MatrixHomogeneous &dotFootPositionOut,
-                          unsigned int &count);
+  void SubsamplingFootPos(pg::FootAbsolutePosition& PrevFootPosition,
+                          pg::FootAbsolutePosition& NextFootPosition,
+                          MatrixHomogeneous& FootPositionOut,
+                          MatrixHomogeneous& dotFootPositionOut,
+                          unsigned int& count);
 
-  void SubsamplingVector(dynamicgraph::Vector &PrevPosition,
-                         dynamicgraph::Vector &NextPosition,
-                         dynamicgraph::Vector &PositionOut,
-                         unsigned int &count);
+  void SubsamplingVector(dynamicgraph::Vector& PrevPosition,
+                         dynamicgraph::Vector& NextPosition,
+                         dynamicgraph::Vector& PositionOut,
+                         unsigned int& count);
 
-  void CopyFootPosition(pg::FootAbsolutePosition &FootPositionIn,
-                        pg::FootAbsolutePosition &FootPositionOut);
+  void CopyFootPosition(pg::FootAbsolutePosition& FootPositionIn,
+                        pg::FootAbsolutePosition& FootPositionOut);
 
   /*! \brief Internal method to get the initial
     reference ZMP at a given time. */
-  dynamicgraph::Vector &getInitZMPRef(dynamicgraph::Vector &res, int time);
+  dynamicgraph::Vector& getInitZMPRef(dynamicgraph::Vector& res, int time);
 
   /*! \brief Internal method to get the
     initial reference CoM at a given time.*/
-  dynamicgraph::Vector &getInitCoMRef(dynamicgraph::Vector &res, int time);
+  dynamicgraph::Vector& getInitCoMRef(dynamicgraph::Vector& res, int time);
 
   /*! \brief Internal method to get the initial
     reference CoM at a given time.*/
-  dynamicgraph::Vector &getInitWaistPosRef(dynamicgraph::Vector &res, int time);
+  dynamicgraph::Vector& getInitWaistPosRef(dynamicgraph::Vector& res, int time);
 
   /*! \brief Internal method to get the initial
     reference CoM at a given time.*/
-  VectorRollPitchYaw &getInitWaistAttRef(VectorRollPitchYaw &res, int time);
+  VectorRollPitchYaw& getInitWaistAttRef(VectorRollPitchYaw& res, int time);
 
   /*! \brief Internal method to get the position of the left foot. */
-  MatrixHomogeneous &getInitLeftFootRef(MatrixHomogeneous &res, int time);
+  MatrixHomogeneous& getInitLeftFootRef(MatrixHomogeneous& res, int time);
 
   /*! \brief Internal method to get the position of the right foot. */
-  MatrixHomogeneous &getInitRightFootRef(MatrixHomogeneous &res, int time);
+  MatrixHomogeneous& getInitRightFootRef(MatrixHomogeneous& res, int time);
 
   /*! \brief Internal method to get the information of contact or not on
     the feet. */
-  bool &getLeftFootContact(bool &res, int time);
-  bool &getRightFootContact(bool &res, int time);
+  bool& getLeftFootContact(bool& res, int time);
+  bool& getRightFootContact(bool& res, int time);
   /*! \brief Internal method to get the information of contact phase leftFoot=1,
    * rightFoot=-1, doubleSupport=0. */
-  int &getContactPhase(int &res, int time);
+  int& getContactPhase(int& res, int time);
 
  public:
   /*! \name External signals
@@ -678,13 +678,13 @@ class PatternGenerator_EXPORT PatternGenerator : public Entity {
 
  public: /* --- PARAMS --- */
   void initCommands(void);
-  int stringToReferenceEnum(const std::string &FrameReference);
-  void setReferenceFromString(const std::string &str);
-  void addOnLineStep(const double &x, const double &y, const double &th);
-  void addStep(const double &x, const double &y, const double &th);
-  void pgCommandLine(const std::string &cmdline);
-  void useFeedBackSignals(const bool &feedBack);
-  void useDynamicFilter(const bool &dynamicFilter);
+  int stringToReferenceEnum(const std::string& FrameReference);
+  void setReferenceFromString(const std::string& str);
+  void addOnLineStep(const double& x, const double& y, const double& th);
+  void addStep(const double& x, const double& y, const double& th);
+  void pgCommandLine(const std::string& cmdline);
+  void useFeedBackSignals(const bool& feedBack);
+  void useDynamicFilter(const bool& dynamicFilter);
 
   void debug(void);
 };

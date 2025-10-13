@@ -39,7 +39,7 @@ const double StepQueue::ZERO_STEP_POSITION = 0.19;
 const FootPrint StepQueue::START_FOOT_PRINT(0.0, -ZERO_STEP_POSITION / 2., 0.0,
                                             CONTACT_RIGHT_FOOT);
 
-StepQueue::StepQueue(const std::string &name)
+StepQueue::StepQueue(const std::string& name)
     : Entity(name), footPrintList(), firstStepChanged(false) {
   startSequence();
 }
@@ -63,7 +63,7 @@ void StepQueue::pushStep(double x, double y, double theta) {
   footprint.y = y;
   footprint.theta = theta;
 
-  const FootPrint &last = footPrintList.back();
+  const FootPrint& last = footPrintList.back();
 
   if (last.contact == CONTACT_LEFT_FOOT) {
     footprint.contact = CONTACT_RIGHT_FOOT;
@@ -85,42 +85,42 @@ void StepQueue::changeFirstStep(double x, double y, double theta) {
   firstStepChanged = true;
 }
 
-const FootPrint &StepQueue::getFirstStepChange() const {
+const FootPrint& StepQueue::getFirstStepChange() const {
   return firstStepChange;
 }
 
-const FootPrint &StepQueue::getStep(unsigned int index) const {
+const FootPrint& StepQueue::getStep(unsigned int index) const {
   return footPrintList[index];
 }
 
-const FootPrint &StepQueue::getFirstStep() const {
+const FootPrint& StepQueue::getFirstStep() const {
   return footPrintList.front();
 }
 
-const FootPrint &StepQueue::getLastStep() const { return footPrintList.back(); }
+const FootPrint& StepQueue::getLastStep() const { return footPrintList.back(); }
 
 bool StepQueue::isFirstStepChanged() const { return firstStepChanged; }
 
 unsigned int StepQueue::size() const { return QUEUE_SIZE; }
 
-const FootPrint &StepQueue::getStartFootPrint() const {
+const FootPrint& StepQueue::getStartFootPrint() const {
   return START_FOOT_PRINT;
 }
 
 double StepQueue::getZeroStepPosition() const { return ZERO_STEP_POSITION; }
 
-void StepQueue::display(std::ostream &os) const {
+void StepQueue::display(std::ostream& os) const {
   os << "StepQueue <" << getName() << ">:" << std::endl;
 
   for (size_t i = 0; i < footPrintList.size(); ++i) {
-    const FootPrint &fp = footPrintList[i];
+    const FootPrint& fp = footPrintList[i];
     os << "step " << i << ": " << fp.contact << ", (" << fp.x << " " << fp.y
        << " " << fp.theta << ")" << std::endl;
   }
 }
 
-void StepQueue::commandLine(const std::string &cmdLine,
-                            std::istringstream &cmdArgs, std::ostream &os) {
+void StepQueue::commandLine(const std::string& cmdLine,
+                            std::istringstream& cmdArgs, std::ostream& os) {
   if (cmdLine == "help") {
     os << "StepQueue: " << std::endl << std::endl;
   } else {

@@ -62,17 +62,17 @@ class EXCEPTION_PG_EXPORT ExceptionPatternGenerator : public ExceptionAbstract {
   };
 
   static const std::string EXCEPTION_NAME;
-  virtual const std::string &getExceptionName(void) const {
+  virtual const std::string& getExceptionName(void) const {
     return EXCEPTION_NAME;
   }
 
  public:
   ExceptionPatternGenerator(
-      const ExceptionPatternGenerator::ErrorCodeEnum &errcode,
-      const std::string &msg = "");
+      const ExceptionPatternGenerator::ErrorCodeEnum& errcode,
+      const std::string& msg = "");
   ExceptionPatternGenerator(
-      const ExceptionPatternGenerator::ErrorCodeEnum &errcode,
-      const std::string &msg, const char *format, ...);
+      const ExceptionPatternGenerator::ErrorCodeEnum& errcode,
+      const std::string& msg, const char* format, ...);
   virtual ~ExceptionPatternGenerator(void) throw() {}
 };
 

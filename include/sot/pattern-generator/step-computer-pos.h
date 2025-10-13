@@ -66,14 +66,14 @@ class StepComputerFORCE_EXPORT StepComputerPos : public Entity,
                                                  public StepComputer {
  public:
   static const std::string CLASS_NAME;
-  virtual const std::string &getClassName(void) const { return CLASS_NAME; }
+  virtual const std::string& getClassName(void) const { return CLASS_NAME; }
 
  public:  // Construction
-  StepComputerPos(const std::string &name);
+  StepComputerPos(const std::string& name);
 
  public:  // Methods
-  void changeFirstStep(StepQueue &queue, int timeCurr);
-  void nextStep(StepQueue &queue, int timeCurr);
+  void changeFirstStep(StepQueue& queue, int timeCurr);
+  void nextStep(StepQueue& queue, int timeCurr);
 
  public:  // Signals
   SignalPtr<MatrixHomogeneous, int> referencePositionLeftSIN;
@@ -81,14 +81,14 @@ class StepComputerFORCE_EXPORT StepComputerPos : public Entity,
   SignalPtr<unsigned, int> contactFootSIN;
 
  public:  // Entity
-  virtual void display(std::ostream &os) const;
-  virtual void commandLine(const std::string &cmdLine,
-                           std::istringstream &cmdArgs, std::ostream &os);
+  virtual void display(std::ostream& os) const;
+  virtual void commandLine(const std::string& cmdLine,
+                           std::istringstream& cmdArgs, std::ostream& os);
 
  private:  // Reference frame
   MatrixHomogeneous rfMref0;
   MatrixHomogeneous lfMref0;
-  StepObserver *twoHandObserver;
+  StepObserver* twoHandObserver;
   StepChecker checker;
 
   void thisIsZero();

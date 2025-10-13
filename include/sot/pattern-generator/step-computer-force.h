@@ -66,14 +66,14 @@ class StepComputerFORCE_EXPORT StepComputerForce : public Entity,
                                                    public StepComputer {
  public:
   static const std::string CLASS_NAME;
-  virtual const std::string &getClassName(void) const { return CLASS_NAME; }
+  virtual const std::string& getClassName(void) const { return CLASS_NAME; }
 
  public:  // Construction
-  StepComputerForce(const std::string &name);
+  StepComputerForce(const std::string& name);
 
  public:  // Methods
-  void changeFirstStep(StepQueue &queue, int timeCurr);
-  void nextStep(StepQueue &queue, int timeCurr);
+  void changeFirstStep(StepQueue& queue, int timeCurr);
+  void nextStep(StepQueue& queue, int timeCurr);
 
  public:  // Signals
   SignalPtr<MatrixHomogeneous, int> waistMlhandSIN;
@@ -88,21 +88,21 @@ class StepComputerFORCE_EXPORT StepComputerForce : public Entity,
   SignalTimeDependent<Vector, int> forceLhandSOUT;
   SignalTimeDependent<Vector, int> forceRhandSOUT;
 
-  Vector &computeDisplacement(Vector &res, int timeCurr);
-  Vector &computeForce(Vector &res, int timeCurr);
-  Vector &computeForceL(Vector &res, int timeCurr);
-  Vector &computeForceR(Vector &res, int timeCurr);
-  Vector &computeHandForce(Vector &res, const MatrixHomogeneous &waMh,
-                           const MatrixHomogeneous &waMref, const Vector &F);
+  Vector& computeDisplacement(Vector& res, int timeCurr);
+  Vector& computeForce(Vector& res, int timeCurr);
+  Vector& computeForceL(Vector& res, int timeCurr);
+  Vector& computeForceR(Vector& res, int timeCurr);
+  Vector& computeHandForce(Vector& res, const MatrixHomogeneous& waMh,
+                           const MatrixHomogeneous& waMref, const Vector& F);
 
  public:  // Entity
-  virtual void display(std::ostream &os) const;
-  virtual void commandLine(const std::string &cmdLine,
-                           std::istringstream &cmdArgs, std::ostream &os);
+  virtual void display(std::ostream& os) const;
+  virtual void commandLine(const std::string& cmdLine,
+                           std::istringstream& cmdArgs, std::ostream& os);
 
  private:  // Reference frame
   MatrixHomogeneous waMref0;
-  StepObserver *twoHandObserver;
+  StepObserver* twoHandObserver;
   StepChecker checker;
 
   void thisIsZero();

@@ -39,7 +39,7 @@ DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(NextStepPgSot, "NextStepPgSot");
 /* --- CONSTRUCT ----------------------------------------------------- */
 /* --- CONSTRUCT ----------------------------------------------------- */
 
-NextStepPgSot::NextStepPgSot(const std::string &name) : NextStep(name) {
+NextStepPgSot::NextStepPgSot(const std::string& name) : NextStep(name) {
   sotDEBUGIN(5);
   m_StepModificationMode = NextStepPgSot::ADDING_STEP;
   m_NextStepTime = -1.0;
@@ -53,7 +53,7 @@ NextStepPgSot::NextStepPgSot(const std::string &name) : NextStep(name) {
 /* --- FUNCTIONS ------------------------------------------------------- */
 /* --- FUNCTIONS ------------------------------------------------------- */
 
-void positionClipper(double x, double y, double &x_result, double &y_result) {
+void positionClipper(double x, double y, double& x_result, double& y_result) {
   const double MIN_y = 0.16;
   const double MAX_y = 0.40;
   const double MAX_x = 0.25;
@@ -105,7 +105,7 @@ void positionClipper(double x, double y, double &x_result, double &y_result) {
 
 /* --- FUNCTIONS -------------------------------------------------- */
 
-void NextStepPgSot::starter(const int &timeCurr) {
+void NextStepPgSot::starter(const int& timeCurr) {
   sotDEBUGIN(15);
 
   NextStep::starter(timeCurr);
@@ -132,7 +132,7 @@ void NextStepPgSot::starter(const int &timeCurr) {
   return;
 }
 
-void NextStepPgSot::stoper(const int &) {
+void NextStepPgSot::stoper(const int&) {
   sotDEBUGIN(15);
 
   if (pgEntity) {
@@ -152,11 +152,11 @@ void NextStepPgSot::stoper(const int &) {
   return;
 }
 
-void NextStepPgSot::introductionCallBack(const int &timeCurr) {
+void NextStepPgSot::introductionCallBack(const int& timeCurr) {
   sotDEBUGIN(15);
 
   if (state == STATE_STARTED) {
-    FootPrint &lastStep = footPrintList.back();
+    FootPrint& lastStep = footPrintList.back();
     if (pgEntity) {
       if (m_StepModificationMode == NextStepPgSot::ADDING_STEP) {
         std::string cmdLine = "addStep";
@@ -271,8 +271,8 @@ void NextStepPgSot::introductionCallBack(const int &timeCurr) {
   return;
 }
 
-void NextStepPgSot::commandLine(const std::string &cmdLine,
-                                std::istringstream &cmdArgs, std::ostream &os) {
+void NextStepPgSot::commandLine(const std::string& cmdLine,
+                                std::istringstream& cmdArgs, std::ostream& os) {
   if ("help" == cmdLine) {
     os << "NextStepPgSot: " << std::endl
        << " - initPg [<pg_name>]" << std::endl
@@ -283,7 +283,7 @@ void NextStepPgSot::commandLine(const std::string &cmdLine,
     cmdArgs >> std::ws;
     if (cmdArgs.good()) cmdArgs >> name;
     pgEntity = &(PoolStorage::getInstance()->getEntity(name));
-    m_sPG = dynamic_cast<PatternGenerator *>(pgEntity);
+    m_sPG = dynamic_cast<PatternGenerator*>(pgEntity);
     if (m_sPG != 0) m_PGI = m_sPG->GetPatternGeneratorInterface();
   } else if ("stepmodificationmode" == cmdLine) {
     std::string stgmode;

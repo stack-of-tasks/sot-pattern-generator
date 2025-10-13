@@ -45,7 +45,7 @@ namespace sot {
 DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(StepComputerJoystick,
                                    "StepComputerJoystick");
 
-StepComputerJoystick::StepComputerJoystick(const std::string &name)
+StepComputerJoystick::StepComputerJoystick(const std::string& name)
     : Entity(name),
       joystickSIN(NULL, "StepComputerJoystick(" + name +
                             ")::input(vector)::joystickin"),
@@ -66,7 +66,7 @@ StepComputerJoystick::StepComputerJoystick(const std::string &name)
   sotDEBUGOUT(5);
 }
 
-void StepComputerJoystick::nextStep(StepQueue &queue, int timeCurr) {
+void StepComputerJoystick::nextStep(StepQueue& queue, int timeCurr) {
   // Introduce new step at the end of the preview window.
   if (queue.getLastStep().contact == CONTACT_LEFT_FOOT) {
     queue.pushStep(0., -queue.getZeroStepPosition(), 0.);
@@ -79,10 +79,10 @@ void StepComputerJoystick::nextStep(StepQueue &queue, int timeCurr) {
   }
 }
 
-void StepComputerJoystick::changeFirstStep(StepQueue &queue, int timeCurr) {
+void StepComputerJoystick::changeFirstStep(StepQueue& queue, int timeCurr) {
   logChanges << timeCurr << " changeFirstStep" << std::endl;
 
-  const FootPrint &step = queue.getFirstStep();
+  const FootPrint& step = queue.getFirstStep();
 
   Vector joyin;
   joyin.resize(3);
@@ -139,13 +139,13 @@ void StepComputerJoystick::changeFirstStep(StepQueue &queue, int timeCurr) {
   //  logChanges << x << " " << y << " " << theta << std::endl;
 }
 
-void StepComputerJoystick::display(std::ostream &os) const {
+void StepComputerJoystick::display(std::ostream& os) const {
   os << "StepComputer <" << getName() << ">:" << std::endl;
 }
 
-void StepComputerJoystick::commandLine(const std::string &cmdLine,
-                                       std::istringstream &cmdArgs,
-                                       std::ostream &os) {
+void StepComputerJoystick::commandLine(const std::string& cmdLine,
+                                       std::istringstream& cmdArgs,
+                                       std::ostream& os) {
   if (cmdLine == "help") {
     os << "NextStep: " << std::endl
        << " - verbose [OFF]" << std::endl
@@ -159,7 +159,7 @@ void StepComputerJoystick::commandLine(const std::string &cmdLine,
   }
 }
 
-Vector &StepComputerJoystick::getlaststep(Vector &res, int time) {
+Vector& StepComputerJoystick::getlaststep(Vector& res, int time) {
   if (res.size() != 4) res.resize(4);
 
   res(0) = m_laststep[0];

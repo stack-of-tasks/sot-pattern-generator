@@ -33,13 +33,13 @@ const std::string ExceptionPatternGenerator::EXCEPTION_NAME =
     "PatternGenerator";
 
 ExceptionPatternGenerator::ExceptionPatternGenerator(
-    const ExceptionPatternGenerator::ErrorCodeEnum &errcode,
-    const std::string &msg)
+    const ExceptionPatternGenerator::ErrorCodeEnum& errcode,
+    const std::string& msg)
     : ExceptionAbstract(errcode, msg) {}
 
 ExceptionPatternGenerator::ExceptionPatternGenerator(
-    const ExceptionPatternGenerator::ErrorCodeEnum &errcode,
-    const std::string &msg, const char *format, ...)
+    const ExceptionPatternGenerator::ErrorCodeEnum& errcode,
+    const std::string& msg, const char* format, ...)
     : ExceptionAbstract(errcode, msg) {
   va_list args;
   va_start(args, format);

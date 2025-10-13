@@ -36,7 +36,7 @@ const unsigned int StepTimeLine::PERIOD_DEFAULT = 160;
 // 160iter=800ms
 const unsigned int StepTimeLine::FIRST_STEP_TO_MODIFY = 3;
 
-StepTimeLine::StepTimeLine(const std::string &name)
+StepTimeLine::StepTimeLine(const std::string& name)
     : Entity(name),
       triggerSOUT("NextStep(" + name + ")::input(dummy)::trigger")
 
@@ -59,7 +59,7 @@ StepTimeLine::StepTimeLine(const std::string &name)
   sotDEBUGOUT(5);
 }
 
-int &StepTimeLine::triggerCall(int &dummy, int timeCurrent) {
+int& StepTimeLine::triggerCall(int& dummy, int timeCurrent) {
   sotDEBUGIN(45);
 
   if (state == STATE_STARTED) {
@@ -101,7 +101,7 @@ int &StepTimeLine::triggerCall(int &dummy, int timeCurrent) {
   return dummy;
 }
 
-void StepTimeLine::display(std::ostream &os) const {
+void StepTimeLine::display(std::ostream& os) const {
   os << "StepTimeLine <" << getName() << ">:" << std::endl;
   os << " - timeLastIntroduction: " << timeLastIntroduction << std::endl;
   os << " - period: " << period << std::endl;
@@ -118,8 +118,8 @@ void StepTimeLine::display(std::ostream &os) const {
   }
 }
 
-void StepTimeLine::commandLine(const std::string &cmdLine,
-                               std::istringstream &cmdArgs, std::ostream &os) {
+void StepTimeLine::commandLine(const std::string& cmdLine,
+                               std::istringstream& cmdArgs, std::ostream& os) {
   if (cmdLine == "help") {
     os << "StepTimeLine: " << std::endl << std::endl;
   } else if (cmdLine == "setComputer") {
@@ -128,24 +128,24 @@ void StepTimeLine::commandLine(const std::string &cmdLine,
     if (cmdArgs.good()) {
       cmdArgs >> name;
     }
-    Entity *entity = &(PoolStorage::getInstance()->getEntity(name));
-    stepComputer = dynamic_cast<StepComputer *>(entity);
+    Entity* entity = &(PoolStorage::getInstance()->getEntity(name));
+    stepComputer = dynamic_cast<StepComputer*>(entity);
   } else if (cmdLine == "setQueue") {
     std::string name = "stepqueue";
     cmdArgs >> std::ws;
     if (cmdArgs.good()) {
       cmdArgs >> name;
     }
-    Entity *entity = &(PoolStorage::getInstance()->getEntity(name));
-    stepQueue = dynamic_cast<StepQueue *>(entity);
+    Entity* entity = &(PoolStorage::getInstance()->getEntity(name));
+    stepQueue = dynamic_cast<StepQueue*>(entity);
   } else if (cmdLine == "setPGManager") {
     std::string name = "steppg";
     cmdArgs >> std::ws;
     if (cmdArgs.good()) {
       cmdArgs >> name;
     }
-    Entity *entity = &(PoolStorage::getInstance()->getEntity(name));
-    pgManager = dynamic_cast<PGManager *>(entity);
+    Entity* entity = &(PoolStorage::getInstance()->getEntity(name));
+    pgManager = dynamic_cast<PGManager*>(entity);
   } else if (cmdLine == "state") {
     cmdArgs >> std::ws;
     if (cmdArgs.good()) {

@@ -47,7 +47,7 @@ namespace sot {
 
 DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(StepComputerForce, "StepComputerForce");
 
-StepComputerForce::StepComputerForce(const std::string &name)
+StepComputerForce::StepComputerForce(const std::string& name)
     : Entity(name),
       waistMlhandSIN(
           NULL, "StepComputerForce(" + name + ")::input(vector)::waistMlhand")
@@ -107,7 +107,7 @@ StepComputerForce::StepComputerForce(const std::string &name)
   sotDEBUGOUT(5);
 }
 
-void StepComputerForce::nextStep(StepQueue &queue, int timeCurr) {
+void StepComputerForce::nextStep(StepQueue& queue, int timeCurr) {
   // Introduce new step at the end of the preview window.
   if (queue.getLastStep().contact == CONTACT_LEFT_FOOT) {
     queue.pushStep(0., -queue.getZeroStepPosition(), 0.);
@@ -120,7 +120,7 @@ void StepComputerForce::nextStep(StepQueue &queue, int timeCurr) {
   }
 }
 
-Vector &StepComputerForce::computeDisplacement(Vector &res, int timeCurr) {
+Vector& StepComputerForce::computeDisplacement(Vector& res, int timeCurr) {
   if (!twoHandObserver) {
     std::cerr << "Observer not set" << std::endl;
     res.resize(3);
@@ -130,7 +130,7 @@ Vector &StepComputerForce::computeDisplacement(Vector &res, int timeCurr) {
 
   // transformation from ref0 to ref.
 
-  const MatrixHomogeneous &waMref = referencePositionWaistSIN.access(timeCurr);
+  const MatrixHomogeneous& waMref = referencePositionWaistSIN.access(timeCurr);
   MatrixHomogeneous ref0Mwa;
   ref0Mwa = waMref0.inverse();
   MatrixHomogeneous ref0Mref;
@@ -168,9 +168,9 @@ Vector &StepComputerForce::computeDisplacement(Vector &res, int timeCurr) {
   return res;
 }
 
-Vector &StepComputerForce::computeForce(Vector &res, int timeCurr) {
-  const Vector &dx = displacementSOUT.access(timeCurr);
-  const Vector &K = stiffnessSIN.access(timeCurr);
+Vector& StepComputerForce::computeForce(Vector& res, int timeCurr) {
+  const Vector& dx = displacementSOUT.access(timeCurr);
+  const Vector& K = stiffnessSIN.access(timeCurr);
 
   if ((dx.size() != 3) || (K.size() != 3) || (dx.size() != K.size())) {
     res.resize(3);
@@ -182,10 +182,10 @@ Vector &StepComputerForce::computeForce(Vector &res, int timeCurr) {
   return res;
 }
 
-Vector &StepComputerForce::computeHandForce(Vector &res,
-                                            const MatrixHomogeneous &waMh,
-                                            const MatrixHomogeneous &waMref,
-                                            const Vector &F) {
+Vector& StepComputerForce::computeHandForce(Vector& res,
+                                            const MatrixHomogeneous& waMh,
+                                            const MatrixHomogeneous& waMref,
+                                            const Vector& F) {
   if (F.size() != 3) {
     res.resize(6);
     res.fill(0.);
@@ -235,24 +235,24 @@ Vector &StepComputerForce::computeHandForce(Vector &res,
   return res;
 }
 
-Vector &StepComputerForce::computeForceL(Vector &res, int timeCurr) {
-  const MatrixHomogeneous &waMlh = waistMlhandSIN.access(timeCurr);
-  const MatrixHomogeneous &waMref = referencePositionWaistSIN.access(timeCurr);
-  const Vector &F = forceSOUT.access(timeCurr);
+Vector& StepComputerForce::computeForceL(Vector& res, int timeCurr) {
+  const MatrixHomogeneous& waMlh = waistMlhandSIN.access(timeCurr);
+  const MatrixHomogeneous& waMref = referencePositionWaistSIN.access(timeCurr);
+  const Vector& F = forceSOUT.access(timeCurr);
 
   return computeHandForce(res, waMlh, waMref, F);
 }
 
-Vector &StepComputerForce::computeForceR(Vector &res, int timeCurr) {
-  const MatrixHomogeneous &waMrh = waistMrhandSIN.access(timeCurr);
-  const MatrixHomogeneous &waMref = referencePositionWaistSIN.access(timeCurr);
-  const Vector &F = forceSOUT.access(timeCurr);
+Vector& StepComputerForce::computeForceR(Vector& res, int timeCurr) {
+  const MatrixHomogeneous& waMrh = waistMrhandSIN.access(timeCurr);
+  const MatrixHomogeneous& waMref = referencePositionWaistSIN.access(timeCurr);
+  const Vector& F = forceSOUT.access(timeCurr);
 
   return computeHandForce(res, waMrh, waMref, F);
 }
 
-void StepComputerForce::changeFirstStep(StepQueue &queue, int timeCurr) {
-  const Vector &v = velocitySIN.access(timeCurr);
+void StepComputerForce::changeFirstStep(StepQueue& queue, int timeCurr) {
+  const Vector& v = velocitySIN.access(timeCurr);
   unsigned sfoot = contactFootSIN.access(timeCurr);
 
   double y_default = 0;
@@ -332,13 +332,13 @@ void StepComputerForce::thisIsZero() {
   sotDEBUGOUT(15);
 }
 
-void StepComputerForce::display(std::ostream &os) const {
+void StepComputerForce::display(std::ostream& os) const {
   os << "StepComputerForce <" << getName() << ">:" << std::endl;
 }
 
-void StepComputerForce::commandLine(const std::string &cmdLine,
-                                    std::istringstream &cmdArgs,
-                                    std::ostream &os) {
+void StepComputerForce::commandLine(const std::string& cmdLine,
+                                    std::istringstream& cmdArgs,
+                                    std::ostream& os) {
   if (cmdLine == "help") {
     os << "NextStep: " << std::endl
        << " - setObserver" << std::endl
@@ -358,8 +358,8 @@ void StepComputerForce::commandLine(const std::string &cmdLine,
     if (cmdArgs.good()) {
       cmdArgs >> name;
     }
-    Entity *entity = &(PoolStorage::getInstance()->getEntity(name));
-    twoHandObserver = dynamic_cast<StepObserver *>(entity);
+    Entity* entity = &(PoolStorage::getInstance()->getEntity(name));
+    twoHandObserver = dynamic_cast<StepObserver*>(entity);
   } else {
   }
 }

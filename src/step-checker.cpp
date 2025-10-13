@@ -5,8 +5,8 @@
 namespace dynamicgraph {
 namespace sot {
 
-void StepChecker::clipStep(double x, double y, double &x_result,
-                           double &y_result) {
+void StepChecker::clipStep(double x, double y, double& x_result,
+                           double& y_result) {
   //   const double MIN_y = 0.16;
   //   const double MAX_y = 0.40;
   //   const double MAX_x = 0.25;

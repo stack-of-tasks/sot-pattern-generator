@@ -64,30 +64,30 @@ class NextStepPGSOT_EXPORT NextStepPgSot : public NextStep {
       FootPrint_t;
   std::vector<FootPrint_t> stepbuf;
 
-  Entity *pgEntity;
+  Entity* pgEntity;
   unsigned int m_StepModificationMode;
   double m_NextStepTime;
   unsigned int m_NbOfFirstSteps;
 
   /*! \brief Pointer towards the interface of the pattern generator. */
-  pg::PatternGeneratorInterface *m_PGI;
+  pg::PatternGeneratorInterface* m_PGI;
 
   /*! \brief Pointer towards the entity
     which handle the pattern generator. */
-  PatternGenerator *m_sPG;
+  PatternGenerator* m_sPG;
 
  public: /* --- CONSTRUCTION --- */
-  NextStepPgSot(const std::string &name);
+  NextStepPgSot(const std::string& name);
   virtual ~NextStepPgSot(void) {}
 
  public: /* --- FUNCTIONS --- */
-  virtual void starter(const int &timeCurr);
-  virtual void stoper(const int &timeCurr);
-  virtual void introductionCallBack(const int &timeCurr);
+  virtual void starter(const int& timeCurr);
+  virtual void stoper(const int& timeCurr);
+  virtual void introductionCallBack(const int& timeCurr);
 
  public: /* --- ENTITY INHERITANCE --- */
-  virtual void commandLine(const std::string &cmdLine,
-                           std::istringstream &cmdArgs, std::ostream &os);
+  virtual void commandLine(const std::string& cmdLine,
+                           std::istringstream& cmdArgs, std::ostream& os);
 };
 
 }  // namespace sot

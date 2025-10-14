@@ -33,10 +33,10 @@ const unsigned int WhichFootUpper::INDEX_LEFT_FOOT_DEFAULT = 0;
 const unsigned int WhichFootUpper::INDEX_RIGHT_FOOT_DEFAULT = 1;
 
 const double WhichFootUpper::TRIGGER_THRESHOLD_DEFAULT = 5e-4;
-typedef Eigen::Matrix<double, 4, 4> &(MatrixHomogeneous::*ExtractMemberType)(
+typedef Eigen::Matrix<double, 4, 4>& (MatrixHomogeneous::*ExtractMemberType)(
     void) const;
 
-WhichFootUpper::WhichFootUpper(const std::string &name)
+WhichFootUpper::WhichFootUpper(const std::string& name)
     : Entity(name),
       indexLeftFoot(INDEX_LEFT_FOOT_DEFAULT),
       indexRightFoot(INDEX_RIGHT_FOOT_DEFAULT),
@@ -96,7 +96,7 @@ WhichFootUpper::~WhichFootUpper(void) {
 /* --- SIGNALS ------------------------------------------------------ */
 /* --- SIGNALS ------------------------------------------------------ */
 /* --- SIGNALS ------------------------------------------------------ */
-MatrixRotation &WhichFootUpper::computeRotationMatrix(MatrixRotation &rotMat,
+MatrixRotation& WhichFootUpper::computeRotationMatrix(MatrixRotation& rotMat,
                                                       int time) {
   MatrixHomogeneous mh = waistMsensorSIN(time);
   sotDEBUGIN(15);
@@ -105,9 +105,9 @@ MatrixRotation &WhichFootUpper::computeRotationMatrix(MatrixRotation &rotMat,
   return rotMat;
 }
 
-MatrixHomogeneous &WhichFootUpper::computeFootPosition(
-    const MatrixHomogeneous &waistMfoot, const MatrixRotation &waistRsensor,
-    const MatrixRotation &worldRsensor, MatrixHomogeneous &worldMfoot) {
+MatrixHomogeneous& WhichFootUpper::computeFootPosition(
+    const MatrixHomogeneous& waistMfoot, const MatrixRotation& waistRsensor,
+    const MatrixRotation& worldRsensor, MatrixHomogeneous& worldMfoot) {
   sotDEBUGIN(15);
 
   MatrixRotation worldRwaist;
@@ -123,13 +123,13 @@ MatrixHomogeneous &WhichFootUpper::computeFootPosition(
   return worldMfoot;
 }
 
-unsigned int &WhichFootUpper::whichFoot(const MatrixHomogeneous &waistMlfoot,
-                                        const MatrixHomogeneous &waistMrfoot,
-                                        unsigned int &res) {
+unsigned int& WhichFootUpper::whichFoot(const MatrixHomogeneous& waistMlfoot,
+                                        const MatrixHomogeneous& waistMrfoot,
+                                        unsigned int& res) {
   sotDEBUGIN(15);
 
-  const double &leftAltitude = waistMlfoot(2, 3);
-  const double &rightAltitude = waistMrfoot(2, 3);
+  const double& leftAltitude = waistMlfoot(2, 3);
+  const double& rightAltitude = waistMrfoot(2, 3);
 
   if (lastFoot == indexRightFoot) {
     if (rightAltitude - triggerThreshold < leftAltitude) {
@@ -153,9 +153,9 @@ unsigned int &WhichFootUpper::whichFoot(const MatrixHomogeneous &waistMlfoot,
 /* --- PARAMS -------------------------------------------------- */
 /* --- PARAMS -------------------------------------------------- */
 
-void WhichFootUpper::commandLine(const std::string &cmdLine,
-                                 std::istringstream &cmdArgs,
-                                 std::ostream &os) {
+void WhichFootUpper::commandLine(const std::string& cmdLine,
+                                 std::istringstream& cmdArgs,
+                                 std::ostream& os) {
   if (cmdLine == "help") {
     os << "WhichFootUpper: " << std::endl
        << " - index {left|right} [<value>]: get/set the foot indeces."
@@ -164,7 +164,7 @@ void WhichFootUpper::commandLine(const std::string &cmdLine,
   } else if (cmdLine == "index") {
     std::string foot;
     cmdArgs >> foot >> std::ws;
-    unsigned int *classIndex = NULL;
+    unsigned int* classIndex = NULL;
     if (foot == "left") {
       classIndex = &indexLeftFoot;
     } else if (foot == "right") {

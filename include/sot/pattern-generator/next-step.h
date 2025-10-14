@@ -83,23 +83,23 @@ class SOTNEXTSTEP_EXPORT NextStepTwoHandObserver {
   SignalTimeDependent<Vector, int> referenceAccelerationSOUT;
 
  public:
-  NextStepTwoHandObserver(const std::string &name);
+  NextStepTwoHandObserver(const std::string& name);
 
-  MatrixHomogeneous &computeReferencePositionLeft(MatrixHomogeneous &res,
+  MatrixHomogeneous& computeReferencePositionLeft(MatrixHomogeneous& res,
                                                   int timeCurr);
-  MatrixHomogeneous &computeReferencePositionRight(MatrixHomogeneous &res,
+  MatrixHomogeneous& computeReferencePositionRight(MatrixHomogeneous& res,
                                                    int timeCurr);
-  Vector &computeReferenceVelocity(const Vector &right, const Vector &left,
-                                   Vector &res);
-  Vector &computeReferenceAcceleration(const Vector &right, const Vector &left,
-                                       Vector &res);
+  Vector& computeReferenceVelocity(const Vector& right, const Vector& left,
+                                   Vector& res);
+  Vector& computeReferenceAcceleration(const Vector& right, const Vector& left,
+                                       Vector& res);
 
   SignalArray<int> getSignals(void);
   operator SignalArray<int>();
 
  private:
-  MatrixHomogeneous &computeRefPos(MatrixHomogeneous &res, int timeCurr,
-                                   const MatrixHomogeneous &wMsf);
+  MatrixHomogeneous& computeRefPos(MatrixHomogeneous& res, int timeCurr,
+                                   const MatrixHomogeneous& wMsf);
 };
 
 /* --- Next Step (stepper) --------------------------------------------- */
@@ -158,10 +158,10 @@ class SOTNEXTSTEP_EXPORT NextStep : public Entity {
   void thisIsZero();
 
  protected: /* --- DEBUG --- */
-  std::ostream *verbose;
+  std::ostream* verbose;
 
  public: /* --- CONSTRUCTION --- */
-  NextStep(const std::string &name);
+  NextStep(const std::string& name);
   virtual ~NextStep(void);
 
  public: /* --- Signal --- */
@@ -172,18 +172,18 @@ class SOTNEXTSTEP_EXPORT NextStep : public Entity {
   Signal<int, int> triggerSOUT;
 
  public: /* --- FUNCTIONS --- */
-  virtual void nextStep(const int &timeCurr);
-  virtual void starter(const int &timeCurr);
-  virtual void stoper(const int &timeCurr);
+  virtual void nextStep(const int& timeCurr);
+  virtual void starter(const int& timeCurr);
+  virtual void stoper(const int& timeCurr);
 
-  virtual void introductionCallBack(const int &) {};
+  virtual void introductionCallBack(const int&) {};
 
-  int &triggerCall(int &dummy, int timeCurr);
+  int& triggerCall(int& dummy, int timeCurr);
 
  public: /* --- PARAMS --- */
-  virtual void display(std::ostream &os) const;
-  virtual void commandLine(const std::string &cmdLine,
-                           std::istringstream &cmdArgs, std::ostream &os);
+  virtual void display(std::ostream& os) const;
+  virtual void commandLine(const std::string& cmdLine,
+                           std::istringstream& cmdArgs, std::ostream& os);
 };
 
 }  // namespace sot

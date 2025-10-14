@@ -52,8 +52,8 @@ class StepQueue;
 /// Generates footsteps.
 class StepComputer {
  public:  // Methods
-  virtual void changeFirstStep(StepQueue &queue, int timeCurr) = 0;
-  virtual void nextStep(StepQueue &queue, int timeCurr) = 0;
+  virtual void changeFirstStep(StepQueue& queue, int timeCurr) = 0;
+  virtual void nextStep(StepQueue& queue, int timeCurr) = 0;
   virtual ~StepComputer() {};
 };
 

@@ -64,7 +64,7 @@ void setFeetParameters(dynamicgraph::sot::RobotUtilShrPtr aRobotUtil) {
   }
 }
 
-void setParameters(const std::string &lrobot_description) {
+void setParameters(const std::string& lrobot_description) {
   dynamicgraph::sot::RobotUtilShrPtr aRobotUtil;
 
   // Reading the parameter.
@@ -86,7 +86,7 @@ void setParameters(const std::string &lrobot_description) {
   setFeetParameters(aRobotUtil);
 }
 
-int main(int, char **) {
+int main(int, char**) {
   using namespace std;
   dynamicgraph::sot::PatternGenerator aPG;
 

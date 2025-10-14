@@ -77,7 +77,7 @@ class StepQueue_EXPORT FootPrint {
 class StepQueue_EXPORT StepQueue : public Entity {
  public:  // Entity name
   static const std::string CLASS_NAME;
-  virtual const std::string &getClassName(void) const { return CLASS_NAME; }
+  virtual const std::string& getClassName(void) const { return CLASS_NAME; }
 
  private:  // Parameters
   static const unsigned int QUEUE_SIZE;
@@ -88,7 +88,7 @@ class StepQueue_EXPORT StepQueue : public Entity {
   /// Builds a queue containing a starting step and three steps in the preview.
   /// The steps correspond to on-place stepping: (0, +/- y, 0), where
   /// y == StepQueue::ZERO_STEP_POSITION
-  StepQueue(const std::string &name);
+  StepQueue(const std::string& name);
 
  public:  // Queue manipulation
   /// Resets the queue to the initial condition (see the constructor,
@@ -103,15 +103,15 @@ class StepQueue_EXPORT StepQueue : public Entity {
   //@{
   /// Access to the step queue.
   /// \warning{No check is performed on the indices used in these accessors.}
-  const FootPrint &getStep(unsigned int index) const;
-  const FootPrint &getFirstStep() const;
-  const FootPrint &getLastStep() const;
+  const FootPrint& getStep(unsigned int index) const;
+  const FootPrint& getFirstStep() const;
+  const FootPrint& getLastStep() const;
   //@}
 
   /// Changes the first step.
   void changeFirstStep(double x, double y, double dtheta);
 
-  const FootPrint &getFirstStepChange() const;
+  const FootPrint& getFirstStepChange() const;
 
   /// Returns true if the first step has been changed since the last call to
   /// pushStep.
@@ -121,14 +121,14 @@ class StepQueue_EXPORT StepQueue : public Entity {
   //@{
   /// Access to the step queue properties (constants).
   unsigned int size() const;
-  const FootPrint &getStartFootPrint() const;
+  const FootPrint& getStartFootPrint() const;
   double getZeroStepPosition() const;
   //@}
 
  public:  // Entity
-  virtual void display(std::ostream &os) const;
-  virtual void commandLine(const std::string &cmdLine,
-                           std::istringstream &cmdArgs, std::ostream &os);
+  virtual void display(std::ostream& os) const;
+  virtual void commandLine(const std::string& cmdLine,
+                           std::istringstream& cmdArgs, std::ostream& os);
 
  private:
   std::deque<FootPrint> footPrintList;

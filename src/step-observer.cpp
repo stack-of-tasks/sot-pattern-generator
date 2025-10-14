@@ -10,7 +10,7 @@ namespace sot {
 
 DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(StepObserver, "StepObserver");
 
-StepObserver::StepObserver(const std::string &name)
+StepObserver::StepObserver(const std::string& name)
     : Entity(name)
 
       ,
@@ -67,9 +67,9 @@ SignalArray<int> StepObserver::getSignals(void) {
 
 StepObserver::operator SignalArray<int>() { return getSignals(); }
 
-MatrixHomogeneous &StepObserver::computeRefPos(MatrixHomogeneous &res,
+MatrixHomogeneous& StepObserver::computeRefPos(MatrixHomogeneous& res,
                                                int timeCurr,
-                                               const MatrixHomogeneous &wMref) {
+                                               const MatrixHomogeneous& wMref) {
   sotDEBUGIN(15);
 
   // Set to 0 to compute a reference frame using both hands. Set to non zero
@@ -78,15 +78,15 @@ MatrixHomogeneous &StepObserver::computeRefPos(MatrixHomogeneous &res,
 
 #if RIGHT_HAND_REFERENCE
 
-  const MatrixHomogeneous &wMrh = rightHandPositionSIN(timeCurr);
+  const MatrixHomogeneous& wMrh = rightHandPositionSIN(timeCurr);
   MatrixHomogeneous refMw;
   refMw = wMref.inverse();
   res = refMw * wMrh;
 
 #else
 
-  const MatrixHomogeneous &wMlh = leftHandPositionSIN(timeCurr);
-  const MatrixHomogeneous &wMrh = rightHandPositionSIN(timeCurr);
+  const MatrixHomogeneous& wMlh = leftHandPositionSIN(timeCurr);
+  const MatrixHomogeneous& wMrh = rightHandPositionSIN(timeCurr);
 
   MatrixHomogeneous refMw;
   refMw = wMref.inverse();
@@ -124,42 +124,42 @@ MatrixHomogeneous &StepObserver::computeRefPos(MatrixHomogeneous &res,
   return res;
 }
 
-MatrixHomogeneous &StepObserver::computeReferencePositionLeft(
-    MatrixHomogeneous &res, int timeCurr) {
+MatrixHomogeneous& StepObserver::computeReferencePositionLeft(
+    MatrixHomogeneous& res, int timeCurr) {
   sotDEBUGIN(15);
 
-  const MatrixHomogeneous &wMref = leftFootPositionSIN(timeCurr);
+  const MatrixHomogeneous& wMref = leftFootPositionSIN(timeCurr);
 
   sotDEBUGOUT(15);
   return computeRefPos(res, timeCurr, wMref);
 }
 
-MatrixHomogeneous &StepObserver::computeReferencePositionRight(
-    MatrixHomogeneous &res, int timeCurr) {
+MatrixHomogeneous& StepObserver::computeReferencePositionRight(
+    MatrixHomogeneous& res, int timeCurr) {
   sotDEBUGIN(15);
 
-  const MatrixHomogeneous &wMref = rightFootPositionSIN(timeCurr);
+  const MatrixHomogeneous& wMref = rightFootPositionSIN(timeCurr);
 
   sotDEBUGOUT(15);
   return computeRefPos(res, timeCurr, wMref);
 }
 
-MatrixHomogeneous &StepObserver::computeReferencePositionWaist(
-    MatrixHomogeneous &res, int timeCurr) {
+MatrixHomogeneous& StepObserver::computeReferencePositionWaist(
+    MatrixHomogeneous& res, int timeCurr) {
   sotDEBUGIN(15);
 
-  const MatrixHomogeneous &wMref = waistPositionSIN(timeCurr);
+  const MatrixHomogeneous& wMref = waistPositionSIN(timeCurr);
 
   sotDEBUGOUT(15);
   return computeRefPos(res, timeCurr, wMref);
 }
 
-void StepObserver::display(std::ostream &os) const {
+void StepObserver::display(std::ostream& os) const {
   os << "StepObserver <" << getName() << ">:" << std::endl;
 }
 
-void StepObserver::commandLine(const std::string &cmdLine,
-                               std::istringstream &cmdArgs, std::ostream &os) {
+void StepObserver::commandLine(const std::string& cmdLine,
+                               std::istringstream& cmdArgs, std::ostream& os) {
   if (cmdLine == "help") {
     os << "StepObserver: " << std::endl << std::endl;
   } else {

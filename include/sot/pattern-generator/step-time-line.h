@@ -82,7 +82,7 @@ namespace sot {
 class StepTimeLine_EXPORT StepTimeLine : public Entity {
  public:  // Entity name
   static const std::string CLASS_NAME;
-  virtual const std::string &getClassName(void) const { return CLASS_NAME; }
+  virtual const std::string& getClassName(void) const { return CLASS_NAME; }
 
  private:
   static const unsigned int PERIOD_DEFAULT;
@@ -92,7 +92,7 @@ class StepTimeLine_EXPORT StepTimeLine : public Entity {
   static const unsigned int FIRST_STEP_TO_MODIFY;
 
  public:  // Construction
-  StepTimeLine(const std::string &name);
+  StepTimeLine(const std::string& name);
 
  public:  // Trigger
   /// Trigger signal, to be updated periodically to trigger a
@@ -102,7 +102,7 @@ class StepTimeLine_EXPORT StepTimeLine : public Entity {
 
   /// The trigger callback function, which implements the synchronization
   /// of all the sub-components used to generate and send the steps.
-  int &triggerCall(int &dummy, int timeCurr);
+  int& triggerCall(int& dummy, int timeCurr);
 
  private:  // State
   enum SteppingState {
@@ -114,14 +114,14 @@ class StepTimeLine_EXPORT StepTimeLine : public Entity {
   };
 
  public:  // Entity
-  virtual void display(std::ostream &os) const;
-  virtual void commandLine(const std::string &cmdLine,
-                           std::istringstream &cmdArgs, std::ostream &os);
+  virtual void display(std::ostream& os) const;
+  virtual void commandLine(const std::string& cmdLine,
+                           std::istringstream& cmdArgs, std::ostream& os);
 
  private:
-  StepQueue *stepQueue;
-  StepComputer *stepComputer;
-  PGManager *pgManager;
+  StepQueue* stepQueue;
+  StepComputer* stepComputer;
+  PGManager* pgManager;
 
   SteppingState state;
   int timeLastIntroduction;

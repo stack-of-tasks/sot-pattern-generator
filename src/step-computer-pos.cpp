@@ -46,7 +46,7 @@ namespace sot {
 
 DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(StepComputerPos, "StepComputerPos");
 
-StepComputerPos::StepComputerPos(const std::string &name)
+StepComputerPos::StepComputerPos(const std::string& name)
     : Entity(name),
       referencePositionLeftSIN(
           NULL, "StepComputerPos(" + name + ")::input(vector)::posrefleft"),
@@ -68,7 +68,7 @@ StepComputerPos::StepComputerPos(const std::string &name)
   sotDEBUGOUT(5);
 }
 
-void StepComputerPos::nextStep(StepQueue &queue, int timeCurr) {
+void StepComputerPos::nextStep(StepQueue& queue, int timeCurr) {
   // Introduce new step at the end of the preview window.
   if (queue.getLastStep().contact == CONTACT_LEFT_FOOT) {
     queue.pushStep(0., -queue.getZeroStepPosition(), 0.);
@@ -81,16 +81,16 @@ void StepComputerPos::nextStep(StepQueue &queue, int timeCurr) {
   }
 }
 
-void StepComputerPos::changeFirstStep(StepQueue &queue, int timeCurr) {
+void StepComputerPos::changeFirstStep(StepQueue& queue, int timeCurr) {
   if (!twoHandObserver) {
     std::cerr << "Observer not set" << std::endl;
     return;
   }
 
-  const unsigned &sfoot = contactFootSIN(timeCurr);
-  const MatrixHomogeneous &wMlf =
+  const unsigned& sfoot = contactFootSIN(timeCurr);
+  const MatrixHomogeneous& wMlf =
       twoHandObserver->leftFootPositionSIN.access(timeCurr);
-  const MatrixHomogeneous &wMrf =
+  const MatrixHomogeneous& wMrf =
       twoHandObserver->rightFootPositionSIN.access(timeCurr);
 
   // actual and reference position of reference frame in fly foot,
@@ -223,13 +223,13 @@ void StepComputerPos::thisIsZero() {
   sotDEBUGOUT(15);
 }
 
-void StepComputerPos::display(std::ostream &os) const {
+void StepComputerPos::display(std::ostream& os) const {
   os << "StepComputerPos <" << getName() << ">:" << std::endl;
 }
 
-void StepComputerPos::commandLine(const std::string &cmdLine,
-                                  std::istringstream &cmdArgs,
-                                  std::ostream &os) {
+void StepComputerPos::commandLine(const std::string& cmdLine,
+                                  std::istringstream& cmdArgs,
+                                  std::ostream& os) {
   if (cmdLine == "help") {
     os << "NextStep: " << std::endl
        << " - setObserver" << std::endl
@@ -251,8 +251,8 @@ void StepComputerPos::commandLine(const std::string &cmdLine,
     if (cmdArgs.good()) {
       cmdArgs >> name;
     }
-    Entity *entity = &(PoolStorage::getInstance()->getEntity(name));
-    twoHandObserver = dynamic_cast<StepObserver *>(entity);
+    Entity* entity = &(PoolStorage::getInstance()->getEntity(name));
+    twoHandObserver = dynamic_cast<StepObserver*>(entity);
   } else {
   }
 }

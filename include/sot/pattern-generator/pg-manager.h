@@ -67,22 +67,22 @@ class PGManager_EXPORT PGManager : public Entity {
   DYNAMIC_GRAPH_ENTITY_DECL();
 
  public:  // Construction
-  PGManager(const std::string &name);
+  PGManager(const std::string& name);
 
-  void startSequence(const StepQueue &seq);
-  void stopSequence(const StepQueue &seq);
-  void introduceStep(StepQueue &queue);
-  double changeNextStep(StepQueue &queue);
+  void startSequence(const StepQueue& seq);
+  void stopSequence(const StepQueue& seq);
+  void introduceStep(StepQueue& queue);
+  double changeNextStep(StepQueue& queue);
 
  public:  // Entity
-  virtual void display(std::ostream &os) const;
-  virtual void commandLine(const std::string &cmdLine,
-                           std::istringstream &cmdArgs, std::ostream &os);
+  virtual void display(std::ostream& os) const;
+  virtual void commandLine(const std::string& cmdLine,
+                           std::istringstream& cmdArgs, std::ostream& os);
 
  private:
   std::vector<FootPrint> stepbuf_;
-  PatternGenerator *spg_;
-  PatternGeneratorJRL::PatternGeneratorInterface *pgi_;
+  PatternGenerator* spg_;
+  PatternGeneratorJRL::PatternGeneratorInterface* pgi_;
 };
 
 }  // namespace sot

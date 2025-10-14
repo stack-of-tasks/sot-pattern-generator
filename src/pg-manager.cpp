@@ -29,13 +29,13 @@ namespace sot {
 
 DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(PGManager, "PGManager");
 
-PGManager::PGManager(const std::string &name) : Entity(name) {
+PGManager::PGManager(const std::string& name) : Entity(name) {
   sotDEBUGIN(5);
 
   sotDEBUGOUT(5);
 }
 
-void PGManager::startSequence(const StepQueue &seq) {
+void PGManager::startSequence(const StepQueue& seq) {
   if (!spg_) {
     sotERROR << "PG not set" << std::endl;
     return;
@@ -45,7 +45,7 @@ void PGManager::startSequence(const StepQueue &seq) {
   cmdstd << ":StartOnLineStepSequencing ";
 
   for (unsigned int i = 0; i < seq.size(); ++i) {
-    const FootPrint &fp = seq.getStep(i);
+    const FootPrint& fp = seq.getStep(i);
     cmdstd << fp.x << " " << fp.y << " " << fp.theta << " ";
   }
 
@@ -57,7 +57,7 @@ void PGManager::startSequence(const StepQueue &seq) {
   sotDEBUG(15) << "Cmd: " << cmdstd.str() << std::endl;
 }
 
-void PGManager::stopSequence(const StepQueue & /* seq */) {
+void PGManager::stopSequence(const StepQueue& /* seq */) {
   if (!spg_) {
     sotERROR << "PG not set" << std::endl;
     return;
@@ -69,13 +69,13 @@ void PGManager::stopSequence(const StepQueue & /* seq */) {
   spg_->pgCommandLine(cmdArg.str());
 }
 
-void PGManager::introduceStep(StepQueue &queue) {
+void PGManager::introduceStep(StepQueue& queue) {
   if (!spg_) {
     sotERROR << "Walk plugin not found. " << std::endl;
     return;
   }
 
-  const FootPrint &lastStep = queue.getLastStep();
+  const FootPrint& lastStep = queue.getLastStep();
 
   std::string cmdLine = "addStep";
   std::ostringstream cmdArgIn;
@@ -84,15 +84,15 @@ void PGManager::introduceStep(StepQueue &queue) {
   spg_->pgCommandLine(cmdArg.str());
 }
 
-double PGManager::changeNextStep(StepQueue &queue) {
+double PGManager::changeNextStep(StepQueue& queue) {
   double stepTime = -1.;
 
-  const FootPrint &step = queue.getFirstStep();
+  const FootPrint& step = queue.getFirstStep();
   stepbuf_.push_back(step);
 
   if (queue.isFirstStepChanged()) {
     PatternGeneratorJRL::FootAbsolutePosition aFAP;
-    const FootPrint &change = queue.getFirstStepChange();
+    const FootPrint& change = queue.getFirstStepChange();
     aFAP.x = change.x - step.x;
     aFAP.y = change.y - step.y;
     aFAP.theta = change.theta - step.theta;
@@ -102,12 +102,12 @@ double PGManager::changeNextStep(StepQueue &queue) {
   return stepTime;
 }
 
-void PGManager::display(std::ostream &os) const {
+void PGManager::display(std::ostream& os) const {
   os << "PGManager <" << getName() << ">:" << std::endl;
 }
 
-void PGManager::commandLine(const std::string &cmdLine,
-                            std::istringstream &cmdArgs, std::ostream &os) {
+void PGManager::commandLine(const std::string& cmdLine,
+                            std::istringstream& cmdArgs, std::ostream& os) {
   if (cmdLine == "help") {
     os << "StepTimeLine: " << std::endl << std::endl;
   } else if ("initPg" == cmdLine) {
@@ -116,8 +116,8 @@ void PGManager::commandLine(const std::string &cmdLine,
     if (cmdArgs.good()) {
       cmdArgs >> name;
     }
-    Entity *pgEntity = &(PoolStorage::getInstance()->getEntity(name));
-    spg_ = dynamic_cast<PatternGenerator *>(pgEntity);
+    Entity* pgEntity = &(PoolStorage::getInstance()->getEntity(name));
+    spg_ = dynamic_cast<PatternGenerator*>(pgEntity);
     pgi_ = spg_->GetPatternGeneratorInterface();
   } else if ("savesteps" == cmdLine) {
     std::ofstream os("/tmp/steps.dat");

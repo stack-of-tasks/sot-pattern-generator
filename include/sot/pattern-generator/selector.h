@@ -68,37 +68,37 @@ class Selector_EXPORT Selector : public Entity {
   unsigned int nbEntries;
 
  public: /* --- CONSTRUCTION --- */
-  Selector(const std::string &name);
+  Selector(const std::string& name);
   virtual ~Selector(void);
 
  public: /* --- SIGNAL --- */
   SignalPtr<unsigned int, int> selectorSIN;
 
-  std::vector<std::vector<SignalBase<int> *> > inputsSIN;
-  std::vector<SignalBase<int> *> outputsSOUT;
+  std::vector<std::vector<SignalBase<int>*> > inputsSIN;
+  std::vector<SignalBase<int>*> outputsSOUT;
 
  public: /* --- FUNCTIONS --- */
   template <class T>
-  static T &computeSelection(const unsigned int &sigNum,
-                             std::vector<SignalBase<int> *> &entriesSIN, T &res,
-                             const int &time);
+  static T& computeSelection(const unsigned int& sigNum,
+                             std::vector<SignalBase<int>*>& entriesSIN, T& res,
+                             const int& time);
 
   template <class T>
-  unsigned int createSignal(const std::string &shortname,
-                            const int &sigId = -1);
+  unsigned int createSignal(const std::string& shortname,
+                            const int& sigId = -1);
 
-  void resetSignals(const unsigned int &nbEntries,
-                    const unsigned int &nbSignals);
+  void resetSignals(const unsigned int& nbEntries,
+                    const unsigned int& nbSignals);
 
  public: /* --- PARAMS --- */
   void initCommands(void);
-  virtual void commandLine(const std::string &cmdLine,
-                           std::istringstream &cmdArgs, std::ostream &os);
+  virtual void commandLine(const std::string& cmdLine,
+                           std::istringstream& cmdArgs, std::ostream& os);
 
-  void create(const std::string &name, const std::string &type,
-              const int &sigId);
+  void create(const std::string& name, const std::string& type,
+              const int& sigId);
   std::string getTypeList(void);
-  void getTypeList(std::ostream &os);
+  void getTypeList(std::ostream& os);
 };
 
 }  // namespace sot

@@ -67,14 +67,14 @@ class StepComputerJOYSTICK_EXPORT StepComputerJoystick : public Entity,
                                                          public StepComputer {
  public:
   static const std::string CLASS_NAME;
-  virtual const std::string &getClassName(void) const { return CLASS_NAME; }
+  virtual const std::string& getClassName(void) const { return CLASS_NAME; }
 
  public:  // Construction
-  StepComputerJoystick(const std::string &name);
+  StepComputerJoystick(const std::string& name);
 
  public:  // Methods
-  void changeFirstStep(StepQueue &queue, int timeCurr);
-  void nextStep(StepQueue &queue, int timeCurr);
+  void changeFirstStep(StepQueue& queue, int timeCurr);
+  void nextStep(StepQueue& queue, int timeCurr);
 
  public:  // Signals
   /*! \brief Entry of the joystick (x,y,theta)*/
@@ -85,12 +85,12 @@ class StepComputerJOYSTICK_EXPORT StepComputerJoystick : public Entity,
   SignalTimeDependent<Vector, int> laststepSOUT;
 
  protected:
-  Vector &getlaststep(Vector &res, int time);
+  Vector& getlaststep(Vector& res, int time);
 
  public:  // Entity
-  virtual void display(std::ostream &os) const;
-  virtual void commandLine(const std::string &cmdLine,
-                           std::istringstream &cmdArgs, std::ostream &os);
+  virtual void display(std::ostream& os) const;
+  virtual void commandLine(const std::string& cmdLine,
+                           std::istringstream& cmdArgs, std::ostream& os);
 
  private:  // Reference frame
   StepChecker checker;

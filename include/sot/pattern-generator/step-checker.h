@@ -40,7 +40,7 @@ namespace sot {
 
 class StepChecker_EXPORT StepChecker {
  public:  // Methods
-  void clipStep(double x, double y, double &x_result, double &y_result);
+  void clipStep(double x, double y, double& x_result, double& y_result);
 };
 
 int tata12;

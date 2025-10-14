@@ -62,7 +62,7 @@ namespace sot {
 
 DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(PatternGenerator, "PatternGenerator");
 
-PatternGenerator::PatternGenerator(const std::string &name)
+PatternGenerator::PatternGenerator(const std::string& name)
     : Entity(name),
       m_PGI(0),
       m_PreviewControlParametersFile(),
@@ -489,7 +489,7 @@ bool PatternGenerator::InitState(void) {
   Vector res;
   Eigen::Matrix<double, 6, 1> lWaistPosition;
   if (m_InitPositionByRealState) {
-    const Vector &pos = jointPositionSIN(m_LocalTime);
+    const Vector& pos = jointPositionSIN(m_LocalTime);
 
     lWaistPosition.resize(6);
     for (unsigned int i = 0; i < 6; ++i) {
@@ -649,7 +649,7 @@ bool PatternGenerator::buildReducedModel(void) {
   Eigen::VectorXd q_neutral = neutral(lrobotModel);
   ExtractJointMimics an_extract_joint_mimics(lrobot_description);
 
-  const std::vector<std::string> &list_of_joints_to_lock_by_name =
+  const std::vector<std::string>& list_of_joints_to_lock_by_name =
       an_extract_joint_mimics.get_mimic_joints();
 
   std::ostringstream oss;
@@ -659,7 +659,7 @@ bool PatternGenerator::buildReducedModel(void) {
 
   std::vector<pinocchio::JointIndex> list_of_joints_to_lock_by_id;
   for (auto it : list_of_joints_to_lock_by_name) {
-    const std::string &joint_name = it;
+    const std::string& joint_name = it;
 
     if (lrobotModel.existJointName(joint_name)) {
       // do not consider joint that are not in the model
@@ -714,8 +714,8 @@ bool PatternGenerator::addComplementaryFrames() {
   return true;
 }
 
-void PatternGenerator::readFootParameters(std::string &rootFootPath,
-                                          pg::PRFoot &aFoot) {
+void PatternGenerator::readFootParameters(std::string& rootFootPath,
+                                          pg::PRFoot& aFoot) {
   // Reading the parameter.
   std::string model_name("robot");
 
@@ -785,7 +785,7 @@ bool PatternGenerator::buildPGI(void) {
   }
 
   if (m_PR != 0) {
-    pg::PRFoot *rightFoot = m_PR->rightFoot();
+    pg::PRFoot* rightFoot = m_PR->rightFoot();
     if (rightFoot != 0) {
       Eigen::Vector3d AnkleInFoot;
       AnkleInFoot = rightFoot->anklePosition;
@@ -837,21 +837,21 @@ PatternGenerator::~PatternGenerator(void) {
 /* --- CONFIG ---------------------------------------------------------- */
 /* --- CONFIG ---------------------------------------------------------- */
 /* --- CONFIG ---------------------------------------------------------- */
-void PatternGenerator::setParamPreviewFile(const std::string &filename) {
+void PatternGenerator::setParamPreviewFile(const std::string& filename) {
   m_PreviewControlParametersFile = filename;
 }
 
-void PatternGenerator::setURDFFile(const std::string &filename) {
+void PatternGenerator::setURDFFile(const std::string& filename) {
   m_urdfFile = filename;
 }
-void PatternGenerator::setSRDFFile(const std::string &filename) {
+void PatternGenerator::setSRDFFile(const std::string& filename) {
   m_srdfFile = filename;
 }
-void PatternGenerator::setXmlRankFile(const std::string &filename) {
+void PatternGenerator::setXmlRankFile(const std::string& filename) {
   m_xmlRankFile = filename;
 }
-void PatternGenerator::addJointMapping(const std::string &link,
-                                       const std::string &repName) {
+void PatternGenerator::addJointMapping(const std::string& link,
+                                       const std::string& repName) {
   specialJoints_[link] = repName;
 }
 
@@ -859,7 +859,7 @@ void PatternGenerator::addJointMapping(const std::string &link,
 /* --- COMPUTE --------------------------------------------------------- */
 /* --- COMPUTE --------------------------------------------------------- */
 
-Vector &PatternGenerator::getZMPRef(Vector &ZMPRefval, int time) {
+Vector& PatternGenerator::getZMPRef(Vector& ZMPRefval, int time) {
   sotDEBUGIN(5);
 
   OneStepOfControlS(time);
@@ -875,7 +875,7 @@ Vector &PatternGenerator::getZMPRef(Vector &ZMPRefval, int time) {
   return ZMPRefval;
 }
 
-Vector &PatternGenerator::getCoMRef(Vector &CoMRefval, int time) {
+Vector& PatternGenerator::getCoMRef(Vector& CoMRefval, int time) {
   sotDEBUGIN(25);
 
   OneStepOfControlS(time);
@@ -885,7 +885,7 @@ Vector &PatternGenerator::getCoMRef(Vector &CoMRefval, int time) {
   return CoMRefval;
 }
 
-Vector &PatternGenerator::getdCoMRef(Vector &CoMRefval, int time) {
+Vector& PatternGenerator::getdCoMRef(Vector& CoMRefval, int time) {
   sotDEBUGIN(25);
 
   OneStepOfControlS(time);
@@ -895,7 +895,7 @@ Vector &PatternGenerator::getdCoMRef(Vector &CoMRefval, int time) {
   return CoMRefval;
 }
 
-Vector &PatternGenerator::getddCoMRef(Vector &CoMRefval, int time) {
+Vector& PatternGenerator::getddCoMRef(Vector& CoMRefval, int time) {
   sotDEBUGIN(25);
 
   OneStepOfControlS(time);
@@ -905,7 +905,7 @@ Vector &PatternGenerator::getddCoMRef(Vector &CoMRefval, int time) {
   return CoMRefval;
 }
 
-Vector &PatternGenerator::getExternalForces(Vector &forces, int time) {
+Vector& PatternGenerator::getExternalForces(Vector& forces, int time) {
   sotDEBUGIN(25);
 
   OneStepOfControlS(time);
@@ -915,7 +915,7 @@ Vector &PatternGenerator::getExternalForces(Vector &forces, int time) {
   return forces;
 }
 
-Vector &PatternGenerator::getInitZMPRef(Vector &InitZMPRefval, int /*time*/) {
+Vector& PatternGenerator::getInitZMPRef(Vector& InitZMPRefval, int /*time*/) {
   sotDEBUGIN(25);
 
   sotDEBUG(25) << "InitZMPRefPos transmitted" << m_InitZMPRefPos << " "
@@ -929,7 +929,7 @@ Vector &PatternGenerator::getInitZMPRef(Vector &InitZMPRefval, int /*time*/) {
   return InitZMPRefval;
 }
 
-Vector &PatternGenerator::getInitCoMRef(Vector &InitCoMRefval, int /*time*/) {
+Vector& PatternGenerator::getInitCoMRef(Vector& InitCoMRefval, int /*time*/) {
   sotDEBUGIN(25);
 
   InitCoMRefval.resize(3);
@@ -941,7 +941,7 @@ Vector &PatternGenerator::getInitCoMRef(Vector &InitCoMRefval, int /*time*/) {
   return InitCoMRefval;
 }
 
-Vector &PatternGenerator::getInitWaistPosRef(Vector &InitWaistRefval,
+Vector& PatternGenerator::getInitWaistPosRef(Vector& InitWaistRefval,
                                              int /*time*/) {
   sotDEBUGIN(25);
 
@@ -950,8 +950,8 @@ Vector &PatternGenerator::getInitWaistPosRef(Vector &InitWaistRefval,
   sotDEBUGOUT(25);
   return InitWaistRefval;
 }
-VectorRollPitchYaw &PatternGenerator::getInitWaistAttRef(
-    VectorRollPitchYaw &InitWaistRefval, int /*time*/) {
+VectorRollPitchYaw& PatternGenerator::getInitWaistAttRef(
+    VectorRollPitchYaw& InitWaistRefval, int /*time*/) {
   sotDEBUGIN(25);
 
   for (unsigned int i = 0; i < 3; ++i)
@@ -961,8 +961,8 @@ VectorRollPitchYaw &PatternGenerator::getInitWaistAttRef(
   return InitWaistRefval;
 }
 
-MatrixHomogeneous &PatternGenerator::getLeftFootRef(
-    MatrixHomogeneous &LeftFootRefVal, int time) {
+MatrixHomogeneous& PatternGenerator::getLeftFootRef(
+    MatrixHomogeneous& LeftFootRefVal, int time) {
   sotDEBUGIN(25);
 
   OneStepOfControlS(time);
@@ -971,8 +971,8 @@ MatrixHomogeneous &PatternGenerator::getLeftFootRef(
   return LeftFootRefVal;
 }
 
-MatrixHomogeneous &PatternGenerator::getRightFootRef(
-    MatrixHomogeneous &RightFootRefval, int time) {
+MatrixHomogeneous& PatternGenerator::getRightFootRef(
+    MatrixHomogeneous& RightFootRefval, int time) {
   sotDEBUGIN(25);
 
   OneStepOfControlS(time);
@@ -981,8 +981,8 @@ MatrixHomogeneous &PatternGenerator::getRightFootRef(
   sotDEBUGOUT(25);
   return RightFootRefval;
 }
-MatrixHomogeneous &PatternGenerator::getdotLeftFootRef(
-    MatrixHomogeneous &LeftFootRefVal, int time) {
+MatrixHomogeneous& PatternGenerator::getdotLeftFootRef(
+    MatrixHomogeneous& LeftFootRefVal, int time) {
   sotDEBUGIN(25);
 
   OneStepOfControlS(time);
@@ -990,8 +990,8 @@ MatrixHomogeneous &PatternGenerator::getdotLeftFootRef(
   sotDEBUGOUT(25);
   return LeftFootRefVal;
 }
-MatrixHomogeneous &PatternGenerator::getdotRightFootRef(
-    MatrixHomogeneous &RightFootRefval, int time) {
+MatrixHomogeneous& PatternGenerator::getdotRightFootRef(
+    MatrixHomogeneous& RightFootRefval, int time) {
   sotDEBUGIN(25);
 
   OneStepOfControlS(time);
@@ -1001,16 +1001,16 @@ MatrixHomogeneous &PatternGenerator::getdotRightFootRef(
   return RightFootRefval;
 }
 
-MatrixHomogeneous &PatternGenerator::getInitLeftFootRef(
-    MatrixHomogeneous &LeftFootRefVal, int /*time*/) {
+MatrixHomogeneous& PatternGenerator::getInitLeftFootRef(
+    MatrixHomogeneous& LeftFootRefVal, int /*time*/) {
   sotDEBUGIN(25);
 
   LeftFootRefVal = m_InitLeftFootPosition;
   sotDEBUGOUT(25);
   return LeftFootRefVal;
 }
-MatrixHomogeneous &PatternGenerator::getInitRightFootRef(
-    MatrixHomogeneous &RightFootRefval, int /*time*/) {
+MatrixHomogeneous& PatternGenerator::getInitRightFootRef(
+    MatrixHomogeneous& RightFootRefval, int /*time*/) {
   sotDEBUGIN(25);
 
   RightFootRefval = m_InitRightFootPosition;
@@ -1018,8 +1018,8 @@ MatrixHomogeneous &PatternGenerator::getInitRightFootRef(
   return RightFootRefval;
 }
 
-MatrixHomogeneous &PatternGenerator::getFlyingFootRef(
-    MatrixHomogeneous &FlyingFootRefval, int time) {
+MatrixHomogeneous& PatternGenerator::getFlyingFootRef(
+    MatrixHomogeneous& FlyingFootRefval, int time) {
   sotDEBUGIN(25);
   OneStepOfControlS(time);
   FlyingFootRefval = m_FlyingFootPosition;
@@ -1027,7 +1027,7 @@ MatrixHomogeneous &PatternGenerator::getFlyingFootRef(
   return FlyingFootRefval;
 }
 
-bool &PatternGenerator ::getLeftFootContact(bool &res, int time) {
+bool& PatternGenerator ::getLeftFootContact(bool& res, int time) {
   sotDEBUGIN(25);
   OneStepOfControlS(time);
   res = m_leftFootContact;
@@ -1035,7 +1035,7 @@ bool &PatternGenerator ::getLeftFootContact(bool &res, int time) {
   return res;
 }
 
-bool &PatternGenerator ::getRightFootContact(bool &res, int time) {
+bool& PatternGenerator ::getRightFootContact(bool& res, int time) {
   sotDEBUGIN(25);
   OneStepOfControlS(time);
   res = m_rightFootContact;
@@ -1043,7 +1043,7 @@ bool &PatternGenerator ::getRightFootContact(bool &res, int time) {
   return res;
 }
 
-int &PatternGenerator ::getContactPhase(int &res, int time) {
+int& PatternGenerator ::getContactPhase(int& res, int time) {
   sotDEBUGIN(25);
   OneStepOfControlS(time);
   res = m_ContactPhase;
@@ -1051,7 +1051,7 @@ int &PatternGenerator ::getContactPhase(int &res, int time) {
   return res;
 }
 
-int &PatternGenerator::InitOneStepOfControl(int &dummy, int /*time*/) {
+int& PatternGenerator::InitOneStepOfControl(int& dummy, int /*time*/) {
   sotDEBUGIN(15);
   // TODO: modified first to avoid the loop.
   firstSINTERN.setReady(false);
@@ -1063,7 +1063,7 @@ int &PatternGenerator::InitOneStepOfControl(int &dummy, int /*time*/) {
 }
 
 void PatternGenerator::getAbsoluteWaistPosAttHomogeneousMatrix(
-    MatrixHomogeneous &aWaistMH) {
+    MatrixHomogeneous& aWaistMH) {
   const double cr = cos(m_WaistAttitudeAbsolute(0));  // ROLL
   const double sr = sin(m_WaistAttitudeAbsolute(0));
   const double cp = cos(m_WaistAttitudeAbsolute(1));  // PITCH
@@ -1092,8 +1092,8 @@ void PatternGenerator::getAbsoluteWaistPosAttHomogeneousMatrix(
 }
 
 void PatternGenerator::FromAbsoluteFootPosToDotHomogeneous(
-    pg::FootAbsolutePosition aFootPosition, MatrixHomogeneous &aFootMH,
-    MatrixHomogeneous &adotFootMH) {
+    pg::FootAbsolutePosition aFootPosition, MatrixHomogeneous& aFootMH,
+    MatrixHomogeneous& adotFootMH) {
   MatrixRotation dRot, Twist, Rot;
   adotFootMH.setIdentity();
   FromAbsoluteFootPosToHomogeneous(aFootPosition, aFootMH);
@@ -1122,7 +1122,7 @@ void PatternGenerator::FromAbsoluteFootPosToDotHomogeneous(
 }
 
 void PatternGenerator::FromAbsoluteFootPosToHomogeneous(
-    pg::FootAbsolutePosition aFootPosition, MatrixHomogeneous &aFootMH) {
+    pg::FootAbsolutePosition aFootPosition, MatrixHomogeneous& aFootMH) {
   double c, s, co, so;
   c = cos(aFootPosition.theta * M_PI / 180.0);
   s = sin(aFootPosition.theta * M_PI / 180.0);
@@ -1150,10 +1150,10 @@ void PatternGenerator::FromAbsoluteFootPosToHomogeneous(
 }
 
 void PatternGenerator::SubsamplingFootPos(
-    pg::FootAbsolutePosition &PrevFootPosition,
-    pg::FootAbsolutePosition &NextFootPosition,
-    MatrixHomogeneous &FootPositionOut, MatrixHomogeneous &dotFootPositionOut,
-    unsigned int &count) {
+    pg::FootAbsolutePosition& PrevFootPosition,
+    pg::FootAbsolutePosition& NextFootPosition,
+    MatrixHomogeneous& FootPositionOut, MatrixHomogeneous& dotFootPositionOut,
+    unsigned int& count) {
   pg::FootAbsolutePosition lFootPosition;
 
   lFootPosition.x =
@@ -1180,10 +1180,10 @@ void PatternGenerator::SubsamplingFootPos(
                                       dotFootPositionOut);
 }
 
-void PatternGenerator::SubsamplingVector(dynamicgraph::Vector &PrevPosition,
-                                         dynamicgraph::Vector &NextPosition,
-                                         dynamicgraph::Vector &PositionOut,
-                                         unsigned int &count) {
+void PatternGenerator::SubsamplingVector(dynamicgraph::Vector& PrevPosition,
+                                         dynamicgraph::Vector& NextPosition,
+                                         dynamicgraph::Vector& PositionOut,
+                                         unsigned int& count) {
   for (unsigned int i = 0; i < 3; i++) {
     PositionOut(i) = PrevPosition(i) + (NextPosition(i) - PrevPosition(i)) *
                                            (double)(count % 5) / 5.0;
@@ -1191,8 +1191,8 @@ void PatternGenerator::SubsamplingVector(dynamicgraph::Vector &PrevPosition,
 }
 
 void PatternGenerator::CopyFootPosition(
-    pg::FootAbsolutePosition &FootPositionIn,
-    pg::FootAbsolutePosition &FootPositionOut) {
+    pg::FootAbsolutePosition& FootPositionIn,
+    pg::FootAbsolutePosition& FootPositionOut) {
   FootPositionOut.x = FootPositionIn.x;
   FootPositionOut.y = FootPositionIn.y;
   FootPositionOut.z = FootPositionIn.z;
@@ -1201,7 +1201,7 @@ void PatternGenerator::CopyFootPosition(
   FootPositionOut.omega2 = FootPositionIn.omega2;
 }
 
-int &PatternGenerator::OneStepOfControl(int &dummy, int time) {
+int& PatternGenerator::OneStepOfControl(int& dummy, int time) {
   m_LocalTime = time;
   int lSupportFoot;  // Local support foot.
   // Default value
@@ -1844,23 +1844,23 @@ void PatternGenerator::debug(void) {
   dataInProcessSOUT.Signal<unsigned int, int>::access(1);
 }
 
-void PatternGenerator::addOnLineStep(const double &x, const double &y,
-                                     const double &th) {
+void PatternGenerator::addOnLineStep(const double& x, const double& y,
+                                     const double& th) {
   assert(m_PGI != 0);
   m_PGI->AddOnLineStep(x, y, th);
 }
-void PatternGenerator::addStep(const double &x, const double &y,
-                               const double &th) {
+void PatternGenerator::addStep(const double& x, const double& y,
+                               const double& th) {
   assert(m_PGI != 0);
   m_PGI->AddStepInStack(x, y, th);
 }
-void PatternGenerator::pgCommandLine(const std::string &cmdline) {
+void PatternGenerator::pgCommandLine(const std::string& cmdline) {
   assert(m_PGI != 0);
   std::istringstream cmdArgs(cmdline);
   m_PGI->ParseCmd(cmdArgs);
 }
 
-void PatternGenerator::useFeedBackSignals(const bool &feedBack) {
+void PatternGenerator::useFeedBackSignals(const bool& feedBack) {
   m_feedBackControl = feedBack;
   string cmdBool = feedBack ? "true" : "false";
   assert(m_PGI != 0);
@@ -1868,7 +1868,7 @@ void PatternGenerator::useFeedBackSignals(const bool &feedBack) {
   m_PGI->ParseCmd(cmdArgs);
 }
 
-void PatternGenerator::useDynamicFilter(const bool &dynamicFilter) {
+void PatternGenerator::useDynamicFilter(const bool& dynamicFilter) {
   m_feedBackControl = dynamicFilter;
   string cmdBool = dynamicFilter ? "true" : "false";
   assert(m_PGI != 0);
@@ -1876,7 +1876,7 @@ void PatternGenerator::useDynamicFilter(const bool &dynamicFilter) {
   m_PGI->ParseCmd(cmdArgs);
 }
 
-int PatternGenerator::stringToReferenceEnum(const std::string &FrameReference) {
+int PatternGenerator::stringToReferenceEnum(const std::string& FrameReference) {
   if (FrameReference == "World")
     return WORLD_FRAME;
   else if (FrameReference == "Egocentered")
@@ -1891,11 +1891,11 @@ int PatternGenerator::stringToReferenceEnum(const std::string &FrameReference) {
   return 0;
 }
 
-void PatternGenerator::setReferenceFromString(const std::string &str) {
+void PatternGenerator::setReferenceFromString(const std::string& str) {
   m_ReferenceFrame = stringToReferenceEnum(str);
 }
 
-Vector &PatternGenerator::getjointWalkingErrorPosition(Vector &res, int time) {
+Vector& PatternGenerator::getjointWalkingErrorPosition(Vector& res, int time) {
   sotDEBUGIN(5);
   OneStepOfControlS(time);
   res = m_JointErrorValuesForWalking;
@@ -1904,12 +1904,12 @@ Vector &PatternGenerator::getjointWalkingErrorPosition(Vector &res, int time) {
   return res;
 }
 
-int &PatternGenerator::getSupportFoot(int &res, int /*time*/) {
+int& PatternGenerator::getSupportFoot(int& res, int /*time*/) {
   res = m_SupportFoot;
   return res;
 }
 
-VectorRollPitchYaw &PatternGenerator::getWaistAttitude(VectorRollPitchYaw &res,
+VectorRollPitchYaw& PatternGenerator::getWaistAttitude(VectorRollPitchYaw& res,
                                                        int time) {
   sotDEBUGIN(5);
   OneStepOfControlS(time);
@@ -1921,8 +1921,8 @@ VectorRollPitchYaw &PatternGenerator::getWaistAttitude(VectorRollPitchYaw &res,
   return res;
 }
 
-dynamicgraph::Vector &PatternGenerator::getdComAttitude(
-    dynamicgraph::Vector &res, int time) {
+dynamicgraph::Vector& PatternGenerator::getdComAttitude(
+    dynamicgraph::Vector& res, int time) {
   sotDEBUGIN(5);
   OneStepOfControlS(time);
   res.resize(3);
@@ -1934,8 +1934,8 @@ dynamicgraph::Vector &PatternGenerator::getdComAttitude(
   return res;
 }
 
-dynamicgraph::Vector &PatternGenerator::getddComAttitude(
-    dynamicgraph::Vector &res, int time) {
+dynamicgraph::Vector& PatternGenerator::getddComAttitude(
+    dynamicgraph::Vector& res, int time) {
   sotDEBUGIN(5);
   OneStepOfControlS(time);
   res.resize(3);
@@ -1947,8 +1947,8 @@ dynamicgraph::Vector &PatternGenerator::getddComAttitude(
   return res;
 }
 
-dynamicgraph::Vector &PatternGenerator::getComAttitude(
-    dynamicgraph::Vector &res, int time) {
+dynamicgraph::Vector& PatternGenerator::getComAttitude(
+    dynamicgraph::Vector& res, int time) {
   sotDEBUGIN(5);
   OneStepOfControlS(time);
   res.resize(3);
@@ -1960,8 +1960,8 @@ dynamicgraph::Vector &PatternGenerator::getComAttitude(
   return res;
 }
 
-VectorRollPitchYaw &PatternGenerator::getWaistAttitudeAbsolute(
-    VectorRollPitchYaw &res, int time) {
+VectorRollPitchYaw& PatternGenerator::getWaistAttitudeAbsolute(
+    VectorRollPitchYaw& res, int time) {
   sotDEBUGIN(5);
   OneStepOfControlS(time);
   sotDEBUG(15) << "I survived one step of control" << std::endl;
@@ -1973,8 +1973,8 @@ VectorRollPitchYaw &PatternGenerator::getWaistAttitudeAbsolute(
   return res;
 }
 
-MatrixHomogeneous &PatternGenerator::getWaistAttitudeMatrixAbsolute(
-    MatrixHomogeneous &res, int time) {
+MatrixHomogeneous& PatternGenerator::getWaistAttitudeMatrixAbsolute(
+    MatrixHomogeneous& res, int time) {
   sotDEBUGIN(5);
   OneStepOfControlS(time);
   res = m_WaistAttitudeMatrixAbsolute;
@@ -1982,7 +1982,7 @@ MatrixHomogeneous &PatternGenerator::getWaistAttitudeMatrixAbsolute(
   return res;
 }
 
-Vector &PatternGenerator::getWaistPosition(Vector &res, int time) {
+Vector& PatternGenerator::getWaistPosition(Vector& res, int time) {
   sotDEBUGIN(5);
   OneStepOfControlS(time);
   res = m_WaistPosition;
@@ -1990,7 +1990,7 @@ Vector &PatternGenerator::getWaistPosition(Vector &res, int time) {
   sotDEBUGOUT(5);
   return res;
 }
-Vector &PatternGenerator::getWaistPositionAbsolute(Vector &res, int time) {
+Vector& PatternGenerator::getWaistPositionAbsolute(Vector& res, int time) {
   sotDEBUGIN(5);
   OneStepOfControlS(time);
   res = m_WaistPositionAbsolute;
@@ -2000,7 +2000,7 @@ Vector &PatternGenerator::getWaistPositionAbsolute(Vector &res, int time) {
   return res;
 }
 
-unsigned &PatternGenerator::getDataInProcess(unsigned &res, int time) {
+unsigned& PatternGenerator::getDataInProcess(unsigned& res, int time) {
   sotDEBUGIN(5);
   OneStepOfControlS(time);
   res = m_dataInProcess;
@@ -2009,8 +2009,8 @@ unsigned &PatternGenerator::getDataInProcess(unsigned &res, int time) {
   return res;
 }
 
-void PatternGenerator::setSoleParameters(const double &inSoleLength,
-                                         const double &inSoleWidth) {
+void PatternGenerator::setSoleParameters(const double& inSoleLength,
+                                         const double& inSoleWidth) {
   m_soleLength = inSoleLength;
   m_soleWidth = inSoleWidth;
 }
